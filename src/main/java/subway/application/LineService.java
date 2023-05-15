@@ -2,7 +2,11 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.SectionRepository;
+import subway.domain.Sections;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
@@ -12,9 +16,13 @@ import java.util.stream.Collectors;
 @Service
 public class LineService {
     private final LineDao lineDao;
+    private final StationDao stationDao;
+    private final SectionRepository sectionRepository;
 
-    public LineService(LineDao lineDao) {
+    public LineService(LineDao lineDao, StationDao stationDao, SectionRepository sectionRepository) {
         this.lineDao = lineDao;
+        this.stationDao = stationDao;
+        this.sectionRepository = sectionRepository;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -25,7 +33,7 @@ public class LineService {
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(LineResponse::of)
+                .map(it -> findLineResponseById(it.getId()))
                 .collect(Collectors.toList());
     }
 
@@ -33,9 +41,20 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineResponseById(Long id) {
+    public LineResponse findLineResponseById(long id) {
         Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
+        Sections sections = findSectionInLine(persistLine.getId());
+        List<Station> stations = findStationInLine(sections);
+        return LineResponse.of(persistLine, stations);
+    }
+
+    private List<Station> findStationInLine(Sections sections) {
+        List<Long> stationIds = sections.getAllStationId();
+        return stationDao.findAllByIds(stationIds);
+    }
+
+    private Sections findSectionInLine(long lineId) {
+        return sectionRepository.findAllByLineId(lineId);
     }
 
     public Line findLineById(Long id) {

@@ -3,6 +3,8 @@ package subway.dao;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -10,9 +12,10 @@ import subway.domain.Station;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public class StationDao {
+public class StationDao extends NamedParameterJdbcDaoSupport {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
@@ -24,6 +27,7 @@ public class StationDao {
 
 
     public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+        setDataSource(dataSource);
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("station")
@@ -41,9 +45,17 @@ public class StationDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Station findById(Long id) {
+    public List<Station> findAllByIds(List<Long> ids) {
+        String sql = "select * from STATION where id in (:ids)";
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("ids", ids);
+
+        return getNamedParameterJdbcTemplate().query(sql, namedParameters, rowMapper);
+    }
+
+    public Optional<Station> findById(Long id) {
         String sql = "select * from STATION where id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        Station station = jdbcTemplate.query(sql, rs -> rs.next() ? rowMapper.mapRow(rs, 1) : null, id);
+        return Optional.ofNullable(station);
     }
 
     public void update(Station newStation) {
