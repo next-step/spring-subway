@@ -27,8 +27,9 @@ public class Section {
     @Override
     public String toString() {
         return "Section{" +
-                "station=" + station +
-                ", nextStation=" + downStation +
+                "line=" + line +
+                ", station=" + station +
+                ", downStation=" + downStation +
                 ", distance=" + distance +
                 '}';
     }
