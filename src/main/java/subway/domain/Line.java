@@ -10,6 +10,11 @@ public class Line {
     public Line() {
     }
 
+    Line(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
@@ -44,5 +49,14 @@ public class Line {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, color);
+    }
+
+    @Override
+    public String toString() {
+        return "Line{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                '}';
     }
 }
