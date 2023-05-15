@@ -35,7 +35,7 @@
 ### 단위 기능 목록
 
 1. 도메인 구현
-- [ ] Distance 구현
+- [x] Distance 구현
 - [ ] Section 구현
 - [ ] SubwayGraph 구현
 - [ ] 그래프에 값 추가
