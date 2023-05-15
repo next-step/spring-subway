@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -186,5 +188,51 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("노선에 구간(역)을 등록합니다")
+    void addStationToLine() {
+        // given
+        Long stationId = 1L;
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("downStationId", "4");
+        params.put("upStationId", "2");
+        params.put("distance", 10);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .pathParam("id", stationId)
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{id}/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("노선에 있는 구간(역)을 제거합니다")
+    void removeStationToLine() {
+        Long lineId = 1L;
+        Long stationId = 2L;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .pathParam("lineId", lineId)
+                .queryParam("stationId", stationId)
+                .when()
+                .delete("/lines/{lineId}/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(204);
     }
 }
