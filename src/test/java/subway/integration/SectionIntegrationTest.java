@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.dto.ErrorResponse;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
 
@@ -93,6 +94,9 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isNotEmpty();
+        assertThat(errorResponse.getErrorMessage()).isNotEmpty();
     }
 
 }
