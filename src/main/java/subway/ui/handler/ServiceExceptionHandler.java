@@ -1,5 +1,7 @@
 package subway.ui.handler;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -11,6 +13,7 @@ import subway.dto.ErrorResponse;
 import subway.exception.ErrorType;
 import subway.exception.ServiceException;
 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class ServiceExceptionHandler {
 
