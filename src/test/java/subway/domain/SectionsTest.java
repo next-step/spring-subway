@@ -92,7 +92,7 @@ class SectionsTest {
 
     @DisplayName("마지막 구간을 삭제할 수 있다.")
     @Test
-    void deleteSection() {
+    void deleteLastSection() {
         // given
         int expected = 1;
         sections.addSection(section1);
@@ -100,7 +100,7 @@ class SectionsTest {
         Station station = new Station(section2.getDownStationId());
 
         // when
-        sections.deleteSection(station);
+        sections.deleteLastSection(station);
 
         // then
         assertThat(sections.getValue().size()).isEqualTo(expected);
@@ -108,13 +108,13 @@ class SectionsTest {
 
     @DisplayName("등록된 구간이 없는 상태에서 구간을 삭제하는 경우")
     @Test
-    void deleteSection_empty() {
+    void deleteLastSection_empty() {
         // given
         int expected = 0;
         Station station = new Station(section1.getDownStationId());
 
         // when
-        sections.deleteSection(station);
+        sections.deleteLastSection(station);
 
         // then
         assertThat(sections.getValue().size()).isEqualTo(expected);
@@ -128,7 +128,7 @@ class SectionsTest {
         Station station = new Station(section1.getUpStationId());
 
         // then
-        assertThatThrownBy(() -> sections.deleteSection(station))
+        assertThatThrownBy(() -> sections.deleteLastSection(station))
                 .isInstanceOf(ServiceException.class)
                 .hasMessage(ErrorType.VALIDATE_DELETE_SECTION.getMessage());
     }

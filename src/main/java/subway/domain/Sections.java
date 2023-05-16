@@ -30,7 +30,7 @@ public class Sections {
         value.add(section);
     }
 
-    public void deleteSection(Station station) {
+    public void deleteLastSection(Station station) {
         if (value.isEmpty()) {
             return;
         }
