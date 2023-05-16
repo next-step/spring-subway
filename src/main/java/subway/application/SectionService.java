@@ -14,8 +14,6 @@ import subway.dto.SectionResponse;
 import subway.exception.ErrorType;
 import subway.exception.ServiceException;
 
-import java.util.Objects;
-
 @Service
 @Transactional(readOnly = true)
 public class SectionService {
@@ -49,14 +47,9 @@ public class SectionService {
         return SectionResponse.of(section);
     }
 
-
     private Line findLineById(long lineId) {
-        Line line = lineDao.findById(lineId);
-        if (Objects.isNull(line)) {
-            throw new ServiceException(ErrorType.NOT_EXIST_LINE);
-        }
-
-        return line;
+        return lineDao.findById(lineId)
+                .orElseThrow(() -> new ServiceException(ErrorType.NOT_EXIST_LINE));
     }
 
     public void deleteSection(Long lineId, Long stationId) {

@@ -9,6 +9,8 @@ import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.exception.ErrorType;
+import subway.exception.ServiceException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +60,8 @@ public class LineService {
     }
 
     public Line findLineById(Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id)
+                .orElseThrow(() -> new ServiceException(ErrorType.NOT_EXIST_LINE));
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
