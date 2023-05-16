@@ -6,7 +6,7 @@
 
 ## 미션 PR 링크
 
-*
+* https://github.com/next-step/spring-subway/pull/1
 
 ## 미션 소개
 
