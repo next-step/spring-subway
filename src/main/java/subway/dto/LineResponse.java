@@ -38,7 +38,6 @@ public class LineResponse {
                 .map(StationResponse::of)
                 .collect(Collectors.toList());
 
-
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 
