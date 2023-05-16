@@ -10,15 +10,15 @@ import subway.domain.vo.Distance;
 @Builder
 public class Section {
     private final Line line;
-    private final Station station;
+    private final Station upStation;
     private final Station downStation;
     private final Distance distance;
 
 
-    public static Section of(Line line, Station station, Station nextStation, Integer distance) {
+    public static Section of(Line line, Station upStation, Station nextStation, Integer distance) {
         return Section.builder()
                 .line(line)
-                .station(station)
+                .upStation(upStation)
                 .downStation(nextStation)
                 .distance(new Distance(distance))
                 .build();
@@ -28,7 +28,7 @@ public class Section {
     public String toString() {
         return "Section{" +
                 "line=" + line +
-                ", station=" + station +
+                ", upStation=" + upStation +
                 ", downStation=" + downStation +
                 ", distance=" + distance +
                 '}';
