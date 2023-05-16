@@ -76,18 +76,16 @@ class SectionsTest {
     @Test
     void validateDuplicateSection() {
         // given
-        long downStationId = 1L;
-        Section section = Section.builder()
-                .downStationId(downStationId)
-                .build();
-        sections.addSection(section);
+        sections.addSection(section1);
+        sections.addSection(section2);
 
-        Section section2 = Section.builder()
-                .upStationId(downStationId)
+        Section section = Section.builder()
+                .upStationId(section2.getDownStationId())
+                .downStationId(section1.getUpStationId())
                 .build();
 
         // then
-        assertThatThrownBy(() -> sections.addSection(section2))
+        assertThatThrownBy(() -> sections.addSection(section))
                 .isInstanceOf(ServiceException.class)
                 .hasMessage(ErrorType.ALREADY_EXIST_SECTION.getMessage());
     }

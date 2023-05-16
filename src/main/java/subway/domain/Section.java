@@ -1,5 +1,8 @@
 package subway.domain;
 
+import subway.exception.ErrorType;
+import subway.exception.ServiceException;
+
 public class Section {
 
     private Long id;
@@ -9,11 +12,19 @@ public class Section {
     private Integer distance;
 
     private Section(Long id, Long lineId, Long downStationId, Long upStationId, Integer distance) {
+        validateDuplicateStation(downStationId, upStationId);
         this.id = id;
         this.lineId = lineId;
         this.downStationId = downStationId;
         this.upStationId = upStationId;
         this.distance = distance;
+    }
+
+    private void validateDuplicateStation(long downStationId, long upStationId) {
+        if (downStationId == upStationId) {
+            throw new ServiceException(ErrorType.VALIDATE_DUPLICATE_SECTION);
+        }
+
     }
 
     public Long getId() {
