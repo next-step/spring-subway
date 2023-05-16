@@ -8,6 +8,10 @@ import subway.exception.ServiceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static subway.integration.StationStep.강남역;
+import static subway.integration.StationStep.미금역;
+import static subway.integration.StationStep.정자역;
+import static subway.integration.StationStep.판교역;
 
 class SectionsTest {
 
@@ -19,18 +23,23 @@ class SectionsTest {
 
     @BeforeEach
     void setUp() {
+        Station 강남 = new Station(1L, 강남역);
+        Station 판교 = new Station(2L, 판교역);
+        Station 정자 = new Station(3L, 정자역);
+        Station 미금 = new Station(4L, 미금역);
+
         sections = new Sections();
         section1 = Section.builder()
-                .upStationId(1L)
-                .downStationId(2L)
+                .upStation(강남)
+                .downStation(판교)
                 .build();
         section2 = Section.builder()
-                .upStationId(2L)
-                .downStationId(3L)
+                .upStation(판교)
+                .downStation(정자)
                 .build();
         section3 = Section.builder()
-                .upStationId(3L)
-                .downStationId(4L)
+                .upStation(정자)
+                .downStation(미금)
                 .build();
     }
 
@@ -80,8 +89,8 @@ class SectionsTest {
         sections.addSection(section2);
 
         Section section = Section.builder()
-                .upStationId(section2.getDownStationId())
-                .downStationId(section1.getUpStationId())
+                .upStation(section2.getDownStation())
+                .downStation(section1.getUpStation())
                 .build();
 
         // then

@@ -12,6 +12,7 @@ public final class StationStep {
     public static final String 강남역 = "강남역";
     public static final String 판교역 = "판교역";
     public static final String 정자역 = "정자역";
+    public static final String 미금역 = "미금역";
 
     public static ExtractableResponse<Response> 역_생성_api(String name) {
         StationRequest request = new StationRequest(name);

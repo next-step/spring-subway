@@ -4,6 +4,7 @@ import subway.exception.ErrorType;
 import subway.exception.ServiceException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,6 +73,12 @@ public class Sections {
         return value.get(lastIndex).getDownStationId();
     }
 
+    private Station getLastDownStation() {
+        int lastIndex = value.size() - INDEX;
+        Section lastSection = value.get(lastIndex);
+        return lastSection.getDownStation();
+    }
+
     public List<Long> getAllStationId() {
         List<Long> stationIds = new ArrayList<>();
         for (Section section : value) {
@@ -82,6 +89,19 @@ public class Sections {
         return stationIds.stream()
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    public List<Station> getAllStation() {
+        if (value.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Station> stations = value.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+        stations.add(getLastDownStation());
+
+        return stations;
     }
 
     private boolean isEmpty() {

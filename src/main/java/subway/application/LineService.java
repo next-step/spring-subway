@@ -6,7 +6,6 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.SectionRepository;
 import subway.domain.Sections;
-import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.exception.ErrorType;
@@ -45,18 +44,10 @@ public class LineService {
 
     public LineResponse findLineResponseById(long id) {
         Line persistLine = findLineById(id);
-        Sections sections = findSectionInLine(persistLine.getId());
-        List<Station> stations = findStationInLine(sections);
-        return LineResponse.of(persistLine, stations);
-    }
+        Sections sections = sectionRepository.findAllByLineId(id);
+        persistLine.updateSections(sections);
 
-    private List<Station> findStationInLine(Sections sections) {
-        List<Long> stationIds = sections.getAllStationId();
-        return stationDao.findAllByIds(stationIds);
-    }
-
-    private Sections findSectionInLine(long lineId) {
-        return sectionRepository.findAllByLineId(lineId);
+        return LineResponse.of(persistLine);
     }
 
     public Line findLineById(Long id) {

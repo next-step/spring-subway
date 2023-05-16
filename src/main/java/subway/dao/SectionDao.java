@@ -39,15 +39,26 @@ public class SectionDao extends NamedParameterJdbcDaoSupport implements SectionR
         return Section.builder()
                 .id(key.longValue())
                 .lineId(section.getLineId())
-                .downStationId(section.getDownStationId())
-                .upStationId(section.getUpStationId())
+                .downStation(section.getDownStation())
+                .upStation(section.getUpStation())
                 .distance(section.getDistance())
                 .build();
     }
 
     @Override
     public Sections findAllByLineId(long lineId) {
-        String query = String.format("SELECT * FROM %s WHERE line_id = :lineId", TABLE_NAME);
+        String query = String.format("SELECT " +
+                "       s.id   AS section_id," +
+                "       s.line_id   AS line_id," +
+                "       d.id   AS down_station_id," +
+                "       d.name AS down_station_name," +
+                "       u.id   AS up_station_id," +
+                "       u.name AS up_station_name," +
+                "       s.distance" +
+                " FROM SECTION s " +
+                "         INNER JOIN STATION d ON s.down_station_id = d.id" +
+                "         INNER JOIN STATION u ON s.up_station_id = u.id" +
+                " WHERE s.line_id = :lineId", TABLE_NAME);
         SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("lineId", lineId);
         List<Section> sections = getNamedParameterJdbcTemplate().query(query, namedParameters, ROW_MAPPER);
 

@@ -1,9 +1,11 @@
 package subway.dto;
 
 import subway.domain.Line;
+import subway.domain.Sections;
 import subway.domain.Station;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class LineResponse {
@@ -30,15 +32,18 @@ public class LineResponse {
     }
 
     public static LineResponse of(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor());
-    }
+        Sections sections = line.getSections();
 
-    public static LineResponse of(Line line, List<Station> stations) {
-        List<StationResponse> stationResponses = stations.stream()
+        if (Objects.isNull(sections)) {
+            return new LineResponse(line.getId(), line.getName(), line.getColor());
+        }
+
+        List<StationResponse> stationResponses = sections.getAllStation()
+                .stream()
                 .map(StationResponse::of)
                 .collect(Collectors.toList());
-
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
+
     }
 
     public Long getId() {

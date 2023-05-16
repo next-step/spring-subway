@@ -7,21 +7,21 @@ public class Section {
 
     private Long id;
     private Long lineId;
-    private Long downStationId;
-    private Long upStationId;
+    private Station downStation;
+    private Station upStation;
     private Integer distance;
 
-    private Section(Long id, Long lineId, Long downStationId, Long upStationId, Integer distance) {
-        validateDuplicateStation(downStationId, upStationId);
+    private Section(Long id, Long lineId, Station downStation, Station upStation, Integer distance) {
+        validateDuplicateStation(downStation, upStation);
         this.id = id;
         this.lineId = lineId;
-        this.downStationId = downStationId;
-        this.upStationId = upStationId;
+        this.downStation = downStation;
+        this.upStation = upStation;
         this.distance = distance;
     }
 
-    private void validateDuplicateStation(long downStationId, long upStationId) {
-        if (downStationId == upStationId) {
+    private void validateDuplicateStation(Station downStation, Station upStation) {
+        if (downStation.getId() == upStation.getId()) {
             throw new ServiceException(ErrorType.VALIDATE_DUPLICATE_SECTION);
         }
 
@@ -35,16 +35,24 @@ public class Section {
         return lineId;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public long getDownStationId() {
+        return downStation.getId();
+    }
+
+    public long getUpStationId() {
+        return upStation.getId();
     }
 
     public static SectionBuilder builder() {
@@ -55,8 +63,8 @@ public class Section {
 
         private Long id;
         private Long lineId;
-        private Long downStationId;
-        private Long upStationId;
+        private Station downStation;
+        private Station upStation;
         private Integer distance;
 
         public SectionBuilder id(Long id) {
@@ -69,13 +77,13 @@ public class Section {
             return this;
         }
 
-        public SectionBuilder downStationId(Long downStationId) {
-            this.downStationId = downStationId;
+        public SectionBuilder downStation(Station downStation) {
+            this.downStation = downStation;
             return this;
         }
 
-        public SectionBuilder upStationId(Long upStationId) {
-            this.upStationId = upStationId;
+        public SectionBuilder upStation(Station upStation) {
+            this.upStation = upStation;
             return this;
         }
 
@@ -85,7 +93,7 @@ public class Section {
         }
 
         public Section build() {
-            return new Section(id, lineId, downStationId, upStationId, distance);
+            return new Section(id, lineId, downStation, upStation, distance);
         }
     }
 

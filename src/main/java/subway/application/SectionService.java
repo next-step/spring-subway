@@ -37,8 +37,8 @@ public class SectionService {
 
         Section section = Section.builder()
                 .lineId(lineId)
-                .downStationId(downStation.getId())
-                .upStationId(upStation.getId())
+                .downStation(downStation)
+                .upStation(upStation)
                 .distance(request.getDistance())
                 .build();
         sections.addSection(section);

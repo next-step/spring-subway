@@ -12,10 +12,10 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleServiceException(Exception e) {
-        ErrorType errorType = ErrorType.SERVICE_ERROR;
+        ErrorType errorType = ErrorType.SERVER_ERROR;
         ErrorResponse response = new ErrorResponse(errorType.name(), errorType.getMessage());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(response);
     }
 

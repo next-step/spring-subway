@@ -6,6 +6,7 @@ public class Line {
     private Long id;
     private String name;
     private String color;
+    private Sections sections;
 
     public Line() {
     }
@@ -21,6 +22,10 @@ public class Line {
         this.color = color;
     }
 
+    public void updateSections(Sections sections) {
+        this.sections = sections;
+    }
+
     public Long getId() {
         return id;
     }
@@ -31,6 +36,10 @@ public class Line {
 
     public String getColor() {
         return color;
+    }
+
+    public Sections getSections() {
+        return sections;
     }
 
     @Override

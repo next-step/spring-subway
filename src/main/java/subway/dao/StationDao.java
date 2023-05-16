@@ -3,7 +3,6 @@ package subway.dao;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -43,13 +42,6 @@ public class StationDao extends NamedParameterJdbcDaoSupport {
     public List<Station> findAll() {
         String sql = "select * from STATION";
         return jdbcTemplate.query(sql, rowMapper);
-    }
-
-    public List<Station> findAllByIds(List<Long> ids) {
-        String sql = "select * from STATION where id in (:ids)";
-        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("ids", ids);
-
-        return getNamedParameterJdbcTemplate().query(sql, namedParameters, rowMapper);
     }
 
     public Optional<Station> findById(Long id) {
