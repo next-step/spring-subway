@@ -31,8 +31,13 @@ public class Sections {
     }
 
     public void deleteSection(Station station) {
+        if (value.isEmpty()) {
+            return;
+        }
+
         validateDelete(station);
-        value.removeIf(section -> section.getDownStationId() == station.getId());
+        int lastIndex = value.size() - INDEX;
+        value.remove(lastIndex);
     }
 
     public void validateAdd(Section section) {

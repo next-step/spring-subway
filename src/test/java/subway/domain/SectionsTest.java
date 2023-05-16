@@ -106,6 +106,20 @@ class SectionsTest {
         assertThat(sections.getValue().size()).isEqualTo(expected);
     }
 
+    @DisplayName("등록된 구간이 없는 상태에서 구간을 삭제하는 경우")
+    @Test
+    void deleteSection_empty() {
+        // given
+        int expected = 0;
+        Station station = new Station(section1.getDownStationId());
+
+        // when
+        sections.deleteSection(station);
+
+        // then
+        assertThat(sections.getValue().size()).isEqualTo(expected);
+    }
+
     @DisplayName("마지막 구간이 아니면 삭제 불가능하다.")
     @Test
     void validateDelete() {
