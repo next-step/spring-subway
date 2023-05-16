@@ -3,8 +3,12 @@ package subway.integration;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ErrorResponse;
 import subway.dto.SectionRequest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class SectionStep {
 
@@ -29,6 +33,13 @@ public final class SectionStep {
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all().
                 extract();
+    }
+
+    public static void 잘못된_요청_검증(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        ErrorResponse errorResponse = response.as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorCode()).isNotEmpty();
+        assertThat(errorResponse.getErrorMessage()).isNotEmpty();
     }
 
 }

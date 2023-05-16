@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.dto.ErrorResponse;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
 
@@ -16,6 +15,7 @@ import static subway.integration.LineStep.노선_생성_api_응답변환;
 import static subway.integration.LineStep.신분당선;
 import static subway.integration.SectionStep.구간_삭제_api;
 import static subway.integration.SectionStep.구간_생성_api;
+import static subway.integration.SectionStep.잘못된_요청_검증;
 import static subway.integration.StationStep.강남역;
 import static subway.integration.StationStep.역_생성_api_응답변환;
 import static subway.integration.StationStep.정자역;
@@ -52,6 +52,19 @@ public class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    @DisplayName("잘못된 구간 정보로 구간 추가를 요청하면 실패 응답이 온다.")
+    @Test
+    void createSection_fail() {
+        // given
+        int failDistance = 0;
+
+        // when
+        ExtractableResponse<Response> response = 구간_생성_api(신분당선_id, 강남역_id, 판교역_id, failDistance);
+
+        // then
+        잘못된_요청_검증(response);
     }
 
     @DisplayName("연결된 지하철 구간을 추가 가능하다.")
@@ -93,10 +106,7 @@ public class SectionIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = 구간_생성_api(신분당선_id, failStationId, 판교역_id, 10);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        ErrorResponse errorResponse = response.as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorCode()).isNotEmpty();
-        assertThat(errorResponse.getErrorMessage()).isNotEmpty();
+        잘못된_요청_검증(response);
     }
 
 }
