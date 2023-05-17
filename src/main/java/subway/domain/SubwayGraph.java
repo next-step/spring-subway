@@ -4,13 +4,21 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter(AccessLevel.PACKAGE)
 public class SubwayGraph {
     /**
      * 해당 역과 연결되어 있는 구간들을 저장합니다.
+     * 정방향 탐색에 쓰입니다.
      */
     private Map<Station, Set<Section>> connection = new HashMap<>();
+
+    /**
+     * 하행역과 연결되어 있는 구간들을 저장합니다.
+     * 역방향 탐색과 값 제거에 쓰입니다.
+     */
+    private Map<Station, Set<Section>> backwardConnection = new HashMap<>();
 
     /**
      * 각 호선의 첫번째 역을 저장합니다.
@@ -36,6 +44,7 @@ public class SubwayGraph {
         }
         connection.computeIfAbsent(section.getUpStation(), (unused) -> new HashSet<>()).add(section);
         firstStationInLines.putIfAbsent(section.getLine(), section.getUpStation());
+        addToBackward(section);
     }
 
     private boolean isAlreadyExistsInLine(Line line, Station newStation) {
@@ -78,6 +87,59 @@ public class SubwayGraph {
                 .filter(connectSection
                         -> connectSection.getLine().equals(section.getLine())).findAny();
         return connectedSectionInSameLine.isEmpty();
+    }
+
+    private void addToBackward(Section section) {
+        backwardConnection.computeIfAbsent(section.getDownStation(),
+                (unused) -> new HashSet<>()).add(section);
+    }
+
+    /**
+     * 지하철 노선에 등록된 역 중 하행 종점역만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있습니다.
+     * @param stationId
+     */
+    public void remove(Long stationId) {
+        Station removeStation = new Station(stationId);
+        if(!backwardConnection.containsKey(removeStation)) {
+            throw new IllegalStateException("삭제할 역이 존재하지 않습니다.");
+        }
+
+        // 삭제할 역의 상행역 찾기
+        List<Station> upStations = backwardConnection.get(removeStation).stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+
+        if (!isLastDownStation(removeStation)) {
+            throw new IllegalStateException("하행 종점역만 제거할 수 있습니다.");
+        }
+
+        for (Station upStation: upStations) {
+            removeStationConnectedUpStation(upStation, removeStation);
+        }
+    }
+
+    /**
+     * upStation 과 연결돠어 있는 downStation 을 삭제합니다.
+     * @param upStation
+     * @param removeStation
+     */
+    private void removeStationConnectedUpStation(Station upStation, Station removeStation) {
+        Set<Section> sections = connection.get(upStation);
+        Optional<Section> removeSection = sections.stream()
+                .filter(section -> section.getDownStation().equals(removeStation))
+                .findAny();
+        sections.remove(removeSection
+                .orElseThrow(() -> new IllegalStateException("upStation과 연결된 downStation 삭제에 실패했습니다.")));
+    }
+
+    private boolean isLastDownStation(Station downStation) {
+        if(!connection.containsKey(downStation)) {
+            return true;
+        }
+        if (connection.get(downStation).isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     public Set<Section> getSections(Station station) {

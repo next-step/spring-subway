@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import subway.domain.vo.Distance;
 
+import java.util.Objects;
+
 @Getter
 @RequiredArgsConstructor
 @Builder
@@ -22,6 +24,19 @@ public class Section {
                 .downStation(nextStation)
                 .distance(new Distance(distance))
                 .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Section section = (Section) o;
+        return Objects.equals(line, section.line) && Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation) && Objects.equals(distance, section.distance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, upStation, downStation, distance);
     }
 
     @Override

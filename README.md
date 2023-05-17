@@ -37,7 +37,7 @@
 1. 도메인 구현
 - [x] Distance 구현
 - [x] Section 구현
-- [ ] SubwayGraph 구현
-- [ ] 그래프에 값 추가
-- [ ] 그래프에 값 삭제
+- [x] SubwayGraph 구현
+- [x] 그래프에 값 추가
+- [x] 그래프에 값 삭제
 - [ ] 그래프 조회
