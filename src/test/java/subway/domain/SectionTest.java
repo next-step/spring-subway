@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.SectionMinDistanceException;
-import subway.exception.SectionNotConnectingStationException;
+import subway.exception.SectionSameStationException;
 
 public class SectionTest {
 
@@ -29,7 +29,7 @@ public class SectionTest {
         // when
 
         // then
-        assertThrows(SectionNotConnectingStationException.class,
+        assertThrows(SectionSameStationException.class,
             () -> new Section(1L, 1L, 1L, 1L, 1));
     }
 

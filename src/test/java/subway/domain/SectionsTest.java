@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SectionCrossException;
 import subway.exception.SectionDuplicationStationIdException;
 import subway.exception.SectionNotConnectingStationException;
 import subway.exception.SectionRemoveLastStationException;
@@ -28,7 +29,7 @@ class SectionsTest {
         assertEquals(1, 대전_1호선_구간들.getSections().size());
     }
 
-    @DisplayName("빈 노선일 때 구간을 등록하면 노선도에 구간이 추가된다.")
+    @DisplayName("빈 노선일 아닐 때 구간을 등록하면 노선도에 구간이 추가된다.")
     @Test
     void addSection2() {
         // given
@@ -58,6 +59,19 @@ class SectionsTest {
     @DisplayName("상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐 경우 구간을 추가하면 에러를 반환한다.")
     @Test
     void addSectionFalse2() {
+        // given
+        Sections 대전_1호선_구간들 = new Sections(new ArrayList<>(List.of(반석역_지족역_구간())));
+        Section addSection = new Section(1L, 대전_노선도_1호선().getId(), 반석역().getId(), 월드컵경기장역().getId(), 5);
+
+        // when
+
+        // then
+        assertThrows(SectionCrossException.class, () -> 대전_1호선_구간들.addSection(addSection));
+    }
+
+    @DisplayName("상행역은 해당 노선에 등록되어있는 하행 종점역이 아닐 경우 구간을 추가하면 에러를 반환한다.")
+    @Test
+    void addSectionFalse3() {
         // given
         Sections 대전_1호선_구간들 = new Sections(new ArrayList<>(List.of(반석역_지족역_구간())));
         Section addSection = new Section(1L, 대전_노선도_1호선().getId(), 노은역().getId(), 월드컵경기장역().getId(), 5);

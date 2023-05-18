@@ -1,7 +1,7 @@
 package subway.domain;
 
-import subway.exception.SectionNotConnectingStationException;
 import subway.exception.SectionMinDistanceException;
+import subway.exception.SectionSameStationException;
 
 public class Section {
 
@@ -24,7 +24,7 @@ public class Section {
 
     private void validate(Long upStationId, Long downStationId, int distance) {
         validateMinDistance(distance);
-        validateConnectingStation(upStationId, downStationId);
+        validateSameStation(upStationId, downStationId);
     }
 
     private void validateMinDistance(int distance) {
@@ -33,9 +33,9 @@ public class Section {
         }
     }
 
-    private void validateConnectingStation(Long upStationId, Long downStationId) {
+    private void validateSameStation(Long upStationId, Long downStationId) {
         if (upStationId.equals(downStationId)) {
-            throw new SectionNotConnectingStationException();
+            throw new SectionSameStationException();
         }
     }
 
