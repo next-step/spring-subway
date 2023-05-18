@@ -1,8 +1,8 @@
 package subway.exception;
 
-import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(SQLException.class)
+    @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<Void> handleSQLException() {
         return ResponseEntity.badRequest().build();
     }

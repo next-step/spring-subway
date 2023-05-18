@@ -1,7 +1,9 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
@@ -9,37 +11,32 @@ import subway.dto.LineResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class LineService {
     private final LineDao lineDao;
+    private final StationDao stationDao;
 
-    public LineService(LineDao lineDao) {
+    public LineService(LineDao lineDao, StationDao stationDao) {
         this.lineDao = lineDao;
+        this.stationDao = stationDao;
     }
 
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        return LineResponse.of(persistLine);
+        return LineResponse.from(persistLine);
     }
-
-    public List<LineResponse> findLineResponses() {
-        List<Line> persistLines = findLines();
-        return persistLines.stream()
-                .map(LineResponse::of)
-                .collect(Collectors.toList());
+    
+    @Transactional(readOnly = true)
+    public List<LineResponse> findAll() {
+        return lineDao.findAll()
+            .stream()
+            .map(line -> LineResponse.of(line, stationDao.findAllByLineId(line.getId())))
+            .collect(Collectors.toUnmodifiableList());
     }
-
-    public List<Line> findLines() {
-        return lineDao.findAll();
-    }
-
-    public LineResponse findLineResponseById(Long id) {
-        Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
-    }
-
-    public Line findLineById(Long id) {
-        return lineDao.findById(id);
+    @Transactional(readOnly = true)
+    public LineResponse findById(Long id) {
+        return LineResponse.of(lineDao.findById(id), stationDao.findAllByLineId(id));
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
