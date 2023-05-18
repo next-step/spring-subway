@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.StationDao;
+import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.SectionRepository;
@@ -39,7 +40,7 @@ public class SectionService {
                 .lineId(lineId)
                 .downStation(downStation)
                 .upStation(upStation)
-                .distance(request.getDistance())
+                .distance(Distance.of(request.getDistance()))
                 .build();
         sections.addSection(section);
         section = sectionRepository.save(section);

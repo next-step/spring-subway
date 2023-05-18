@@ -9,9 +9,9 @@ public class Section {
     private Long lineId;
     private Station downStation;
     private Station upStation;
-    private Integer distance;
+    private Distance distance;
 
-    private Section(Long id, Long lineId, Station downStation, Station upStation, Integer distance) {
+    private Section(Long id, Long lineId, Station downStation, Station upStation, Distance distance) {
         validateDuplicateStation(downStation, upStation);
         this.id = id;
         this.lineId = lineId;
@@ -43,8 +43,8 @@ public class Section {
         return upStation;
     }
 
-    public Integer getDistance() {
-        return distance;
+    public int getDistance() {
+        return distance.getValue();
     }
 
     public long getDownStationId() {
@@ -65,7 +65,7 @@ public class Section {
         private Long lineId;
         private Station downStation;
         private Station upStation;
-        private Integer distance;
+        private Distance distance;
 
         public SectionBuilder id(Long id) {
             this.id = id;
@@ -87,7 +87,7 @@ public class Section {
             return this;
         }
 
-        public SectionBuilder distance(Integer distance) {
+        public SectionBuilder distance(Distance distance) {
             this.distance = distance;
             return this;
         }

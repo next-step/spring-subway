@@ -1,6 +1,7 @@
 package subway.dao;
 
 import org.springframework.jdbc.core.RowMapper;
+import subway.domain.Distance;
 import subway.domain.Section;
 import subway.domain.Station;
 
@@ -25,7 +26,7 @@ public class SectionRowMapper implements RowMapper<Section> {
                 .lineId(rs.getLong("line_id"))
                 .downStation(downStation)
                 .upStation(upStation)
-                .distance(rs.getInt("distance"))
+                .distance(Distance.of(rs.getInt("distance")))
                 .build();
     }
 }

@@ -8,7 +8,8 @@ public enum ErrorType {
     VALIDATE_CONNECT_ABLE_STATION("연결 가능한 구간이 아닙니다."),
     NOT_FOUND_STATION("존재하지 않는 역입니다."),
     VALIDATE_DELETE_SECTION("마지막 역이 아니면 삭제할 수 없습니다."),
-    VALIDATE_DUPLICATE_SECTION("상행 종점과 하행 종점이 같을 수 없습니다.");
+    VALIDATE_DUPLICATE_SECTION("상행 종점과 하행 종점이 같을 수 없습니다."),
+    INVALID_DISTANCE("올바르지 않은 거리 값 입니다.");
 
 
     private String message;

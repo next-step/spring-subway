@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import subway.domain.Distance;
 import subway.domain.Section;
 import subway.domain.SectionRepository;
 import subway.domain.Sections;
@@ -41,7 +42,7 @@ public class SectionDao extends NamedParameterJdbcDaoSupport implements SectionR
                 .lineId(section.getLineId())
                 .downStation(section.getDownStation())
                 .upStation(section.getUpStation())
-                .distance(section.getDistance())
+                .distance(Distance.of(section.getDistance()))
                 .build();
     }
 
