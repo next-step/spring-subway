@@ -6,6 +6,8 @@ import subway.dao.LineDao;
 import subway.domain.Line;
 import subway.domain.SectionRepository;
 import subway.domain.Sections;
+import subway.domain.Station;
+import subway.domain.path.DirectedPathFinder;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.exception.ErrorType;
@@ -47,7 +49,16 @@ public class LineService {
         Sections sections = sectionRepository.findAllByLineId(id);
         persistLine.updateSections(sections);
 
-        return LineResponse.of(persistLine);
+        return LineResponse.of(persistLine, sortStation(persistLine));
+    }
+
+    private List<Station> sortStation(Line line) {
+        Sections sections = line.getSections();
+        if (sections.isEmpty()) {
+            return List.of();
+        }
+        DirectedPathFinder pathFinder = DirectedPathFinder.of(sections);
+        return pathFinder.getPath(sections.getFirstUpStation(), sections.getLastDownStation());
     }
 
     public Line findLineById(Long id) {

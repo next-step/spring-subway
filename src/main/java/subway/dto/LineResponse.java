@@ -46,6 +46,17 @@ public class LineResponse {
 
     }
 
+    public static LineResponse of(Line line, List<Station> sortStation) {
+        LineResponse response = new LineResponse(line.getId(), line.getName(), line.getColor());
+
+        List<StationResponse> stationResponses = sortStation.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
+        response.stations = stationResponses;
+
+        return response;
+    }
+
     public Long getId() {
         return id;
     }

@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 
 public class Sections {
 
-    public static final int INDEX = 1;
+    private static final int INDEX = 1;
+    private static final int FIRST_INDEX = 0;
 
     private List<Section> value = new ArrayList<>();
 
@@ -68,12 +69,17 @@ public class Sections {
         }
     }
 
-    private long getLastDownStationId() {
-        int lastIndex = value.size() - INDEX;
-        return value.get(lastIndex).getDownStationId();
+    public Station getFirstUpStation() {
+        Section firstSection = value.get(FIRST_INDEX);
+        return firstSection.getUpStation();
     }
 
-    private Station getLastDownStation() {
+    private long getLastDownStationId() {
+        Station lastDownStation = getLastDownStation();
+        return lastDownStation.getId();
+    }
+
+    public Station getLastDownStation() {
         int lastIndex = value.size() - INDEX;
         Section lastSection = value.get(lastIndex);
         return lastSection.getDownStation();
@@ -104,7 +110,7 @@ public class Sections {
         return stations;
     }
 
-    private boolean isEmpty() {
+    public boolean isEmpty() {
         return value.isEmpty();
     }
 
