@@ -50,9 +50,9 @@ public class Sections {
             .ifPresent(section -> {throw new SectionDuplicationStationIdException();});
     }
 
-    public void removeLastSection(Long id) {
+    public void removeLastSection(Long stationId) {
         if (!sections.isEmpty()) {
-            validateLastDownStationId(id);
+            validateLastDownStationId(stationId);
             sections.remove(getLastSection());
         }
     }

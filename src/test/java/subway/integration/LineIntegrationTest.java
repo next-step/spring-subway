@@ -368,4 +368,70 @@ public class LineIntegrationTest extends IntegrationTest {
             Arguments.of(1L, 1L, null),
             Arguments.of(1L, 1L, 0));
     }
+
+    @DisplayName("지하철 노선에 구간을 제거한다.")
+    @Test
+    void removeSection() {
+        // given
+        ExtractableResponse<Response> createResponse = RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(lineRequest3)
+            .when().post("/lines")
+            .then().log().all().
+            extract();
+
+        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(new SectionAddRequest(반석역.getId(), 지족역.getId(), 10))
+            .when().post("/lines/{lineId}/sections", lineId)
+            .then().log().all()
+            .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .queryParam("stationId", 지족역.getId())
+            .when().delete("/lines/{lienId}/sections", lineId)
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 노선에 구간을 제거할 때 하행 종점역이 아니면 에러를 반환한다.")
+    @Test
+    void removeFalse() {
+        // given
+        ExtractableResponse<Response> createResponse = RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(lineRequest3)
+            .when().post("/lines")
+            .then().log().all().
+            extract();
+
+        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(new SectionAddRequest(반석역.getId(), 지족역.getId(), 10))
+            .when().post("/lines/{lineId}/sections", lineId)
+            .then().log().all()
+            .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .queryParam("stationId", 반석역.getId())
+            .when().delete("/lines/{lienId}/sections", lineId)
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }

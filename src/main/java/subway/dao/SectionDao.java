@@ -41,4 +41,9 @@ public class SectionDao {
             rs.getLong("up_station_id"),
             rs.getLong("down_station_id"),
             rs.getInt("distance"));
+
+    public void delete(Long lineId, Long stationId) {
+        String sql = "delete from section where line_id = :lineId AND down_station_id = :stationId";
+        jdbcTemplate.update(sql, Map.of("lineId", lineId, "stationId", stationId));
+    }
 }

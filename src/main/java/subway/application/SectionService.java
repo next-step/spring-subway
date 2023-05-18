@@ -24,4 +24,10 @@ public class SectionService {
         sections.addSection(section);
         return SectionResponse.from(sectionDao.save(section));
     }
+
+    public void remove(Long lineId, Long stationId) {
+        Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
+        sections.removeLastSection(stationId);
+        sectionDao.delete(lineId, stationId);
+    }
 }
