@@ -14,13 +14,20 @@ import subway.domain.Section;
 public class SectionDao {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert simpleJdbcInsert;
+    private final SimpleJdbcInsert jdbcInsert;
 
     public SectionDao(DataSource dataSource) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-        this.simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
+        this.jdbcInsert = new SimpleJdbcInsert(dataSource)
             .withTableName("section")
             .usingGeneratedKeyColumns("id");
+    }
+
+    public Section insert(Section section) {
+        long savedId = jdbcInsert.executeAndReturnKey(new BeanPropertySqlParameterSource(section))
+            .longValue();
+        section.injectionId(savedId);
+        return section;
     }
 
     public List<Section> findAllByLineId(Long lineId) {
@@ -28,22 +35,16 @@ public class SectionDao {
         return jdbcTemplate.query(sql, Map.of("lineId", lineId), sectionRowMapper);
     }
 
-    public Section save(Section section) {
-        long savedId = simpleJdbcInsert.executeAndReturnKey(new BeanPropertySqlParameterSource(section))
-            .longValue();
-        section.injectionId(savedId);
-        return section;
+    public void delete(Long lineId, Long stationId) {
+        String sql = "DELETE FROM section WHERE line_id = :lineId AND down_station_id = :stationId";
+        jdbcTemplate.update(sql, Map.of("lineId", lineId, "stationId", stationId));
     }
 
     private final RowMapper<Section> sectionRowMapper = (rs, rowNum) ->
-        new Section(rs.getLong("id"),
+        new Section(
+            rs.getLong("id"),
             rs.getLong("line_id"),
             rs.getLong("up_station_id"),
             rs.getLong("down_station_id"),
             rs.getInt("distance"));
-
-    public void delete(Long lineId, Long stationId) {
-        String sql = "delete from section where line_id = :lineId AND down_station_id = :stationId";
-        jdbcTemplate.update(sql, Map.of("lineId", lineId, "stationId", stationId));
-    }
 }

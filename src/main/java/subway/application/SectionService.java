@@ -22,7 +22,7 @@ public class SectionService {
         Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         Section section = sectionAddRequest.toSection(lineId);
         sections.addSection(section);
-        return SectionResponse.from(sectionDao.save(section));
+        return SectionResponse.from(sectionDao.insert(section));
     }
 
     public void remove(Long lineId, Long stationId) {
