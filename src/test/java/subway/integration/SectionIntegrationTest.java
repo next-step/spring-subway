@@ -81,7 +81,6 @@ public class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-
     @DisplayName("지하철 구간을 삭제한다.")
     @Test
     void deleteSection() {
@@ -94,6 +93,20 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("마지막이 아닌 구간을 삭제할 수 없다.")
+    @Test
+    void deleteSection_fail() {
+        // given
+        구간_생성_api(신분당선_id, 판교역_id, 강남역_id, 10);
+        구간_생성_api(신분당선_id, 정자역_id, 판교역_id, 10);
+
+        // when
+        ExtractableResponse<Response> response = 구간_삭제_api(신분당선_id, 강남역_id);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("없는 역을 구간으로 추가한다.")
