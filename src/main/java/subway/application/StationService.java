@@ -1,6 +1,7 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
@@ -19,6 +20,8 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
+
+    @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationDao.insert(new Station(stationRequest.getName()));
         return StationResponse.of(station);
@@ -38,10 +41,13 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void updateStation(Long id, StationRequest stationRequest) {
         stationDao.update(new Station(id, stationRequest.getName()));
     }
 
+
+    @Transactional
     public void deleteStationById(Long id) {
         stationDao.deleteById(id);
     }

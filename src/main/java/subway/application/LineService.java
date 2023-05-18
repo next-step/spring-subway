@@ -1,8 +1,8 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
-import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.SectionRepository;
 import subway.domain.Sections;
@@ -15,17 +15,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class LineService {
     private final LineDao lineDao;
-    private final StationDao stationDao;
     private final SectionRepository sectionRepository;
 
-    public LineService(LineDao lineDao, StationDao stationDao, SectionRepository sectionRepository) {
+    public LineService(LineDao lineDao, SectionRepository sectionRepository) {
         this.lineDao = lineDao;
-        this.stationDao = stationDao;
         this.sectionRepository = sectionRepository;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         return LineResponse.of(persistLine);
@@ -55,10 +55,12 @@ public class LineService {
                 .orElseThrow(() -> new ServiceException(ErrorType.NOT_EXIST_LINE));
     }
 
+    @Transactional
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    @Transactional
     public void deleteLineById(Long id) {
         lineDao.deleteById(id);
     }

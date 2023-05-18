@@ -53,6 +53,7 @@ public class SectionService {
                 .orElseThrow(() -> new ServiceException(ErrorType.NOT_EXIST_LINE));
     }
 
+    @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Sections sections = findSectionByLineId(lineId);
         Station station = findStationById(stationId);
