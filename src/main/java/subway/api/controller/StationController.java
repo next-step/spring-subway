@@ -1,10 +1,10 @@
-package subway.ui;
+package subway.api.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
-import subway.application.StationService;
+import subway.api.dto.StationRequest;
+import subway.api.dto.StationResponse;
+import subway.service.StationService;
 
 import java.net.URI;
 import java.sql.SQLException;

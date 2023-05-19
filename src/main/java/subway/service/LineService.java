@@ -1,10 +1,10 @@
-package subway.application;
+package subway.service;
 
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
 import subway.domain.Line;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.api.dto.LineRequest;
+import subway.api.dto.LineResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
