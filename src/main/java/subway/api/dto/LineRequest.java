@@ -1,5 +1,7 @@
 package subway.api.dto;
 
+import subway.domain.Line;
+
 public class LineRequest {
     private String name;
     private String color;
@@ -20,4 +22,7 @@ public class LineRequest {
         return color;
     }
 
+    public Line toDomain() {
+        return new Line(name, color);
+    }
 }

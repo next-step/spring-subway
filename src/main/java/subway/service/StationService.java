@@ -3,11 +3,8 @@ package subway.service;
 import org.springframework.stereotype.Service;
 import subway.dao.StationDao;
 import subway.domain.Station;
-import subway.api.dto.StationRequest;
-import subway.api.dto.StationResponse;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class StationService {
@@ -17,25 +14,20 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
-        return StationResponse.of(station);
+    public Station saveStation(Station station) {
+        return stationDao.insert(new Station(station.getName()));
     }
 
-    public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+    public Station findStationById(Long id) {
+        return stationDao.findById(id);
     }
 
-    public List<StationResponse> findAllStationResponses() {
-        List<Station> stations = stationDao.findAll();
-
-        return stations.stream()
-                .map(StationResponse::of)
-                .collect(Collectors.toList());
+    public List<Station> findAllStations() {
+        return stationDao.findAll();
     }
 
-    public void updateStation(Long id, StationRequest stationRequest) {
-        stationDao.update(new Station(id, stationRequest.getName()));
+    public void updateStation(Long id, Station newStation) {
+        stationDao.update(new Station(id, newStation.getName()));
     }
 
     public void deleteStationById(Long id) {

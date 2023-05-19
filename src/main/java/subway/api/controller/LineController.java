@@ -9,6 +9,7 @@ import subway.api.dto.LineResponse;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/lines")
@@ -22,23 +23,26 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+        LineResponse line = LineResponse.of(lineService.saveLine(lineRequest.toDomain()));
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> findAllLines() {
-        return ResponseEntity.ok(lineService.findLineResponses());
+        List<LineResponse> lines = lineService.findLines().stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(lines);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
-        return ResponseEntity.ok(lineService.findLineResponseById(id));
+        return ResponseEntity.ok(LineResponse.of(lineService.findLineById(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineUpdateRequest) {
-        lineService.updateLine(id, lineUpdateRequest);
+        lineService.updateLine(id, lineUpdateRequest.toDomain());
         return ResponseEntity.ok().build();
     }
 

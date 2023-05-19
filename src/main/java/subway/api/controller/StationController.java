@@ -4,11 +4,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.api.dto.StationRequest;
 import subway.api.dto.StationResponse;
+import subway.domain.Station;
 import subway.service.StationService;
 
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/stations")
@@ -21,23 +23,26 @@ public class StationController {
 
     @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
-        return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
+        Station station = stationService.saveStation(stationRequest.toDomain());
+        return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(StationResponse.of(station));
     }
 
     @GetMapping
     public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationService.findAllStationResponses());
+        List<StationResponse> stations = stationService.findAllStations().stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(stations);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
-        return ResponseEntity.ok().body(stationService.findStationResponseById(id));
+        return ResponseEntity.ok().body(StationResponse.of(stationService.findStationById(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateStation(@PathVariable Long id, @RequestBody StationRequest stationRequest) {
-        stationService.updateStation(id, stationRequest);
+        stationService.updateStation(id, stationRequest.toDomain());
         return ResponseEntity.ok().build();
     }
 
