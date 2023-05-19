@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import subway.dto.SectionAddRequest;
+import subway.dto.SectionResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -226,7 +227,11 @@ public class LineIntegrationTest extends IntegrationTest {
             .extract();
 
         // then
+        SectionResponse sectionResponse = response.body().as(SectionResponse.class);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(sectionResponse.getUpStationId()).isEqualTo(반석역.getId());
+        assertThat(sectionResponse.getDownStationId()).isEqualTo(지족역.getId());
+        assertThat(sectionResponse.getDistance()).isEqualTo(10);
     }
 
     @DisplayName("지하철 노선에 구간을 추가할 때 등록된 역이 있으면 에러를 반환한다.")
