@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
+import static subway.domain.EntityFactoryForTest.*;
 
 @DisplayName("지하철 노선 그래프 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -106,12 +107,4 @@ class SubwayGraphServiceTest {
                 .usingRecursiveComparison()
                 .isEqualTo(stationIds);
     }
-
-    private Section makeSection(Long lineId, Long upStationId, Long downStationId, Integer distance) {
-        return Section.of(new Line(lineId, "name", "color"),
-                new Station(upStationId, "name"),
-                new Station(downStationId, "name"),
-                distance);
-    }
-
 }

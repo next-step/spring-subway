@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static subway.domain.EntityFactoryForTest.*;
 
 @DisplayName("지하철 노선 그래프")
 class SubwayGraphTest {
@@ -198,13 +199,5 @@ class SubwayGraphTest {
 
         // then
         assertThat(stationsInLine).hasSize(0);
-    }
-
-    private static Section makeSection(long lineId, long upStationId, long downStationId, Integer distance) {
-        Line line = new Line(lineId, "name");
-        Station upStation = new Station(upStationId);
-        Station downStation = new Station(downStationId);
-
-        return Section.of(line, upStation, downStation, distance);
     }
 }
