@@ -3,6 +3,8 @@ package subway.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("지하철 노선 그래프")
@@ -158,6 +160,44 @@ class SubwayGraphTest {
 
         // then
         assertThat(subwayGraph.getSections(new Station(3L))).doesNotContain(sectionWillBeRemoved);
+    }
+
+    @Test
+    @DisplayName("호선에 해당하는 역을 전부 반환합니다")
+    void getStationsInLineSuccess() {
+        // given
+        SubwayGraph subwayGraph = new SubwayGraph();
+        subwayGraph.add(makeSection(1L, 1L, 2L, 1));
+        subwayGraph.add(makeSection(1L, 2L, 3L, 1));
+        subwayGraph.add(makeSection(1L, 3L, 4L, 1));
+
+        Line line = new Line(1L, "1호선");
+
+        // when
+        List<Station> stationsInLine = subwayGraph.getStationsInLine(line);
+
+        // then
+        assertThat(stationsInLine).hasSize(4);
+        List<Station> result = List.of(new Station(1L), new Station(2L), new Station(3L), new Station(4L));
+        assertThat(stationsInLine).isEqualTo(result);
+    }
+
+    @Test
+    @DisplayName("호선에 해당하는 역이 없을 경우 빈 리스트을 반환합니다.")
+    void getStationsInLineSuccessReturnEmptyList() {
+        // given
+        SubwayGraph subwayGraph = new SubwayGraph();
+        subwayGraph.add(makeSection(1L, 1L, 2L, 1));
+        subwayGraph.add(makeSection(1L, 2L, 3L, 1));
+        subwayGraph.add(makeSection(1L, 3L, 4L, 1));
+
+        Line line = new Line(2L, "2호선");
+
+        // when
+        List<Station> stationsInLine = subwayGraph.getStationsInLine(line);
+
+        // then
+        assertThat(stationsInLine).hasSize(0);
     }
 
     private static Section makeSection(long lineId, long upStationId, long downStationId, Integer distance) {
