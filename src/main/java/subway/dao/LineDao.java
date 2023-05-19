@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class LineDao {
@@ -45,9 +46,10 @@ public class LineDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Line findById(Long id) {
+    public Optional<Line> findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        Line line = jdbcTemplate.queryForObject(sql, rowMapper, id);
+        return Optional.ofNullable(line);
     }
 
     public void update(Line newLine) {
