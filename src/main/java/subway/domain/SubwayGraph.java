@@ -142,10 +142,20 @@ public class SubwayGraph {
         return false;
     }
 
+    /**
+     * 역과 연결되어 있는 구간을 반환합니다
+     * @param station
+     * @return
+     */
     public Set<Section> getSections(Station station) {
         return connection.get(station);
     }
 
+    /**
+     * 호선에 해당하는 모든 역을 조회합니다
+     * @param line
+     * @return
+     */
     public Line getLineWithStations(Line line) {
         List<Station> stationsInLine = getStationsInLine(line);
         line.setStations(stationsInLine);
