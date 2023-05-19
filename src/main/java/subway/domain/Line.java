@@ -1,11 +1,14 @@
 package subway.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Line {
     private Long id;
     private String name;
     private String color;
+    private List<Station> stations = new ArrayList<>();
 
     public Line() {
     }
@@ -26,6 +29,10 @@ public class Line {
         this.color = color;
     }
 
+    public void setStations(List<Station> stations) {
+        this.stations = stations;
+    }
+
     public Long getId() {
         return id;
     }
@@ -36,6 +43,9 @@ public class Line {
 
     public String getColor() {
         return color;
+    }
+    public List<Station> getStations() {
+        return stations;
     }
 
     @Override

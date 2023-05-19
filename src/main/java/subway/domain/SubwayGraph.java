@@ -146,6 +146,12 @@ public class SubwayGraph {
         return connection.get(station);
     }
 
+    public Line getLineWithStations(Line line) {
+        List<Station> stationsInLine = getStationsInLine(line);
+        line.setStations(stationsInLine);
+        return line;
+    }
+
     List<Station> getStationsInLine(Line line) {
         List<Station> stations = new ArrayList<>();
         if (!firstStationInLines.containsKey(line)) {
