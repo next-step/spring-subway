@@ -1,7 +1,7 @@
 package subway.domain.application;
 
 import org.springframework.stereotype.Service;
-import subway.persistence.dao.StationDao;
+import subway.persistence.jdbcDao.StationDao;
 import subway.domain.Station;
 import subway.web.dto.StationRequest;
 import subway.web.dto.StationResponse;
