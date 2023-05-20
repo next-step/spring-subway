@@ -70,6 +70,12 @@ public class LineController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSections(@PathVariable Long id, @RequestParam Long stationId) {
+        subwayGraphService.removeStation(id ,stationId);
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<Void> handleSQLException() {
         return ResponseEntity.badRequest().build();

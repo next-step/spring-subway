@@ -28,6 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineIntegrationTest extends IntegrationTest {
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
+    private SectionRequest sectionRequest1;
+    private SectionRequest sectionRequest2;
 
     @BeforeEach
     public void setUp() {
@@ -35,6 +37,18 @@ public class LineIntegrationTest extends IntegrationTest {
 
         lineRequest1 = new LineRequest("신분당선", "bg-red-600");
         lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
+
+
+        sectionRequest1 = SectionRequest.builder()
+                .downStationId(2L)
+                .upStationId(1L)
+                .distance(10)
+                .build();
+        sectionRequest2 = SectionRequest.builder()
+                .downStationId(3L)
+                .upStationId(2L)
+                .distance(5)
+                .build();
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -228,7 +242,29 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     @DisplayName("노선에 있는 구간(역)을 제거합니다")
     void removeStationToLine() {
+
         Long lineId = 1L;
+
+        RestAssured
+                .given().log().all()
+                .pathParam("id", lineId)
+                .body(sectionRequest1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .pathParam("id", lineId)
+                .body(sectionRequest2)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{id}/sections")
+                .then().log().all()
+                .extract();
+
         Long stationId = 2L;
 
         // when
@@ -237,7 +273,7 @@ public class LineIntegrationTest extends IntegrationTest {
                 .pathParam("lineId", lineId)
                 .queryParam("stationId", stationId)
                 .when()
-                .delete("/lines/{lineId}/stations")
+                .delete("/lines/{lineId}/sections")
                 .then().log().all()
                 .extract();
 
