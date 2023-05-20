@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import subway.domain.application.LineService;
 import subway.domain.application.SubwayGraphService;
 import subway.domain.dto.AddSectionDto;
+import subway.domain.dto.LineDto;
 import subway.web.dto.LineRequest;
 import subway.web.dto.LineResponse;
 import subway.web.dto.SectionRequest;
@@ -37,8 +38,8 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
-        return ResponseEntity.ok(lineService.findLineResponseById(id));
+    public ResponseEntity<LineDto> findLineById(@PathVariable Long id) {
+        return ResponseEntity.ok(subwayGraphService.getLineWithStations(id));
     }
 
     @PutMapping("/{id}")
@@ -53,12 +54,23 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 그래프 초기화
+     * DB의 모든 section 을 조회해와서 그래프를 초기화 시킵니다.
+     * @return
+     */
     @GetMapping("/sections/init")
     public ResponseEntity<Void> initSections() {
         subwayGraphService.initGraph();
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 해당 호선에 새 구간을 추가합니다.
+     * @param id
+     * @param sectionRequest
+     * @return
+     */
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         subwayGraphService.addSection(AddSectionDto.builder()
@@ -70,6 +82,12 @@ public class LineController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 해당 호선의 역을 제거합니다.
+     * @param id
+     * @param stationId
+     * @return
+     */
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSections(@PathVariable Long id, @RequestParam Long stationId) {
         subwayGraphService.removeStation(id ,stationId);

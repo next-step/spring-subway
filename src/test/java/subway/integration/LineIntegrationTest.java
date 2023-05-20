@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
+import subway.domain.dto.LineDto;
 import subway.web.dto.LineRequest;
 import subway.web.dto.LineResponse;
 import subway.web.dto.SectionRequest;
@@ -136,16 +137,17 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
+        // 그래프 초기화
+        RestAssured
                 .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+                .when()
+                .get("/lines/sections/init")
+                .then().log().all()
+                .statusCode(200);
+
+        Long lineId = 1L;
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -155,8 +157,12 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        LineResponse resultResponse = response.as(LineResponse.class);
-        assertThat(resultResponse.getId()).isEqualTo(lineId);
+        LineDto lineDto = response.as(LineDto.class);
+        assertThat(lineDto.getId()).isEqualTo(lineId);
+
+        // TODO: 궁금한점
+        // data.sql 로 DB 초기값을 세팅하도록 되어 있는데,
+        // 목록 조회의 테스트 같은 경우, 상세 값 비교로 검증을 하면, 초기 데이터가 변경되는 경우에 테스트가 틀어질 것 같은데 혹시 방법이 있나요?
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -244,28 +250,15 @@ public class LineIntegrationTest extends IntegrationTest {
     void removeStationToLine() {
 
         Long lineId = 1L;
+        Long stationId = 4L;    // 해당 호선의 하행 종점역 이어야 합니다
 
+        // 그래프 초기화
         RestAssured
                 .given().log().all()
-                .pathParam("id", lineId)
-                .body(sectionRequest1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/lines/{id}/sections")
+                .get("/lines/sections/init")
                 .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .pathParam("id", lineId)
-                .body(sectionRequest2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{id}/sections")
-                .then().log().all()
-                .extract();
-
-        Long stationId = 2L;
+                .statusCode(200);
 
         // when
         ExtractableResponse<Response> response = RestAssured
