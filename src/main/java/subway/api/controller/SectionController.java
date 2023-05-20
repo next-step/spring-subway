@@ -3,24 +3,19 @@ package subway.api.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import subway.api.dto.LineResponse;
 import subway.api.dto.SectionRequest;
 import subway.api.dto.SectionResponse;
-import subway.service.LineService;
 import subway.service.SectionService;
 
 import java.net.URI;
-import java.sql.SQLException;
 
 @RestController
 @RequestMapping("/lines/{lineId}/sections")
 public class SectionController {
 
-    private final LineService lineService;
     private final SectionService sectionService;
 
-    public SectionController(LineService lineService, SectionService sectionService) {
-        this.lineService = lineService;
+    public SectionController(SectionService sectionService) {
         this.sectionService = sectionService;
     }
 

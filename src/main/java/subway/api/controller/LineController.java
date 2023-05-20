@@ -2,14 +2,13 @@ package subway.api.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.service.LineService;
 import subway.api.dto.LineRequest;
 import subway.api.dto.LineResponse;
+import subway.service.LineService;
+import subway.service.SectionService;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -17,9 +16,11 @@ import java.util.stream.Collectors;
 public class LineController {
 
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    public LineController(LineService lineService) {
+    public LineController(LineService lineService, SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping
@@ -31,14 +32,14 @@ public class LineController {
     @GetMapping
     public ResponseEntity<List<LineResponse>> findAllLines() {
         List<LineResponse> lines = lineService.findLines().stream()
-                .map(LineResponse::of)
+                .map(line -> LineResponse.withStations(line, sectionService.findAllStationsByLineId(line.getId())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(lines);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
-        return ResponseEntity.ok(LineResponse.of(lineService.findLineById(id)));
+        return ResponseEntity.ok(LineResponse.withStations(lineService.findLineById(id), sectionService.findAllStationsByLineId(id)));
     }
 
     @PutMapping("/{id}")

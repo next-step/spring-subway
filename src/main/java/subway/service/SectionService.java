@@ -1,11 +1,14 @@
 package subway.service;
 
 import org.springframework.stereotype.Service;
-import subway.domain.repository.SectionRepository;
-import subway.jdbcdao.SectionDao;
 import subway.domain.entity.Section;
+import subway.domain.entity.Station;
+import subway.domain.repository.SectionRepository;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SectionService {
@@ -43,6 +46,19 @@ public class SectionService {
 
     public List<Section> findAllSectionsByLineId(Long lineId) {
         return sectionRepository.findAllByLineId(lineId);
+    }
+
+    public List<Station> findAllStationsByLineId(Long lineId) {
+        List<Section> sections = sectionRepository.findAllByLineId(lineId);
+        if (sections.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Station> stations = sections.stream()
+                .map(section -> stationService.findStationById(section.getUpStationId()))
+                .sorted(Comparator.comparing(Station::getId))
+                .collect(Collectors.toList());
+        stations.add(stationService.findStationById(sections.get(sections.size() - 1).getDownStationId()));
+        return stations;
     }
 
     private void validateLine(Long lineId) {
