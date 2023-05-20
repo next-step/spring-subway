@@ -94,15 +94,14 @@ class SubwayGraphTest {
         // given
         Line line = new Line(1L, "1");
         Station upStation = new Station(1L);
-        Station downStationId = new Station(2L);
+        Station downStation = new Station(2L);
         Integer distance = 10;
-        Section section = Section.of(line, upStation, downStationId, distance);
-
+        Section section = Section.of(line, upStation, downStation, distance);
         SubwayGraph subwayGraph = new SubwayGraph();
         subwayGraph.add(section);
 
         // when
-        subwayGraph.remove(2L);
+        subwayGraph.remove(line, downStation);
 
         // then
         assertThat(subwayGraph.getSections(upStation)).doesNotContain(section);
@@ -116,14 +115,15 @@ class SubwayGraphTest {
         subwayGraph.add(makeSection(1L, 1L, 2L, 1));
         subwayGraph.add(makeSection(1L, 2L, 3L, 1));
         subwayGraph.add(makeSection(1L, 3L, 4L, 1));
+        subwayGraph.add(makeSection(2L, 3L, 5L, 1));
 
-        Long removeStationId = 10L;
-        System.out.println(subwayGraph.getConnection());
+        Line line = new Line(1L, "name");
+        Station station = new Station(10L);
         // when
         assertThatThrownBy(() -> {
-            subwayGraph.remove(removeStationId);
-        }).isInstanceOf(IllegalStateException.class)
-                .hasMessage("삭제할 역이 존재하지 않습니다.");
+            subwayGraph.remove(line, station);
+        }).isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 호선에 삭제하려는 역이 없습니다.");
     }
 
     @Test
@@ -135,12 +135,12 @@ class SubwayGraphTest {
         subwayGraph.add(makeSection(1L, 2L, 3L, 1));
         subwayGraph.add(makeSection(1L, 3L, 4L, 1));
 
-        Long removeStationId = 3L;
-        System.out.println(subwayGraph.getConnection());
+        Line line = new Line(1L, "name");
+        Station station = new Station(3L);
         // when
         assertThatThrownBy(() -> {
-            subwayGraph.remove(removeStationId);
-        }).isInstanceOf(IllegalStateException.class)
+            subwayGraph.remove(line, station);
+        }).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("하행 종점역만 제거할 수 있습니다.");
     }
 
@@ -154,10 +154,11 @@ class SubwayGraphTest {
         Section sectionWillBeRemoved = makeSection(1L, 3L, 4L, 1);
         subwayGraph.add(sectionWillBeRemoved);
 
-        Long removeStationId = 4L;
+        Line line = new Line(1L, "name");
+        Station station = new Station(4L);
 
         // when
-        subwayGraph.remove(removeStationId);
+        subwayGraph.remove(line, station);
 
         // then
         assertThat(subwayGraph.getSections(new Station(3L))).doesNotContain(sectionWillBeRemoved);

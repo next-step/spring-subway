@@ -15,12 +15,6 @@ public class SubwayGraph {
     private Map<Station, Set<Section>> connection = new HashMap<>();
 
     /**
-     * 하행역과 연결되어 있는 구간들을 저장합니다.
-     * 역방향 탐색과 값 제거에 쓰입니다.
-     */
-    private Map<Station, Set<Section>> backwardConnection = new HashMap<>();
-
-    /**
      * 각 호선의 첫번째 역을 저장합니다.
      * 노선별 탐색에 사용됩니다.
      */
@@ -44,7 +38,6 @@ public class SubwayGraph {
         }
         connection.computeIfAbsent(section.getUpStation(), (unused) -> new HashSet<>()).add(section);
         firstStationInLines.putIfAbsent(section.getLine(), section.getUpStation());
-        addToBackward(section);
     }
 
     private boolean isAlreadyExistsInLine(Line line, Station newStation) {
@@ -89,33 +82,32 @@ public class SubwayGraph {
         return connectedSectionInSameLine.isEmpty();
     }
 
-    private void addToBackward(Section section) {
-        backwardConnection.computeIfAbsent(section.getDownStation(),
-                (unused) -> new HashSet<>()).add(section);
-    }
-
     /**
+     * 해당 호선에 있는 역을 제거합니다
      * 지하철 노선에 등록된 역 중 하행 종점역만 제거할 수 있다. 즉, 마지막 구간만 제거할 수 있습니다.
-     * @param stationId
+     * @param line
+     * @param removeStation
+     * @return 삭제한 구간
      */
-    public void remove(Long stationId) {
-        Station removeStation = new Station(stationId);
-        if(!backwardConnection.containsKey(removeStation)) {
-            throw new IllegalStateException("삭제할 역이 존재하지 않습니다.");
+    public Section remove(Line line, Station removeStation) {
+
+        List<Station> stationsInLine = getStationsInLine(line);
+        long count = stationsInLine.stream()
+                .filter(station -> station.equals(removeStation))
+                .count();
+        if (count < 1) {
+            throw new IllegalArgumentException("해당 호선에 삭제하려는 역이 없습니다.");
+        }
+        if (!stationsInLine.get(stationsInLine.size() - 1).equals(removeStation)) {
+            throw new IllegalArgumentException("하행 종점역만 제거할 수 있습니다.");
         }
 
-        // 삭제할 역의 상행역 찾기
-        List<Station> upStations = backwardConnection.get(removeStation).stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toList());
-
-        if (!isLastDownStation(removeStation)) {
-            throw new IllegalStateException("하행 종점역만 제거할 수 있습니다.");
-        }
-
-        for (Station upStation: upStations) {
-            removeStationConnectedUpStation(upStation, removeStation);
-        }
+        Station upStation = stationsInLine.get(stationsInLine.size() - 2);
+        Set<Section> sections = connection.get(upStation);
+        Optional<Section> removeSection = sections.stream().filter(section -> section.getLine().equals(line)).findAny();
+        sections.remove(removeSection
+                .orElseThrow(() -> new IllegalStateException("구간 삭제에 실패했습니다.")));
+        return removeSection.get();
     }
 
     /**

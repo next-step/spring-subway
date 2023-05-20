@@ -86,13 +86,16 @@ class SubwayGraphServiceTest {
     @DisplayName("구간 삭제에 성공합니다.")
     void removeSectionSuccessfully() {
         // given
-        Long lineId = 5L;
+        Long lineId = 1L;
+        Long stationId = 5L;
+        when(lineRepository.findById(lineId)).thenReturn(new Line(lineId, "name", "color"));
+        when(stationRepository.findById(stationId)).thenReturn(new Station(stationId, "name"));
 
         // when
-        subwayGraphService.removeStation(lineId);
+        subwayGraphService.removeStation(lineId, stationId);
 
         // then
-        then(sectionRepository).should(times(1)).deleteById(lineId);
+        then(sectionRepository).should(times(1)).deleteById(any());
     }
 
     @Test

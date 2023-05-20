@@ -1,6 +1,7 @@
 package subway.domain.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import subway.domain.Line;
 import subway.domain.Section;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubwayGraphService {
     SubwayGraph subwayGraph = new SubwayGraph();
     private final SectionRepository sectionRepository;
@@ -44,9 +46,17 @@ public class SubwayGraphService {
         return sectionRepository.insert(section);
     }
 
-    public void removeStation(Long stationId) {
-        subwayGraph.remove(stationId);
-        sectionRepository.deleteById(stationId);
+    public void removeStation(Long lineId, Long stationId) {
+        Line line = lineRepository.findById(lineId);
+        Station station = stationRepository.findById(stationId);
+        Section removedSection = subwayGraph.remove(line, station);
+        try {
+            sectionRepository.deleteById(removedSection.getId());
+        } catch (Exception e) {
+            subwayGraph.add(removedSection);        // 롤백
+            log.error(e.getMessage());
+            throw e;
+        }
     }
 
     public LineDto getLineWithStations(Long lineId) {
