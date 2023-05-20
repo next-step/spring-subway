@@ -10,10 +10,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.domain.dto.AddSectionDto;
 import subway.domain.dto.LineDto;
 import subway.domain.dto.StationDto;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.SectionRepository;
+import subway.domain.repository.StationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +33,13 @@ class SubwayGraphServiceTest {
     @Mock
     LineRepository lineRepository;
 
+    @Mock
+    StationRepository stationRepository;
+
+    private SubwayGraphService subwayGraphService;
+
     @BeforeEach
-    void mockingInitData() {
+    void initGraph() {
         // given
         List<Section> sections = new ArrayList<>();
         sections.add(makeSection(1L, 1L, 2L, 1));
@@ -43,29 +50,35 @@ class SubwayGraphServiceTest {
 
         given(sectionRepository.findAll())
                 .willReturn(sections);
-    }
 
-    @Test
-    @DisplayName("그래프를 초기화 합니다.")
-    void initGraphSuccess(){
-        // when
-        SubwayGraphService subwayGraphService = new SubwayGraphService(sectionRepository, lineRepository);
-
-        // then
-        assertThat(subwayGraphService).isNotNull();
+        subwayGraphService = new SubwayGraphService(sectionRepository, lineRepository, stationRepository);
+        subwayGraphService.initGraph();
     }
 
     @Test
     @DisplayName("구간 추가에 성공합니다.")
     void addSectionSuccessfully() {
         // given
-        Section section = makeSection(2L, 6L, 7L, 3);
-        SubwayGraphService subwayGraphService = new SubwayGraphService(sectionRepository, lineRepository);
+        Line line = new Line(2L, "2호선", "color");
+        Station upStation = new Station(6L, "6번역");
+        Station downStation = new Station(7L, "7번역");
+        Integer distance = 10;
+        when(lineRepository.findById(2L)).thenReturn(line);
+        when(stationRepository.findById(6L)).thenReturn(upStation);
+        when(stationRepository.findById(7L)).thenReturn(downStation);
+
+        AddSectionDto addSectionDto = AddSectionDto.builder()
+                .lineId(line.getId())
+                .upStationId(upStation.getId())
+                .downStationId(downStation.getId())
+                .distance(distance)
+                .build();
 
         // when
-        subwayGraphService.addSection(section);
+        subwayGraphService.addSection(addSectionDto);
 
         // then
+        Section section = Section.of(line, upStation, downStation, distance);
         then(sectionRepository).should(times(1)).insert(section);
     }
 
@@ -74,7 +87,6 @@ class SubwayGraphServiceTest {
     void removeSectionSuccessfully() {
         // given
         Long lineId = 5L;
-        SubwayGraphService subwayGraphService = new SubwayGraphService(sectionRepository, lineRepository);
 
         // when
         subwayGraphService.removeStation(lineId);
@@ -88,7 +100,6 @@ class SubwayGraphServiceTest {
     void getLineWithStationsSuccessfully() {
         // given
         Long lineId = 1L;
-        SubwayGraphService subwayGraphService = new SubwayGraphService(sectionRepository, lineRepository);
 
         Line line = new Line(1L, "1호선", "white");
         when(lineRepository.findById(lineId)).thenReturn(line);

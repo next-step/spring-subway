@@ -3,8 +3,11 @@ package subway.web.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.domain.application.LineService;
+import subway.domain.application.SubwayGraphService;
+import subway.domain.dto.AddSectionDto;
 import subway.web.dto.LineRequest;
 import subway.web.dto.LineResponse;
+import subway.web.dto.SectionRequest;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -15,9 +18,11 @@ import java.util.List;
 public class LineController {
 
     private final LineService lineService;
+    private final SubwayGraphService subwayGraphService;
 
-    public LineController(LineService lineService) {
+    public LineController(LineService lineService, SubwayGraphService subwayGraphService) {
         this.lineService = lineService;
+        this.subwayGraphService = subwayGraphService;
     }
 
     @PostMapping
@@ -48,8 +53,26 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/sections/init")
+    public ResponseEntity<Void> initSections() {
+        subwayGraphService.initGraph();
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        subwayGraphService.addSection(AddSectionDto.builder()
+                .lineId(id)
+                .downStationId(sectionRequest.getDownStationId())
+                .upStationId(sectionRequest.getUpStationId())
+                .distance(sectionRequest.getDistance())
+                .build());
+        return ResponseEntity.ok().build();
+    }
+
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<Void> handleSQLException() {
         return ResponseEntity.badRequest().build();
     }
+
 }

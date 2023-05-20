@@ -8,8 +8,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 import subway.web.dto.LineRequest;
 import subway.web.dto.LineResponse;
+import subway.web.dto.SectionRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +23,8 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
+@Sql(value = {"/truncate.sql", "/data.sql"}
+        , config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED))
 public class LineIntegrationTest extends IntegrationTest {
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
@@ -194,21 +199,25 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("노선에 구간(역)을 등록합니다")
     void addStationToLine() {
         // given
-        Long stationId = 1L;
+        Long lineId = 1L;
+        Long downStationId = 2L;
+        Long upStationId = 2L;
+        Integer distance = 10;
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("downStationId", "4");
-        params.put("upStationId", "2");
-        params.put("distance", 10);
+        SectionRequest sectionRequest = SectionRequest.builder()
+                .downStationId(downStationId)
+                .upStationId(upStationId)
+                .distance(distance)
+                .build();
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .pathParam("id", stationId)
-                .body(params)
+                .pathParam("id", lineId)
+                .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .post("/lines/{id}/stations")
+                .post("/lines/{id}/sections")
                 .then().log().all()
                 .extract();
 
