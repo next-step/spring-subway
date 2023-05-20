@@ -1,23 +1,28 @@
 package subway.ui;
 
+import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
+import subway.application.SectionService;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
+import subway.dto.SectionAddRequest;
+import subway.dto.SectionResponse;
 
 @RestController
 @RequestMapping("/lines")
 public class LineController {
 
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    public LineController(LineService lineService) {
+    public LineController(LineService lineService, SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping
@@ -28,12 +33,12 @@ public class LineController {
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> findAllLines() {
-        return ResponseEntity.ok(lineService.findLineResponses());
+        return ResponseEntity.ok(lineService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
-        return ResponseEntity.ok(lineService.findLineResponseById(id));
+        return ResponseEntity.ok(lineService.findById(id));
     }
 
     @PutMapping("/{id}")
@@ -48,8 +53,17 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> addSection(@PathVariable Long id,
+        @RequestBody @Valid SectionAddRequest sectionAddRequest) {
+        SectionResponse sectionResponse = sectionService.add(id, sectionAddRequest);
+        return ResponseEntity.ok(sectionResponse);
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> removeSection(@PathVariable Long id,
+        @RequestParam Long stationId) {
+        sectionService.remove(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 }
