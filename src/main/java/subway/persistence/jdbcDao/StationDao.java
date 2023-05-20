@@ -24,8 +24,8 @@ public class StationDao implements StationRepository {
             );
 
 
-    public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
-        this.jdbcTemplate = jdbcTemplate;
+    public StationDao(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("station")
                 .usingGeneratedKeyColumns("id");

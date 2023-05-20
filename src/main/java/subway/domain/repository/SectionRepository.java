@@ -10,6 +10,5 @@ public interface SectionRepository {
     Section insert(Section section);
     List<Section> findAll();
     Section findById(Long id);
-    void update(Section section);
     void deleteById(Long id);
 }

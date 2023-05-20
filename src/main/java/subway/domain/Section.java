@@ -1,5 +1,6 @@
 package subway.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +9,10 @@ import subway.domain.vo.Distance;
 import java.util.Objects;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Section {
+    private Long id;
     private final Line line;
     private final Station upStation;
     private final Station downStation;
@@ -24,6 +26,10 @@ public class Section {
                 .downStation(nextStation)
                 .distance(new Distance(distance))
                 .build();
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override
