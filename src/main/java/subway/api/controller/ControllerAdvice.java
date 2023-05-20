@@ -15,7 +15,7 @@ public class ControllerAdvice {
         return ResponseEntity.badRequest().body("SQL 오류");
     }
 
-    @ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class})
+    @ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class, IllegalStateException.class})
     public ResponseEntity<String> handleNoSuchElementException(RuntimeException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }

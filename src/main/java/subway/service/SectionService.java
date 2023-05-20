@@ -26,6 +26,20 @@ public class SectionService {
         return sectionDao.insert(section);
     }
 
+    public void deleteSectionByStationId(Long lineId, Long stationId) {
+        List<Section> sections = findAllSectionsByLineId(lineId);
+        if (sections.isEmpty()) {
+            throw new IllegalStateException("등록된 구간이 없습니다.");
+        }
+
+        Section lastSection = sections.get(sections.size() - 1);
+        if (!lastSection.getDownStationId().equals(stationId)) {
+            throw new IllegalArgumentException("노선의 하행 종점역만 제거할 수 있습니다.");
+        }
+
+        sectionDao.deleteByStationId(lineId, stationId);
+    }
+
     public List<Section> findAllSectionsByLineId(Long lineId) {
         return sectionDao.findAllByLineId(lineId);
     }
@@ -39,7 +53,7 @@ public class SectionService {
     }
 
     private void validateNewSection(Long lineId, Section section) {
-        List<Section> sections = sectionDao.findAllByLineId(lineId);
+        List<Section> sections = findAllSectionsByLineId(lineId);
         if (!sections.isEmpty()) {
             Section lastSection = sections.get(sections.size() - 1);
             if (!lastSection.getDownStationId().equals(section.getUpStationId())) {
