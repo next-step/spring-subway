@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import subway.domain.EntityFactoryForTest;
@@ -26,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static subway.domain.EntityFactoryForTest.*;
 
 @DisplayName("sectionRepository Test")
+@Sql(value = "/truncate.sql")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @JdbcTest
 class SectionRepositoryTest {
 
