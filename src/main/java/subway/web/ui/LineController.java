@@ -37,8 +37,8 @@ public class LineController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<List<LineResponse>> findAllLines() {
-        return ResponseEntity.ok(lineService.findLineResponses());
+    public ResponseEntity<List<LineDto>> findAllLines() {
+        return ResponseEntity.ok(subwayGraphService.getAllLineWithStations());
     }
 
     /**

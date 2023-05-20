@@ -15,6 +15,7 @@ import subway.domain.repository.StationRepository;
 import subway.domain.vo.Distance;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +78,18 @@ public class SubwayGraphService {
     public LineDto getLineWithStations(Long lineId) {
         Line line = lineRepository.findById(lineId);
         return LineDto.from(subwayGraph.getLineWithStations(line));
+    }
+
+    /**
+     * 전체 호선 정보와 역 목록을 조회합니다.
+     * @return
+     */
+    public List<LineDto> getAllLineWithStations() {
+        List<Line> lines = lineRepository.findAll();
+        return lines.stream()
+                .map(line -> subwayGraph.getLineWithStations(line))
+                .map(LineDto::from)
+                .collect(Collectors.toList());
     }
 
 }
