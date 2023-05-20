@@ -4,11 +4,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.api.dto.StationRequest;
 import subway.api.dto.StationResponse;
-import subway.domain.Station;
+import subway.domain.entity.Station;
 import subway.service.StationService;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 

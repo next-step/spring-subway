@@ -9,18 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.api.dto.LineRequest;
-import subway.api.dto.LineResponse;
 import subway.api.dto.SectionRequest;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Station;
+import subway.domain.entity.Line;
+import subway.domain.entity.Station;
 import subway.service.LineService;
 import subway.service.StationService;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

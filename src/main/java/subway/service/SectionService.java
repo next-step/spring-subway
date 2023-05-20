@@ -1,8 +1,9 @@
 package subway.service;
 
 import org.springframework.stereotype.Service;
-import subway.dao.SectionDao;
-import subway.domain.Section;
+import subway.domain.repository.SectionRepository;
+import subway.jdbcdao.SectionDao;
+import subway.domain.entity.Section;
 
 import java.util.List;
 
@@ -11,19 +12,19 @@ public class SectionService {
 
     private final LineService lineService;
     private final StationService stationService;
-    private final SectionDao sectionDao;
+    private final SectionRepository sectionRepository;
 
-    public SectionService(LineService lineService, StationService stationService, SectionDao sectionDao) {
+    public SectionService(LineService lineService, StationService stationService, SectionRepository sectionRepository) {
         this.lineService = lineService;
         this.stationService = stationService;
-        this.sectionDao = sectionDao;
+        this.sectionRepository = sectionRepository;
     }
 
     public Section saveSection(Long lineId, Section section) {
         validateLine(lineId);
         validateStations(List.of(section.getUpStationId(), section.getDownStationId()));
         validateNewSection(lineId, section);
-        return sectionDao.insert(section);
+        return sectionRepository.insert(section);
     }
 
     public void deleteSectionByStationId(Long lineId, Long stationId) {
@@ -37,11 +38,11 @@ public class SectionService {
             throw new IllegalArgumentException("노선의 하행 종점역만 제거할 수 있습니다.");
         }
 
-        sectionDao.deleteByStationId(lineId, stationId);
+        sectionRepository.deleteByStationId(lineId, stationId);
     }
 
     public List<Section> findAllSectionsByLineId(Long lineId) {
-        return sectionDao.findAllByLineId(lineId);
+        return sectionRepository.findAllByLineId(lineId);
     }
 
     private void validateLine(Long lineId) {

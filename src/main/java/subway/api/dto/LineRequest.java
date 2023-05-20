@@ -1,6 +1,6 @@
 package subway.api.dto;
 
-import subway.domain.Line;
+import subway.domain.entity.Line;
 
 import javax.validation.constraints.NotBlank;
 

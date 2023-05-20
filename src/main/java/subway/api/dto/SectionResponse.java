@@ -1,6 +1,6 @@
 package subway.api.dto;
 
-import subway.domain.Section;
+import subway.domain.entity.Section;
 
 public class SectionResponse {
     private Long id;
