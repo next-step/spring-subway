@@ -35,6 +35,11 @@ public class SubwayGraphService {
         }
     }
 
+    /**
+     * 그래프와 DB에 구간을 추가합니다.
+     * @param addSectionDto
+     * @return
+     */
     public Section addSection(AddSectionDto addSectionDto) {
         Line line = lineRepository.findById(addSectionDto.getLineId());
         Station upStation = stationRepository.findById(addSectionDto.getUpStationId());
@@ -46,6 +51,11 @@ public class SubwayGraphService {
         return sectionRepository.insert(section);
     }
 
+    /**
+     * 그래프와 DB에서 해당 호선의 구간(역)을 제거합니다.
+     * @param lineId
+     * @param stationId
+     */
     public void removeStation(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId);
         Station station = stationRepository.findById(stationId);
@@ -59,8 +69,14 @@ public class SubwayGraphService {
         }
     }
 
+    /**
+     * 호선 번호에 해당하는 호선정보와 역 목록을 조회합니다.
+     * @param lineId
+     * @return
+     */
     public LineDto getLineWithStations(Long lineId) {
         Line line = lineRepository.findById(lineId);
         return LineDto.from(subwayGraph.getLineWithStations(line));
     }
+
 }

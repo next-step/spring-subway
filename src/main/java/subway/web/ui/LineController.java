@@ -32,11 +32,20 @@ public class LineController {
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
+    /**
+     * 전체 호선 정보를 조회합니다.
+     * @return
+     */
     @GetMapping
     public ResponseEntity<List<LineResponse>> findAllLines() {
         return ResponseEntity.ok(lineService.findLineResponses());
     }
 
+    /**
+     * 호선 번호로 호선 정보를 조회합니다.
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public ResponseEntity<LineDto> findLineById(@PathVariable Long id) {
         return ResponseEntity.ok(subwayGraphService.getLineWithStations(id));
