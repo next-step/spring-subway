@@ -5,6 +5,7 @@ import subway.dao.LineDao;
 import subway.domain.Line;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class LineService {
@@ -23,7 +24,11 @@ public class LineService {
     }
 
     public Line findLineById(Long id) {
-        return lineDao.findById(id);
+        try {
+            return lineDao.findById(id);
+        } catch (Exception e) {
+            throw new NoSuchElementException("존재하지 않는 노선입니다.");
+        }
     }
 
     public void updateLine(Long id, Line newLine) {

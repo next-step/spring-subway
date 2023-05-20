@@ -2,8 +2,12 @@ package subway.api.dto;
 
 import subway.domain.Line;
 
+import javax.validation.constraints.NotBlank;
+
 public class LineRequest {
+    @NotBlank
     private String name;
+    @NotBlank
     private String color;
 
     public LineRequest() {

@@ -50,30 +50,11 @@ public class SectionIntegrationTest extends IntegrationTest {
         stationService.saveStation(station3);
     }
 
-    @DisplayName("지하철 노선에 첫번째 구간을 등록한다. (down = up, 거리 0)")
-    @Test
-    void createInitialSection() {
-        SectionRequest sectionRequest = new SectionRequest(1L, 1L, 0);
-
-        // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all().
-                extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
-    }
-
-    @DisplayName("지하철 노선에 첫번째 구간이 아닌 구간을 등록한다.")
+    @DisplayName("지하철 노선에 구간을 등록한다.")
     @Test
     void createSection() {
         // given
-        SectionRequest sectionRequest1 = new SectionRequest(1L, 1L, 0);
+        SectionRequest sectionRequest1 = new SectionRequest(2L, 1L, 10);
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -82,7 +63,7 @@ public class SectionIntegrationTest extends IntegrationTest {
                 .then().log().all().
                 extract();
         // section 저장
-        SectionRequest sectionRequest2 = new SectionRequest(2L, 1L, 1);
+        SectionRequest sectionRequest2 = new SectionRequest(3L, 2L, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -102,7 +83,7 @@ public class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionInvalidUpStation() {
         // given
-        SectionRequest sectionRequest1 = new SectionRequest(1L, 1L, 0);
+        SectionRequest sectionRequest1 = new SectionRequest(2L, 1L, 10);
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -110,7 +91,7 @@ public class SectionIntegrationTest extends IntegrationTest {
                 .when().post("/lines/1/sections")
                 .then().log().all().
                 extract();
-        SectionRequest sectionRequest2 = new SectionRequest(2L, 2L, 0);
+        SectionRequest sectionRequest2 = new SectionRequest(3L, 1L, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -123,38 +104,36 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().asString()).isEqualTo("노선의 하행 종점역이 새 구간의 상행역과 같지 않습니다.");
     }
 
     @DisplayName("노선에 이미 등록되어있는 역은 새로운 구간의 하행역이 될 수 없다.")
     @Test
     void createSectionAlreadyRegistered() {
         // given
-        SectionRequest sectionRequest1 = new SectionRequest(1L, 1L, 0);
-        SectionRequest sectionRequest2 = new SectionRequest(2L, 1L, 1);
+        SectionRequest sectionRequest1 = new SectionRequest(2L, 1L, 10);
+        SectionRequest sectionRequest2 = new SectionRequest(3L, 2L, 1);
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest1)
                 .when().post("/lines/1/sections")
-                .then().log().all().
-                extract();
+                .then().log().all().extract();
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest2)
                 .when().post("/lines/1/sections")
-                .then().log().all().
-                extract();
-        SectionRequest sectionRequest3 = new SectionRequest(2L, 1L, 10);
+                .then().log().all().extract();
+        SectionRequest sectionRequest3 = new SectionRequest(3L, 1L, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest3)
                 .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+                .then().log().all().extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -164,7 +143,7 @@ public class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteSection() {
         // given
-        SectionRequest sectionRequest1 = new SectionRequest(1L, 1L, 0);
+        SectionRequest sectionRequest1 = new SectionRequest(2L, 1L, 10);
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -177,7 +156,7 @@ public class SectionIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .queryParam("stationId", 1)
+                .queryParam("stationId", 2)
                 .when().delete("/lines/1/sections")
                 .then().log().all().
                 extract();
@@ -190,8 +169,8 @@ public class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteInvalidSection() {
         // given
-        SectionRequest sectionRequest1 = new SectionRequest(1L, 1L, 0);
-        SectionRequest sectionRequest2 = new SectionRequest(2L, 1L, 1);
+        SectionRequest sectionRequest1 = new SectionRequest(2L, 1L, 10);
+        SectionRequest sectionRequest2 = new SectionRequest(3L, 2L, 1);
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

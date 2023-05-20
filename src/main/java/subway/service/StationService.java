@@ -5,6 +5,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class StationService {
@@ -19,7 +20,11 @@ public class StationService {
     }
 
     public Station findStationById(Long id) {
-        return stationDao.findById(id);
+        try {
+            return stationDao.findById(id);
+        } catch (Exception e) {
+            throw new NoSuchElementException("존재하지 않는 역입니다.");
+        }
     }
 
     public List<Station> findAllStations() {
