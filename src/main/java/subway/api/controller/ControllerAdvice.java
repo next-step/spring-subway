@@ -1,6 +1,7 @@
 package subway.api.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,5 +18,10 @@ public class ControllerAdvice {
     @ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class, IllegalStateException.class})
     public ResponseEntity<String> handleNoSuchElementException(RuntimeException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return ResponseEntity.badRequest().body("입력값을 확인해주세요.");
     }
 }

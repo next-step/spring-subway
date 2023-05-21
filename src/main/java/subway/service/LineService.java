@@ -1,5 +1,6 @@
 package subway.service;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import subway.domain.entity.Line;
 import subway.domain.repository.LineRepository;
@@ -31,6 +32,10 @@ public class LineService {
     }
 
     public void deleteLineById(Long id) {
-        lineRepository.deleteById(id);
+        try {
+            lineRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalStateException("구간이 등록된 노선은 삭제할 수 없습니다. 구간 삭제 후 다시 시도해주세요.");
+        }
     }
 }
