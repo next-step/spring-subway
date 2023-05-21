@@ -65,17 +65,6 @@ public class LineController {
     }
 
     /**
-     * 그래프 초기화
-     * DB의 모든 section 을 조회해와서 그래프를 초기화 시킵니다.
-     * @return
-     */
-    @GetMapping("/sections/init")
-    public ResponseEntity<Void> initSections() {
-        subwayGraphService.initGraph();
-        return ResponseEntity.ok().build();
-    }
-
-    /**
      * 해당 호선에 새 구간을 추가합니다.
      * @param id
      * @param sectionRequest

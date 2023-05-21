@@ -2,11 +2,12 @@ package subway.domain;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter(AccessLevel.PACKAGE)
+@Component
 public class SubwayGraph {
     /**
      * 해당 역과 연결되어 있는 구간들을 저장합니다.

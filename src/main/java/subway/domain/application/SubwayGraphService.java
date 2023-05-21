@@ -18,13 +18,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class SubwayGraphService {
-    SubwayGraph subwayGraph = new SubwayGraph();
+    private final SubwayGraph subwayGraph;
     private final SectionRepository sectionRepository;
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+
+    public SubwayGraphService(SubwayGraph subwayGraph, SectionRepository sectionRepository,
+                              LineRepository lineRepository, StationRepository stationRepository) {
+        this.subwayGraph = subwayGraph;
+        this.sectionRepository = sectionRepository;
+        this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
+    }
 
     /**
      * DB의 구간 데이터를 조회하여 그래프 상태를 초기화한다.

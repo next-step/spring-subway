@@ -21,8 +21,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("지하철 노선 관련 기능")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DisplayName("지하철 노선 통합테스트")
 public class LineIntegrationTest extends IntegrationTest {
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
@@ -95,15 +94,6 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("전체 지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
-        // given
-        // 그래프 초기화
-        RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines/sections/init")
-                .then().log().all()
-                .statusCode(200);
-
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -119,15 +109,6 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("특정 지하철 노선을 조회한다.")
     @Test
     void getLine() {
-        // given
-        // 그래프 초기화
-        RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines/sections/init")
-                .then().log().all()
-                .statusCode(200);
-
         Long lineId = 1L;
 
         // when
@@ -203,8 +184,8 @@ public class LineIntegrationTest extends IntegrationTest {
     void addStationToLine() {
         // given
         Long lineId = 1L;
-        Long downStationId = 2L;
-        Long upStationId = 2L;
+        Long downStationId = 5L;
+        Long upStationId = 4L;
         Integer distance = 10;
 
         SectionRequest sectionRequest = SectionRequest.builder()
@@ -231,17 +212,9 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     @DisplayName("노선에 있는 구간(역)을 제거합니다")
     void removeStationToLine() {
-
+        // given
         Long lineId = 1L;
         Long stationId = 4L;    // 해당 호선의 하행 종점역 이어야 합니다
-
-        // 그래프 초기화
-        RestAssured
-                .given().log().all()
-                .when()
-                .get("/lines/sections/init")
-                .then().log().all()
-                .statusCode(200);
 
         // when
         ExtractableResponse<Response> response = RestAssured

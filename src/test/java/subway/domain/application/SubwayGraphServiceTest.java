@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.domain.SubwayGraph;
 import subway.domain.dto.AddSectionDto;
 import subway.domain.dto.LineDto;
 import subway.domain.dto.StationDto;
@@ -27,6 +28,8 @@ import static subway.domain.EntityFactoryForTest.*;
 @DisplayName("지하철 노선 그래프 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class SubwayGraphServiceTest {
+
+    SubwayGraph subwayGraph = new SubwayGraph();
     @Mock
     SectionRepository sectionRepository;
 
@@ -51,7 +54,7 @@ class SubwayGraphServiceTest {
         given(sectionRepository.findAll())
                 .willReturn(sections);
 
-        subwayGraphService = new SubwayGraphService(sectionRepository, lineRepository, stationRepository);
+        subwayGraphService = new SubwayGraphService(subwayGraph, sectionRepository, lineRepository, stationRepository);
         subwayGraphService.initGraph();
     }
 
