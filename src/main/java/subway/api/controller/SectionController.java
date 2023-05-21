@@ -1,12 +1,12 @@
 package subway.api.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import subway.api.dto.SectionRequest;
 import subway.api.dto.SectionResponse;
 import subway.service.SectionService;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -22,7 +22,7 @@ public class SectionController {
     @PostMapping
     public ResponseEntity<SectionResponse> createSection(
             @PathVariable Long lineId,
-            @RequestBody @Validated SectionRequest sectionRequest
+            @RequestBody @Valid SectionRequest sectionRequest
     ) {
         SectionResponse section = SectionResponse.of(sectionService.saveSection(lineId, sectionRequest.toDomain(lineId)));
         return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections")).body(section);

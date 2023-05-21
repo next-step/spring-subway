@@ -9,7 +9,8 @@ public class Section {
     private Long lineId;
     private int distance;
 
-    public Section() {}
+    public Section() {
+    }
 
     public Section(Long downStationId, Long upStationId, Long lineId, int distance) {
         this.downStationId = downStationId;
@@ -46,13 +47,14 @@ public class Section {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+        if (id == null) return false;
         if (!(o instanceof Section)) return false;
         Section section = (Section) o;
-        return distance == section.distance && Objects.equals(id, section.id) && Objects.equals(downStationId, section.downStationId) && Objects.equals(upStationId, section.upStationId) && Objects.equals(lineId, section.lineId);
+        return Objects.equals(id, section.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, downStationId, upStationId, lineId, distance);
+        return Objects.hash(id);
     }
 }
