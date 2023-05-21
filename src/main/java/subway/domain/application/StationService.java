@@ -19,8 +19,17 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        validateUniqueName(stationRequest.getName());
         Station station = stationRepository.insert(new Station(stationRequest.getName()));
         return StationResponse.of(station);
+    }
+
+    private void validateUniqueName(String name) {
+        List<Station> stations = stationRepository.findAll();
+        boolean isDuplicate = stations.stream().anyMatch(station -> station.getName().equals(name));
+        if (isDuplicate) {
+            throw new IllegalArgumentException("중복된 역 이름은 추가할 수 없습니다.");
+        }
     }
 
     public StationResponse findStationResponseById(Long id) {
