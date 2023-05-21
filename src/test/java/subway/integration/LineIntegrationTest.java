@@ -39,7 +39,6 @@ public class LineIntegrationTest extends IntegrationTest {
         lineRequest1 = new LineRequest("신분당선", "bg-red-600");
         lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
 
-
         sectionRequest1 = SectionRequest.builder()
                 .downStationId(2L)
                 .upStationId(1L)
@@ -207,7 +206,7 @@ public class LineIntegrationTest extends IntegrationTest {
         Long lineId = 1L;
         Long downStationId = 2L;
         Long upStationId = 2L;
-        Integer distance = 10;
+        Integer distance = -1;
 
         SectionRequest sectionRequest = SectionRequest.builder()
                 .downStationId(downStationId)

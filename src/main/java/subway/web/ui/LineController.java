@@ -108,5 +108,4 @@ public class LineController {
     public ResponseEntity<Void> handleSQLException() {
         return ResponseEntity.badRequest().build();
     }
-
 }
