@@ -1,12 +1,10 @@
 package subway.service;
 
 import org.springframework.stereotype.Service;
-import subway.domain.repository.StationRepository;
-import subway.jdbcdao.StationDao;
 import subway.domain.entity.Station;
+import subway.domain.repository.StationRepository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class StationService {
@@ -21,11 +19,7 @@ public class StationService {
     }
 
     public Station findStationById(Long id) {
-        try {
-            return stationRepository.findById(id);
-        } catch (Exception e) {
-            throw new NoSuchElementException("존재하지 않는 역입니다.");
-        }
+        return stationRepository.findById(id);
     }
 
     public List<Station> findAllStations() {

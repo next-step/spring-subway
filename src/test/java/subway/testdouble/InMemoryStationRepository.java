@@ -1,7 +1,5 @@
 package subway.testdouble;
 
-import org.springframework.dao.EmptyResultDataAccessException;
-import subway.domain.entity.Line;
 import subway.domain.entity.Station;
 import subway.domain.repository.StationRepository;
 
@@ -25,7 +23,7 @@ public class InMemoryStationRepository implements StationRepository {
     public Station findById(Long id) {
         Station station = stationMap.get(id);
         if (station == null) {
-            throw new EmptyResultDataAccessException(1);
+            throw new NoSuchElementException("존재하지 않는 역입니다.");
         }
         return station;
     }

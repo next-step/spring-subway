@@ -11,6 +11,7 @@ import subway.domain.repository.StationRepository;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Repository
 public class StationDao implements StationRepository {
@@ -47,7 +48,11 @@ public class StationDao implements StationRepository {
     @Override
     public Station findById(Long id) {
         String sql = "select * from STATION where id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        } catch (Exception e) {
+            throw new NoSuchElementException("존재하지 않는 역입니다.");
+        }
     }
 
     @Override

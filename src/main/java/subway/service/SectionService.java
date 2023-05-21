@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import subway.domain.entity.Section;
 import subway.domain.entity.Station;
 import subway.domain.repository.SectionRepository;
+import subway.domain.repository.StationRepository;
+import subway.service.validator.SubwayValidator;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,40 +14,26 @@ import java.util.stream.Collectors;
 
 @Service
 public class SectionService {
-
-    private final LineService lineService;
-    private final StationService stationService;
+    private final StationRepository stationRepository;
     private final SectionRepository sectionRepository;
+    private final SubwayValidator subwayValidator;
 
-    public SectionService(LineService lineService, StationService stationService, SectionRepository sectionRepository) {
-        this.lineService = lineService;
-        this.stationService = stationService;
+    public SectionService(StationRepository stationRepository, SectionRepository sectionRepository, SubwayValidator subwayValidator) {
+        this.stationRepository = stationRepository;
         this.sectionRepository = sectionRepository;
+        this.subwayValidator = subwayValidator;
     }
 
     public Section saveSection(Long lineId, Section section) {
-        validateLine(lineId);
-        validateStations(List.of(section.getUpStationId(), section.getDownStationId()));
-        validateNewSection(lineId, section);
+        subwayValidator.validateLine(lineId);
+        subwayValidator.validateStations(List.of(section.getUpStationId(), section.getDownStationId()));
+        subwayValidator.validateNewSection(lineId, section);
         return sectionRepository.insert(section);
     }
 
     public void deleteSectionByStationId(Long lineId, Long stationId) {
-        List<Section> sections = findAllSectionsByLineId(lineId);
-        if (sections.isEmpty()) {
-            throw new IllegalStateException("등록된 구간이 없습니다.");
-        }
-
-        Section lastSection = sections.get(sections.size() - 1);
-        if (!lastSection.getDownStationId().equals(stationId)) {
-            throw new IllegalArgumentException("노선의 하행 종점역만 제거할 수 있습니다.");
-        }
-
+        subwayValidator.validateSectionForDelete(lineId, stationId);
         sectionRepository.deleteByStationId(lineId, stationId);
-    }
-
-    public List<Section> findAllSectionsByLineId(Long lineId) {
-        return sectionRepository.findAllByLineId(lineId);
     }
 
     public List<Station> findAllStationsByLineId(Long lineId) {
@@ -53,32 +41,12 @@ public class SectionService {
         if (sections.isEmpty()) {
             return Collections.emptyList();
         }
+
         List<Station> stations = sections.stream()
-                .map(section -> stationService.findStationById(section.getUpStationId()))
+                .map(section -> stationRepository.findById(section.getUpStationId()))
                 .sorted(Comparator.comparing(Station::getId))
                 .collect(Collectors.toList());
-        stations.add(stationService.findStationById(sections.get(sections.size() - 1).getDownStationId()));
+        stations.add(stationRepository.findById(sections.get(sections.size() - 1).getDownStationId()));
         return stations;
-    }
-
-    private void validateLine(Long lineId) {
-        lineService.findLineById(lineId);
-    }
-
-    private void validateStations(List<Long> stationIds) {
-        stationIds.forEach(stationService::findStationById);
-    }
-
-    private void validateNewSection(Long lineId, Section section) {
-        List<Section> sections = findAllSectionsByLineId(lineId);
-        if (!sections.isEmpty()) {
-            Section lastSection = sections.get(sections.size() - 1);
-            if (!lastSection.getDownStationId().equals(section.getUpStationId())) {
-                throw new IllegalArgumentException("노선의 하행 종점역이 새 구간의 상행역과 같지 않습니다.");
-            }
-            if (sections.stream().anyMatch(s -> s.getUpStationId().equals(section.getDownStationId()))) {
-                throw new IllegalArgumentException("이미 등록된 역입니다.");
-            }
-        }
     }
 }

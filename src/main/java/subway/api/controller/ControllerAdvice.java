@@ -4,15 +4,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class ControllerAdvice {
 
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<String> handleSQLException(SQLException e) {
-        return ResponseEntity.badRequest().body("SQL 오류");
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception e) {
+        return ResponseEntity.internalServerError().body("서비스가 현재 원할하지 않습니다. 잠시 후 다시 시도해주세요.");
     }
 
     @ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class, IllegalStateException.class})

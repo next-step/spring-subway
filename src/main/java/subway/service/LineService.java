@@ -1,12 +1,10 @@
 package subway.service;
 
 import org.springframework.stereotype.Service;
-import subway.domain.repository.LineRepository;
-import subway.jdbcdao.LineDao;
 import subway.domain.entity.Line;
+import subway.domain.repository.LineRepository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class LineService {
@@ -25,11 +23,7 @@ public class LineService {
     }
 
     public Line findLineById(Long id) {
-        try {
-            return lineRepository.findById(id);
-        } catch (Exception e) {
-            throw new NoSuchElementException("존재하지 않는 노선입니다.");
-        }
+        return lineRepository.findById(id);
     }
 
     public void updateLine(Long id, Line newLine) {

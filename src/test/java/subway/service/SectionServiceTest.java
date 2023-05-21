@@ -8,6 +8,7 @@ import subway.domain.entity.Station;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.SectionRepository;
 import subway.domain.repository.StationRepository;
+import subway.service.validator.SubwayValidator;
 import subway.testdouble.InMemoryLineRepository;
 import subway.testdouble.InMemorySectionRepository;
 import subway.testdouble.InMemoryStationRepository;
@@ -16,15 +17,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SectionServiceTest {
     private final LineRepository lineRepository = new InMemoryLineRepository();
     private final StationRepository stationRepository = new InMemoryStationRepository();
     private final SectionRepository sectionRepository = new InMemorySectionRepository();
-    private final LineService lineService = new LineService(lineRepository);
-    private final StationService stationService = new StationService(stationRepository);
-    private final SectionService sectionService = new SectionService(lineService, stationService, sectionRepository);
+    private final SubwayValidator subwayValidator = new SubwayValidator(lineRepository, stationRepository, sectionRepository);
+    private final SectionService sectionService = new SectionService(stationRepository, sectionRepository, subwayValidator);
 
     @Test
     void saveSection() {

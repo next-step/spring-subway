@@ -1,11 +1,9 @@
 package subway.testdouble;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import subway.domain.entity.Line;
 import subway.domain.repository.LineRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class InMemoryLineRepository implements LineRepository {
     private final Map<Long, Line> lineMap = new HashMap<>();
@@ -25,7 +23,7 @@ public class InMemoryLineRepository implements LineRepository {
     public Line findById(Long id) {
         Line line = lineMap.get(id);
         if (line == null) {
-            throw new EmptyResultDataAccessException(1);
+            throw new NoSuchElementException("존재하지 않는 노선입니다.");
         }
         return line;
     }

@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Repository
 public class LineDao implements LineRepository {
@@ -51,7 +52,11 @@ public class LineDao implements LineRepository {
     @Override
     public Line findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        } catch (Exception e) {
+            throw new NoSuchElementException("존재하지 않는 노선입니다.");
+        }
     }
 
     @Override
