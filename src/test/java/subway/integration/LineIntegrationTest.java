@@ -3,6 +3,7 @@ package subway.integration;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,10 +33,7 @@ public class LineIntegrationTest extends IntegrationTest {
     private SectionRequest sectionRequest1;
     private SectionRequest sectionRequest2;
 
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-
+    public LineIntegrationTest() {
         lineRequest1 = new LineRequest("신분당선", "bg-red-600");
         lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
 
@@ -49,6 +47,11 @@ public class LineIntegrationTest extends IntegrationTest {
                 .upStationId(2L)
                 .distance(5)
                 .build();
+    }
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -206,7 +209,7 @@ public class LineIntegrationTest extends IntegrationTest {
         Long lineId = 1L;
         Long downStationId = 2L;
         Long upStationId = 2L;
-        Integer distance = -1;
+        Integer distance = 10;
 
         SectionRequest sectionRequest = SectionRequest.builder()
                 .downStationId(downStationId)
