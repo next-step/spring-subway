@@ -10,6 +10,7 @@ import subway.web.dto.LineRequest;
 import subway.web.dto.LineResponse;
 import subway.web.dto.SectionRequest;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
@@ -81,7 +82,7 @@ public class LineController {
      * @return
      */
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody @Valid SectionRequest sectionRequest) {
         subwayGraphService.addSection(AddSectionDto.builder()
                 .lineId(id)
                 .downStationId(sectionRequest.getDownStationId())
