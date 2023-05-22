@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 import subway.dto.SectionAddRequest;
 import subway.dto.SectionResponse;
 import subway.dto.StationRequest;
-import subway.dto.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -217,8 +216,6 @@ public class LineIntegrationTest extends IntegrationTest {
             .when().post("/lines")
             .then().log().all().
             extract();
-
-
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);

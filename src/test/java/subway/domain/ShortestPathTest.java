@@ -1,5 +1,6 @@
 package subway.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
@@ -47,7 +48,7 @@ class ShortestPathTest {
         List<Station> paths = shortestPath.getPaths(신사역, 판교역);
 
         // then
-        assertEquals(3, paths.size());
+        assertThat(paths.size()).isEqualTo(3);
     }
 
     @DisplayName("역들과 노선들이 있고 출발역과 도착역이 같을때 최단거리 경로를 구하면 에러를 반환한다.")
@@ -72,7 +73,7 @@ class ShortestPathTest {
         int distance = shortestPath.getDistance(신사역, 판교역);
 
         // then
-        assertEquals(3, distance);
+        assertThat(distance).isEqualTo(3);
     }
 
     @DisplayName("역들과 노선들이 있고 출발역과 도착역이 같을때 총 거리를 구하면 에러를 반환한다.")
