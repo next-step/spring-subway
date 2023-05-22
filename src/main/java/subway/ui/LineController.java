@@ -32,12 +32,12 @@ public class LineController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LineResponse>> findAllLines() {
+    public ResponseEntity<List<LineResponse>> getLines() {
         return ResponseEntity.ok(lineService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> getLine(@PathVariable Long id) {
         return ResponseEntity.ok(lineService.findById(id));
     }
 

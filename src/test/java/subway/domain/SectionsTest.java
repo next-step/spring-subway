@@ -20,7 +20,7 @@ class SectionsTest {
     void addSection() {
         // given
         Sections 대전_1호선_구간들 = new Sections(new ArrayList<>());
-        Section addSection = new Section(1L, 대전_노선도_1호선().getId(), 반석역().getId(), 지족역().getId(), 10);
+        Section addSection = new Section(1L, 대전_노선도_1호선(), 반석역(), 지족역(), 10);
 
         // when
 
@@ -34,7 +34,7 @@ class SectionsTest {
     void addSection2() {
         // given
         Sections 대전_1호선_구간들 = new Sections(new ArrayList<>(List.of(반석역_지족역_구간())));
-        Section addSection = new Section(1L, 대전_노선도_1호선().getId(), 지족역().getId(), 노은역().getId(), 5);
+        Section addSection = new Section(1L, 대전_노선도_1호선(), 지족역(), 노은역(), 5);
 
         // when
 
@@ -48,7 +48,7 @@ class SectionsTest {
     void addSectionFalse() {
         // given
         Sections 대전_1호선_구간들 = new Sections(new ArrayList<>(List.of(반석역_지족역_구간())));
-        Section addSection = new Section(1L, 대전_노선도_1호선().getId(), 지족역().getId(), 반석역().getId(), 5);
+        Section addSection = new Section(1L, 대전_노선도_1호선(), 지족역(), 반석역(), 5);
 
         // when
 
@@ -61,7 +61,7 @@ class SectionsTest {
     void addSectionFalse2() {
         // given
         Sections 대전_1호선_구간들 = new Sections(new ArrayList<>(List.of(반석역_지족역_구간())));
-        Section addSection = new Section(1L, 대전_노선도_1호선().getId(), 반석역().getId(), 월드컵경기장역().getId(), 5);
+        Section addSection = new Section(1L, 대전_노선도_1호선(), 반석역(), 월드컵경기장역(), 5);
 
         // when
 
@@ -74,7 +74,7 @@ class SectionsTest {
     void addSectionFalse3() {
         // given
         Sections 대전_1호선_구간들 = new Sections(new ArrayList<>(List.of(반석역_지족역_구간())));
-        Section addSection = new Section(1L, 대전_노선도_1호선().getId(), 노은역().getId(), 월드컵경기장역().getId(), 5);
+        Section addSection = new Section(1L, 대전_노선도_1호선(), 노은역(), 월드컵경기장역(), 5);
 
         // when
 
@@ -129,6 +129,6 @@ class SectionsTest {
     }
 
     private Section 반석역_지족역_구간() {
-        return new Section(1L, 대전_노선도_1호선().getId(), 반석역().getId(), 지족역().getId(), 10);
+        return new Section(1L, 대전_노선도_1호선(), 반석역(), 지족역(), 10);
     }
 }

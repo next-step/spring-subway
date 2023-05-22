@@ -10,7 +10,6 @@ import subway.dto.StationResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Transactional
 @Service
 public class StationService {
     private final StationDao stationDao;
@@ -19,6 +18,7 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
         Station station = stationDao.insert(new Station(stationRequest.getName()));
         return StationResponse.of(station);
@@ -37,10 +37,12 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void updateStation(Long id, StationRequest stationRequest) {
         stationDao.update(new Station(id, stationRequest.getName()));
     }
 
+    @Transactional
     public void deleteStationById(Long id) {
         stationDao.deleteById(id);
     }

@@ -3,6 +3,7 @@ package subway.domain;
 import java.util.Objects;
 
 public class Station {
+
     private Long id;
     private String name;
 
@@ -24,6 +25,10 @@ public class Station {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isSameId(Long id) {
+        return this.id.equals(id);
     }
 
     @Override

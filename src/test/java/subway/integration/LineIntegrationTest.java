@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import subway.dto.SectionAddRequest;
 import subway.dto.SectionResponse;
+import subway.dto.StationRequest;
+import subway.dto.StationResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,10 +42,10 @@ public class LineIntegrationTest extends IntegrationTest {
         lineRequest1 = new LineRequest("신분당선", "bg-red-600");
         lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
         lineRequest3 = new LineRequest("대전1호선", "Gray");
-        반석역 = new Station(1L, "반석");
-        지족역 = new Station(2L, "지족");
-        노은역 = new Station(3L, "노은");
-        월드컵경기장역 = new Station(4L, "월드컵경기장");
+        반석역 = insertStation("반석");
+        지족역 = insertStation("지족");
+        노은역 = insertStation("노은");
+        월드컵경기장역 = insertStation("월드컵경기장");
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -215,6 +217,8 @@ public class LineIntegrationTest extends IntegrationTest {
             .when().post("/lines")
             .then().log().all().
             extract();
+
+
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -437,5 +441,15 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private Station insertStation(String stationName) {
+        return RestAssured.given().log().all()
+            .body(new StationRequest(stationName))
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/stations")
+            .then().log().all()
+            .extract().as(Station.class);
     }
 }

@@ -11,7 +11,6 @@ import subway.dto.LineResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Transactional
 @Service
 public class LineService {
     private final LineDao lineDao;
@@ -22,6 +21,7 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         return LineResponse.from(persistLine);
@@ -39,10 +39,12 @@ public class LineService {
         return LineResponse.of(lineDao.findById(id), stationDao.findAllByLineId(id));
     }
 
+    @Transactional
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    @Transactional
     public void deleteLineById(Long id) {
         lineDao.deleteById(id);
     }
