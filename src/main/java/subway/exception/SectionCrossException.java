@@ -2,7 +2,7 @@ package subway.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class SectionCrossException extends BadRequestException {
+public class SectionCrossException extends CommonException {
 
     private static final String MESSAGE = "갈림길을 생성할 수 없습니다.";
 

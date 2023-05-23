@@ -2,7 +2,7 @@ package subway.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class SectionDuplicationStationIdException extends BadRequestException {
+public class SectionDuplicationStationIdException extends CommonException {
 
     private static final String MESSAGE = "중복된 역이 있습니다.";
 

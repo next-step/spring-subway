@@ -2,7 +2,7 @@ package subway.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class SectionMinDistanceException extends BadRequestException {
+public class SectionMinDistanceException extends CommonException {
 
     private static final String MESSAGE = "최소 거리는 1이상 입니다.";
 

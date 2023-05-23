@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
             .body(new ErrorResponse(HttpStatus.BAD_REQUEST, e));
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleApiException(BadRequestException e) {
+    @ExceptionHandler(CommonException.class)
+    public ResponseEntity<ErrorResponse> handleApiException(CommonException e) {
         return ResponseEntity.status(e.getStatus())
             .body(new ErrorResponse(e.getStatus(), e.getMessage()));
     }
