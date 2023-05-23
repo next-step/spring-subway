@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.exception.SectionCrossException;
-import subway.exception.SectionDuplicationStationIdException;
-import subway.exception.SectionNotConnectingStationException;
-import subway.exception.SectionRemoveLastStationException;
+import subway.exception.section.SectionCrossException;
+import subway.exception.section.SectionDuplicationStationIdException;
+import subway.exception.section.SectionNotConnectingStationException;
+import subway.exception.section.SectionRemoveLastStationException;
 
 class SectionsTest {
 

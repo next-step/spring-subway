@@ -1,7 +1,7 @@
 package subway.domain;
 
-import subway.exception.FareMinAgeException;
-import subway.exception.FareMinDiscountException;
+import subway.exception.fare.FareMinAgeException;
+import subway.exception.fare.FareMinDiscountException;
 
 public class Fare {
 

@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.exception.SectionMinDistanceException;
-import subway.exception.SectionSameStationException;
+import subway.exception.section.SectionMinDistanceException;
+import subway.exception.section.SectionSameStationException;
 
 public class SectionTest {
 

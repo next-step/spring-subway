@@ -2,21 +2,28 @@ package subway.dto;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import subway.domain.Fare;
 import subway.domain.Station;
 
 public class PathResponse {
 
-    private final Integer distance;
     private final List<StationResponse> stations;
-    public PathResponse(Integer distance, List<StationResponse> stations) {
-        this.distance = distance;
+    private final Integer distance;
+    private final Fare fare;
+
+    public PathResponse(List<StationResponse> stations, Integer distance, Fare fare) {
         this.stations = stations;
+        this.distance = distance;
+        this.fare = fare;
     }
 
-    public static PathResponse of(List<Station> stations, int distance) {
-        return new PathResponse(distance, stations.stream()
-            .map(StationResponse::of)
-            .collect(Collectors.toUnmodifiableList()));
+    public static PathResponse of(List<Station> stations, int distance, Fare fare) {
+        return new PathResponse(
+            stations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toUnmodifiableList()),
+            distance,
+            fare);
     }
 
     public Integer getDistance() {
@@ -25,5 +32,9 @@ public class PathResponse {
 
     public List<StationResponse> getStations() {
         return stations;
+    }
+
+    public Long getFare() {
+        return fare.getFare();
     }
 }

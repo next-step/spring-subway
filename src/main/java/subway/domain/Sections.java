@@ -1,10 +1,10 @@
 package subway.domain;
 
 import java.util.List;
-import subway.exception.SectionCrossException;
-import subway.exception.SectionDuplicationStationIdException;
-import subway.exception.SectionNotConnectingStationException;
-import subway.exception.SectionRemoveLastStationException;
+import subway.exception.section.SectionCrossException;
+import subway.exception.section.SectionDuplicationStationIdException;
+import subway.exception.section.SectionNotConnectingStationException;
+import subway.exception.section.SectionRemoveLastStationException;
 
 public class Sections {
 

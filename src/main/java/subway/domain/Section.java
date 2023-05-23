@@ -1,7 +1,7 @@
 package subway.domain;
 
-import subway.exception.SectionMinDistanceException;
-import subway.exception.SectionSameStationException;
+import subway.exception.section.SectionMinDistanceException;
+import subway.exception.section.SectionSameStationException;
 
 public class Section {
 

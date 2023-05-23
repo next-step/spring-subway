@@ -20,7 +20,7 @@ import subway.dto.StationResponse;
 @DisplayName("지하철 노선 경로 조회 기능")
 public class PathIntegrationTest extends IntegrationTest {
 
-    @DisplayName("지하철 노선 경로를 조회할 때 출발역과 도착역을 입력하면 최단거리 및 총 거리를 반환한다.")
+    @DisplayName("지하철 노선 경로를 조회할 때 출발역, 도착역, 나이를 입력하면 최단거리, 총 거리, 요금을 반환한다.")
     @Test
     void getPaths() {
         // given
@@ -28,14 +28,16 @@ public class PathIntegrationTest extends IntegrationTest {
         StationResponse 신사역 = 역_생성("신사");
         StationResponse 논현역 = 역_생성("논현");
         StationResponse 신논현역 = 역_생성("신논현");
-        구간_생성(신분당선.getId(), 신사역.getId(), 논현역.getId());
-        구간_생성(신분당선.getId(), 논현역.getId(), 신논현역.getId());
+        구간_생성(신분당선.getId(), 신사역.getId(), 논현역.getId(), 1);
+        구간_생성(신분당선.getId(), 논현역.getId(), 신논현역.getId(), 1);
+        int age = 20;
 
         // when
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
             .queryParam("source", 신사역.getId())
             .queryParam("target", 신논현역.getId())
+            .queryParam("age", age)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/paths")
             .then().log().all()
@@ -46,6 +48,7 @@ public class PathIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(pathResponse.getDistance()).isEqualTo(2);
         assertThat(pathResponse.getStations().size()).isEqualTo(3);
+        assertThat(pathResponse.getFare()).isEqualTo(1250L);
     }
 
     @DisplayName("지하철 노선 경로를 조회할 때 출발역과 도착역이 같으면 에러를 반환한다.")
@@ -56,14 +59,43 @@ public class PathIntegrationTest extends IntegrationTest {
         StationResponse 신사역 = 역_생성("신사");
         StationResponse 논현역 = 역_생성("논현");
         StationResponse 신논현역 = 역_생성("신논현");
-        구간_생성(신분당선.getId(), 신사역.getId(), 논현역.getId());
-        구간_생성(신분당선.getId(), 논현역.getId(), 신논현역.getId());
+        구간_생성(신분당선.getId(), 신사역.getId(), 논현역.getId(), 1);
+        구간_생성(신분당선.getId(), 논현역.getId(), 신논현역.getId(), 1);
+        int age = 20;
 
         // when
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
             .queryParam("source", 신사역.getId())
             .queryParam("target", 신사역.getId())
+            .queryParam("age", age)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().get("/paths")
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("지하철 노선 경로를 조회할 때 나이가 0미만이면 에러를 반환한다.")
+    @Test
+    void getPathsFalse2() {
+        // given
+        LineResponse 신분당선 = 신분당선_생성();
+        StationResponse 신사역 = 역_생성("신사");
+        StationResponse 논현역 = 역_생성("논현");
+        StationResponse 신논현역 = 역_생성("신논현");
+        구간_생성(신분당선.getId(), 신사역.getId(), 논현역.getId(), 1);
+        구간_생성(신분당선.getId(), 논현역.getId(), 신논현역.getId(), 1);
+        int age = -1;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .queryParam("source", 신사역.getId())
+            .queryParam("target", 신사역.getId())
+            .queryParam("age", age)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when().get("/paths")
             .then().log().all()
@@ -94,11 +126,11 @@ public class PathIntegrationTest extends IntegrationTest {
             .extract().body().as(StationResponse.class);
     }
 
-    private SectionResponse 구간_생성(Long lineId, Long upStationId, Long downStationId) {
+    private SectionResponse 구간_생성(Long lineId, Long upStationId, Long downStationId, int distance) {
         return RestAssured
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(new SectionAddRequest(upStationId, downStationId, 1))
+            .body(new SectionAddRequest(upStationId, downStationId, distance))
             .when().post("/lines/{lineId}/sections", lineId)
             .then().log().all()
             .extract().body().as(SectionResponse.class);

@@ -1,6 +1,7 @@
-package subway.exception;
+package subway.exception.shortestpath;
 
 import org.springframework.http.HttpStatus;
+import subway.exception.CommonException;
 
 public class ShortestPathSameStationException extends CommonException {
 

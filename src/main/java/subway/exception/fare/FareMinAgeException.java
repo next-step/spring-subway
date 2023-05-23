@@ -1,6 +1,7 @@
-package subway.exception;
+package subway.exception.fare;
 
 import org.springframework.http.HttpStatus;
+import subway.exception.CommonException;
 
 public class FareMinAgeException extends CommonException {
 
