@@ -1,7 +1,13 @@
-package subway.dto;
+package subway.api.dto;
+
+import subway.domain.entity.Line;
+
+import javax.validation.constraints.NotBlank;
 
 public class LineRequest {
+    @NotBlank
     private String name;
+    @NotBlank
     private String color;
 
     public LineRequest() {
@@ -20,4 +26,7 @@ public class LineRequest {
         return color;
     }
 
+    public Line toDomain() {
+        return new Line(name, color);
+    }
 }

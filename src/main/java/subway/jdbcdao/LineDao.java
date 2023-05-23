@@ -1,18 +1,20 @@
-package subway.dao;
+package subway.jdbcdao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import subway.domain.Line;
+import subway.domain.entity.Line;
+import subway.domain.repository.LineRepository;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Repository
-public class LineDao {
+public class LineDao implements LineRepository {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
@@ -30,6 +32,7 @@ public class LineDao {
                 .usingGeneratedKeyColumns("id");
     }
 
+    @Override
     public Line insert(Line line) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", line.getId());
@@ -40,21 +43,29 @@ public class LineDao {
         return new Line(lineId, line.getName(), line.getColor());
     }
 
+    @Override
     public List<Line> findAll() {
         String sql = "select id, name, color from LINE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
+    @Override
     public Line findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        } catch (Exception e) {
+            throw new NoSuchElementException("존재하지 않는 노선입니다.");
+        }
     }
 
+    @Override
     public void update(Line newLine) {
         String sql = "update LINE set name = ?, color = ? where id = ?";
         jdbcTemplate.update(sql, new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
     }
 
+    @Override
     public void deleteById(Long id) {
         jdbcTemplate.update("delete from Line where id = ?", id);
     }

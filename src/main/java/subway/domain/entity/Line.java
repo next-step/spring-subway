@@ -1,4 +1,4 @@
-package subway.domain;
+package subway.domain.entity;
 
 import java.util.Objects;
 
@@ -36,13 +36,14 @@ public class Line {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (id == null) return false;
+        if (!(o instanceof Line)) return false;
         Line line = (Line) o;
-        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color);
+        return Objects.equals(id, line.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, color);
+        return Objects.hash(id);
     }
 }
