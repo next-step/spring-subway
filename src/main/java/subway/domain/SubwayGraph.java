@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter(AccessLevel.PACKAGE)
 @Component
@@ -13,13 +14,13 @@ public class SubwayGraph {
      * 해당 역과 연결되어 있는 구간들을 저장합니다.
      * 정방향 탐색에 쓰입니다.
      */
-    private Map<Station, Set<Section>> connection = new HashMap<>();
+    private Map<Station, Set<Section>> connection = new ConcurrentHashMap<>();
 
     /**
      * 각 호선의 첫번째 역을 저장합니다.
      * 노선별 탐색에 사용됩니다.
      */
-    private Map<Line, Station> firstStationInLines = new HashMap<>();
+    private Map<Line, Station> firstStationInLines = new ConcurrentHashMap<>();
 
     public SubwayGraph() {}
 
@@ -72,7 +73,7 @@ public class SubwayGraph {
      * @param section
      * @return
      */
-    private boolean isLastDownStationInLine(Section section) {
+    protected boolean isLastDownStationInLine(Section section) {
         if (!connection.containsKey(section.getUpStation())) {
             return true;
         }
