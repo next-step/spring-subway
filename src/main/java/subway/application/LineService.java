@@ -2,8 +2,8 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.dao.LineDao;
-import subway.dao.StationDao;
+import subway.infrastrucure.LineDao;
+import subway.infrastrucure.StationDao;
 import subway.domain.Line;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class LineService {
+
     private final LineDao lineDao;
     private final StationDao stationDao;
 

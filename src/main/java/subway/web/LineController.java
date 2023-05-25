@@ -1,4 +1,4 @@
-package subway.ui;
+package subway.web;
 
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;

@@ -2,9 +2,9 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import subway.dao.LineDao;
-import subway.dao.SectionDao;
-import subway.dao.StationDao;
+import subway.infrastrucure.LineDao;
+import subway.infrastrucure.SectionDao;
+import subway.infrastrucure.StationDao;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.dto.SectionAddRequest;

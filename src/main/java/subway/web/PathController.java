@@ -1,4 +1,4 @@
-package subway.ui;
+package subway.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

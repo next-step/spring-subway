@@ -1,4 +1,4 @@
-package subway.ui;
+package subway.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +7,6 @@ import subway.dto.StationResponse;
 import subway.application.StationService;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController

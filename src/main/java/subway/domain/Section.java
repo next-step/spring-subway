@@ -11,9 +11,9 @@ public class Section {
     private final Line line;
     private final Station upStation;
     private final Station downStation;
-    private final int distance;
+    private final Integer distance;
 
-    public Section(Long id, Line line, Station upStation, Station downStation, int distance) {
+    public Section(Long id, Line line, Station upStation, Station downStation, Integer distance) {
         validate(upStation, downStation, distance);
         this.id = id;
         this.line = line;
@@ -22,7 +22,7 @@ public class Section {
         this.distance = distance;
     }
 
-    private void validate(Station upStation, Station downStation, int distance) {
+    private void validate(Station upStation, Station downStation, Integer distance) {
         validateMinDistance(distance);
         validateSameStation(upStation, downStation);
     }
