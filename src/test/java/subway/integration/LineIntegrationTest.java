@@ -123,10 +123,6 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineDto lineDto = response.as(LineDto.class);
         assertThat(lineDto.getId()).isEqualTo(lineId);
-
-        // TODO: 궁금한점
-        // data.sql 로 DB 초기값을 세팅하도록 되어 있는데,
-        // 목록 조회의 테스트 같은 경우, 상세 값 비교로 검증을 하면, 초기 데이터가 변경되는 경우에 테스트가 틀어질 것 같은데 혹시 방법이 있나요?
     }
 
     @DisplayName("지하철 노선을 수정한다.")

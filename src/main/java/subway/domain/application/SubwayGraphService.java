@@ -10,11 +10,13 @@ import subway.domain.Station;
 import subway.domain.SubwayGraph;
 import subway.domain.dto.AddSectionDto;
 import subway.domain.dto.LineDto;
+import subway.domain.dto.SubwayPathDto;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.SectionRepository;
 import subway.domain.repository.StationRepository;
 import subway.domain.searchGraph.SearchGraph;
 import subway.domain.vo.Distance;
+import subway.domain.vo.SubwayPath;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -111,6 +113,19 @@ public class SubwayGraphService {
                 .map(line -> subwayGraph.getLineWithStations(line))
                 .map(LineDto::from)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 최단거리 경로를 찾는다.
+     * @param startStationId
+     * @param endStationId
+     * @return
+     */
+    public SubwayPathDto findShortenPath(Long startStationId, Long endStationId) {
+        Station startStation = stationRepository.findById(startStationId);
+        Station endStation = stationRepository.findById(endStationId);
+
+        return SubwayPathDto.from(searchGraph.findShortenPath(startStation, endStation));
     }
 
 }
