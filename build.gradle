@@ -23,6 +23,9 @@ dependencies {
 	implementation 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// https://mvnrepository.com/artifact/org.jgrapht/jgrapht
+	implementation 'org.jgrapht:jgrapht-core:1.0.1'
+
 	runtimeOnly 'com.h2database:h2'
 }
 
