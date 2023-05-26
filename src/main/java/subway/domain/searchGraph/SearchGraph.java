@@ -20,12 +20,18 @@ public interface SearchGraph {
     void addSection(Section section);
 
     /**
+     * 구간을 제거합니다.
+     * @Param section
+     */
+    void removeSection(Section section);
+
+    /**
      * 최단경로를 구합니다.
      * @Param 탐색 시작 역
      * @Param 탐색 도착 역
      * @return GraphPath - 경로, 최단거리
      */
-    SubwayPath getShortenPath(Station startStation, Station endStation);
+    SubwayPath findShortenPath(Station startStation, Station endStation);
 
     /**
      * 저장된 역을 반환합니다.

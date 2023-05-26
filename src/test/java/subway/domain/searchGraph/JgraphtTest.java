@@ -1,4 +1,4 @@
-package subway.domain;
+package subway.domain.searchGraph;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
@@ -7,10 +7,10 @@ import org.jgrapht.graph.WeightedMultigraph;
 import org.jgrapht.graph.concurrent.AsSynchronizedGraph;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.domain.Station;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.*;
 
