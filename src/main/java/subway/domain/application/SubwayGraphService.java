@@ -3,6 +3,7 @@ package subway.domain.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
@@ -12,6 +13,7 @@ import subway.domain.dto.LineDto;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.SectionRepository;
 import subway.domain.repository.StationRepository;
+import subway.domain.searchGraph.SearchGraph;
 import subway.domain.vo.Distance;
 
 import java.util.List;
@@ -24,30 +26,41 @@ public class SubwayGraphService {
     private final SectionRepository sectionRepository;
     private final LineRepository lineRepository;
     private final StationRepository stationRepository;
+    private final SearchGraph searchGraph;
 
     public SubwayGraphService(SubwayGraph subwayGraph, SectionRepository sectionRepository,
-                              LineRepository lineRepository, StationRepository stationRepository) {
+                              LineRepository lineRepository, StationRepository stationRepository,
+                              SearchGraph searchGraph) {
         this.subwayGraph = subwayGraph;
         this.sectionRepository = sectionRepository;
         this.lineRepository = lineRepository;
         this.stationRepository = stationRepository;
+        this.searchGraph = searchGraph;
     }
 
     /**
-     * DB의 구간 데이터를 조회하여 그래프 상태를 초기화한다.
+     * DB의 구간 데이터를 조회하여 지하철그래프와 탐색그래프의 상태를 초기화한다.
      */
     public void initGraph() {
+        List<Station> allStation = stationRepository.findAll();
+        for (Station station : allStation) {
+            searchGraph.addStation(station);
+        }
+
         List<Section> allSection = sectionRepository.findAll();
         for (Section section : allSection) {
             subwayGraph.add(section);
+            searchGraph.addSection(section);
         }
+
     }
 
     /**
-     * 그래프와 DB에 구간을 추가합니다.
+     * 지하철 그래프, 탐색 그래프, DB에 구간을 추가합니다.
      * @param addSectionDto
      * @return
      */
+    @Transactional
     public Section addSection(AddSectionDto addSectionDto) {
         Line line = lineRepository.findById(addSectionDto.getLineId());
         Station upStation = stationRepository.findById(addSectionDto.getUpStationId());
@@ -56,6 +69,7 @@ public class SubwayGraphService {
         Section section = Section.of(line, upStation, downStation, distance);
 
         subwayGraph.add(section);
+        searchGraph.addSection(section);
         return sectionRepository.insert(section);
     }
 
