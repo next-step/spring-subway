@@ -1,4 +1,4 @@
-package subway.dao;
+package subway.infrastrucure;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +13,7 @@ import subway.domain.Line;
 
 @Repository
 public class LineDao {
+
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 

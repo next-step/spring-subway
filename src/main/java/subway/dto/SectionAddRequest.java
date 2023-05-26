@@ -2,7 +2,9 @@ package subway.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Station;
 
 public class SectionAddRequest {
 
@@ -34,7 +36,7 @@ public class SectionAddRequest {
         return distance;
     }
 
-    public Section toSection(Long lineId) {
-        return new Section(null, lineId, upStationId, downStationId, distance);
+    public Section toSection(Line line, Station upStation, Station downStation) {
+        return new Section(null, line, upStation, downStation, distance);
     }
 }

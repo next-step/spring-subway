@@ -1,30 +1,30 @@
 package subway.domain;
 
-import subway.exception.SectionMinDistanceException;
-import subway.exception.SectionSameStationException;
+import subway.exception.section.SectionMinDistanceException;
+import subway.exception.section.SectionSameStationException;
 
 public class Section {
 
     private static final int MIN_DISTANCE = 1;
 
     private Long id;
-    private final Long lineId;
-    private final Long upStationId;
-    private final Long downStationId;
-    private final int distance;
+    private final Line line;
+    private final Station upStation;
+    private final Station downStation;
+    private final Integer distance;
 
-    public Section(Long id, Long lineId, Long upStationId, Long downStationId, int distance) {
-        validate(upStationId, downStationId, distance);
+    public Section(Long id, Line line, Station upStation, Station downStation, Integer distance) {
+        validate(upStation, downStation, distance);
         this.id = id;
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    private void validate(Long upStationId, Long downStationId, int distance) {
+    private void validate(Station upStation, Station downStation, Integer distance) {
         validateMinDistance(distance);
-        validateSameStation(upStationId, downStationId);
+        validateSameStation(upStation, downStation);
     }
 
     private void validateMinDistance(int distance) {
@@ -33,34 +33,46 @@ public class Section {
         }
     }
 
-    private void validateSameStation(Long upStationId, Long downStationId) {
-        if (upStationId.equals(downStationId)) {
+    private void validateSameStation(Station upStation, Station downStation) {
+        if (upStation.isSameId(downStation.getId())) {
             throw new SectionSameStationException();
         }
     }
 
     public boolean isNotSameDownStation(Long stationId) {
-        return !this.downStationId.equals(stationId);
+        return !this.downStation.isSameId(stationId);
     }
 
     public boolean isSameUpStation(Long stationId) {
-        return this.upStationId.equals(stationId);
+        return this.upStation.isSameId(stationId);
     }
 
     public Long getId() {
         return id;
     }
 
+    public Line getLine() {
+        return line;
+    }
+
     public Long getLineId() {
-        return lineId;
+        return line.getId();
+    }
+
+    public Station getUpStation() {
+        return upStation;
     }
 
     public Long getUpStationId() {
-        return upStationId;
+        return upStation.getId();
+    }
+
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Long getDownStationId() {
-        return downStationId;
+        return downStation.getId();
     }
 
     public int getDistance() {

@@ -1,4 +1,4 @@
-package subway.dao;
+package subway.infrastrucure;
 
 import java.util.Map;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,6 +14,7 @@ import java.util.List;
 
 @Repository
 public class StationDao {
+
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
