@@ -20,6 +20,14 @@ public class Distance implements Comparator<Distance> {
         }
     }
 
+    public Distance add(Distance distance) {
+        return Distance.of(this.value + distance.value);
+    }
+
+    public static Distance of(Integer distance) {
+        return new Distance(distance);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
