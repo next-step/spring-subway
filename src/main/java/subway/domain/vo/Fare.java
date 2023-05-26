@@ -2,31 +2,25 @@ package subway.domain.vo;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static subway.domain.vo.Fare.FareTable.*;
 
+@Getter
 public class Fare {
 
     private Integer value;
-    private Distance distance;
+    private double distance;
 
     public Fare(Integer fare) {
         this.value = fare;
     }
-    public Fare(Distance distance) {
-        this.distance = distance;
-    }
 
-    public static Fare fromDistance(Distance distance) {
+    public static Fare fromDistance(double distance) {
         return new Fare(calculateFare(distance));
     }
 
-    private static int calculateFare(Distance distanceObject) {
-        int distance = distanceObject.getValue();
+    private static int calculateFare(double distance) {
         if (distance < DEFAULT.limitDistance) {
             return DEFAULT.fare;
         }
