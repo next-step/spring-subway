@@ -1,18 +1,21 @@
 package subway.domain.vo;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import subway.domain.Station;
-
 import java.util.List;
 import java.util.Objects;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SubwayPath {
     private final List<Station> stations;
     private final Double distance;
+    private Fare fare;
+
+    public SubwayPath(List<Station> stations, Double distance) {
+        this.stations = stations;
+        this.distance = distance;
+        this.fare = Fare.fromDistance(distance);
+    }
 
     public static SubwayPath of(List<Station> stations, Double distance) {
         return new SubwayPath(stations, distance);

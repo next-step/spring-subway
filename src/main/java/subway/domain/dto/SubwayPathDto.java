@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class SubwayPathDto {
     private final List<StationDto> stations;
     private final Double distance;
+    private final Integer fare;
 
     public static SubwayPathDto from(SubwayPath subwayPath) {
         return SubwayPathDto.builder()
@@ -21,6 +22,7 @@ public class SubwayPathDto {
                         .map(StationDto::from)
                         .collect(Collectors.toList()))
                 .distance(subwayPath.getDistance())
+                .fare(subwayPath.getFare().getValue())
                 .build();
     }
 }

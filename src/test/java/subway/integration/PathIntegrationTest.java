@@ -103,6 +103,7 @@ public class PathIntegrationTest extends IntegrationTest {
         SubwayPathDto answer = SubwayPathDto.builder()
                 .stations(Stream.of(sichung, jongro3, uljiro4).map(StationDto::from).collect(Collectors.toList()))
                 .distance(4d)
+                .fare(1250)
                 .build();
         SubwayPathDto result = response.body().as(SubwayPathDto.class);
         assertThat(result).usingRecursiveComparison().isEqualTo(answer);

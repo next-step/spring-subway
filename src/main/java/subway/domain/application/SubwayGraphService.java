@@ -124,7 +124,6 @@ public class SubwayGraphService {
     public SubwayPathDto findShortenPath(Long startStationId, Long endStationId) {
         Station startStation = stationRepository.findById(startStationId);
         Station endStation = stationRepository.findById(endStationId);
-
         return SubwayPathDto.from(searchGraph.findShortenPath(startStation, endStation));
     }
 
