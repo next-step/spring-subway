@@ -80,6 +80,7 @@ public class SubwayGraphService {
      * @param lineId
      * @param stationId
      */
+    @Transactional
     public void removeStation(Long lineId, Long stationId) {
         Line line = lineRepository.findById(lineId);
         Station station = stationRepository.findById(stationId);

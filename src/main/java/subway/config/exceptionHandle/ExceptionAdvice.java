@@ -13,6 +13,8 @@ import java.util.UUID;
 @RestControllerAdvice
 public class ExceptionAdvice {
 
+    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "알 수 없는 에러가 발생했습니다.";
+
     private UUID generateLogId(Exception ex) {
         UUID uuid = UUID.randomUUID();
         log.error("## error : {}, {}", uuid, ex.getClass().getSimpleName(), ex);
@@ -34,6 +36,6 @@ public class ExceptionAdvice {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception ex) {
-        return ErrorResponse.of(generateLogId(ex), ex);
+        return ErrorResponse.of(generateLogId(ex), new Exception(INTERNAL_SERVER_ERROR_MESSAGE));
     }
 }
