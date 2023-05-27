@@ -10,17 +10,22 @@ import static subway.domain.vo.Fare.FareTable.*;
 public class Fare {
 
     private Integer value;
-    private double distance;
+    private Distance distance;
 
     public Fare(Integer fare) {
         this.value = fare;
     }
 
-    public static Fare fromDistance(double distance) {
+    public static Fare fromDistance(Distance distance) {
         return new Fare(calculateFare(distance));
     }
 
-    private static int calculateFare(double distance) {
+    public static Fare fromDistance(Double distance) {
+        return new Fare(calculateFare(new Distance(distance)));
+    }
+
+    private static int calculateFare(Distance distanceObject) {
+        Double distance = distanceObject.getDoubleValue();
         if (distance < DEFAULT.limitDistance) {
             return DEFAULT.fare;
         }

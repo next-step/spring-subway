@@ -8,20 +8,20 @@ import java.util.Objects;
 @Getter
 public class SubwayPath {
     private final List<Station> stations;
-    private final Double distance;
+    private final Distance distance;
     private Fare fare;
 
-    public SubwayPath(List<Station> stations, Double distance) {
+    public SubwayPath(List<Station> stations, Distance distance) {
         this.stations = stations;
         this.distance = distance;
         this.fare = Fare.fromDistance(distance);
     }
 
     public static SubwayPath of(List<Station> stations, Double distance) {
-        return new SubwayPath(stations, distance);
+        return new SubwayPath(stations, new Distance(distance));
     }
     public static SubwayPath of(List<Station> stations, Integer distance) {
-        return new SubwayPath(stations, (double)distance);
+        return new SubwayPath(stations, new Distance(distance));
     }
 
     @Override

@@ -21,7 +21,7 @@ public class SubwayPathDto {
                 .stations(subwayPath.getStations().stream()
                         .map(StationDto::from)
                         .collect(Collectors.toList()))
-                .distance(subwayPath.getDistance())
+                .distance(subwayPath.getDistance().getDoubleValue())
                 .fare(subwayPath.getFare().getValue())
                 .build();
     }

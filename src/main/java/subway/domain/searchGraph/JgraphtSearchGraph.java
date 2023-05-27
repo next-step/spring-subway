@@ -1,7 +1,5 @@
 package subway.domain.searchGraph;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -50,7 +48,7 @@ public class JgraphtSearchGraph implements SearchGraph {
      * @param section
      */
     public void addSection(Section section) {
-        Integer distance = section.getDistance().getValue();
+        Integer distance = section.getDistance().getIntValue();
         DefaultWeightedEdge edge;
         try {
             edge = graph.addEdge(section.getUpStation(), section.getDownStation());

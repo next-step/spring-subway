@@ -1,20 +1,21 @@
 package subway.domain.vo;
 
-import lombok.Getter;
-
 import java.util.Comparator;
 import java.util.Objects;
 
-@Getter
 public class Distance implements Comparator<Distance> {
-    private final Integer value;
+    private final Double value;
 
-    public Distance(Integer distance) {
+    public Distance(Double distance) {
         validatePositive(distance);
         this.value = distance;
     }
 
-    private void validatePositive(Integer distance) {
+    public Distance(Integer distance) {
+        this(Double.valueOf(distance));
+    }
+
+    private void validatePositive(Double distance) {
         if (distance < 0) {
             throw new IllegalStateException("거리는 0 이하일 수 없습니다.");
         }
@@ -22,6 +23,14 @@ public class Distance implements Comparator<Distance> {
 
     public static Distance of(Integer distance) {
         return new Distance(distance);
+    }
+
+    public Double getDoubleValue() {
+        return value;
+    }
+
+    public Integer getIntValue() {
+        return value.intValue();
     }
 
     @Override
@@ -39,7 +48,7 @@ public class Distance implements Comparator<Distance> {
 
     @Override
     public int compare(Distance o1, Distance o2) {
-        return o1.value - o2.value;
+        return o1.value.compareTo(o2.value);
     }
 
     @Override
