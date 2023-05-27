@@ -22,18 +22,18 @@ public class ExceptionAdvice {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, generateLogId(ex), ex);
+        return ErrorResponse.of(generateLogId(ex), ex);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleAuthenticationException(AuthenticationException ex) {
-        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, generateLogId(ex), ex);
+        return ErrorResponse.of(generateLogId(ex), ex);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception ex) {
-        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, generateLogId(ex), ex);
+        return ErrorResponse.of(generateLogId(ex), ex);
     }
 }
