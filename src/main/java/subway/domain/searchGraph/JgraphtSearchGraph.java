@@ -28,10 +28,13 @@ public class JgraphtSearchGraph implements SearchGraph {
      */
     private final AsSynchronizedGraph<Station, DefaultWeightedEdge> graph;
 
+    private final DijkstraShortestPath dijkstraShortestPath;
+
     public JgraphtSearchGraph() {
         WeightedMultigraph<Station, DefaultWeightedEdge> nonAsyncGraph
                 = new WeightedMultigraph<>(DefaultWeightedEdge.class);
         this.graph = new AsSynchronizedGraph<>(nonAsyncGraph);
+        this.dijkstraShortestPath = new DijkstraShortestPath(graph);
     }
 
     /**
@@ -74,15 +77,14 @@ public class JgraphtSearchGraph implements SearchGraph {
      * @return GraphPath - 경로, 최단거리
      */
     public SubwayPath findShortenPath(Station startStation, Station endStation) {
-        DijkstraShortestPath dijkstraShortestPath = new DijkstraShortestPath(graph);
         GraphPath graphPath;
         try {
             graphPath = dijkstraShortestPath.getPath(startStation, endStation);
+            if (graphPath == null) {
+                throw new IllegalArgumentException(SEARCH_GRAPH_CANNOT_FIND_PATH);
+            }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(SEARCH_GRAPH_NOT_CONTAINS_STATION, e);
-        }
-        if (graphPath == null) {
-            throw new IllegalArgumentException(SEARCH_GRAPH_CANNOT_FIND_PATH);
         }
         return SubwayPath.of(graphPath.getVertexList(), graphPath.getWeight());
     }
