@@ -29,7 +29,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
+    private List<Line> findLines() {
         return lineDao.findAll();
     }
 
@@ -38,7 +38,7 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
-    public Line findLineById(Long id) {
+    private Line findLineById(Long id) {
         return lineDao.findById(id);
     }
 

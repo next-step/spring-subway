@@ -1,9 +1,11 @@
 package subway.dto;
 
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
     private Long id;
@@ -16,6 +18,15 @@ public class LineResponse {
         this.name = name;
         this.color = color;
         this.stations = stations;
+    }
+
+    public static LineResponse of(Line line) {
+        List<Station> distinctStations = Section.distinctStations(line.getSections());
+        List<StationResponse> stationResponses = distinctStations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
+
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 
     public Long getId() {
@@ -32,33 +43,6 @@ public class LineResponse {
 
     public List<StationResponse> getStations() {
         return stations;
-    }
-
-    static class LineResponseBuilder {
-        private Long id;
-        private String name;
-        private String color;
-        private List<StationResponse> stations;
-
-        public LineResponseBuilder() {
-            this.stations = new ArrayList<>();
-        }
-
-        public LineResponseBuilder line(Line line) {
-            this.id = line.getId();
-            this.name = line.getName();
-            this.color = line.getColor();
-            return this;
-        }
-
-        public LineResponseBuilder station(StationResponse station) {
-            this.stations.add(station);
-            return this;
-        }
-
-        public LineResponse build() {
-            return new LineResponse(this.id, this.name, this.color, this.stations);
-        }
     }
 
 }
