@@ -13,7 +13,7 @@ public class Line {
     public Line() {
     }
 
-    Line(Long id, String name) {
+    public Line(Long id, String name) {
         this.id = id;
         this.name = name;
     }

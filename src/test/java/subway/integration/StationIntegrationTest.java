@@ -54,6 +54,14 @@ public class StationIntegrationTest extends IntegrationTest {
                 .then().log().all()
                 .extract();
 
+        RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)

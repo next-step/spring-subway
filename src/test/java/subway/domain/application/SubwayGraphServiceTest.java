@@ -17,6 +17,8 @@ import subway.domain.dto.StationDto;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.SectionRepository;
 import subway.domain.repository.StationRepository;
+import subway.domain.searchGraph.JgraphtSearchGraph;
+import subway.domain.searchGraph.SearchGraph;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +41,24 @@ class SubwayGraphServiceTest {
     @Mock
     StationRepository stationRepository;
 
+    private SearchGraph searchGraph = new JgraphtSearchGraph();
+
     private SubwayGraphService subwayGraphService;
 
     @BeforeEach
     void initGraph() {
         // given
+        // station
+        List<Station> stations = new ArrayList<>();
+        stations.add(new Station(1L, "name"));
+        stations.add(new Station(2L, "name"));
+        stations.add(new Station(3L, "name"));
+        stations.add(new Station(4L, "name"));
+        stations.add(new Station(5L, "name"));
+        stations.add(new Station(6L, "name"));
+        stations.add(new Station(7L, "name"));
+
+        // section
         List<Section> sections = new ArrayList<>();
         sections.add(makeSection(1L, 1L, 2L, 1));
         sections.add(makeSection(1L, 2L, 3L, 1));
@@ -51,10 +66,12 @@ class SubwayGraphServiceTest {
         sections.add(makeSection(1L, 4L, 5L, 1));
         sections.add(makeSection(2L, 1L, 6L, 1));
 
+        given(stationRepository.findAll())
+                .willReturn(stations);
         given(sectionRepository.findAll())
                 .willReturn(sections);
 
-        subwayGraphService = new SubwayGraphService(subwayGraph, sectionRepository, lineRepository, stationRepository);
+        subwayGraphService = new SubwayGraphService(subwayGraph, sectionRepository, lineRepository, stationRepository, searchGraph);
         subwayGraphService.initGraph();
     }
 
@@ -64,7 +81,7 @@ class SubwayGraphServiceTest {
         // given
         Line line = new Line(2L, "2호선", "color");
         Station upStation = new Station(6L, "6번역");
-        Station downStation = new Station(7L, "7번역");
+        Station downStation = new Station(7L, "name");
         Integer distance = 10;
         when(lineRepository.findById(2L)).thenReturn(line);
         when(stationRepository.findById(6L)).thenReturn(upStation);

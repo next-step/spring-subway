@@ -31,7 +31,7 @@ public class SectionDao implements SectionRepository {
         parameters.put("line_id", section.getLine().getId());
         parameters.put("up_station_id", section.getUpStation().getId());
         parameters.put("down_station_id", section.getDownStation().getId());
-        parameters.put("distance", section.getDistance().getValue());
+        parameters.put("distance", section.getDistance().getIntValue());
         long id = insertAction.executeAndReturnKey(parameters).longValue();
         section.setId(id);
         return section;
