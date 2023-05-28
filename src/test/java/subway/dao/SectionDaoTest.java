@@ -118,14 +118,14 @@ class SectionDaoTest {
         Section insertedSection = sectionDao.insert(line1.getId(), new Section(station1, station2, 5));
 
         // when
-        Optional<Section> foundSection = sectionDao.findById(insertedSection.getId());
+        Optional<Section> foundOptionalSection = sectionDao.findById(insertedSection.getId());
 
         // then
-        Section section = assertDoesNotThrow(() -> foundSection.get());
-        assertThat(section.getId()).isNotNull();
-        assertThat(section.getUpStation()).isEqualTo(station1);
-        assertThat(section.getDownStation()).isEqualTo(station2);
-        assertThat(section.getDistance()).isEqualTo(5);
+        Section foundSection = assertDoesNotThrow(() -> foundOptionalSection.get());
+        assertThat(foundSection.getId()).isNotNull();
+        assertThat(foundSection.getUpStation()).isEqualTo(station1);
+        assertThat(foundSection.getDownStation()).isEqualTo(station2);
+        assertThat(foundSection.getDistance()).isEqualTo(5);
     }
 
     @DisplayName("Section id로 Section 테이블의 엔티티를 삭제한다")

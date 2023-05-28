@@ -39,7 +39,8 @@ public class LineService {
     }
 
     private Line findLineById(Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Line 입니다."));
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
