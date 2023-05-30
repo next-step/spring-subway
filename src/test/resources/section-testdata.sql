@@ -1,3 +1,8 @@
+-- reset tables
+delete from section;
+delete from station;
+delete from line;
+
 -- line insert
 insert into line(id, name, color) values(1, '신분당선', 'bg-red-600');
 insert into line(id, name, color) values(2, '수인분당선', 'bg-yellow-600');
