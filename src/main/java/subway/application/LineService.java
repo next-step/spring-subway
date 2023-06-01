@@ -29,7 +29,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
+    private List<Line> findLines() {
         return lineDao.findAll();
     }
 
@@ -38,8 +38,9 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
-    public Line findLineById(Long id) {
-        return lineDao.findById(id);
+    private Line findLineById(Long id) {
+        return lineDao.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Line 입니다."));
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {

@@ -23,7 +23,12 @@ public class StationService {
     }
 
     public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        return StationResponse.of(findStationById(id));
+    }
+
+    private Station findStationById(Long id) {
+        return stationDao.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Station 입니다."));
     }
 
     public List<StationResponse> findAllStationResponses() {
