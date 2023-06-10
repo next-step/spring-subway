@@ -41,6 +41,10 @@ public class Section {
         return distance;
     }
 
+    public boolean isIdEquals(Long id) {
+        return this.id.equals(id);
+    }
+
     public static List<Station> distinctStations(List<Section> sections) {
         return sections.stream()
                 .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))

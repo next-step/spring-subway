@@ -59,17 +59,16 @@ public class SectionService {
     }
 
     private boolean isUpStationDoesNotEqualToLastDownStation(List<Section> sections, List<Station> distinctStations, Long upStationId) {
-        return !(sections.isEmpty() || getLastStationId(distinctStations).equals(upStationId));
+        return !(sections.isEmpty() || getLastStation(distinctStations).isIdEquals(upStationId));
     }
 
-    private Long getLastStationId(List<Station> stations) {
-        return stations.get(stations.size() - 1).getId();
+    private Station getLastStation(List<Station> stations) {
+        return stations.get(stations.size() - 1);
     }
 
     private boolean isStationAlreadyExists(List<Station> distinctStations, Long downStationId) {
         return distinctStations.stream()
-                .map(Station::getId)
-                .anyMatch(id -> id.equals(downStationId));
+                .anyMatch(station -> station.isIdEquals(downStationId));
     }
 
     public void deleteSectionById(Long lineId, Long sectionId) {
@@ -86,10 +85,10 @@ public class SectionService {
     }
 
     private boolean isNotLastSection(List<Section> sections, Long sectionId) {
-        return !sections.isEmpty() && !getLastSectionId(sections).equals(sectionId);
+        return !(sections.isEmpty() || getLastSection(sections).isIdEquals(sectionId));
     }
 
-    private Long getLastSectionId(List<Section> sections) {
-        return sections.get(sections.size() - 1).getId();
+    private Section getLastSection(List<Section> sections) {
+        return sections.get(sections.size() - 1);
     }
 }
