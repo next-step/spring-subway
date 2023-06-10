@@ -59,7 +59,7 @@ public class SectionService {
     }
 
     private boolean isUpStationDoesNotEqualToLastDownStation(List<Section> sections, List<Station> distinctStations, Long upStationId) {
-        return !sections.isEmpty() && !getLastStationId(distinctStations).equals(upStationId);
+        return !(sections.isEmpty() || getLastStationId(distinctStations).equals(upStationId));
     }
 
     private Long getLastStationId(List<Station> stations) {
