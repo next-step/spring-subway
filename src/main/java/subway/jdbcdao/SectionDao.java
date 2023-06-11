@@ -47,6 +47,12 @@ public class SectionDao implements SectionRepository {
     }
 
     @Override
+    public List<Section> findAll() {
+        String sql = "select * from SECTION";
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
+    @Override
     public void deleteByStationId(Long lineId, Long stationId) {
         jdbcTemplate.update("delete from SECTION where line_id = ? and down_station_id = ?", lineId, stationId);
     }

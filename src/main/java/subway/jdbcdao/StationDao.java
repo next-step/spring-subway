@@ -56,6 +56,16 @@ public class StationDao implements StationRepository {
     }
 
     @Override
+    public Station findByName(String name) {
+        String sql = "select * from STATION where name = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, rowMapper, name);
+        } catch (Exception e) {
+            throw new NoSuchElementException("존재하지 않는 역입니다.");
+        }
+    }
+
+    @Override
     public void update(Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
         jdbcTemplate.update(sql, new Object[]{newStation.getName(), newStation.getId()});

@@ -11,6 +11,8 @@ public interface StationRepository {
 
     Station findById(Long id);
 
+    Station findByName(String name);
+
     void update(Station newStation);
 
     void deleteById(Long id);

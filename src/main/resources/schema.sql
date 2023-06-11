@@ -25,3 +25,14 @@ create table if not exists SECTION
     foreign key(up_station_id) references STATION(id),
     foreign key(down_station_id) references STATION(id)
 );
+
+insert into STATION (name) values ('사당');
+insert into STATION (name) values ('방배');
+insert into STATION (name) values ('서초');
+insert into STATION (name) values ('교대');
+insert into STATION (name) values ('강남');
+
+insert into LINE (name, color) values ('2호선', 'GREEN');
+insert into LINE (name, color) values ('4호선', 'BLUE');
+insert into LINE (name, color) values ('3호선', 'ORANGE');
+insert into LINE (name, color) values ('신분당선', 'RED');

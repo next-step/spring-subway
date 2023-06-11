@@ -29,6 +29,15 @@ public class InMemoryStationRepository implements StationRepository {
     }
 
     @Override
+    public Station findByName(String name) {
+        return stationMap.values()
+                .stream()
+                .filter(s -> s.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 역입니다."));
+    }
+
+    @Override
     public void update(Station newStation) {
         stationMap.put(newStation.getId(), newStation);
     }

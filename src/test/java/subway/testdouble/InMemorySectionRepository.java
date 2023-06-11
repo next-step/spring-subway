@@ -1,9 +1,9 @@
 package subway.testdouble;
 
 import subway.domain.entity.Section;
-import subway.domain.entity.Station;
 import subway.domain.repository.SectionRepository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +23,11 @@ public class InMemorySectionRepository implements SectionRepository {
         return sectionMap.values().stream()
                 .filter(section -> section.getLineId().equals(lineId))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Section> findAll() {
+        return new ArrayList<>(sectionMap.values());
     }
 
     @Override

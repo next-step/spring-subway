@@ -10,5 +10,7 @@ public interface SectionRepository {
 
     List<Section> findAllByLineId(Long lineId);
 
+    List<Section> findAll();
+
     void deleteByStationId(Long lineId, Long stationId);
 }
