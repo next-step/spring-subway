@@ -49,9 +49,10 @@ class LineDaoTest {
 
         // then
         assertThat(insertedLine.getId()).isNotNull();
-        assertThat(insertedLine.getName()).isEqualTo(LINE_1.getName());
-        assertThat(insertedLine.getColor()).isEqualTo(LINE_1.getColor());
-        assertThat(insertedLine.getSections()).hasSize(0);
+        assertThat(insertedLine)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(LINE_1);
     }
 
     @DisplayName("Line 테이블에서 모든 엔티티를 조회한다")
@@ -84,9 +85,10 @@ class LineDaoTest {
 
         // then
         Line foundLine = assertDoesNotThrow(() -> foundOptionalLine.get());
-        assertThat(foundLine.getId()).isNotNull();
-        assertThat(foundLine.getName()).isEqualTo(LINE_1.getName());
-        assertThat(foundLine.getColor()).isEqualTo(LINE_1.getColor());
+        assertThat(foundLine)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(LINE_1);
     }
 
     @DisplayName("Line id로 section 리스트를 갖는 Line 테이블의 엔티티를 조회한다")
@@ -117,8 +119,10 @@ class LineDaoTest {
 
         // then
         Line updatedLine = lineDao.findById(insertedLine.getId()).get();
-        assertThat(updatedLine.getName()).isEqualTo(LINE_2.getName());
-        assertThat(updatedLine.getColor()).isEqualTo(LINE_2.getColor());
+        assertThat(updatedLine)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(LINE_2);
     }
 
     @DisplayName("Line 테이블의 엔티티를 삭제한다")

@@ -3,8 +3,8 @@
 - [x] Station에서 id를 꺼내 외부에서 비교하지 말고 직접 물어보기
   - SectionService 개선
 - [x] Section 도메인 생성자 체이닝 적용
-- [ ] test에서 필드끼리 비교할 때 usingRecursiveComparison() 사용해보기 
-- [ ] LineDaoTest - hasSize(0) 을 isEmpty() 로 개선
+- [x] test에서 필드끼리 비교할 때 usingRecursiveComparison() 사용해보기 
+- [x] LineDaoTest - hasSize(0) 을 isEmpty() 로 개선
 
 ## 2단계 기능 요구사항
 - [ ] 프로덕션, 테스트용 profile 다르게 설정하기
