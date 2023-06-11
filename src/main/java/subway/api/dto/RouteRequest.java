@@ -8,6 +8,9 @@ public class RouteRequest {
     @NotBlank
     private String destinationStationName;
 
+    public RouteRequest() {
+    }
+
     public RouteRequest(String sourceStationName, String destinationStationName) {
         this.sourceStationName = sourceStationName;
         this.destinationStationName = destinationStationName;

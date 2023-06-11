@@ -42,7 +42,7 @@ public class SectionDao implements SectionRepository {
 
     @Override
     public List<Section> findAllByLineId(Long lineId) {
-        String sql = "select * from SECTION where line_id = ?";
+        String sql = "select * from SECTION where line_id = ? order by id asc";
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 

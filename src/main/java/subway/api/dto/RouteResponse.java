@@ -19,4 +19,16 @@ public class RouteResponse {
     public static RouteResponse of(Route route, int price) {
         return new RouteResponse(route.getStations(), route.getDistance(), price);
     }
+
+    public List<Station> getStations() {
+        return stations;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public int getPrice() {
+        return price;
+    }
 }

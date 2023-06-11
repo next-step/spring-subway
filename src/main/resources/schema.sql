@@ -31,6 +31,8 @@ insert into STATION (name) values ('방배');
 insert into STATION (name) values ('서초');
 insert into STATION (name) values ('교대');
 insert into STATION (name) values ('강남');
+insert into STATION (name) values ('남태령');
+insert into STATION (name) values ('양재');
 
 insert into LINE (name, color) values ('2호선', 'GREEN');
 insert into LINE (name, color) values ('4호선', 'BLUE');

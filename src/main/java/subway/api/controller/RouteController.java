@@ -7,19 +7,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.api.dto.RouteRequest;
 import subway.api.dto.RouteResponse;
+import subway.domain.vo.Route;
+import subway.service.RouteService;
 
 import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/route")
 public class RouteController {
+    private final RouteService routeService;
+
+    public RouteController(RouteService routeService) {
+        this.routeService = routeService;
+    }
 
     @GetMapping
     public ResponseEntity<RouteResponse> findRoute(
             @RequestBody @Valid RouteRequest routeRequest
     ) {
-        // 최단경로 찾기
-        // 요금 찾기
-        return ResponseEntity.ok().build();
+        Route shortestRoute = routeService.getShortestRoute(routeRequest.getSourceStationName(), routeRequest.getDestinationStationName());
+        return ResponseEntity.ok(RouteResponse.of(shortestRoute, 0));
     }
 }
