@@ -1,4 +1,4 @@
-package subway.jdbcdao;
+package subway.infra.jdbcdao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

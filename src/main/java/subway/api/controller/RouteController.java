@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.api.dto.RouteRequest;
 import subway.api.dto.RouteResponse;
+import subway.domain.service.RouteService;
 import subway.domain.vo.Route;
-import subway.service.RouteService;
 
 import javax.validation.Valid;
 
@@ -26,6 +26,6 @@ public class RouteController {
             @RequestBody @Valid RouteRequest routeRequest
     ) {
         Route shortestRoute = routeService.getShortestRoute(routeRequest.getSourceStationName(), routeRequest.getDestinationStationName());
-        return ResponseEntity.ok(RouteResponse.of(shortestRoute, 0));
+        return ResponseEntity.ok(RouteResponse.of(shortestRoute));
     }
 }

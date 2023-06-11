@@ -13,8 +13,8 @@ import subway.api.dto.LineRequest;
 import subway.api.dto.LineResponse;
 import subway.domain.entity.Section;
 import subway.domain.entity.Station;
-import subway.service.SectionService;
-import subway.service.StationService;
+import subway.domain.service.SectionService;
+import subway.domain.service.StationService;
 
 import java.util.List;
 import java.util.stream.Collectors;

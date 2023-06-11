@@ -1,4 +1,4 @@
-package subway.service;
+package subway.domain.service;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

@@ -16,8 +16,8 @@ public class RouteResponse {
         this.price = price;
     }
 
-    public static RouteResponse of(Route route, int price) {
-        return new RouteResponse(route.getStations(), route.getDistance(), price);
+    public static RouteResponse of(Route route) {
+        return new RouteResponse(route.getStations(), route.getDistance(), route.getPrice());
     }
 
     public List<Station> getStations() {

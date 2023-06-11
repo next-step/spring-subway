@@ -7,6 +7,7 @@ import subway.domain.entity.Station;
 import subway.domain.repository.LineRepository;
 import subway.domain.repository.SectionRepository;
 import subway.domain.repository.StationRepository;
+import subway.domain.service.RouteService;
 import subway.domain.vo.Route;
 import subway.testdouble.InMemoryLineRepository;
 import subway.testdouble.InMemorySectionRepository;
@@ -34,5 +35,6 @@ class RouteServiceTest {
 
         assertThat(shortestRoute.getStations().size()).isEqualTo(3);
         assertThat(shortestRoute.getDistance()).isEqualTo(13);
+        assertThat(shortestRoute.getPrice()).isEqualTo(1350);
     }
 }

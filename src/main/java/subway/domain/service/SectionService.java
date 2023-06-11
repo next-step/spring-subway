@@ -1,11 +1,11 @@
-package subway.service;
+package subway.domain.service;
 
 import org.springframework.stereotype.Service;
 import subway.domain.entity.Section;
 import subway.domain.entity.Station;
 import subway.domain.repository.SectionRepository;
 import subway.domain.repository.StationRepository;
-import subway.service.validator.SubwayValidator;
+import subway.domain.service.validator.SubwayValidator;
 
 import java.util.Collections;
 import java.util.Comparator;

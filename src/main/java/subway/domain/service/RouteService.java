@@ -1,4 +1,4 @@
-package subway.service;
+package subway.domain.service;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
@@ -9,6 +9,7 @@ import subway.domain.entity.Station;
 import subway.domain.repository.SectionRepository;
 import subway.domain.repository.StationRepository;
 import subway.domain.vo.Route;
+import subway.util.FareCalculator;
 
 import java.util.List;
 
@@ -27,7 +28,8 @@ public class RouteService {
         Station destinationStation = stationRepository.findByName(destination);
         DijkstraShortestPath<Station, Section> dijkstraShortestPath = getShortestPath();
         GraphPath<Station, Section> path = dijkstraShortestPath.getPath(sourceStation, destinationStation);
-        return new Route(path.getVertexList(), (int) Math.round(path.getWeight()));
+        int distance = (int) Math.round(path.getWeight());
+        return new Route(path.getVertexList(), distance, FareCalculator.calculateByDistance(distance));
     }
 
     private DijkstraShortestPath<Station, Section> getShortestPath() {

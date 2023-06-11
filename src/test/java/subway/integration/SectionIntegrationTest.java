@@ -12,8 +12,8 @@ import org.springframework.http.MediaType;
 import subway.api.dto.SectionRequest;
 import subway.domain.entity.Line;
 import subway.domain.entity.Station;
-import subway.service.LineService;
-import subway.service.StationService;
+import subway.domain.service.LineService;
+import subway.domain.service.StationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
