@@ -1,4 +1,4 @@
-package subway.jdbcdao;
+package subway.infra.jdbcdao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -50,6 +50,16 @@ public class StationDao implements StationRepository {
         String sql = "select * from STATION where id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        } catch (Exception e) {
+            throw new NoSuchElementException("존재하지 않는 역입니다.");
+        }
+    }
+
+    @Override
+    public Station findByName(String name) {
+        String sql = "select * from STATION where name = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, rowMapper, name);
         } catch (Exception e) {
             throw new NoSuchElementException("존재하지 않는 역입니다.");
         }

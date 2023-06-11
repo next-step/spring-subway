@@ -1,4 +1,4 @@
-package subway.jdbcdao;
+package subway.infra.jdbcdao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -42,8 +42,14 @@ public class SectionDao implements SectionRepository {
 
     @Override
     public List<Section> findAllByLineId(Long lineId) {
-        String sql = "select * from SECTION where line_id = ?";
+        String sql = "select * from SECTION where line_id = ? order by id asc";
         return jdbcTemplate.query(sql, rowMapper, lineId);
+    }
+
+    @Override
+    public List<Section> findAll() {
+        String sql = "select * from SECTION";
+        return jdbcTemplate.query(sql, rowMapper);
     }
 
     @Override

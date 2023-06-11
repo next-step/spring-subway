@@ -1,4 +1,4 @@
-package subway.service.validator;
+package subway.domain.service.validator;
 
 import org.springframework.stereotype.Service;
 import subway.domain.entity.Section;
