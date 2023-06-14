@@ -3,9 +3,11 @@ package subway.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
+import subway.application.SectionService;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-
+import subway.dto.SectionRequest;
+import subway.dto.SectionResponse;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
@@ -15,9 +17,11 @@ import java.util.List;
 public class LineController {
 
     private final LineService lineService;
+    private final SectionService sectionService;
 
-    public LineController(LineService lineService) {
+    public LineController(LineService lineService, SectionService sectionService) {
         this.lineService = lineService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping
@@ -48,8 +52,14 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<SectionResponse> createSection(@PathVariable Long id, @RequestBody SectionRequest request) {
+        SectionResponse response = sectionService.save(id, request);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections/" + response.getId())).body(response);
     }
+
+//    @ExceptionHandler(SQLException.class)
+//    public ResponseEntity<Void> handleSQLException() {
+//        return ResponseEntity.badRequest().build();
+//    }
 }

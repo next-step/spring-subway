@@ -5,7 +5,6 @@ import subway.dao.LineDao;
 import subway.domain.Line;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,7 @@ public class LineService {
     }
 
     public Line findLineById(Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {

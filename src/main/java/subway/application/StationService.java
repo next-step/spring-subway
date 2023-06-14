@@ -5,7 +5,6 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +22,12 @@ public class StationService {
     }
 
     public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        return StationResponse.of(findStationById(id));
+    }
+
+    public Station findStationById(Long id) {
+        return stationDao.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 역입니다."));
     }
 
     public List<StationResponse> findAllStationResponses() {
