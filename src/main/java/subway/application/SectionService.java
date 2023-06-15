@@ -91,4 +91,14 @@ public class SectionService {
     private Section getLastSection(List<Section> sections) {
         return sections.get(sections.size() - 1);
     }
+
+    public SectionResponse findSectionResponseById(Long id) {
+        Section persistSection = findSectionById(id);
+        return SectionResponse.of(persistSection);
+    }
+
+    private Section findSectionById(Long id) {
+        return sectionDao.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Section 입니다. id = " + id));
+    }
 }

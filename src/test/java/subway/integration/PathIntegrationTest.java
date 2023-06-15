@@ -9,16 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
-import subway.application.path.PathService;
-import subway.dao.SectionDao;
-import subway.dao.StationDao;
-import subway.domain.Section;
-import subway.domain.Station;
-import subway.dto.PathResponse;
-import subway.dto.StationResponse;
+import org.springframework.http.MediaType;
+import subway.dto.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,34 +19,88 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Sql(value = "classpath:/path-testdata.sql")
 @DisplayName("경로 조회 기능")
 public class PathIntegrationTest extends IntegrationTest {
-
-    @Autowired
-    private StationDao stationDao;
-    @Autowired
-    private SectionDao sectionDao;
-    @Autowired
-    private PathService pathService;
 
     @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
-
-        addExistingDataToGraph();
+        addTestData();
     }
 
-    private void addExistingDataToGraph() {
-        List<Station> stations = stationDao.findAll();
-        for (Station station : stations) {
-            pathService.addVertex(station.getId());
-        }
+    private void addTestData() {
+        List<LineRequest> lineRequests = List.of(
+                new LineRequest("3호선", "bg-orange-600"),
+                new LineRequest("신분당선", "bg-red-600"),
+                new LineRequest("수인분당선", "bg-yellow-600"),
+                new LineRequest("7호선", "bg-green-600")
+        );
+        sendPostRequests("/lines", lineRequests);
 
-        List<Section> sections = sectionDao.findAll();
-        for (Section section : sections) {
-            pathService.addEdge(section.getUpStation().getId(), section.getDownStation().getId(), section.getDistance());
+        List<StationRequest> stationRequests = List.of(
+                new StationRequest("교대역"),
+                new StationRequest("남부터미널역"),
+                new StationRequest("양재역"),
+                new StationRequest("매봉역"),
+                new StationRequest("도곡역"),
+                new StationRequest("대치역"),
+                new StationRequest("학여울역"),
+                new StationRequest("강남역"),
+                new StationRequest("양재시민의숲역"),
+                new StationRequest("청계산입구역"),
+                new StationRequest("판교역"),
+                new StationRequest("선릉역"),
+                new StationRequest("한티역"),
+                new StationRequest("구룡역"),
+                new StationRequest("개포동역"),
+                new StationRequest("수내역"),
+                new StationRequest("총신대입구역"),
+                new StationRequest("내방역")
+        );
+        sendPostRequests("/stations", stationRequests);
+
+        List<SectionRequest> line1SectionRequests = List.of(
+                new SectionRequest(1L, 2L, 2),
+                new SectionRequest(2L, 3L, 3),
+                new SectionRequest(3L, 4L, 6),
+                new SectionRequest(4L, 5L, 7),
+                new SectionRequest(5L, 6L, 50),
+                new SectionRequest(6L, 7L, 10)
+        );
+        sendPostRequests("/lines/1/sections", line1SectionRequests);
+
+        List<SectionRequest> line2SectionRequests = List.of(
+                new SectionRequest(8L, 3L, 5),
+                new SectionRequest(3L, 9L, 7),
+                new SectionRequest(9L, 10L, 3),
+                new SectionRequest(10L, 11L, 4)
+        );
+        sendPostRequests("/lines/2/sections", line2SectionRequests);
+
+        List<SectionRequest> line3SectionRequests = List.of(
+                new SectionRequest(12L, 13L, 1),
+                new SectionRequest(13L, 5L, 2),
+                new SectionRequest(5L, 14L, 6),
+                new SectionRequest(14L, 15L, 2),
+                new SectionRequest(15L, 16L, 3)
+        );
+        sendPostRequests("/lines/3/sections", line3SectionRequests);
+
+        List<SectionRequest> line4SectionRequests = List.of(
+                new SectionRequest(17L, 18L, 4)
+        );
+        sendPostRequests("/lines/4/sections", line4SectionRequests);
+    }
+
+    private void sendPostRequests(String url, List<?> requestBodies) {
+        for (Object requestBody : requestBodies) {
+            RestAssured
+                    .given()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(requestBody)
+                    .when().post(url)
+                    .then();
         }
     }
 
