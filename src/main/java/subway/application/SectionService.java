@@ -34,7 +34,7 @@ public class SectionService {
                 throw new IllegalArgumentException("추가하려는 상행역이 기존의 하행역과 불일치합니다.");
             }
 
-            if (distinctStation(sections).contains(downStation)) {
+            if (findAllStation(sections).contains(downStation)) {
                 throw new IllegalArgumentException("이미 노선에 추가되어 있는 역입니다.");
             }
         }
@@ -42,7 +42,7 @@ public class SectionService {
         return SectionResponse.of(section);
     }
 
-    private List<Station> distinctStation(List<Section> sections) {
+    private List<Station> findAllStation(List<Section> sections) {
         List<Station> stations = new ArrayList<>();
         for (Section section : sections) {
             stations.add(section.getUpStation());
@@ -51,4 +51,15 @@ public class SectionService {
         return stations.stream().distinct().collect(Collectors.toList());
     }
 
+
+    public void delete(Long lineId, Long stationId) {
+        lineService.findLineById(lineId);
+        Station station = stationService.findStationById(stationId);
+        List<Section> sections = sectionDao.findAllByLineId(lineId);
+
+        if (!findAllStation(sections).get(sections.size()).equals(station)) {
+            throw new IllegalArgumentException("노선에 등록된 역 중 하행 종점역만 제거할 수 있습니다.");
+        }
+        sectionDao.delete(stationId);
+    }
 }
