@@ -13,9 +13,7 @@ public class Section {
     private Integer distance;
 
     public Section(Station upStation, Station downStation, Integer distance) {
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
+        this(null, upStation, downStation, distance);
     }
 
     public Section(Long id, Station upStation, Station downStation, Integer distance) {
@@ -39,6 +37,10 @@ public class Section {
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public boolean isIdEquals(Long id) {
+        return this.id.equals(id);
     }
 
     public static List<Station> distinctStations(List<Section> sections) {

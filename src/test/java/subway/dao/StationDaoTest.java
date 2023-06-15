@@ -6,17 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import subway.domain.Line;
-import subway.domain.Section;
 import subway.domain.Station;
 
 import javax.sql.DataSource;
-
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @JdbcTest
 class StationDaoTest {
@@ -44,7 +41,10 @@ class StationDaoTest {
 
         // then
         assertThat(insertedStation.getId()).isNotNull();
-        assertThat(insertedStation.getName()).isEqualTo(STATION_1.getName());
+        assertThat(insertedStation)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(STATION_1);
     }
 
     @DisplayName("Station 테이블에서 모든 엔티티를 조회한다")
@@ -75,7 +75,10 @@ class StationDaoTest {
 
         // then
         Station foundStation = assertDoesNotThrow(() -> foundOptionalStation.get());
-        assertThat(foundStation.getName()).isEqualTo(STATION_1.getName());
+        assertThat(foundStation)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(STATION_1);
     }
 
     @DisplayName("Station 테이블의 엔티티를 수정한다")
@@ -89,7 +92,10 @@ class StationDaoTest {
 
         // then
         Station updatedStation = stationDao.findById(insertedStation.getId()).get();
-        assertThat(updatedStation.getName()).isEqualTo(STATION_2.getName());
+        assertThat(updatedStation)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(STATION_2);
     }
 
     @DisplayName("Station 테이블의 엔티티를 삭제한다")

@@ -2,9 +2,10 @@ package subway.ui;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.application.StationService;
+import subway.application.path.PathService;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-import subway.application.StationService;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -14,14 +15,18 @@ import java.util.List;
 @RequestMapping("/stations")
 public class StationController {
     private final StationService stationService;
+    private final PathService pathService;
 
-    public StationController(StationService stationService) {
+    public StationController(StationService stationService, PathService pathService) {
         this.stationService = stationService;
+        this.pathService = pathService;
     }
 
     @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
         StationResponse station = stationService.saveStation(stationRequest);
+        pathService.addVertex(station.getId());
+
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
@@ -44,6 +49,8 @@ public class StationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         stationService.deleteStationById(id);
+        pathService.removeVertex(id);
+
         return ResponseEntity.noContent().build();
     }
 
