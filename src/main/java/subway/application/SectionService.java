@@ -42,7 +42,7 @@ public class SectionService {
         return SectionResponse.of(section);
     }
 
-    private List<Station> findAllStation(List<Section> sections) {
+    public static List<Station> findAllStation(List<Section> sections) {
         List<Station> stations = new ArrayList<>();
         for (Section section : sections) {
             stations.add(section.getUpStation());

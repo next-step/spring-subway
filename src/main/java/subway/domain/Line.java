@@ -42,6 +42,10 @@ public class Line {
         return color;
     }
 
+    public List<Section> getSections() {
+        return sections;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -18,11 +18,13 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        return LineResponse.of(persistLine);
+        return LineResponse.createResponse(persistLine);
     }
 
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
+
+
         return persistLines.stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
