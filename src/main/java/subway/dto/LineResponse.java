@@ -30,8 +30,7 @@ public class LineResponse {
         return new LineResponse(line.getId(), line.getName(), line.getColor());
     }
 
-    public static LineResponse of(Line line) {
-        List<Station> stations = SectionService.findAllStation(line.getSections());
+    public static LineResponse of(Line line, List<Station> stations) {
         List<StationResponse> stationResponses = stations.stream().map(StationResponse::of)
                 .collect(Collectors.toList());
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
