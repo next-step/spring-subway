@@ -3,9 +3,11 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,13 +21,13 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        return LineResponse.of(persistLine);
+        return LineResponse.createResponse(persistLine);
     }
 
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(LineResponse::of)
+                .map(line -> LineResponse.of(line, findAllStation(line.getSections())))
                 .collect(Collectors.toList());
     }
 
@@ -35,11 +37,21 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
+        List<Station> allStation = findAllStation(persistLine.getSections());
+        return LineResponse.of(persistLine, allStation);
+    }
+
+    public List<Station> findAllStation(List<Section> sections) {
+        List<Station> stations = new ArrayList<>();
+        for (Section section : sections) {
+            stations.add(section.getUpStation());
+            stations.add(section.getDownStation());
+        }
+        return stations.stream().distinct().collect(Collectors.toList());
     }
 
     public Line findLineById(Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노선입니다."));
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
