@@ -3,6 +3,7 @@ package subway.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,8 +14,10 @@ class SectionsTest {
     @DisplayName("새로운 구간을 등록하는 테스트")
     @Test
     void insertNewSection() {
-        Sections sections = new Sections(List.of(new Section()));
-        assertDoesNotThrow(() -> sections.insert(new Section()));
+        List<Section> originSections = new ArrayList<>();
+        originSections.add(new Section(4L, 2L, 1L, 10));
+        Sections sections = new Sections(originSections);
+        assertDoesNotThrow(() -> sections.insert(new Section(2L, 1L, 1L, 10)));
     }
 
     @DisplayName("비어있는 구간으로 생성하는 테스트")
