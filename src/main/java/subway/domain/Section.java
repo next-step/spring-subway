@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class Section {
 
+    private static final String SAME_STATION_EXCEPTION_MESSAGE = "상행역과 하행역은 다른 역이어야 합니다.";
+
     private Long id;
     private Long upStationId;
     private Long downStationId;
@@ -14,18 +16,22 @@ public class Section {
     }
 
     public Section(Long upStationId, Long downStationId, Long lineId, Integer distance) {
+        this(null, upStationId, downStationId, lineId, distance);
+    }
+
+    public Section(Long id, Long upStationId, Long downStationId, Long lineId, Integer distance) {
+        validateDifferent(upStationId, downStationId);
+        this.id = id;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.lineId = lineId;
         this.distance = distance;
     }
 
-    public Section(Long id, Long upStationId, Long downStationId, Long lineId, Integer distance) {
-        this.id = id;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
-        this.lineId = lineId;
-        this.distance = distance;
+    private static void validateDifferent(Long upStationId, Long downStationId) {
+        if (upStationId == downStationId) {
+            throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
+        }
     }
 
     public Long getId() {
