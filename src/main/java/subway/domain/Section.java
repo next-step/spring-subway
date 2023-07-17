@@ -30,9 +30,14 @@ public class Section {
                 "추가되는 downSection.upStation은 현재의 section.downStation과 동일해야합니다. downSection.upStation \"{0}\" current.downStation \"{1}\"",
                 downSection.upStation, downStation));
         this.downSection = downSection;
+        downSection.upSection = this;
     }
 
-    public Section getDownsection() {
+    Section getDownsection() {
         return downSection;
+    }
+
+    Section getUpSection() {
+        return upSection;
     }
 }
