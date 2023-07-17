@@ -7,9 +7,9 @@ import org.springframework.util.Assert;
 public class Section {
 
     private static final Section NOT_CONNECTED_SECTION = new Section();
-
     private final Station upStation;
     private final Station downStation;
+    private Long id;
     private Section upSection = NOT_CONNECTED_SECTION;
     private Section downSection = NOT_CONNECTED_SECTION;
 
@@ -17,6 +17,15 @@ public class Section {
         Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
         Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
 
+        this.upStation = upStation;
+        this.downStation = downStation;
+    }
+
+    public Section(Long id, Station upStation, Station downStation) {
+        Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
+        Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
+
+        this.id = id;
         this.upStation = upStation;
         this.downStation = downStation;
     }
@@ -34,6 +43,10 @@ public class Section {
 
         this.downSection = downSection;
         downSection.upSection = this;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     Section getDownsection() {
