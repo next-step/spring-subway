@@ -11,9 +11,9 @@ class SectionTest {
     @Test
     void validationSuccess() {
         // given
-        Long lineId = 1L;
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long lineId = 1001L;
+        Long upStationId = 1001L;
+        Long downStationId = 1002L;
         Long distance = 10L;
 
         // when, then
@@ -26,8 +26,8 @@ class SectionTest {
     void validationLineIdNotNull() {
         // given
         Long lineId = null;
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long upStationId = 1001L;
+        Long downStationId = 1002L;
         Long distance = 10L;
 
         // when, then
@@ -40,9 +40,9 @@ class SectionTest {
     @Test
     void validationUpStationIdNotNull() {
         // given
-        Long lineId = 1L;
+        Long lineId = 1001L;
         Long upStationId = null;
-        Long downStationId = 2L;
+        Long downStationId = 1002L;
         Long distance = 10L;
 
         // when, then
@@ -55,8 +55,8 @@ class SectionTest {
     @Test
     void validationDownStationIdNotNull() {
         // given
-        Long lineId = 1L;
-        Long upStationId = 1L;
+        Long lineId = 1001L;
+        Long upStationId = 1001L;
         Long downStationId = null;
         Long distance = 10L;
 
@@ -70,9 +70,9 @@ class SectionTest {
     @Test
     void validationDistanceNotNull() {
         // given
-        Long lineId = 1L;
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long lineId = 1001L;
+        Long upStationId = 1001L;
+        Long downStationId = 1002L;
         Long distance = null;
 
         // when, then
@@ -85,9 +85,9 @@ class SectionTest {
     @Test
     void validationUpStationIdNotEqualDownStationId() {
         // given
-        Long lineId = 1L;
-        Long upStationId = 1L;
-        Long downStationId = 1L;
+        Long lineId = 1001L;
+        Long upStationId = 1001L;
+        Long downStationId = 1001L;
         Long distance = 10L;
 
         // when, then
@@ -100,9 +100,9 @@ class SectionTest {
     @Test
     void validationPositiveDistance() {
         // given
-        Long lineId = 1L;
-        Long upStationId = 1L;
-        Long downStationId = 2L;
+        Long lineId = 1001L;
+        Long upStationId = 1001L;
+        Long downStationId = 1002L;
         Long distance = -1L;
 
         // when, then
