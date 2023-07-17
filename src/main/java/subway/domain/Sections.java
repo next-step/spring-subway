@@ -19,6 +19,14 @@ public class Sections {
         if (!Objects.equals(newSection.getUpStationId(), sections.get(sections.size() - 1).getDownStationId())) {
             throw new IllegalArgumentException("새로운 구간의 상행역은 기존 하행 종점역과 같아야 합니다.");
         }
+
+        Long newDownStationId = newSection.getDownStationId();
+        for (Section section : sections) {
+            if (section.getUpStationId() == newDownStationId) {
+                throw new IllegalArgumentException("새로운 구간의 하행역은 기존 노선에 등록되어 있지 않은 역이어야 합니다.");
+            }
+        }
+
         sections.add(newSection);
     }
 }

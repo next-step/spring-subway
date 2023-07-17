@@ -38,4 +38,20 @@ class SectionsTest {
 
         assertThrows(IllegalArgumentException.class, () -> sections.insert(newSection));
     }
+
+    @DisplayName("새로운 구간의 하행역이 노선에 등록되어 있을 경우")
+    @Test
+    void alreadyEnrolled() {
+        long upStationId = 4;
+        long downStationId = 2;
+        long newUpStationId = 2;
+        long newDownStationId = 4;
+        long lineId = 1;
+        int distance = 10;
+
+        Sections sections = new Sections(List.of(new Section(upStationId, downStationId, lineId, distance)));
+        Section  newSection = new Section(newUpStationId, newDownStationId, lineId, distance);
+
+        assertThrows(IllegalArgumentException.class, () -> sections.insert(newSection));
+    }
 }
