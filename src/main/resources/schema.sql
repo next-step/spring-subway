@@ -19,5 +19,6 @@ create table if not exists SECTION
     upward_id bigint not null,
     downward_id bigint not null,
     line_id bigint not null,
+    distance int not null,
     primary key(id)
 );
