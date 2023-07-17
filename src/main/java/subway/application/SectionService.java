@@ -18,18 +18,30 @@ public class SectionService {
 
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
-        if (sectionDao.existByLineId(lineId)) {
-            Section lastSection = sectionDao.findLastSection(lineId);
-            if (!lastSection.getDownStationId().equals(request.getUpStationId())) {
-                throw new IllegalArgumentException("하행 종점역과 새로운 구간의 상행역은 같아야합니다.");
-            }
-        }
-
-        if (sectionDao.existByLineIdAndStationId(lineId, request.getDownStationId())) {
-            throw new IllegalArgumentException("새로운 구간 하행역이 기존 노선에 존재하면 안됩니다.");
-        }
+        validateSaveSection(lineId, request);
 
         Section section = sectionDao.insert(request.toEntity(lineId));
         return SectionResponse.from(section);
+    }
+
+    private void validateSaveSection(Long lineId, SectionRequest request) {
+        if (!sectionDao.existByLineId(lineId)) {
+            return;
+        }
+        validateLastDownStationEqualsToUpStation(lineId, request);
+        validateDownStationCannotExistInLine(lineId, request);
+    }
+
+    private void validateDownStationCannotExistInLine(Long lineId, SectionRequest request) {
+        if (sectionDao.existByLineIdAndStationId(lineId, request.getDownStationId())) {
+            throw new IllegalArgumentException("새로운 구간 하행역이 기존 노선에 존재하면 안됩니다.");
+        }
+    }
+
+    private void validateLastDownStationEqualsToUpStation(Long lineId, SectionRequest request) {
+        if (!sectionDao.findLastSection(lineId).getDownStationId()
+                .equals(request.getUpStationId())) {
+            throw new IllegalArgumentException("하행 종점역과 새로운 구간의 상행역은 같아야합니다.");
+        }
     }
 }
