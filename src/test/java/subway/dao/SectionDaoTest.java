@@ -36,6 +36,5 @@ class SectionDaoTest {
                 Section::getDownStationId,
                 Section::getDistance
         ).contains(lineId, upStationId, downStationId, distance);
-
     }
 }
