@@ -13,8 +13,11 @@ import subway.domain.Station;
 
 @DisplayName("SectionDao 클래스")
 @JdbcTest
-@ContextConfiguration(classes = SectionDao.class)
+@ContextConfiguration(classes = {SectionDao.class, StationDao.class})
 class SectionDaoTest {
+
+    @Autowired
+    private StationDao stationDao;
 
     @Autowired
     private SectionDao sectionDao;
@@ -27,13 +30,16 @@ class SectionDaoTest {
         @DisplayName("Section을 받아 아이디를 생성하고 저장한다.")
         void Insert_Section_And_Return_Section() {
             // given
-            Long upStationId = 1L;
             String upStationName = "upStation";
-            Long downStationId = 2L;
-            String downStationName = "downStation";
+            Station upStation = stationDao.insert(new Station(upStationName));
 
-            Section section = new Section(new Station(upStationId, upStationName),
-                    new Station(downStationId, downStationName));
+            String downStationName = "downStation";
+            Station downStation = stationDao.insert(new Station(downStationName));
+
+            Section section = Section.builder()
+                    .upStation(upStation)
+                    .downStation(downStation)
+                    .build();
 
             // when
             Section result = sectionDao.insert(section);
