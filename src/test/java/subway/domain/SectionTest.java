@@ -1,6 +1,5 @@
 package subway.domain;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +34,7 @@ class SectionTest {
         Section section = new Section(stationA, stationB, 1);
         Section otherSection = new Section(stationB, stationC, 1);
 
-        assertThat(section.canPrecede(otherSection)).isTrue();
-        assertThat(otherSection.canPrecede(section)).isFalse();
+        assertThat(section.cannotPrecede(otherSection)).isFalse();
+        assertThat(otherSection.cannotPrecede(section)).isTrue();
     }
 }

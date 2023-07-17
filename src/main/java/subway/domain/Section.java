@@ -1,5 +1,7 @@
 package subway.domain;
 
+import java.util.Objects;
+
 public class Section {
 
     private final Station upStation;
@@ -27,7 +29,34 @@ public class Section {
         }
     }
 
-    public boolean canPrecede(Section other) {
-        return downStation.equals(other.upStation);
+    public boolean cannotPrecede(Section other) {
+        return !downStation.equals(other.upStation);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Section)) {
+            return false;
+        }
+        Section section = (Section) o;
+        return distance == section.distance && Objects.equals(upStation, section.upStation)
+            && Objects.equals(downStation, section.downStation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(upStation, downStation, distance);
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+            "upStation=" + upStation +
+            ", downStation=" + downStation +
+            ", distance=" + distance +
+            '}';
     }
 }
