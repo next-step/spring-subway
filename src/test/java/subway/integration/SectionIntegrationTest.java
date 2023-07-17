@@ -23,9 +23,9 @@ public class SectionIntegrationTest extends IntegrationTest {
     public void setUp() {
         super.setUp();
 
-        lineId = 1001L;
-        sectionRequest1 = new SectionRequest(1001L, 1002L, 10L);
-        sectionRequest2 = new SectionRequest(1002L, 1003L, 10L);
+        lineId = 1L;
+        sectionRequest1 = new SectionRequest(1L, 2L, 10L);
+        sectionRequest2 = new SectionRequest(2L, 3L, 10L);
     }
 
     @DisplayName("지하철 구간을 생성한다.")

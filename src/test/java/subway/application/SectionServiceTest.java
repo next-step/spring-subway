@@ -19,9 +19,9 @@ class SectionServiceTest {
     @Test
     void saveSection() {
         // given
-        Long lineId = 1001L;
-        Long upStationId = 1001L;
-        Long downStationId = 1002L;
+        Long lineId = 1L;
+        Long upStationId = 1L;
+        Long downStationId = 2L;
         Long distance = 10L;
         SectionRequest request = new SectionRequest(upStationId, downStationId, distance);
 
