@@ -48,4 +48,11 @@ public class SectionDao {
 
         return jdbcTemplate.queryForObject(sql, rowMapper, lineId);
     }
+
+    public boolean existByLineIdAndStationId(long lineId, long stationId) {
+        String sql = "select count(*) from section where line_id = ? and (down_station_id = ? or up_station_id = ?)";
+
+        return Boolean.TRUE.equals(
+                jdbcTemplate.queryForObject(sql, Boolean.class, lineId, stationId, stationId));
+    }
 }

@@ -53,4 +53,21 @@ class SectionDaoTest {
         // then
         assertThat(lastDownStation.getDownStationId()).isEqualTo(4L);
     }
+
+    @DisplayName("")
+    @Test
+    void test() {
+        // given
+        long lineId = 1L;
+        Section section1 = sectionDao.insert(new Section(lineId, 1L, 2L, 10L));
+        Section section2 = sectionDao.insert(new Section(lineId, 2L, 3L, 10L));
+        Section section3 = sectionDao.insert(new Section(lineId, 3L, 4L, 10L));
+
+        long stationId = 4L;
+        // when
+        boolean exist = sectionDao.existByLineIdAndStationId(lineId, stationId);
+
+        // then
+        assertThat(exist).isTrue();
+    }
 }
