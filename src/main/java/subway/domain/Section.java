@@ -8,6 +8,7 @@ public class Section {
 
     private final Station upStation;
     private final Station downStation;
+    private final Integer distance;
     private Long id;
     private Section upSection;
     private Section downSection;
@@ -18,18 +19,21 @@ public class Section {
 
         this.upStation = builder.upStation;
         this.downStation = builder.downStation;
+        this.distance = builder.distance;
         this.id = builder.id;
         this.upSection = builder.upSection;
         this.downSection = builder.downSection;
     }
 
-    public Section(Long id, Station upStation, Station downStation, Section upSection, Section downSection) {
+    public Section(Long id, Station upStation, Station downStation, Section upSection, Section downSection,
+            Integer distance) {
         Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
         Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
 
-        this.id = id;
         this.upStation = upStation;
         this.downStation = downStation;
+        this.distance = distance;
+        this.id = id;
         this.upSection = upSection;
         this.downSection = downSection;
     }
@@ -68,6 +72,10 @@ public class Section {
         return downStation;
     }
 
+    public Integer getDistance() {
+        return distance;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -104,6 +112,7 @@ public class Section {
         private Station downStation;
         private Section upSection;
         private Section downSection;
+        private Integer distance;
 
         private Builder() {
 
@@ -131,6 +140,11 @@ public class Section {
 
         public Builder downSection(Section downSection) {
             this.downSection = downSection;
+            return this;
+        }
+
+        public Builder distance(Integer distance) {
+            this.distance = distance;
             return this;
         }
 

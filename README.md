@@ -39,6 +39,24 @@ Line 색(color)
   - [x] 이름을 표현한다.
   - [x] 이름이 중복되면 예외를 던진다.
 
+### 애플리케이션 서비스
+
+- [x] SectionService
+  - [x] UpStationId, DownStationId를 통해 Section을 생성한다.
+
+### Dao
+
+- [ ] SectionDao
+  - [ ] Section을 받아 저장한다.
+
+``` mermaid
+
+flowchart LR
+
+SectionController[SectionController] --> SectionService[SectionService]
+
+```
+
 ### Section 등록 기능
 
 - [ ] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 같으면 등록 가능 하다.

@@ -36,9 +36,12 @@ class SectionDaoTest {
             String downStationName = "downStation";
             Station downStation = stationDao.insert(new Station(downStationName));
 
+            Integer distance = 10;
+
             Section section = Section.builder()
                     .upStation(upStation)
                     .downStation(downStation)
+                    .distance(distance)
                     .build();
 
             // when
