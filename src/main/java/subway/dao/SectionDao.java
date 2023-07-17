@@ -3,7 +3,9 @@ package subway.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -21,9 +23,19 @@ public class SectionDao {
     private RowMapper<Section> rowMapper = (rs, rowNum) ->
         new Section(
             rs.getLong("id"),
-            rs.getObject("upStation", Station.class),
-            rs.getObject("downStation", Station.class),
-            rs.getObject("line", Line.class),
+            new Station(
+                rs.getLong("up_station_id"),
+                rs.getString("us_name")
+                ),
+            new Station(
+                rs.getLong("down_station_id"),
+                rs.getString("ds_name")
+            ),
+            new Line(
+                rs.getLong("line_id"),
+                rs.getString("l_name"),
+                rs.getString("color")
+            ),
             rs.getInt("distance")
         );
 
@@ -37,10 +49,10 @@ public class SectionDao {
     public Section insert(Section section) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
-        params.put("upStation", section.getUpStation());
-        params.put("downStation", section.getDownStation());
-        params.put("line", section.getLine());
-        params.put("distance", section.getDistance());
+        params.put("up_station_id", section.getUpStation().getId());
+        params.put("down_station_id", section.getDownStation().getId());
+        params.put("line_id", section.getLine().getId());
+        params.put("distance", section.getDistance().getDistance());
 
         Long sectionId = simpleJdbcInsert.executeAndReturnKey(params).longValue();
         return new Section(sectionId, section.getUpStation(), section.getDownStation(),
@@ -48,13 +60,27 @@ public class SectionDao {
     }
 
     public List<Section> findAll() {
-        String sql = "select * from section";
+        String sql = "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
+            + "from section s "
+            + "inner join line l on (s.line_id = l.id) "
+            + "inner join station us on (s.up_station_id = us.id) "
+            + "inner join station ds on (s.down_station_id = ds.id)";
+
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Section findById(Long id) {
-        String sql = "select * from section WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    public Optional<Section> findById(Long id) {
+        String sql = "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
+            + "from section s "
+            + "inner join line l on (s.line_id = l.id) "
+            + "inner join station us on (s.up_station_id = us.id) "
+            + "inner join station ds on (s.down_station_id = ds.id) "
+            + "where s.id = ?";
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(Section newSection) {
