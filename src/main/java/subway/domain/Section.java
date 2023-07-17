@@ -1,8 +1,5 @@
 package subway.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 public class Section {
 
     private final Station upStation;
