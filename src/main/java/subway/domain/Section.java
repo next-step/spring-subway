@@ -16,6 +16,7 @@ public class Section {
     Section(Station upStation, Station downStation) {
         Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
         Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
+
         this.upStation = upStation;
         this.downStation = downStation;
     }
@@ -30,6 +31,7 @@ public class Section {
         Assert.isTrue(downSection.upStation == downStation, () -> MessageFormat.format(
                 "추가되는 downSection.upStation은 현재의 section.downStation과 동일해야합니다. downSection.upStation \"{0}\" current.downStation \"{1}\"",
                 downSection.upStation, downStation));
+
         this.downSection = downSection;
         downSection.upSection = this;
     }
