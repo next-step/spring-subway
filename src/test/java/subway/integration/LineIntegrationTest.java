@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineIntegrationTest extends IntegrationTest {
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
+    private SectionRequest sectionRequest1;
+    private SectionRequest sectionRequest2;
 
     @BeforeEach
     public void setUp() {
@@ -28,6 +31,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         lineRequest1 = new LineRequest("신분당선", "bg-red-600");
         lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
+        sectionRequest1 = new SectionRequest("1", "2", 5);
+        sectionRequest2 = new SectionRequest("2", "3", 4);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -186,5 +191,31 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("아무 구간도 안가지고 있을 때, 구간 삽입 테스트")
+    void createSection() {
+        // given
+        ExtractableResponse<Response> createResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest1)
+                .when().post("/lines")
+                .then().log().all().
+                extract();
+
+        // when
+        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest1)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 }

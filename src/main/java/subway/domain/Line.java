@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Line {
     private Long id;
@@ -73,7 +74,7 @@ public class Line {
 
     public boolean contains(Station station) {
         return sections.stream()
-                .flatMap(section -> List.of(section.getUpward(), section.getDownward()).stream())
+                .flatMap(section -> Stream.of(section.getUpward(), section.getDownward()))
                 .distinct()
                 .collect(Collectors.toList())
                 .contains(station);
