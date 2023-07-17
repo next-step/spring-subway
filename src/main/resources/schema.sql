@@ -12,6 +12,7 @@ create table if not exists SECTION
     line_id bigint not null,
     up_station_id bigint not null,
     down_station_id bigint not null,
+    distance bigint not null,
     pre_section_id bigint,
     post_section_id bigint,
     primary key(id),
