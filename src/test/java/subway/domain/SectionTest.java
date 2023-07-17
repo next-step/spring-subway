@@ -23,7 +23,10 @@ class SectionTest {
             Station downStation = new Station(2L, "downStation");
 
             // when
-            Throwable throwable = Assertions.catchThrowable(() -> new Section(upStation, downStation));
+            Throwable throwable = Assertions.catchThrowable(() -> Section.builder()
+                    .upStation(upStation)
+                    .downStation(downStation)
+                    .build());
 
             // then
             assertThat(throwable).isNull();
@@ -37,7 +40,11 @@ class SectionTest {
             Station nullStation = null;
 
             // when
-            Exception exception = catchException(() -> new Section(upStation, nullStation));
+            Exception exception = catchException(
+                    () -> Section.builder()
+                            .upStation(upStation)
+                            .downStation(nullStation)
+                            .build());
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
@@ -56,13 +63,20 @@ class SectionTest {
             Station middleStation = new Station(1L, "middleStation");
             Station downStation = new Station(2L, "downStation");
 
-            Section section = new Section(upStation, middleStation);
-            Section downSection = new Section(middleStation, downStation);
+            Section section = Section.builder()
+                    .upStation(upStation)
+                    .downStation(middleStation)
+                    .build();
+
+            Section downSection = Section.builder()
+                    .upStation(middleStation)
+                    .downStation(downStation)
+                    .build();
 
             // when
             section.connectDownSection(downSection);
 
-            Section result = section.getDownsection();
+            Section result = section.getDownSection();
             Section resultUpSection = result.getUpSection();
 
             // then
@@ -79,8 +93,14 @@ class SectionTest {
             Station differentMiddleStation = new Station(1L, "upStation");
             Station downStation = new Station(2L, "downStation");
 
-            Section section = new Section(upStation, middleStation);
-            Section downSection = new Section(differentMiddleStation, downStation);
+            Section section = Section.builder()
+                    .upStation(upStation)
+                    .downStation(middleStation)
+                    .build();
+            Section downSection = Section.builder()
+                    .upStation(differentMiddleStation)
+                    .downStation(downStation)
+                    .build();
 
             // when
             Exception exception = catchException(() -> section.connectDownSection(downSection));
@@ -96,7 +116,11 @@ class SectionTest {
             Station upStation = new Station(2L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
 
-            Section section = new Section(upStation, middleStation);
+            Section section = Section.builder()
+                    .upStation(upStation)
+                    .downStation(middleStation)
+                    .build();
+
             Section downSection = null;
 
             // when

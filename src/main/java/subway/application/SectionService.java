@@ -25,7 +25,10 @@ public class SectionService {
         Station upStation = stationDao.findById(upStationId);
         Station downStation = stationDao.findById(downStationId);
 
-        Section section = new Section(upStation, downStation);
+        Section section = Section.builder()
+                .upStation(upStation)
+                .downStation(downStation)
+                .build();
 
         sectionDao.insert(section);
     }

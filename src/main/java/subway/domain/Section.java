@@ -6,33 +6,36 @@ import org.springframework.util.Assert;
 
 public class Section {
 
-    private static final Section NOT_CONNECTED_SECTION = new Section();
     private final Station upStation;
     private final Station downStation;
     private Long id;
-    private Section upSection = NOT_CONNECTED_SECTION;
-    private Section downSection = NOT_CONNECTED_SECTION;
+    private Section upSection;
+    private Section downSection;
 
-    public Section(Station upStation, Station downStation) {
-        Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
-        Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
+    private Section(Builder builder) {
+        Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.");
+        Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.");
 
-        this.upStation = upStation;
-        this.downStation = downStation;
+        this.upStation = builder.upStation;
+        this.downStation = builder.downStation;
+        this.id = builder.id;
+        this.upSection = builder.upSection;
+        this.downSection = builder.downSection;
     }
 
-    public Section(Long id, Station upStation, Station downStation) {
+    public Section(Long id, Station upStation, Station downStation, Section upSection, Section downSection) {
         Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
         Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
 
         this.id = id;
         this.upStation = upStation;
         this.downStation = downStation;
+        this.upSection = upSection;
+        this.downSection = downSection;
     }
 
-    private Section() {
-        upStation = null;
-        downStation = null;
+    public static Builder builder() {
+        return new Builder();
     }
 
     void connectDownSection(Section downSection) {
@@ -49,12 +52,20 @@ public class Section {
         return id;
     }
 
-    Section getDownsection() {
+    public Section getDownSection() {
         return downSection;
     }
 
-    Section getUpSection() {
+    public Section getUpSection() {
         return upSection;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
     }
 
     @Override
@@ -84,5 +95,48 @@ public class Section {
                 ", upSection=" + upSection +
                 ", downSection=" + downSection +
                 '}';
+    }
+
+    public static final class Builder {
+
+        private Long id;
+        private Station upStation;
+        private Station downStation;
+        private Section upSection;
+        private Section downSection;
+
+        private Builder() {
+
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder upStation(Station upStation) {
+            this.upStation = upStation;
+            return this;
+        }
+
+        public Builder downStation(Station downStation) {
+            this.downStation = downStation;
+            return this;
+        }
+
+        public Builder upSection(Section upSection) {
+            this.upSection = upSection;
+            return this;
+        }
+
+        public Builder downSection(Section downSection) {
+            this.downSection = downSection;
+            return this;
+        }
+
+        public Section build() {
+            return new Section(this);
+        }
+
     }
 }
