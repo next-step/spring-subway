@@ -1,5 +1,7 @@
 package subway.domain;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import java.util.Objects;
 
 public class Station {
@@ -15,7 +17,14 @@ public class Station {
     }
 
     public Station(String name) {
+        validateStation(name);
         this.name = name;
+    }
+
+    private void validateStation(String name) {
+        if (!hasText(name)) {
+            throw new IllegalArgumentException("이름을 반드시 입력해야합니다.");
+        }
     }
 
     public Long getId() {
