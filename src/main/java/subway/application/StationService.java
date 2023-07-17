@@ -25,7 +25,7 @@ public class StationService {
 
     public StationResponse findStationResponseById(Long id) {
         return StationResponse.of(stationDao.findById(id)
-            .orElseThrow(() -> new RuntimeException("잘못 입력된 station id입니다. id: \"" + id + "\"")));
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 station id입니다. id: \"" + id + "\"")));
     }
 
     public List<StationResponse> findAllStationResponses() {
