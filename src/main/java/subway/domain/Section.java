@@ -67,4 +67,15 @@ public class Section {
     public int hashCode() {
         return Objects.hash(id, upStation, downStation, line, distance);
     }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+            "id=" + id +
+            ", upStation=" + upStation +
+            ", downStation=" + downStation +
+            ", line=" + line +
+            ", distance=" + distance +
+            '}';
+    }
 }
