@@ -7,6 +7,10 @@ public class LineResponse {
     private String name;
     private String color;
 
+    private LineResponse() {
+        /* no-op */
+    }
+
     public LineResponse(Long id, String name, String color) {
         this.id = id;
         this.name = name;
