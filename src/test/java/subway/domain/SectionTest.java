@@ -25,5 +25,19 @@ class SectionTest {
             // then
             Assertions.assertThat(throwable).isNull();
         }
+
+        @Test
+        @DisplayName("하나의 Station이 null값으로 들어오면, IllegalArgumentException을 던진다.")
+        void Throw_IllegalArgumentException_When_Input_Null_Station() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station nullStation = null;
+
+            // when
+            Exception exception = Assertions.catchException(() -> new Section(upStation, nullStation));
+
+            // then
+            Assertions.assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 }
