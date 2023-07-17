@@ -13,7 +13,7 @@ public class Section {
     private Section upSection = NOT_CONNECTED_SECTION;
     private Section downSection = NOT_CONNECTED_SECTION;
 
-    Section(Station upStation, Station downStation) {
+    public Section(Station upStation, Station downStation) {
         Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
         Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
 
