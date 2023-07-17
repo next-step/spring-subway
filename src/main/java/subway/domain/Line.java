@@ -2,6 +2,9 @@ package subway.domain;
 
 import java.util.Objects;
 
+/**
+ * 노선
+ */
 public class Line {
     private Long id;
     private String name;

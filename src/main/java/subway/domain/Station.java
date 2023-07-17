@@ -2,6 +2,9 @@ package subway.domain;
 
 import java.util.Objects;
 
+/**
+ * 지하철 역
+ */
 public class Station {
     private Long id;
     private String name;
