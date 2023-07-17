@@ -54,9 +54,9 @@ class SectionDaoTest {
         assertThat(lastDownStation.getDownStationId()).isEqualTo(4L);
     }
 
-    @DisplayName("")
+    @DisplayName("노선과 역 아이디에 해당하는 구간이 존재 여부 반환 - true")
     @Test
-    void test() {
+    void existByLineIdAndStationIdTrue() {
         // given
         long lineId = 1L;
         Section section1 = sectionDao.insert(new Section(lineId, 1L, 2L, 10L));
@@ -65,9 +65,26 @@ class SectionDaoTest {
 
         long stationId = 4L;
         // when
-        boolean exist = sectionDao.existByLineIdAndStationId(lineId, stationId);
+        boolean result = sectionDao.existByLineIdAndStationId(lineId, stationId);
 
         // then
-        assertThat(exist).isTrue();
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("노선과 역 아이디에 해당하는 구간이 존재 여부 반환 - false")
+    @Test
+    void existByLineIdAndStationIdFalse() {
+        // given
+        long lineId = 1L;
+        Section section1 = sectionDao.insert(new Section(lineId, 1L, 2L, 10L));
+        Section section2 = sectionDao.insert(new Section(lineId, 2L, 3L, 10L));
+        Section section3 = sectionDao.insert(new Section(lineId, 3L, 4L, 10L));
+
+        long stationId = 5L;
+        // when
+        boolean result = sectionDao.existByLineIdAndStationId(lineId, stationId);
+
+        // then
+        assertThat(result).isFalse();
     }
 }
