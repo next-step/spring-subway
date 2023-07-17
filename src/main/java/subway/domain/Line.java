@@ -2,6 +2,8 @@ package subway.domain;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Line {
     private Long id;
@@ -56,6 +58,16 @@ public class Line {
     }
 
     public boolean isTerminal(Station station) {
-        return true;
+        Set<Station> upward = sections.stream()
+                .map(Section::getUpward)
+                .collect(Collectors.toSet());
+
+        Station terminal = sections.stream()
+                .map(Section::getDownward)
+                .filter(s -> !upward.contains(s))
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("하행 종점이 존재하지 않습니다."));
+
+        return station.equals(terminal);
     }
 }
