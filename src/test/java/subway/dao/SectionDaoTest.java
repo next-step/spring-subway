@@ -37,4 +37,20 @@ class SectionDaoTest {
                 Section::getDistance
         ).contains(lineId, upStationId, downStationId, distance);
     }
+
+    @DisplayName("노선 아이디를 가지고 구간 테이블에서 하행 종점역이 있는 구간을 구하는데 성공")
+    @Test
+    void findLastSectionSuccess() {
+        // given
+        long lineId = 1L;
+        Section section1 = sectionDao.insert(new Section(lineId, 1L, 2L, 10L));
+        Section section2 = sectionDao.insert(new Section(lineId, 2L, 3L, 10L));
+        Section section3 = sectionDao.insert(new Section(lineId, 3L, 4L, 10L));
+
+        // when
+        Section lastDownStation = sectionDao.findLastSection(lineId);
+
+        // then
+        assertThat(lastDownStation.getDownStationId()).isEqualTo(4L);
+    }
 }

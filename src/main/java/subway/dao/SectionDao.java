@@ -41,4 +41,11 @@ public class SectionDao {
                 section.getDownStationId(),
                 section.getDistance());
     }
+
+    public Section findLastSection(long lineId) {
+        String sql = "select * from section s1 where s1.line_id = ? "
+                + "and not exists (select * from section s2 where s1.down_station_id = s2.up_station_id)";
+
+        return jdbcTemplate.queryForObject(sql, rowMapper, lineId);
+    }
 }
