@@ -15,9 +15,14 @@ class SectionsTest {
     @Test
     void insertNewSection() {
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(4L, 2L, 1L, 10));
+        Station upStation = new Station(4L, "잠실역");
+        Station downStation = new Station(2L, "잠실나루역");
+        Station newDownStation = new Station(1L, "강변역");
+
+        originSections.add(new Section(upStation, downStation,  10));
         Sections sections = new Sections(originSections);
-        assertDoesNotThrow(() -> sections.insert(new Section(2L, 1L, 1L, 10)));
+
+        assertDoesNotThrow(() -> sections.insert(new Section(downStation, newDownStation,  10)));
     }
 
     @DisplayName("비어있는 구간으로 생성하는 테스트")
@@ -29,15 +34,14 @@ class SectionsTest {
     @DisplayName("새로운 구간의 상행역이 하행 종점역과 다를 경우 예외로 처리")
     @Test
     void differentStation() {
-        long upStationId = 4;
-        long downStationId = 2;
-        long newUpStationId = 8;
-        long newDownStationId = 9;
-        long lineId = 1;
+        Station upStation = new Station(4L, "잠실역");
+        Station downStation = new Station(2L, "잠실나루역");
+        Station newUpStation = new Station(1L, "강변역");
+        Station newDownStation = new Station(3L, "구의역");
         int distance = 10;
 
-        Sections sections = new Sections(List.of(new Section(upStationId, downStationId, lineId, distance)));
-        Section  newSection = new Section(newUpStationId, newDownStationId, lineId, distance);
+        Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
+        Section  newSection = new Section(newUpStation, newDownStation, distance);
 
         assertThrows(IllegalArgumentException.class, () -> sections.insert(newSection));
     }
@@ -45,15 +49,14 @@ class SectionsTest {
     @DisplayName("새로운 구간의 하행역이 노선에 등록되어 있을 경우")
     @Test
     void alreadyEnrolled() {
-        long upStationId = 4;
-        long downStationId = 2;
-        long newUpStationId = 2;
-        long newDownStationId = 4;
-        long lineId = 1;
+        Station upStation = new Station(4L, "잠실역");
+        Station downStation = new Station(2L, "잠실나루역");
+        Station newUpStation = new Station(2L, "잠실나루역");
+        Station newDownStation = new Station(4L, "잠실역");
         int distance = 10;
 
-        Sections sections = new Sections(List.of(new Section(upStationId, downStationId, lineId, distance)));
-        Section  newSection = new Section(newUpStationId, newDownStationId, lineId, distance);
+        Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
+        Section  newSection = new Section(newUpStation, newDownStation, distance);
 
         assertThrows(IllegalArgumentException.class, () -> sections.insert(newSection));
     }

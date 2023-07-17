@@ -30,11 +30,11 @@ public class Sections {
     }
 
     private void validateDuplicated(final Section newSection) {
-        Long newDownStationId = newSection.getDownStationId();
+        Station newDownStation = newSection.getDownStation();
 
         // TODO : Set으로 시간복잡도 줄이는 것 논의하기
         boolean isIncluded = sections.stream()
-                .anyMatch(section -> section.getUpStationId() == newDownStationId);
+                .anyMatch(section -> section.getUpStation().equals(newDownStation));
 
         if (isIncluded) {
             throw new IllegalArgumentException(DUPLICATED_EXCEPTION_MESSAGE);
@@ -42,7 +42,7 @@ public class Sections {
     }
 
     private void validateSameStation(final Section newSection) {
-        if (!Objects.equals(newSection.getUpStationId(), sections.get(sections.size() - 1).getDownStationId())) {
+        if (!newSection.getUpStation().equals(sections.get(sections.size() - 1).getDownStation())) {
             throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
         }
     }
