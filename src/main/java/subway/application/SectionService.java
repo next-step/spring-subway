@@ -16,6 +16,7 @@ public class SectionService {
     }
 
     public SectionResponse saveSection(final Long lineId, final SectionRequest sectionRequest) {
-        return null;
+        final Section section = sectionDao.insert(sectionRequest.toEntity(lineId));
+        return SectionResponse.of(section);
     }
 }
