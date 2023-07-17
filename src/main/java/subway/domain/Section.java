@@ -8,7 +8,7 @@ public class Section {
     private Station upStation;
     private Station downStation;
     private Line line;
-    private int distance;
+    private Distance distance;
 
     public Section() {
     }
@@ -17,7 +17,7 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.line = line;
-        this.distance = distance;
+        this.distance = new Distance(distance);
     }
 
     public Section(Long id, Station upStation, Station downStation, Line line, int distance) {
@@ -25,7 +25,7 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.line = line;
-        this.distance = distance;
+        this.distance = new Distance(distance);
     }
 
     public Long getId() {
@@ -44,7 +44,7 @@ public class Section {
         return line;
     }
 
-    public int getDistance() {
+    public Distance getDistance() {
         return distance;
     }
 
