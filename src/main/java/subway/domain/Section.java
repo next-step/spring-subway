@@ -1,6 +1,7 @@
 package subway.domain;
 
 import java.text.MessageFormat;
+import java.util.Objects;
 import org.springframework.util.Assert;
 
 public class Section {
@@ -39,5 +40,34 @@ public class Section {
 
     Section getUpSection() {
         return upSection;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Section)) {
+            return false;
+        }
+        Section section = (Section) o;
+        return Objects.equals(upStation, section.upStation) && Objects.equals(downStation,
+                section.downStation) && Objects.equals(upSection, section.upSection) && Objects.equals(
+                downSection, section.downSection);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(upStation, downStation, upSection, downSection);
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+                "upStation=" + upStation +
+                ", downStation=" + downStation +
+                ", upSection=" + upSection +
+                ", downSection=" + downSection +
+                '}';
     }
 }
