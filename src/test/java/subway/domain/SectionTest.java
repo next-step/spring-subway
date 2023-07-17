@@ -62,9 +62,11 @@ class SectionTest {
             // when
             section.connectDownSection(downSection);
             Section result = section.getDownsection();
+            Section resultUpSection = result.getUpSection();
 
             // then
             assertThat(result).isEqualTo(downSection);
+            assertThat(resultUpSection).isEqualTo(section);
         }
 
         @Test
