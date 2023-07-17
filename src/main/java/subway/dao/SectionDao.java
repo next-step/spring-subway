@@ -24,20 +24,30 @@ public class SectionDao {
     public Section insert(Section section) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
-        Long upSectionId = null;
-        if (section.getUpSection() != null) {
-            upSectionId = section.getUpSection().getId();
-        }
-        Long downSectionId = null;
-        if (section.getDownSection() != null) {
-            downSectionId = section.getDownSection().getId();
-        }
-        params.put("up_section_id", upSectionId);
-        params.put("down_section_id", downSectionId);
+        params.put("up_section_id", extractUpSectionId(section));
+        params.put("down_section_id", extractDownSectionId(section));
         params.put("up_station_id", section.getUpStation().getId());
         params.put("down_station_id", section.getDownStation().getId());
 
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
+        return buildSection(sectionId, section);
+    }
+
+    private Long extractUpSectionId(Section section) {
+        if (section.getUpSection() != null) {
+            return section.getUpSection().getId();
+        }
+        return null;
+    }
+
+    private Long extractDownSectionId(Section section) {
+        if (section.getDownSection() != null) {
+            return section.getDownSection().getId();
+        }
+        return null;
+    }
+
+    private Section buildSection(Long sectionId, Section section) {
         return Section.builder()
                 .id(sectionId)
                 .upStation(section.getUpStation())
@@ -46,4 +56,5 @@ public class SectionDao {
                 .downSection(section.getDownSection())
                 .build();
     }
+
 }
