@@ -4,11 +4,12 @@ import java.util.Objects;
 
 public class Section {
 
+    private final Line line;
     private final Station upStation;
     private final Station downStation;
     private final int distance;
 
-    public Section(Station upStation, Station downStation, int distance) {
+    public Section(Line line, Station upStation, Station downStation, int distance) {
         validatePositive(distance);
 
         if (upStation.equals(downStation)) {
@@ -16,7 +17,7 @@ public class Section {
                 "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
                     + downStation);
         }
-
+        this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
