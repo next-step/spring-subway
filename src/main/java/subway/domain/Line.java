@@ -70,4 +70,12 @@ public class Line {
 
         return station.equals(terminal);
     }
+
+    public boolean contains(Station station) {
+        return sections.stream()
+                .flatMap(section -> List.of(section.getUpward(), section.getDownward()).stream())
+                .distinct()
+                .collect(Collectors.toList())
+                .contains(station);
+    }
 }

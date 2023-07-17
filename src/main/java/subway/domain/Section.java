@@ -12,7 +12,7 @@ public class Section {
     }
 
     public Station getDownward() {
-        return this.downward;
+        return downward;
     }
 
     public Station getUpward() {
