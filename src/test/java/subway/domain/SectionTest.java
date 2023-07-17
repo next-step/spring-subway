@@ -37,4 +37,16 @@ class SectionTest {
         assertThat(section.cannotPrecede(otherSection)).isFalse();
         assertThat(otherSection.cannotPrecede(section)).isTrue();
     }
+
+    @Test
+    @DisplayName("주어진 구간의 하행역을 포함하는지 확인한다.")
+    void checkContainingDownStationOfSection() {
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
+        Section section = new Section(stationA, stationB, 1);
+        Section targetSection = new Section(stationC, stationB, 1);
+
+        assertThat(section.containsDownStationOf(targetSection)).isTrue();
+    }
 }

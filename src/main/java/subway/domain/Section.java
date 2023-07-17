@@ -33,6 +33,10 @@ public class Section {
         return !downStation.equals(other.upStation);
     }
 
+    public boolean containsDownStationOf(Section section) {
+        return this.upStation.equals(section.downStation) || this.downStation.equals(section.downStation);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

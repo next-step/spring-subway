@@ -13,7 +13,15 @@ public class Sections {
 
     public void addLast(Section section) {
         validateAddable(section);
+        validateNotContainDownStationOf(section);
         this.values.add(section);
+    }
+
+    private void validateNotContainDownStationOf(Section section) {
+        if (this.values.stream()
+            .anyMatch(value -> value.containsDownStationOf(section))) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private void validateAddable(Section section) {
