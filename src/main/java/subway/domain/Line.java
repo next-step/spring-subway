@@ -1,5 +1,7 @@
 package subway.domain;
 
+import static org.springframework.util.StringUtils.*;
+
 import java.util.Objects;
 
 public class Line {
@@ -11,8 +13,15 @@ public class Line {
     }
 
     public Line(String name, String color) {
+        validateLine(name, color);
         this.name = name;
         this.color = color;
+    }
+
+    private void validateLine(String name, String color) {
+        if (!hasText(name) || !hasText(color)) {
+            throw new IllegalArgumentException("이름, 색상은 반드시 입력해야합니다.");
+        }
     }
 
     public Line(Long id, String name, String color) {
