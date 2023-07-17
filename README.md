@@ -32,9 +32,9 @@ Line 색(color)
   - [ ] Section을 삭제할 수 있다.
     - [ ] Line에 하나의 Section만 있을때, 삭제할 수 없다.
     - [ ] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
-- [ ] Section
-  - [ ] Station과 Station을 연결할 수 있다.
-  - [ ] 연결된 Section을 알고있다.
+- [x] Section
+  - [x] Station과 Station을 연결할 수 있다.
+  - [x] 연결된 Section을 알고있다.
 - [x] Station
   - [x] 이름을 표현한다.
   - [x] 이름이 중복되면 예외를 던진다.
