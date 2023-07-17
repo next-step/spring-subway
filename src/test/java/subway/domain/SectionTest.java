@@ -30,7 +30,7 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("하나의 Station이 null값으로 들어오면, IllegalArgumentException을 던진다.")
+        @DisplayName("하나의 Station이 Null값으로 들어오면, IllegalArgumentException을 던진다.")
         void Throw_IllegalArgumentException_When_Input_Null_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
@@ -49,7 +49,7 @@ class SectionTest {
     class ConnectDownSection_Method {
 
         @Test
-        @DisplayName("각 Section의 middle station이 동일하면, upStation이 Section에 상행에 연결된다.")
+        @DisplayName("각 Section의 Middle Station이 동일하면, UpStation이 Section에 상행에 연결된다.")
         void Connect_Down_Section_When_Input_Section() {
             // given
             Station upStation = new Station(1L, "upStation");
@@ -61,6 +61,7 @@ class SectionTest {
 
             // when
             section.connectDownSection(downSection);
+
             Section result = section.getDownsection();
             Section resultUpSection = result.getUpSection();
 
@@ -70,7 +71,7 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("각 section의 middle station이 다르면, IllegalArgumentException을 던진다.")
+        @DisplayName("각 Section의 Middle Station이 다르면, IllegalArgumentException을 던진다.")
         void Throw_IllegalArgumentException_When_Input_Different_Middle_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
@@ -89,7 +90,7 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("section으로 null이 들어오면, IllegalArgumentException을 던진다.")
+        @DisplayName("Section으로 Null이 들어오면, IllegalArgumentException을 던진다.")
         void Throw_IllegalArgumentException_When_Input_Null_Section() {
             // given
             Station upStation = new Station(2L, "upStation");
