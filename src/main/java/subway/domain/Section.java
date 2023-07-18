@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class Section {
 
+    private Long id;
     private final Line line;
     private final Station upStation;
     private final Station downStation;
@@ -21,7 +22,11 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
 
+    public Section(Long id, Line line, Station upStation, Station downStation, int distance) {
+        this(line, upStation, downStation, distance);
+        this.id = id;
     }
 
     private void validatePositive(int distance) {
@@ -36,6 +41,26 @@ public class Section {
 
     public boolean containsDownStationOf(Section section) {
         return this.upStation.equals(section.downStation) || this.downStation.equals(section.downStation);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
     @Override

@@ -1,10 +1,14 @@
 package subway.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
@@ -67,17 +71,10 @@ public class SectionDao {
                 () -> new RuntimeException("존재하지 않는 station id입니다. id: \"" + id + "\""));
     }
 
-    /**
-     * jdbcTemplate.queryForObject(sql, rowMapper, id)
-     String sql = "select id, line_id, up_station_id, down_station_id, distance,  from LINE";
-     *
-     *
-     * id bigint auto_increment not null,
-     *     line_id not null,
-     *     up_station_id not null,
-     *     down_station_id not null,
-     *     distance int,
-     */
-
-
+    public Section save(Section section) {
+        SqlParameterSource params = new BeanPropertySqlParameterSource(section);
+        Long sectionId = insertAction.executeAndReturnKey(params).longValue();
+        return new Section(sectionId, section.getLine(), section.getUpStation(), section.getDownStation(),
+            section.getDistance());
+    }
 }
