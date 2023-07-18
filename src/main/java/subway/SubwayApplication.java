@@ -8,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class SubwayApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(SubwayApplication.class, args);
     }
