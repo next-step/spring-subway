@@ -1,6 +1,7 @@
 package subway.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -132,5 +133,20 @@ class SectionDaoTest {
         // then
         assertThat(sections).hasSize(2);
         assertThat(sections).containsAnyOf(section1, section2);
+    }
+
+    @DisplayName("구간 테이블에서 아이디를 기준으로 삭제")
+    @Test
+    void deleteById() {
+        // given
+        long lineId = 1L;
+        Section section1 = sectionDao.insert(new Section(lineId, 1L, 2L, 10L));
+        Section section2 = sectionDao.insert(new Section(lineId, 2L, 3L, 10L));
+
+        //  when
+        assertDoesNotThrow(() -> sectionDao.deleteById(section2.getId()));
+
+        // then
+        assertThat(sectionDao.findAllByLineId(lineId)).hasSize(1);
     }
 }
