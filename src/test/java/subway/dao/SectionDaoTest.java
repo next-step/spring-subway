@@ -101,4 +101,12 @@ class SectionDaoTest {
             () -> assertThat(result2).isEqualTo(new Sections(List.of()))
         );
     }
+
+    @Test
+    @DisplayName("역 구간 삭제 테스트")
+    void deleteByDownStationId() {
+        sectionDao.deleteByDownStationIdAndLineId(2L, 1L);
+        assertThat(sectionDao.findById(1L).isEmpty())
+            .isTrue();
+    }
 }

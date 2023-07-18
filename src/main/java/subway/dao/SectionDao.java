@@ -103,6 +103,10 @@ public class SectionDao {
         jdbcTemplate.update("delete from section where id = ?", id);
     }
 
+    public void deleteByDownStationIdAndLineId(Long downStationId, Long lineId) {
+        jdbcTemplate.update("delete from section where down_station_id = ? and line_id = ?", downStationId, lineId);
+    }
+
     public Sections findAllByLineId(Long lineId) {
         String sql =
             "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
