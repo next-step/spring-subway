@@ -3,6 +3,8 @@ package subway.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -225,5 +227,41 @@ class SectionServiceTest {
         assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+    }
+
+    @DisplayName("노선 조회시 응답이 상행부터 하행 순서대로 조회되야한다.")
+    @Test
+    void findAllByLineId() {
+        // given
+        Long lineId = 1L;
+        SectionRequest request1 = new SectionRequest(5L, 4L, 10L);
+        SectionRequest request2 = new SectionRequest(4L, 3L, 10L);
+        SectionRequest request3 = new SectionRequest(4L, 1L, 4L);
+        sectionService.saveSection(lineId, request1);
+        sectionService.saveSection(lineId, request2);
+        sectionService.saveSection(lineId, request3);
+
+        // when
+        List<SectionResponse> responses = sectionService.findAllByLineId(lineId);
+
+        // then
+
+        Assertions.assertThat(responses.get(0)).extracting(
+                        SectionResponse::getUpStationId,
+                        SectionResponse::getDownStationId,
+                        SectionResponse::getDistance)
+                .contains(5L, 4L, 10L);
+
+        Assertions.assertThat(responses.get(1)).extracting(
+                        SectionResponse::getUpStationId,
+                        SectionResponse::getDownStationId,
+                        SectionResponse::getDistance)
+                .contains(4L, 1L, 4L);
+
+        Assertions.assertThat(responses.get(2)).extracting(
+                        SectionResponse::getUpStationId,
+                        SectionResponse::getDownStationId,
+                        SectionResponse::getDistance)
+                .contains(1L, 3L, 6L);
     }
 }
