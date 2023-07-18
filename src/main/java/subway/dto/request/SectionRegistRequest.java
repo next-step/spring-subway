@@ -4,26 +4,27 @@ import java.util.Objects;
 
 public final class SectionRegistRequest {
 
-    private Long downStationId;
     private Long upStationId;
+    private Long downStationId;
     private int distance;
 
     public SectionRegistRequest() {
     }
 
-    public SectionRegistRequest(final Long downStationId, final Long upStationId, final int distance) {
-        this.downStationId = downStationId;
+    public SectionRegistRequest(final Long upStationId, final Long downStationId, final int distance) {
         this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
     }
 
     public Long getDownStationId() {
         return downStationId;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
-    }
 
     public int getDistance() {
         return distance;
