@@ -26,7 +26,7 @@ public class SectionDao {
             new Station(
                 rs.getLong("up_station_id"),
                 rs.getString("us_name")
-                ),
+            ),
             new Station(
                 rs.getLong("down_station_id"),
                 rs.getString("ds_name")
@@ -60,22 +60,24 @@ public class SectionDao {
     }
 
     public List<Section> findAll() {
-        String sql = "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
-            + "from section s "
-            + "inner join line l on (s.line_id = l.id) "
-            + "inner join station us on (s.up_station_id = us.id) "
-            + "inner join station ds on (s.down_station_id = ds.id)";
+        String sql =
+            "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
+                + "from section s "
+                + "inner join line l on (s.line_id = l.id) "
+                + "inner join station us on (s.up_station_id = us.id) "
+                + "inner join station ds on (s.down_station_id = ds.id)";
 
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     public Optional<Section> findById(Long id) {
-        String sql = "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
-            + "from section s "
-            + "inner join line l on (s.line_id = l.id) "
-            + "inner join station us on (s.up_station_id = us.id) "
-            + "inner join station ds on (s.down_station_id = ds.id) "
-            + "where s.id = ?";
+        String sql =
+            "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
+                + "from section s "
+                + "inner join line l on (s.line_id = l.id) "
+                + "inner join station us on (s.up_station_id = us.id) "
+                + "inner join station ds on (s.down_station_id = ds.id) "
+                + "where s.id = ?";
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
         } catch (EmptyResultDataAccessException e) {
@@ -98,5 +100,17 @@ public class SectionDao {
 
     public void deleteById(Long id) {
         jdbcTemplate.update("delete from section where id = ?", id);
+    }
+
+    public List<Section> findAllByLineId(Long lineId) {
+        String sql =
+            "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
+                + "from section s "
+                + "inner join line l on (s.line_id = l.id) "
+                + "inner join station us on (s.up_station_id = us.id) "
+                + "inner join station ds on (s.down_station_id = ds.id) "
+                + "where s.line_id = ?";
+
+        return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 }

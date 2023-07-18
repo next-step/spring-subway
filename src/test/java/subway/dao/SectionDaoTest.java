@@ -1,5 +1,8 @@
 package subway.dao;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,14 +38,14 @@ class SectionDaoTest {
     @DisplayName("전체 조회 테스트")
     void findAll() {
         List<Section> result = sectionDao.findAll();
-        Assertions.assertThat(result).contains(expectedSection);
+        assertThat(result).contains(expectedSection);
     }
 
     @Test
     @DisplayName("단일 조회 테스트")
     void findById() {
         Section result = sectionDao.findById(1L).get();
-        Assertions.assertThat(result).isEqualTo(expectedSection);
+        assertThat(result).isEqualTo(expectedSection);
     }
 
     @Test
@@ -55,7 +58,7 @@ class SectionDaoTest {
             20
         );
         Section result = sectionDao.insert(addSection);
-        Assertions.assertThat(result.getId()).isNotNull();
+        assertThat(result.getId()).isNotNull();
     }
 
     @Test
@@ -71,8 +74,8 @@ class SectionDaoTest {
         );
 
         sectionDao.update(updateSection);
-        Assertions.assertThat(sectionDao.findById(1L)
-                .orElseThrow(() -> new IllegalStateException("값이 없습니다.")))
+        assertThat(sectionDao.findById(1L)
+            .orElseThrow(() -> new IllegalStateException("값이 없습니다.")))
             .isEqualTo(updateSection);
     }
 
@@ -81,9 +84,20 @@ class SectionDaoTest {
     void delete() {
         sectionDao.deleteById(1L);
         Assertions.assertThatThrownBy(
-                () -> sectionDao.findById(1L).orElseThrow(() -> new IllegalStateException("값이 없습니다."))
+                () -> sectionDao.findById(1L)
+                    .orElseThrow(() -> new IllegalStateException("값이 없습니다."))
             )
             .isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    @DisplayName("lineId에 해당하는 Section 리스트 반환 테스트")
+    void findAllByLineId() {
+        List<Section> result1 = sectionDao.findAllByLineId(1L);
+        List<Section> result2 = sectionDao.findAllByLineId(0L);
+        assertAll(
+            () -> assertThat(result1).contains(expectedSection),
+            () -> assertThat(result2).isEmpty()
+        );
+    }
 }
