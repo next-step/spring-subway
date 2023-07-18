@@ -1,20 +1,46 @@
 package subway.domain;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Line {
     private final Long id;
     private final String name;
     private final String color;
+    private final Sections sections;
 
     public Line(final String name, final String color) {
         this(null, name, color);
     }
 
     public Line(final Long id, final String name, final String color) {
+        this(id, name, color, new Sections());
+    }
+
+    public Line(String name, String color, Sections sections) {
+        this(null, name, color, sections);
+    }
+
+    public Line(final Long id, final String name, final String color, final Sections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.sections = sections;
+    }
+
+    public Line addSections(Sections sections) {
+        return new Line(this.id, this.name, this.color, this.sections.union(sections));
+    }
+
+    public Line addSection(Section section) {
+        validateSection(section);
+        return addSections(new Sections(List.of(section)));
+    }
+
+    private void validateSection(Section section) {
+        if (!sections.isTerminal(section.getUpward()) || sections.contains(section.getDownward())) {
+            throw new IllegalArgumentException("새로운 상행역은 기존의 하행 종점역만 설정 가능합니다.");
+        }
     }
 
     public Long getId() {
@@ -27,6 +53,10 @@ public class Line {
 
     public String getColor() {
         return color;
+    }
+
+    public Sections getSections() {
+        return sections;
     }
 
     @Override

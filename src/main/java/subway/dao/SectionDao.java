@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
 import subway.domain.Section;
-import subway.domain.SectionGroup;
+import subway.domain.Sections;
 import subway.domain.Station;
 
 import javax.sql.DataSource;
@@ -46,7 +46,7 @@ public class SectionDao {
         return new Section(sectionId, section.getUpward(), section.getDownward(), section.getLine(), section.getDistance());
     }
 
-    public SectionGroup findAllByLineId(final Long lineId) {
+    public Sections findAllByLineId(final Long lineId) {
         String sql = "select section.id as section_id, " +
                 "upward.id as upward_id, " +
                 "upward.name as upward_name, " +
@@ -62,6 +62,6 @@ public class SectionDao {
                 "left join STATION downward on section.downward_id = downward.id " +
                 "where section.line_id = ?";
 
-        return new SectionGroup(jdbcTemplate.query(sql, rowMapper, lineId));
+        return new Sections(jdbcTemplate.query(sql, rowMapper, lineId));
     }
 }

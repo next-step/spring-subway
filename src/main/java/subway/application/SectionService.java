@@ -6,7 +6,7 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
-import subway.domain.SectionGroup;
+import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
 
@@ -23,14 +23,14 @@ public class SectionService {
     }
 
     public void saveSection(final Long lineId, final SectionRequest request) {
-        SectionGroup sections = sectionDao.findAllByLineId(lineId);
-        Line line = lineDao.findById(lineId);
+        Sections sections = sectionDao.findAllByLineId(lineId);
+        Line line = lineDao.findById(lineId).addSections(sections);
         Station upward = stationDao.findById(request.getUpStationId());
         Station downward = stationDao.findById(request.getDownStationId());
+        Section section = new Section(upward, downward, line, request.getDistance());
 
-        if (!sections.isTerminal(upward) || sections.contains(downward)) {
-            throw new IllegalArgumentException("새로운 상행역은 기존의 하행 종점역만 설정 가능합니다.");
-        }
-        sectionDao.insert(new Section(upward, downward, line, request.getDistance()));
+        line.addSection(section);
+
+        sectionDao.insert(section);
     }
 }

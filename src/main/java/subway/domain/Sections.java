@@ -1,16 +1,22 @@
 package subway.domain;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SectionGroup {
+public class Sections {
     private final List<Section> sections;
 
-    public SectionGroup(final List<Section> sections) {
+    public Sections(final List<Section> sections) {
         this.sections = Collections.unmodifiableList(sections);
+    }
+
+    public Sections() {
+        this(new ArrayList<>());
     }
 
     public boolean isTerminal(final Station station) {
@@ -33,5 +39,17 @@ public class SectionGroup {
                 .distinct()
                 .collect(Collectors.toList())
                 .contains(station);
+    }
+
+    public Sections union(Sections other) {
+        return new Sections(
+                Stream.of(this.sections, other.sections)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    public List<Section> getSections() {
+        return sections;
     }
 }
