@@ -1,9 +1,9 @@
 package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ class SectionsTest {
 
         Sections sections = new Sections(List.of(section));
 
-        Assertions.assertThatThrownBy(() -> sections.addLast(unaddableSection))
+        assertThatThrownBy(() -> sections.addLast(unaddableSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -63,7 +63,7 @@ class SectionsTest {
 
         Sections sections = new Sections(List.of(section));
 
-        Assertions.assertThatThrownBy(() -> sections.addLast(unaddableSection))
+        assertThatThrownBy(() -> sections.addLast(unaddableSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -80,5 +80,34 @@ class SectionsTest {
         sections.addLast(addableSection);
 
         assertThat(sections.getLast()).isEqualTo(addableSection);
+    }
+
+    @Test
+    @DisplayName("구간이 1개인 경우 구간을 삭제할 수 없다")
+    void cannotRemoveOneSizeSections() {
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Section section = new Section(lineA, stationA, stationB, 1);
+        Sections sections = new Sections(List.of(section));
+
+        assertThatThrownBy(sections::removeLast)
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("마지막 구간을 삭제한다")
+    void removeLast() {
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
+        Section sectionA = new Section(lineA, stationA, stationB, 1);
+        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        Section removedSection = sections.removeLast();
+
+        Sections expectedSections = new Sections(List.of(sectionA));
+        assertThat(sections).isEqualTo(expectedSections);
+        assertThat(removedSection).isEqualTo(sectionB);
     }
 }

@@ -73,6 +73,13 @@ public class Sections {
         }
     }
 
+    public Section removeLast() {
+        if (values.size() <= 1) {
+            throw new IllegalStateException("노선의 구간이 1개인 경우 삭제할 수 없습니다.");
+        }
+        return values.remove(values.size() - 1);
+    }
+
     Section getLast() {
         return this.values.get(this.values.size() - 1);
     }
