@@ -9,8 +9,8 @@ public class Section {
     private Long upStationId;
     private Long downStationId;
     private Long distance;
-    private Long preStationId;
-    private Long postStationId;
+    private Long nextSectionId;
+    private Long prevSectionId;
 
     private Section() {
     }
@@ -25,8 +25,8 @@ public class Section {
             final Long upStationId,
             final Long downStationId,
             final Long distance,
-            final Long preStationId,
-            final Long postStationId
+            final Long nextSectionId,
+            final Long prevSectionId
     ) {
         validate(upStationId, downStationId, distance);
 
@@ -35,8 +35,8 @@ public class Section {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-        this.preStationId = preStationId;
-        this.postStationId = postStationId;
+        this.nextSectionId = nextSectionId;
+        this.prevSectionId = prevSectionId;
     }
 
     public Long getId() {
@@ -59,12 +59,12 @@ public class Section {
         return distance;
     }
 
-    public Long getPreStationId() {
-        return preStationId;
+    public Long getNextSectionId() {
+        return nextSectionId;
     }
 
-    public Long getPostStationId() {
-        return postStationId;
+    public Long getPrevSectionId() {
+        return prevSectionId;
     }
 
     private void validate(final Long upStationId, final Long downStationId, final Long distance) {
@@ -96,11 +96,11 @@ public class Section {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(lineId, section.lineId) && Objects.equals(upStationId, section.upStationId) && Objects.equals(downStationId, section.downStationId) && Objects.equals(distance, section.distance) && Objects.equals(preStationId, section.preStationId) && Objects.equals(postStationId, section.postStationId);
+        return Objects.equals(id, section.id) && Objects.equals(lineId, section.lineId) && Objects.equals(upStationId, section.upStationId) && Objects.equals(downStationId, section.downStationId) && Objects.equals(distance, section.distance) && Objects.equals(nextSectionId, section.nextSectionId) && Objects.equals(prevSectionId, section.prevSectionId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, lineId, upStationId, downStationId, distance, preStationId, postStationId);
+        return Objects.hash(id, lineId, upStationId, downStationId, distance, nextSectionId, prevSectionId);
     }
 }

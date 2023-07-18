@@ -15,8 +15,8 @@ values (11, '시청'),
        (38, '대청');
 
 
-insert into SECTION(`id`, `line_id`, `up_station_id`, `down_station_id`, `distance`, `pre_section_id`,
-                    `post_section_id`)
+insert into SECTION(`id`, `line_id`, `up_station_id`, `down_station_id`, `distance`, `next_section_id`,
+                    `prev_section_id`)
 values (DEFAULT, 1, 11, 12, 777, null, null),
        (DEFAULT, 2, 23, 24, 777, null, null),
        (DEFAULT, 2, 24, 25, 777, 2, null),

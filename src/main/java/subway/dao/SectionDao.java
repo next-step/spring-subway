@@ -16,15 +16,15 @@ public class SectionDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
-    private RowMapper<Section> rowMapper = (rs, rowNum) ->
+    private final RowMapper<Section> rowMapper = (rs, rowNum) ->
             new Section(
                     rs.getLong("id"),
                     rs.getLong("line_id"),
                     rs.getLong("up_station_id"),
                     rs.getLong("down_station_id"),
                     rs.getLong("distance"),
-                    rs.getLong("pre_section_id"),
-                    rs.getLong("post_section_id")
+                    rs.getObject("next_section_id", Long.class),
+                    rs.getObject("prev_section_id", Long.class)
             );
 
     public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
@@ -41,8 +41,8 @@ public class SectionDao {
         params.put("up_station_id", section.getUpStationId());
         params.put("down_station_id", section.getDownStationId());
         params.put("distance", section.getDistance());
-        params.put("pre_section_id", section.getPreStationId());
-        params.put("post_section_id", section.getPostStationId());
+        params.put("next_section_id", section.getNextSectionId());
+        params.put("prev_section_id", section.getPrevSectionId());
 
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
         return new Section(
@@ -51,8 +51,8 @@ public class SectionDao {
                 section.getUpStationId(),
                 section.getDownStationId(),
                 section.getDistance(),
-                section.getPreStationId(),
-                section.getPostStationId()
+                section.getNextSectionId(),
+                section.getPrevSectionId()
         );
     }
 
