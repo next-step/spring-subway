@@ -45,9 +45,9 @@ Line 색(color)
 
 lineId, upStationId, downStationId;
 
-1. [ ] lineId기준 DB에서 모든 section 조회
-2. [x] 조회된 section에서 upStationId가 하행 section이 맞는지 확인
-4. [x] 하행 section이랑 연결
+1. [x] lineId기준 DB에서 모든 section 조회
+2. [ ] 조회된 section에서 upStationId가 하행 section이 맞는지 확인
+3. [ ] 하행 section이랑 연결
 
 ### 애플리케이션 서비스
 
