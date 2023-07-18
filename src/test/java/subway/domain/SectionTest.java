@@ -131,4 +131,36 @@ class SectionTest {
         }
     }
 
+    @Nested
+    @DisplayName("findDownSection 메소드는")
+    class FindDownSection_Method {
+
+        @Test
+        @DisplayName("해당 line의 하행 Section을 찾아 반환한다.")
+        void Return_Down_Section() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Station downStation = new Station(2L, "downStation");
+
+            Section section = Section.builder()
+                    .upStation(upStation)
+                    .downStation(middleStation)
+                    .build();
+
+            Section downSection = Section.builder()
+                    .upStation(middleStation)
+                    .downStation(downStation)
+                    .build();
+
+            section.connectDownSection(downSection);
+
+            // when
+            Section result = section.findDownSection();
+
+            // then
+            assertThat(result).isEqualTo(downSection);
+        }
+    }
+
 }

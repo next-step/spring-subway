@@ -28,11 +28,11 @@ public class Station {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof Station)) {
             return false;
         }
         Station station = (Station) o;
-        return id.equals(station.id) && name.equals(station.name);
+        return Objects.equals(id, station.id) && Objects.equals(name, station.name);
     }
 
     @Override

@@ -56,6 +56,10 @@ public class Section {
         downSection.upSection = this;
     }
 
+    public Section findDownSection() {
+        return null;
+    }
+
     public Long getId() {
         return id;
     }
@@ -93,26 +97,25 @@ public class Section {
             return false;
         }
         Section section = (Section) o;
-        return Objects.equals(upStation, section.upStation) && Objects.equals(downStation,
-                section.downStation) && Objects.equals(distance, section.distance) && Objects.equals(
-                line, section.line) && Objects.equals(id, section.id) && Objects.equals(upSection,
+        return Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation)
+                && Objects.equals(downStation, section.downStation) && Objects.equals(distance,
+                section.distance) && Objects.equals(line, section.line) && Objects.equals(upSection,
                 section.upSection) && Objects.equals(downSection, section.downSection);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(upStation, downStation, distance, line, id, upSection, downSection);
+        return Objects.hash(id, upStation, downStation, distance, line, upSection, downSection);
     }
 
     @Override
     public String toString() {
         return "Section{" +
-                "upStation=" + upStation +
+                "id=" + id +
+                ", upStation=" + upStation +
                 ", downStation=" + downStation +
                 ", distance=" + distance +
                 ", line=" + line +
-                ", id=" + id +
-                ", upSection=" + upSection +
                 ", downSection=" + downSection +
                 '}';
     }
