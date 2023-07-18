@@ -33,7 +33,7 @@ public class Section {
 
     public void connectDownSection(Section downSection) {
         Assert.notNull(downSection, () -> "downSection은 null이 될 수 없습니다.");
-        Assert.isTrue(downSection.upStation == downStation, () -> MessageFormat.format(
+        Assert.isTrue(downSection.upStation.equals(downStation), () -> MessageFormat.format(
                 "추가되는 downSection.upStation은 현재의 section.downStation과 동일해야합니다. downSection.upStation \"{0}\" current.downStation \"{1}\"",
                 downSection.upStation, downStation));
 
@@ -87,8 +87,8 @@ public class Section {
         Section section = (Section) o;
         return Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation)
                 && Objects.equals(downStation, section.downStation) && Objects.equals(distance,
-                section.distance) && Objects.equals(line, section.line) && Objects.equals(upSection,
-                section.upSection) && Objects.equals(downSection, section.downSection);
+                section.distance) && Objects.equals(line, section.line) && Objects.equals(downSection,
+                section.downSection);
     }
 
     @Override
