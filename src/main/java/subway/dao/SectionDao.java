@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import subway.domain.Section;
 
 import javax.sql.DataSource;
+import java.util.Optional;
 
 @Repository
 public class SectionDao {
@@ -19,8 +20,9 @@ public class SectionDao {
     private RowMapper<Section> rowMapper = (rs, rowNum) ->
             new Section(
                     rs.getLong("id"),
-                    rs.getLong("downStationId"),
-                    rs.getLong("upStationId"),
+                    rs.getLong("line_id"),
+                    rs.getLong("down_station_id"),
+                    rs.getLong("up_station_id"),
                     rs.getDouble("distance")
             );
 
@@ -35,5 +37,12 @@ public class SectionDao {
         SqlParameterSource params = new BeanPropertySqlParameterSource(section);
         Long id = insertAction.executeAndReturnKey(params).longValue();
         return new Section(id, section.getLineId(), section.getDownStationId(), section.getUpStationId(), section.getDistance());
+    }
+
+    public Optional<Section> findByDownStationIdAndLineId(final Long lineId, final Long downStationId) {
+        String sql = "select * from section where line_id = ? and down_station_id = ?";
+        return jdbcTemplate.query(sql, rowMapper, lineId, downStationId)
+                .stream()
+                .findAny();
     }
 }
