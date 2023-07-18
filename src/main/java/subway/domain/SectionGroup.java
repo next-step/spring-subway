@@ -9,11 +9,11 @@ import java.util.stream.Stream;
 public class SectionGroup {
     private final List<Section> sections;
 
-    public SectionGroup(List<Section> sections) {
+    public SectionGroup(final List<Section> sections) {
         this.sections = Collections.unmodifiableList(sections);
     }
 
-    public boolean isTerminal(Station station) {
+    public boolean isTerminal(final Station station) {
         Set<Station> upward = sections.stream()
                 .map(Section::getUpward)
                 .collect(Collectors.toSet());

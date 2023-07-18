@@ -16,13 +16,13 @@ public class SectionService {
     private final StationDao stationDao;
     private final LineDao lineDao;
 
-    public SectionService(SectionDao sectionDao, StationDao stationDao, LineDao lineDao) {
+    public SectionService(final SectionDao sectionDao, final StationDao stationDao, final LineDao lineDao) {
         this.sectionDao = sectionDao;
         this.stationDao = stationDao;
         this.lineDao = lineDao;
     }
 
-    public void saveSection(Long lineId, SectionRequest request) {
+    public void saveSection(final Long lineId, final SectionRequest request) {
         SectionGroup sections = sectionDao.findAllByLineId(lineId);
         Line line = lineDao.findById(lineId);
         Station upward = stationDao.findById(request.getUpStationId());
@@ -31,6 +31,6 @@ public class SectionService {
         if (!sections.isTerminal(upward) || sections.contains(downward)) {
             throw new IllegalArgumentException("새로운 상행역은 기존의 하행 종점역만 설정 가능합니다.");
         }
-        sectionDao.insert(new Section(null, upward, downward, line, request.getDistance()));
+        sectionDao.insert(new Section(upward, downward, line, request.getDistance()));
     }
 }

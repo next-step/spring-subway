@@ -7,7 +7,7 @@ public class Section {
     private final Line line;
     private final int distance;
 
-    public Section(Long id, Station upward, Station downward, Line line, int distance) {
+    public Section(final Long id, final Station upward, final Station downward, final Line line, final int distance) {
         this.id = id;
         this.upward = upward;
         this.downward = downward;
@@ -15,7 +15,7 @@ public class Section {
         this.distance = distance;
     }
 
-    public Section(Station upward, Station downward, Line line, int distance) {
+    public Section(final Station upward, final Station downward, final Line line, final int distance) {
         this(null, upward, downward, line, distance);
     }
 
@@ -38,4 +38,5 @@ public class Section {
     public Line getLine() {
         return line;
     }
+
 }

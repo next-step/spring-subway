@@ -104,6 +104,24 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLines() {
         // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest1 = new LineRequest("2호선", "green", station1Id, station2Id, 14);
         ExtractableResponse<Response> createResponse1 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -112,6 +130,7 @@ public class LineIntegrationTest extends IntegrationTest {
                 .then().log().all()
                 .extract();
 
+        LineRequest lineRequest2 = new LineRequest("3호선", "orange", station1Id, station2Id, 15);
         ExtractableResponse<Response> createResponse2 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -119,7 +138,7 @@ public class LineIntegrationTest extends IntegrationTest {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
-
+        
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -143,10 +162,28 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLine() {
         // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
         ExtractableResponse<Response> createResponse = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(lineRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
@@ -170,10 +207,28 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void updateLine() {
         // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
         ExtractableResponse<Response> createResponse = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(lineRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
@@ -196,10 +251,28 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void deleteLine() {
         // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
         ExtractableResponse<Response> createResponse = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(lineRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();

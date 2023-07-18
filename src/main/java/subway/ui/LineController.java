@@ -27,13 +27,13 @@ public class LineController {
     private final LineService lineService;
     private final SectionService sectionService;
 
-    public LineController(LineService lineService, SectionService sectionService) {
+    public LineController(final LineService lineService, final SectionService sectionService) {
         this.lineService = lineService;
         this.sectionService = sectionService;
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody final LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
 
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
@@ -45,24 +45,24 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> findLineById(@PathVariable final Long id) {
         return ResponseEntity.ok(lineService.findLineResponseById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable final Long id, @RequestBody final LineRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable final Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+    public ResponseEntity<Void> createSection(@PathVariable final Long id, @RequestBody final SectionRequest sectionRequest) {
         sectionService.saveSection(id, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
     }
