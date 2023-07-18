@@ -3,6 +3,7 @@ package subway.domain;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -139,5 +140,20 @@ class SectionsTest {
             () -> assertThatThrownBy(() -> sections.canDeleteStation(3L))
                 .isInstanceOf(IllegalArgumentException.class)
         );
+    }
+
+    @Test
+    @DisplayName("Line에 역이 하나도 없다면 구간이 무조건 등록된다")
+    void registSectionInEmptyLine() {
+        Sections sections = new Sections(Collections.emptyList());
+        assertThatNoException().isThrownBy(() -> sections.validNewSection(section1));
+    }
+
+    @Test
+    @DisplayName("구간이 1개 이하인 경우 해당역을 삭제할 수 없다")
+    void canNotRemoveStation() {
+        Sections sections = new Sections(List.of(section1));
+        assertThatThrownBy(() -> sections.canDeleteStation(2L))
+            .isInstanceOf(IllegalStateException.class);
     }
 }

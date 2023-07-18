@@ -1,7 +1,6 @@
 package subway.domain;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,6 +13,9 @@ public class Sections {
     }
 
     public void validNewSection(Section section) {
+        if (sections.size() == 0) {
+            return;
+        }
         validNewSectionDownStation(section);
         validNewSectionUpStation(section);
     }
@@ -36,6 +38,9 @@ public class Sections {
     }
 
     public void canDeleteStation(Long stationId) {
+        if (sections.size() <= 1) {
+            throw new IllegalStateException("구간이 1개 이하이므로 해당역을 삭제할 수 없습니다.");
+        }
         Station endStation = findEndStation();
         if (endStation.getId() != stationId) {
             throw new IllegalArgumentException("하행 종점역이 아니면 삭제할 수 없습니다.");
@@ -55,20 +60,5 @@ public class Sections {
         return station;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Sections sections1 = (Sections) o;
-        return Objects.equals(sections, sections1.sections);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(sections);
-    }
 }
