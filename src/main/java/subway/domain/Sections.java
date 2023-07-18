@@ -33,7 +33,7 @@ public class Sections {
         return station.equals(terminal);
     }
 
-    public boolean contains(Station station) {
+    public boolean contains(final Station station) {
         return sections.stream()
                 .flatMap(section -> Stream.of(section.getUpward(), section.getDownward()))
                 .distinct()
@@ -41,7 +41,7 @@ public class Sections {
                 .contains(station);
     }
 
-    public Sections union(Sections other) {
+    public Sections union(final Sections other) {
         return new Sections(
                 Stream.of(this.sections, other.sections)
                         .flatMap(Collection::stream)

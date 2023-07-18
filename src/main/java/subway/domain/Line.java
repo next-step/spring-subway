@@ -17,7 +17,7 @@ public class Line {
         this(id, name, color, new Sections());
     }
 
-    public Line(String name, String color, Sections sections) {
+    public Line(final String name, final String color, final Sections sections) {
         this(null, name, color, sections);
     }
 
@@ -28,16 +28,16 @@ public class Line {
         this.sections = sections;
     }
 
-    public Line addSections(Sections sections) {
+    public Line addSections(final Sections sections) {
         return new Line(this.id, this.name, this.color, this.sections.union(sections));
     }
 
-    public Line addSection(Section section) {
+    public Line addSection(final Section section) {
         validateSection(section);
         return addSections(new Sections(List.of(section)));
     }
 
-    private void validateSection(Section section) {
+    private void validateSection(final Section section) {
         if (!sections.isTerminal(section.getUpward()) || sections.contains(section.getDownward())) {
             throw new IllegalArgumentException("새로운 상행역은 기존의 하행 종점역만 설정 가능합니다.");
         }
