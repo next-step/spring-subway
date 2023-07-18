@@ -16,6 +16,18 @@ public class Section {
         /* no-op */
     }
 
+    private Section(final Builder builder) {
+        this(
+                builder.id,
+                builder.lineId,
+                builder.upStationId,
+                builder.downStationId,
+                builder.distance,
+                builder.nextSectionId,
+                builder.prevSectionId
+        );
+    }
+
     public Section(
             final Long id,
             final Long lineId,
@@ -37,31 +49,31 @@ public class Section {
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public Long getLineId() {
-        return lineId;
+        return this.lineId;
     }
 
     public Long getUpStationId() {
-        return upStationId;
+        return this.upStationId;
     }
 
     public Long getDownStationId() {
-        return downStationId;
+        return this.downStationId;
     }
 
     public Long getDistance() {
-        return distance;
+        return this.distance;
     }
 
     public Long getNextSectionId() {
-        return nextSectionId;
+        return this.nextSectionId;
     }
 
     public Long getPrevSectionId() {
-        return prevSectionId;
+        return this.prevSectionId;
     }
 
     private void validate(final Long upStationId, final Long downStationId, final Long distance) {
@@ -109,6 +121,7 @@ public class Section {
         private Long downStationId;
         private Long distance;
         private Long nextSectionId;
+
         private Long prevSectionId;
 
         private Builder() {
@@ -140,17 +153,6 @@ public class Section {
         public Section build() {
             return new Section(this);
         }
-    }
 
-    private Section(final Builder builder) {
-        this(
-                builder.id,
-                builder.lineId,
-                builder.upStationId,
-                builder.downStationId,
-                builder.distance,
-                builder.nextSectionId,
-                builder.prevSectionId
-        );
     }
 }

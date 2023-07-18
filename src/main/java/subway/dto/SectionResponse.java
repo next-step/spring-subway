@@ -30,7 +30,7 @@ public class SectionResponse {
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public Long getUpStationId() {

@@ -26,14 +26,14 @@ public class SectionRequest {
     }
 
     public Long getUpStationId() {
-        return upStationId;
+        return this.upStationId;
     }
 
     public Long getDownStationId() {
-        return downStationId;
+        return this.downStationId;
     }
 
     public Long getDistance() {
-        return distance;
+        return this.distance;
     }
 }
