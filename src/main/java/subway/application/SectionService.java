@@ -10,6 +10,7 @@ import subway.dto.SectionResponse;
 @Service
 public class SectionService {
 
+    private static final int MINIMUM_SIZE = 1;
     private final SectionDao sectionDao;
 
     public SectionService(SectionDao sectionDao) {
@@ -47,12 +48,24 @@ public class SectionService {
 
     public void deleteSection(Long lineId, Long stationId) {
         Section lastSection = sectionDao.findLastSection(lineId);
+        validateDeleteSection(lineId, stationId, lastSection);
+        sectionDao.deleteById(lastSection.getId());
+    }
+
+    private void validateDeleteSection(Long lineId, Long stationId, Section lastSection) {
+        validateOnlyLastDownStation(stationId, lastSection);
+        validateGreaterThanMinimumSize(lineId);
+    }
+
+    private void validateGreaterThanMinimumSize(Long lineId) {
+        if (sectionDao.findAllByLineId(lineId).size() <= MINIMUM_SIZE) {
+            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+        }
+    }
+
+    private static void validateOnlyLastDownStation(Long stationId, Section lastSection) {
         if (!lastSection.getDownStationId().equals(stationId)) {
             throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
         }
-        if (sectionDao.findAllByLineId(lineId).size() <= 1) {
-            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
-        }
-        sectionDao.deleteById(lastSection.getId());
     }
 }
