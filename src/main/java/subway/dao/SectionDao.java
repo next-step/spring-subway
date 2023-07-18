@@ -1,9 +1,11 @@
 package subway.dao;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Section;
@@ -13,12 +15,14 @@ public class SectionDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
+    private final RowMapper<Section> sectionRowMapper;
 
-    SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource, RowMapper<Section> sectionRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("sections")
                 .usingGeneratedKeyColumns("id");
+        this.sectionRowMapper = sectionRowMapper;
     }
 
     public Section insert(Section section) {
@@ -47,6 +51,16 @@ public class SectionDao {
             return section.getDownSection().getId();
         }
         return null;
+    }
+
+    public List<Section> findAllByLineId(Long lineId) {
+        String sql = "select * from SECTIONS as S "
+                + "LEFT JOIN LINE as L ON S.line_id = ? AND S.line_id = L.id "
+                + "LEFT JOIN STATION as US ON S.up_station_id = US.id "
+                + "LEFT JOIN STATION as DS ON S.down_station_id = DS.id";
+
+        List<Section> sections = jdbcTemplate.query(sql, sectionRowMapper, lineId);
+        return sections;
     }
 
     private Section buildSection(Long sectionId, Section section) {

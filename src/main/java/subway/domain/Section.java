@@ -27,26 +27,11 @@ public class Section {
         this.downSection = builder.downSection;
     }
 
-    public Section(Long id, Line line, Station upStation, Station downStation, Section upSection,
-            Section downSection,
-            Integer distance) {
-        Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
-        Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
-
-        this.upStation = upStation;
-        this.downStation = downStation;
-        this.distance = distance;
-        this.line = line;
-        this.id = id;
-        this.upSection = upSection;
-        this.downSection = downSection;
-    }
-
     public static Builder builder() {
         return new Builder();
     }
 
-    void connectDownSection(Section downSection) {
+    public void connectDownSection(Section downSection) {
         Assert.notNull(downSection, () -> "downSection은 null이 될 수 없습니다.");
         Assert.isTrue(downSection.upStation == downStation, () -> MessageFormat.format(
                 "추가되는 downSection.upStation은 현재의 section.downStation과 동일해야합니다. downSection.upStation \"{0}\" current.downStation \"{1}\"",
@@ -108,7 +93,7 @@ public class Section {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, upStation, downStation, distance, line, upSection, downSection);
+        return Objects.hash(id, upStation, downStation, distance, line, downSection);
     }
 
     @Override
