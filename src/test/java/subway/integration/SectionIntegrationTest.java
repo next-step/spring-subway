@@ -13,7 +13,7 @@ import org.springframework.http.MediaType;
 import subway.dto.SectionRequest;
 
 @DisplayName("지하철 구간 관련 기능")
-public class SectionIntegrationTest extends IntegrationTest {
+class SectionIntegrationTest extends IntegrationTest {
 
     private Long lineId;
     private SectionRequest sectionRequest1;
@@ -43,6 +43,38 @@ public class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    @DisplayName("지하철 노선을 제거한다.")
+    @Test
+    void deleteLine() {
+        // given
+        ExtractableResponse<Response> createResponse1 = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest1)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all().
+                extract();
+        ExtractableResponse<Response> createResposne2 = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest2)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all().
+                extract();
+
+        // when
+
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("stationId", sectionRequest2.getDownStationId())
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 
