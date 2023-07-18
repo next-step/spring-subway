@@ -22,25 +22,19 @@ Line 색(color)
 ### 도메인
 
 - [ ] Line
-  - [ ] Line에 포함된 Section들을 알고있다.
-  - [ ] Line 이름이 중복되면 예외를 던진다.
-  - [ ] Line의 색깔이 중복되면 안된다.
-  - [ ] 상행 마지막 Section과, 하행 마지막 Section을 알고있다.
-  - [ ] Line에 Section을 추가할 수 있다.
-    - [ ] Section이 추가될 때, 추가되는 Section의 상행Station이 자신의 하행Station과 동일한지 확인한다.
-    - [ ] 새로운 Section의 하행Station은 해당 Line에 등록되어있는 Station일 수 없다. (상행은 됨)
-  - [ ] id에 해당하는 Line이 존재하지 않으면, 예외를 던진다.
-  - [ ] id에 해당하는 Station이 존재하지 않으면, 예외를 던진다.
-  - [ ] Section을 삭제할 수 있다.
-    - [ ] Line에 하나의 Section만 있을때, 삭제할 수 없다.
-    - [ ] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
+  - [x] Line 이름은 중복될 수 없다.
 - [x] Section
   - [x] Station과 Station을 연결할 수 있다.
   - [x] 연결된 Section을 알고있다.
   - [x] 라인과 연결할 수 있다.
   - [x] 특정 라인의 상행 Section, 하행 Section을 알 수 있다.
-- [x] SectionManager
+- [x] LineManager
   - [x] Section과 Station이 Line에 포함되어있는지 알 수 있다.
+    - [x] Section이 추가될 때, 추가되는 Section의 상행Station이 자신의 하행Station과 동일한지 확인한다.
+    - [x] 새로운 Section의 하행Station은 해당 Line에 등록되어있는 Station일 수 없다. (상행은 됨)
+  - [ ] Section을 삭제할 수 있다.
+    - [ ] Line에 하나의 Section만 있을때, 삭제할 수 없다.
+    - [ ] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
 - [x] Station
   - [x] 이름을 표현한다.
   - [x] 이름이 중복되면 예외를 던진다.
@@ -81,3 +75,4 @@ lineId, upStationId, downStationId;
 - [ ] Optional로 리팩토링
 - [ ] Section에 distance 테스트 추가
 - [ ] DTO에 equals, hascode, toString 붙이기
+- [ ] DTO에 response Long -> String 으로 변경
