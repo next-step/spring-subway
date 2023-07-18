@@ -79,5 +79,27 @@ class LineTest {
             // then
             assertThat(result).isInstanceOf(IllegalArgumentException.class);
         }
+
+        @Test
+        @DisplayName("입력된 Section이 null이면, IllegalArgumentException을 던진다")
+        void Throw_IllegalArgumentException_Input_Null_Section() {
+            // given
+            Section section = Section.builder()
+                    .id(1L)
+                    .upStation(new Station(2L, "upStation"))
+                    .downStation(new Station(3L, "downStation"))
+                    .distance(10)
+                    .build();
+
+            Section connectedSection = null;
+
+            Line line = new Line("line", "red", section);
+
+            // when
+            Exception result = catchException(() -> line.connectSection(connectedSection));
+
+            // then
+            assertThat(result).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 }
