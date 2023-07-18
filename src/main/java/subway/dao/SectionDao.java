@@ -54,10 +54,11 @@ public class SectionDao {
     }
 
     public List<Section> findAllByLineId(Long lineId) {
-        String sql = "select * from SECTIONS as S "
-                + "LEFT JOIN LINE as L ON S.line_id = ? AND S.line_id = L.id "
-                + "LEFT JOIN STATION as US ON S.up_station_id = US.id "
-                + "LEFT JOIN STATION as DS ON S.down_station_id = DS.id";
+        String sql =
+                "select S.*, L.*, US.id as US_ID, US.name as US_NAME, DS.id as DS_ID, DS.name as DS_NAME from SECTIONS as S "
+                        + "JOIN LINE as L ON S.line_id = ? AND S.line_id = L.id "
+                        + "JOIN STATION as US ON S.up_station_id = US.id "
+                        + "JOIN STATION as DS ON S.down_station_id = DS.id";
 
         List<Section> sections = jdbcTemplate.query(sql, sectionRowMapper, lineId);
         return sections;

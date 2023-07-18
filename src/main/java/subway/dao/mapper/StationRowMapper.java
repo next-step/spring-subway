@@ -17,12 +17,12 @@ public class StationRowMapper implements RowMapper<Station> {
         return new Station(id, name);
     }
 
-    public Station mapRow(ResultSet rs, int rowNum, int idIdx, int nameIdx, Long stationId) throws SQLException {
+    public Station mapRow(ResultSet rs, String alias, Long stationId) throws SQLException {
         if (stationId == null) {
             return null;
         }
-        Long id = rs.getLong(idIdx);
-        String name = rs.getString(nameIdx);
+        Long id = rs.getLong(alias + "_ID");
+        String name = rs.getString(alias + "_NAME");
 
         return new Station(id, name);
     }

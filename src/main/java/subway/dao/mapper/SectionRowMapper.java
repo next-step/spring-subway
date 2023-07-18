@@ -27,10 +27,10 @@ public class SectionRowMapper implements RowMapper<Section> {
         Line line = lineRowMapper.mapRow(rs, rowNum);
 
         Long upStationId = rs.getLong("up_station_id");
-        Station upStation = stationRowMapper.mapRow(rs, rowNum, 9, 10, upStationId);
+        Station upStation = stationRowMapper.mapRow(rs, "US", upStationId);
 
         Long downStationId = rs.getLong("down_station_id");
-        Station downStation = stationRowMapper.mapRow(rs, rowNum, 11, 12, downStationId);
+        Station downStation = stationRowMapper.mapRow(rs, "DS", downStationId);
 
         return Section.builder()
                 .id(id)
