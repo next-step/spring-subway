@@ -1,55 +1,49 @@
 package subway.application;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import subway.domain.Line;
-import subway.dto.LineRequest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import subway.dao.SectionDao;
+import subway.domain.Section;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
-import subway.dto.StationRequest;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @DisplayName("구간 서비스 테스트")
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class SectionServiceTest {
 
-    private final SectionService sectionService;
-    private final LineService lineService;
-    private final StationService stationService;
+    @InjectMocks
+    private SectionService sectionService;
 
-    @Autowired
-    SectionServiceTest(final SectionService sectionService,
-                       final LineService lineService,
-                       final StationService stationService) {
-        this.sectionService = sectionService;
-        this.lineService = lineService;
-        this.stationService = stationService;
-    }
-
-    @BeforeEach
-    void setUp() {
-        lineService.saveLine(new LineRequest("1", "blue"));
-        stationService.saveStation(new StationRequest("Incheon"));
-    }
+    @Mock private SectionDao sectionDao;
 
     @DisplayName("구간 생성 성공")
     @Test
     void createSection() {
         // given
-        final Long lineId = 1L;
-        final SectionRequest sectionRequest = new SectionRequest("1", "1", 10.0);
+        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
+        final Section section = new Section(1L, 1L, 2L, 1L, 10.0);
+
+        given(sectionDao.insert(any(Section.class))).willReturn(section);
+        given(sectionDao.findByDownStationIdAndLineId(1L, 1L))
+                .willReturn(Optional.of(section));
 
         // when
-        final SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
+        final SectionResponse sectionResponse = sectionService.saveSection(1L, sectionRequest);
 
         // then
         assertThat(sectionResponse.getId()).isNotNull();
         assertThat(sectionResponse.getLineId()).isNotNull();
-        assertThat(sectionResponse.getDownStationId()).isEqualTo(1);
+        assertThat(sectionResponse.getDownStationId()).isEqualTo(2);
         assertThat(sectionResponse.getUpStationId()).isEqualTo(1);
         assertThat(sectionResponse.getDistance()).isEqualTo(10, withPrecision(1d));
     }
@@ -59,7 +53,10 @@ class SectionServiceTest {
     void createSectionWithUnmatchedLineId() {
         // given
         final Long lineId = 3L;
-        final SectionRequest sectionRequest = new SectionRequest("1", "1", 10.0);
+        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
+
+        given(sectionDao.findByDownStationIdAndLineId(lineId, 1L))
+                .willReturn(Optional.empty());
 
         // when
         assertThatIllegalArgumentException()
