@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
 
 @Repository
@@ -102,7 +103,7 @@ public class SectionDao {
         jdbcTemplate.update("delete from section where id = ?", id);
     }
 
-    public List<Section> findAllByLineId(Long lineId) {
+    public Sections findAllByLineId(Long lineId) {
         String sql =
             "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
                 + "from section s "
@@ -111,6 +112,6 @@ public class SectionDao {
                 + "inner join station ds on (s.down_station_id = ds.id) "
                 + "where s.line_id = ?";
 
-        return jdbcTemplate.query(sql, rowMapper, lineId);
+        return new Sections(jdbcTemplate.query(sql, rowMapper, lineId));
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
 
 @SpringBootTest
@@ -93,11 +94,11 @@ class SectionDaoTest {
     @Test
     @DisplayName("lineId에 해당하는 Section 리스트 반환 테스트")
     void findAllByLineId() {
-        List<Section> result1 = sectionDao.findAllByLineId(1L);
-        List<Section> result2 = sectionDao.findAllByLineId(0L);
+        Sections result1 = sectionDao.findAllByLineId(1L);
+        Sections result2 = sectionDao.findAllByLineId(0L);
         assertAll(
-            () -> assertThat(result1).contains(expectedSection),
-            () -> assertThat(result2).isEmpty()
+            () -> assertThat(result1).isEqualTo(new Sections(List.of(expectedSection))),
+            () -> assertThat(result2).isEqualTo(new Sections(List.of()))
         );
     }
 }
