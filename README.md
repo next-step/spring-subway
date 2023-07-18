@@ -39,6 +39,8 @@ Line 색(color)
   - [x] 연결된 Section을 알고있다.
   - [x] 라인과 연결할 수 있다.
   - [x] 특정 라인의 상행 Section, 하행 Section을 알 수 있다.
+- [x] SectionManager
+  - [x] Section과 Station이 Line에 포함되어있는지 알 수 있다.
 - [x] Station
   - [x] 이름을 표현한다.
   - [x] 이름이 중복되면 예외를 던진다.
@@ -54,8 +56,8 @@ lineId, upStationId, downStationId;
 - [x] SectionService
   - [x] UpStationId, DownStationId를 통해 Section을 생성한다.
 
-- [ ] LineService
-  - [ ] LineId랑 SectionDto를 받아서, Section을 Line에 추가할 수 있다.
+- [x] LineService
+  - [x] LineId랑 SectionDto를 받아서, Section을 Line에 추가할 수 있다.
 
 ### Dao
 
