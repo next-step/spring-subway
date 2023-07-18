@@ -42,6 +42,7 @@ public class Line {
     }
 
     public void connectSection(Section section) {
+        Assert.notNull(section, () -> "Section가 null일때, Line에 추가 될 수 없습니다.");
         Assert.notNull(section.getId(), () -> "Section.id가 null일때, Line에 추가 될 수 없습니다.");
         Section downSection = getDownSection();
         downSection.connectDownSection(section);
