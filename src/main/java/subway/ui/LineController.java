@@ -3,6 +3,7 @@ package subway.ui;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -59,9 +60,9 @@ public class LineController {
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<Void> createSection(@PathVariable("lineId") Long lineId,
             @RequestBody SectionRequest sectionRequest) {
-        
+
         lineService.connectSectionByStationId(lineId, sectionRequest);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @ExceptionHandler(SQLException.class)

@@ -15,12 +15,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
 
+    private Long stationRequest1;
+    private Long stationRequest2;
+    private Long stationRequest3;
+    private Long stationRequest4;
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
 
@@ -29,10 +34,10 @@ class LineIntegrationTest extends IntegrationTest {
     public void setUp() {
         super.setUp();
 
-        Long stationRequest1 = createStation(new StationRequest("강남")).body().as(StationResponse.class).getId();
-        Long stationRequest2 = createStation(new StationRequest("신도림")).body().as(StationResponse.class).getId();
-        Long stationRequest3 = createStation(new StationRequest("부천")).body().as(StationResponse.class).getId();
-        Long stationRequest4 = createStation(new StationRequest("잠실")).body().as(StationResponse.class).getId();
+        stationRequest1 = createStation(new StationRequest("강남")).body().as(StationResponse.class).getId();
+        stationRequest2 = createStation(new StationRequest("신도림")).body().as(StationResponse.class).getId();
+        stationRequest3 = createStation(new StationRequest("부천")).body().as(StationResponse.class).getId();
+        stationRequest4 = createStation(new StationRequest("잠실")).body().as(StationResponse.class).getId();
 
         lineRequest1 = new LineRequest("신분당선", "bg-red-600", String.valueOf(stationRequest1),
                 String.valueOf(stationRequest2), 10);
@@ -150,17 +155,26 @@ class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-//    @DisplayName("Line에 구간을 등록한다.")
-//    void createSection() {
-//        // given
-//        ExtractableResponse<Response> response = createLine(lineRequest1);
-//        LineResponse lineResponse = response.body().as(LineResponse.class);
-//
-//        // when
-//
-//        // then
-//
-//    }
+    @Test
+    @DisplayName("Line에 구간을 등록한다.")
+    void createSection() {
+        // given
+        Long lineId = createLine(lineRequest1).body().as(LineResponse.class).getId();
+
+        SectionRequest sectionRequest = new SectionRequest(String.valueOf(stationRequest2),
+                String.valueOf(stationRequest3), 5);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(sectionRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
 
     private ExtractableResponse<Response> createStation(StationRequest stationRequest) {
         return RestAssured.given().log().all()
