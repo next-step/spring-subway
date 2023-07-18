@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.exception.SubwayException;
+
 import java.util.Objects;
 
 public class Section {
@@ -84,19 +86,19 @@ public class Section {
 
     private void validateDistanceLessThanZero(final Long distance) {
         if (distance <= 0L) {
-            throw new IllegalArgumentException("구간 길이는 0보다 커야합니다.");
+            throw new SubwayException("구간 길이는 0보다 커야합니다.");
         }
     }
 
     private void validateDistanceNotNull(final Long distance) {
         if (distance == null) {
-            throw new IllegalArgumentException("구간 길이 정보는 입력해야 합니다.");
+            throw new SubwayException("구간 길이 정보는 입력해야 합니다.");
         }
     }
 
     private void validateContainsUpStationAndDownStation(final Long upStationId, final Long downStationId) {
         if (upStationId == null || downStationId == null) {
-            throw new IllegalArgumentException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
+            throw new SubwayException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
         }
     }
 

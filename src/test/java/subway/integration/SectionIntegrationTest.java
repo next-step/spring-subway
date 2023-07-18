@@ -42,4 +42,23 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
+
+    @Test
+    @DisplayName("새로운 구간의 하행역이 해당 노선에 등록되어 있는 경우 400 Bad Request로 응답한다.")
+    void badRequestWithRegisteredPrevSectionOnLine() {
+        /* given */
+        SectionRequest sectionRequest = new SectionRequest(11L, 12L, 777L);
+
+        /* when */
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }

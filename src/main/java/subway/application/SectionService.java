@@ -5,6 +5,7 @@ import subway.dao.SectionDao;
 import subway.domain.Section;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +34,7 @@ public class SectionService {
         return sections.stream()
                 .filter(section -> isLastPrevSection(sectionRequest, section))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new SubwayException(
                         String.format(
                                 "노선 %d번에 %d부터 %d까지 구간을 추가할 수 없습니다.",
                                 lineId,
@@ -49,7 +50,7 @@ public class SectionService {
 
     private void validateRequest(final SectionRequest sectionRequest, final Section section) {
         if (checkLineContainsRequestDownStation(sectionRequest.getDownStationId(), section)) {
-            throw new IllegalArgumentException("새로운 구간의 하행역은 해당 노선에 등록되어 있는 역일 수 없다.");
+            throw new SubwayException("새로운 구간의 하행역은 해당 노선에 등록되어 있는 역일 수 없다.");
         }
     }
 
