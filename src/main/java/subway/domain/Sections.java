@@ -49,6 +49,14 @@ public class Sections {
         );
     }
 
+    public Sections remove(Station station) {
+        return new Sections(
+                sections.stream()
+                        .filter(s -> !station.equals(s.getDownward()))
+                        .collect(Collectors.toList())
+        );
+    }
+
     public List<Section> getSections() {
         return sections;
     }

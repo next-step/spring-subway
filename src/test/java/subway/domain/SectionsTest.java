@@ -112,4 +112,35 @@ class SectionsTest {
         // then
         assertThat(unionSections.getSections()).containsAll(List.of(section1, section2));
     }
+
+
+    @Test
+    @DisplayName("한개 구간 삭제 테스트")
+    void removeSectionTest() {
+        // given
+        Station deleteStation = new Station("상도역");
+        Section deleteSection = new Section(
+                1L,
+                new Station("신대방역"),
+                deleteStation,
+                new Line("2호선", "green"),
+                4
+        );
+        Sections sections = new Sections(List.of(
+                new Section(
+                        1L,
+                        new Station("서울대입구역"),
+                        new Station("신대방역"),
+                        new Line("2호선", "green"),
+                        10
+                ),
+                deleteSection
+        ));
+
+        // when
+        Sections newSections = sections.remove(deleteStation);
+
+        // then
+        assertThat(newSections.getSections()).doesNotContain(deleteSection);
+    }
 }
