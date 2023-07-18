@@ -57,7 +57,10 @@ public class Section {
     }
 
     public Section findDownSection() {
-        return null;
+        if (downSection == null) {
+            return this;
+        }
+        return downSection.findDownSection();
     }
 
     public Long getId() {
