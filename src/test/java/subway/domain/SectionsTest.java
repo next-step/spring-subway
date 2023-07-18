@@ -90,8 +90,19 @@ class SectionsTest {
         Section section = new Section(lineA, stationA, stationB, 1);
         Sections sections = new Sections(List.of(section));
 
-        assertThatThrownBy(sections::removeLast)
+        assertThatThrownBy(() -> sections.removeLast(stationB))
             .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("주어진 역이 노선의 하행 종점역이 아니면 구간을 삭제할 수 없다")
+    void cannotRemoveSectionIfNotFinalDownStation() {
+        Section sectionA = new Section(lineA, stationA, stationB, 1);
+        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        assertThatThrownBy(() -> sections.removeLast(stationA))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -104,7 +115,7 @@ class SectionsTest {
         Section sectionB = new Section(lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
-        Section removedSection = sections.removeLast();
+        Section removedSection = sections.removeLast(stationC);
 
         Sections expectedSections = new Sections(List.of(sectionA));
         assertThat(sections).isEqualTo(expectedSections);
