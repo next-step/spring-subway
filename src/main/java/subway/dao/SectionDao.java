@@ -45,4 +45,11 @@ public class SectionDao {
                 .stream()
                 .findAny();
     }
+
+    public Optional<Section> findByUpStationIdAndLineId(final Long lineId, final Long upStationId) {
+        String sql = "select * from section where line_id = ? and up_station_id = ?";
+        return jdbcTemplate.query(sql, rowMapper, lineId, upStationId)
+                .stream()
+                .findAny();
+    }
 }

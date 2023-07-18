@@ -62,4 +62,17 @@ class SectionServiceTest {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> sectionService.saveSection(lineId, sectionRequest));
     }
+
+    @DisplayName("새로운 구간의 상행 역이 해당 노선의 하행 종점역이 아니어서 구간 생성 실패")
+    @Test
+    void createSectionWithNotEndStation() {
+        // given
+        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
+        given(sectionDao.findByUpStationIdAndLineId(1L, 1L))
+                .willReturn(Optional.ofNullable(any(Section.class)));
+
+        // when
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest));
+    }
 }
