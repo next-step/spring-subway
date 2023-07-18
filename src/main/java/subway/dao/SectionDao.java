@@ -81,4 +81,8 @@ public class SectionDao {
         return new Section(sectionId, section.getLine(), section.getUpStation(), section.getDownStation(),
             section.getDistance());
     }
+
+    public void deleteById(Long id) {
+        jdbcTemplate.update("delete from Section where id = ?", id);
+    }
 }

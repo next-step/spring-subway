@@ -40,6 +40,15 @@ public class SectionsService {
         return new Section(line, upStation, downStation, request.getDistance());
     }
 
+    public void removeLast(Long lineId, Long stationId) {
+        Sections sections = sectionDao.findAllByLineId(lineId);
+        Station station = getStationOrElseThrow(stationId);
+
+        Section removedSection = sections.removeLast(station);
+
+        sectionDao.deleteById(removedSection.getId());
+    }
+
     private Station getStationOrElseThrow(Long id) {
         return stationDao.findById(id)
             .orElseThrow(
