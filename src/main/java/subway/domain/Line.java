@@ -9,13 +9,20 @@ public class Line {
     private Long id;
     private String name;
     private String color;
-    private List<Section> sectionList;
+    private List<Section> sections;
 
-    public Line(Long id, String name, String color, List<Section> sectionList) {
+    public Line(Long id, String name, String color, List<Section> sections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.sectionList = sectionList;
+        this.sections = sections;
+    }
+
+    public Line(String name, String color, Section section) {
+        Assert.notNull(section.getId(), () -> "Section.id가 null일때, Line에 추가 될 수 없습니다.");
+        this.name = name;
+        this.color = color;
+        this.sections = new LinkedList<>(List.of(section));
     }
 
     public Line() {
@@ -24,19 +31,28 @@ public class Line {
     public Line(String name, String color) {
         this.name = name;
         this.color = color;
-        this.sectionList = new LinkedList<>();
+        this.sections = new LinkedList<>();
     }
 
     public Line(Long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.sectionList = new LinkedList<>();
+        this.sections = new LinkedList<>();
     }
 
-    public void addSection(Section section) {
+    public void connectSection(Section section) {
         Assert.notNull(section.getId(), () -> "Section.id가 null일때, Line에 추가 될 수 없습니다.");
-        sectionList.add(section);
+        Section downSection = getDownSection();
+        downSection.connectDownSection(section);
+        sections.add(section);
+    }
+
+    private Section getDownSection() {
+        return sections.stream()
+                .filter(section -> section.getDownSection() == null)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Line에 포함된 하행 Section을 찾을 수 없습니다."));
     }
 
     public Long getId() {
@@ -51,8 +67,8 @@ public class Line {
         return color;
     }
 
-    public List<Section> getSectionList() {
-        return sectionList;
+    public List<Section> getSections() {
+        return sections;
     }
 
     @Override
@@ -65,12 +81,12 @@ public class Line {
         }
         Line line = (Line) o;
         return Objects.equals(id, line.id) && Objects.equals(name, line.name)
-                && Objects.equals(color, line.color) && Objects.equals(sectionList, line.sectionList);
+                && Objects.equals(color, line.color) && Objects.equals(sections, line.sections);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, color, sectionList);
+        return Objects.hash(id, name, color, sections);
     }
 
     @Override
@@ -79,7 +95,7 @@ public class Line {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", color='" + color + '\'' +
-                ", sectionList=" + sectionList +
+                ", sectionList=" + sections +
                 '}';
     }
 }
