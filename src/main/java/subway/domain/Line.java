@@ -34,7 +34,7 @@ public class Line {
     }
 
     public void addSection(Section section) {
-        
+        sectionList.add(section);
     }
 
     public Long getId() {
