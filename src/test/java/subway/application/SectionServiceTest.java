@@ -3,7 +3,6 @@ package subway.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,9 @@ class SectionServiceTest {
     @Autowired
     private SectionService sectionService;
 
-    @DisplayName("구간 저장 성공")
+    @DisplayName("첫번째 구간 저장 성공")
     @Test
-    void saveSection() {
+    void saveSectionFirst() {
         // given
         Long lineId = 1L;
         Long upStationId = 1L;
@@ -43,45 +42,88 @@ class SectionServiceTest {
 
     }
 
-    @DisplayName("하행 종점역과 새로운 구간의 상행역이 다르면 예외를 던진다")
+    @DisplayName("추가구간의 상행역과 기존 구간의 상행역이 겹칠때 추가구간의 하행역이 기존 구간의 가운데에 삽입 성공")
     @Test
-    void ifLastDownStationEqualToUpstationThrow() {
+    void saveSectionUpStationIntermediate() {
         // given
         Long lineId = 1L;
-        sectionService.saveSection(lineId, new SectionRequest(1L, 2L, 10L));
-        sectionService.saveSection(lineId, new SectionRequest(2L, 3L, 10L));
+        SectionRequest request1 = new SectionRequest(1L, 2L, 10L);
+        SectionRequest request2 = new SectionRequest(2L, 3L, 10L);
+        sectionService.saveSection(lineId, request1);
+        sectionService.saveSection(lineId, request2);
 
-        Long upStationId = 4L;
-        Long downStationId = 5L;
-        Long distance = 10L;
-        SectionRequest request = new SectionRequest(upStationId, downStationId, distance);
+        SectionRequest request = new SectionRequest(2L, 4L, 5L);
 
-        // when , then
-        Assertions.assertThatCode(() -> sectionService.saveSection(lineId, request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("하행 종점역과 새로운 구간의 상행역은 같아야합니다.");
+        // when
+        assertThatCode(() -> sectionService.saveSection(lineId, request))
+                .doesNotThrowAnyException();
 
+        // then
+        assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
     }
 
-    @DisplayName("새로운 구간 하행역이 기존 노선에 존재하면 예외를 던진다.")
+    @DisplayName("추가구간의 상행역과 기존 구간의 상행역이 겹치지 않을 때 추가구간의 하행역이 하행종점역으로 삽입 성공")
     @Test
-    void ifLastDownStationAlreadyExistInLineThenThrow() {
+    void saveSectionUpStationLast() {
         // given
         Long lineId = 1L;
-        sectionService.saveSection(lineId, new SectionRequest(1L, 2L, 10L));
-        sectionService.saveSection(lineId, new SectionRequest(2L, 3L, 10L));
+        SectionRequest request1 = new SectionRequest(1L, 2L, 10L);
+        SectionRequest request2 = new SectionRequest(2L, 3L, 10L);
+        sectionService.saveSection(lineId, request1);
+        sectionService.saveSection(lineId, request2);
 
-        Long upStationId = 3L;
-        Long downStationId = 1L;
-        Long distance = 10L;
-        SectionRequest request = new SectionRequest(upStationId, downStationId, distance);
+        SectionRequest request = new SectionRequest(3L, 4L, 5L);
 
-        // when , then
-        Assertions.assertThatCode(() -> sectionService.saveSection(lineId, request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("새로운 구간 하행역이 기존 노선에 존재하면 안됩니다.");
+        // when
+        assertThatCode(() -> sectionService.saveSection(lineId, request))
+                .doesNotThrowAnyException();
 
+        // then
+        assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
     }
+
+
+    @DisplayName("추가구간의 하행역과 기존 구간의 하행역이 겹칠때 추가구간의 상행역이 기존 구간의 가운데에 삽입 성공")
+    @Test
+    void saveSectionDownStationIntermediate() {
+        // given
+        Long lineId = 1L;
+        SectionRequest request1 = new SectionRequest(1L, 2L, 10L);
+        SectionRequest request2 = new SectionRequest(2L, 3L, 10L);
+        sectionService.saveSection(lineId, request1);
+        sectionService.saveSection(lineId, request2);
+
+        SectionRequest request = new SectionRequest(4L, 3L, 5L);
+
+        // when
+        assertThatCode(() -> sectionService.saveSection(lineId, request))
+                .doesNotThrowAnyException();
+
+        // then
+        assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
+    }
+
+
+    @DisplayName("추가구간의 하행역과 기존 구간의 하행역이 겹칠때 추가구간의 상행역이 상행종점역으로 삽입 성공")
+    @Test
+    void saveSectionDownStationLast() {
+        // given
+        Long lineId = 1L;
+        SectionRequest request1 = new SectionRequest(1L, 2L, 10L);
+        SectionRequest request2 = new SectionRequest(2L, 3L, 10L);
+        sectionService.saveSection(lineId, request1);
+        sectionService.saveSection(lineId, request2);
+
+        SectionRequest request = new SectionRequest(4L, 1L, 5L);
+
+        // when
+        assertThatCode(() -> sectionService.saveSection(lineId, request))
+                .doesNotThrowAnyException();
+
+        // then
+        assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
+    }
+
 
     @DisplayName("지하철 노선에 등록된 하행 종점역만 제거할 수 있다")
     @Test

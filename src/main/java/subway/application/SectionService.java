@@ -1,5 +1,7 @@
 package subway.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
@@ -20,7 +22,6 @@ public class SectionService {
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
         validateSaveSection(lineId, request);
-
         Section section = sectionDao.insert(request.toEntity(lineId));
         return SectionResponse.from(section);
     }
@@ -46,6 +47,7 @@ public class SectionService {
         }
     }
 
+    @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Section lastSection = sectionDao.findLastSection(lineId);
         validateDeleteSection(lineId, stationId, lastSection);
@@ -67,5 +69,12 @@ public class SectionService {
         if (!lastSection.getDownStationId().equals(stationId)) {
             throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
         }
+    }
+
+    public List<SectionResponse> findAllByLineId(Long lineId) {
+        // TODO 순서
+        return sectionDao.findAllByLineId(lineId).stream()
+                .map(SectionResponse::from)
+                .collect(Collectors.toUnmodifiableList());
     }
 }
