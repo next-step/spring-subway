@@ -1,7 +1,9 @@
 package subway.dao;
 
 import java.util.List;
+import java.util.Optional;
 import javax.sql.DataSource;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -71,5 +73,17 @@ public class SectionDao {
     public void deleteById(Long id) {
         String sql = "delete from section where id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    public Optional<Section> findByLineIdAndUpStationId(long lineId, long upStationId) {
+        String sql = "select * from section where line_id = ? and up_station_id = ?";
+        return Optional.ofNullable(DataAccessUtils.singleResult(
+                jdbcTemplate.query(sql, rowMapper, lineId, upStationId)));
+    }
+
+    public Optional<Section> findByLineIdAndDownStationId(long lineId, long downStationId) {
+        String sql = "select * from section where line_id = ? and down_station_id = ?";
+        return Optional.ofNullable(DataAccessUtils.singleResult(
+                jdbcTemplate.query(sql, rowMapper, lineId, downStationId)));
     }
 }

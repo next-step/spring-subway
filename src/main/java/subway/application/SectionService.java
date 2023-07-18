@@ -3,7 +3,6 @@ package subway.application;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,70 +23,76 @@ public class SectionService {
 
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
-        List<Section> sections = sectionDao.findAllByLineId(lineId);
-
-        if (!sections.isEmpty()) {
-
-            Set<Long> upStations = sections.stream().map(Section::getUpStationId)
-                    .collect(Collectors.toSet());
-            Set<Long> downStations = sections.stream().map(Section::getDownStationId)
-                    .collect(Collectors.toSet());
-
-            boolean isUpStationInUpStations = upStations.contains(request.getUpStationId());
-            boolean isUpStationInDownStations = downStations.contains(request.getUpStationId());
-            boolean isDownStationInUpStations = upStations.contains(request.getDownStationId());
-            boolean isDownStationInDownStations = downStations.contains(request.getDownStationId());
-
-            if (!isUpStationInUpStations && !isUpStationInDownStations && !isDownStationInUpStations
-                    && !isDownStationInDownStations) {
-                throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
-            }
-
-            if ((isUpStationInUpStations || isUpStationInDownStations) && (isDownStationInUpStations
-                    || isDownStationInDownStations)) {
-                throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
-            }
-
-            if (isUpStationInUpStations) {
-                Section section1 = sections.stream()
-                        .filter(section -> section.getUpStationId()
-                                .equals(request.getUpStationId()))
-                        .findAny()
-                        .orElseThrow(() -> new IllegalArgumentException("해당하는 구간이 없습니다."));
-
-                if (section1.getDistance() <= request.getDistance()) {
-                    throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
-                }
-
-                Section generatedSection = new Section(lineId, request.getDownStationId(),
-                        section1.getDownStationId(),
-                        section1.getDistance() - request.getDistance());
-                sectionDao.deleteById(section1.getId());
-                sectionDao.insert(generatedSection);
-            }
-
-            if (isDownStationInDownStations) {
-                Section section1 = sections.stream()
-                        .filter(section -> section.getDownStationId()
-                                .equals(request.getDownStationId()))
-                        .findAny()
-                        .orElseThrow(() -> new IllegalArgumentException("해당하는 구간이 없습니다."));
-
-                if (section1.getDistance() <= request.getDistance()) {
-                    throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
-                }
-
-                Section generatedSection = new Section(lineId, section1.getUpStationId(),
-                        request.getUpStationId(),
-                        section1.getDistance() - request.getDistance());
-                sectionDao.deleteById(section1.getId());
-                sectionDao.insert(generatedSection);
-            }
-
-        }
+        preprocessSaveSection(lineId, request);
 
         Section section = sectionDao.insert(request.toEntity(lineId));
         return SectionResponse.from(section);
+
+    }
+
+    private void preprocessSaveSection(Long lineId, SectionRequest request) {
+        if (!sectionDao.existByLineId(lineId)) {
+            return;
+        }
+
+        boolean isUpStationInLine = sectionDao.existByLineIdAndStationId(lineId,
+                request.getUpStationId());
+        boolean isDownStationInLine = sectionDao.existByLineIdAndStationId(lineId,
+                request.getDownStationId());
+
+        validateBothExistOrNot(isUpStationInLine, isDownStationInLine);
+
+        if (isUpStationInLine) {
+            addSectionWithUpStation(lineId, request);
+        }
+
+        if (isDownStationInLine) {
+            addSectionWithDownStation(lineId, request);
+        }
+
+    }
+
+    private void addSectionWithDownStation(Long lineId, SectionRequest request) {
+        Optional<Section> originalSection = sectionDao.findByLineIdAndDownStationId(lineId,
+                request.getDownStationId());
+        originalSection.ifPresent(section -> {
+            validateDistance(request, section);
+            Section generatedSection = new Section(lineId, section.getUpStationId(),
+                    request.getUpStationId(),
+                    section.getDistance() - request.getDistance());
+            sectionDao.deleteById(section.getId());
+            sectionDao.insert(generatedSection);
+        });
+    }
+
+    private static void validateDistance(SectionRequest request, Section sec) {
+        if (sec.getDistance() <= request.getDistance()) {
+            throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
+        }
+    }
+
+    private void addSectionWithUpStation(Long lineId, SectionRequest request) {
+        Optional<Section> originalSection = sectionDao.findByLineIdAndUpStationId(lineId,
+                request.getUpStationId());
+        originalSection.ifPresent(section -> {
+            validateDistance(request, section);
+            Section generatedSection = new Section(lineId, request.getDownStationId(),
+                    section.getDownStationId(),
+                    section.getDistance() - request.getDistance());
+            sectionDao.deleteById(section.getId());
+            sectionDao.insert(generatedSection);
+        });
+    }
+
+    private static void validateBothExistOrNot(boolean isUpStationInLine,
+            boolean isDownStationInLine) {
+        if (!isUpStationInLine && !isDownStationInLine) {
+            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
+        }
+
+        if (isUpStationInLine && isDownStationInLine) {
+            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
+        }
     }
 
     @Transactional
@@ -115,38 +120,45 @@ public class SectionService {
     }
 
     public List<SectionResponse> findAllByLineId(Long lineId) {
-        // TODO 순서
         List<Section> sections = sectionDao.findAllByLineId(lineId);
 
         if (sections.isEmpty()) {
             return List.of();
         }
 
-        Section pivot = sections.get(0);
-        while (true) {
-            Optional<Section> temp = findUpSection(sections, pivot);
-            if (temp.isPresent()) {
-                pivot = temp.get();
-            } else {
-                break;
-            }
-        }
-
-        List<Section> result = new ArrayList<>();
-
-        while (true) {
-            result.add(pivot);
-            Optional<Section> temp = findDownSection(sections, pivot);
-            if (temp.isPresent()) {
-                pivot = temp.get();
-            } else {
-                break;
-            }
-        }
+        List<Section> result = sort(sections);
 
         return result.stream()
                 .map(SectionResponse::from)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    private List<Section> sort(List<Section> sections) {
+        Section pivot = getFirstSection(sections);
+        return getSortedSections(sections, pivot);
+    }
+
+    private Section getFirstSection(List<Section> sections) {
+        Section pivot = sections.get(0);
+        while (true) {
+            Optional<Section> temp = findUpSection(sections, pivot);
+            if (temp.isEmpty()) {
+                return pivot;
+            }
+            pivot = temp.get();
+        }
+    }
+
+    private List<Section> getSortedSections(List<Section> sections, Section pivot) {
+        List<Section> result = new ArrayList<>();
+        while (true) {
+            result.add(pivot);
+            Optional<Section> temp = findDownSection(sections, pivot);
+            if (temp.isEmpty()) {
+                return result;
+            }
+            pivot = temp.get();
+        }
     }
 
     private Optional<Section> findUpSection(List<Section> sections, Section pivot) {
