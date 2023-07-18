@@ -2,6 +2,7 @@ package subway.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,5 +116,21 @@ class SectionDaoTest {
 
         // then
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("구간 테이블에서 특정 노선에 해당하는 구간을 모두 반환한다.")
+    @Test
+    void findAllByLineId() {
+        // given
+        long lineId = 1L;
+        Section section1 = sectionDao.insert(new Section(lineId, 1L, 2L, 10L));
+        Section section2 = sectionDao.insert(new Section(lineId, 2L, 3L, 10L));
+
+        //  when
+        List<Section> sections = sectionDao.findAllByLineId(lineId);
+
+        // then
+        assertThat(sections).hasSize(2);
+        assertThat(sections).containsAnyOf(section1, section2);
     }
 }

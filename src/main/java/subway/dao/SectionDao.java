@@ -1,5 +1,6 @@
 package subway.dao;
 
+import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -60,5 +61,10 @@ public class SectionDao {
 
         return Boolean.TRUE.equals(
                 jdbcTemplate.queryForObject(sql, Boolean.class, lineId, stationId, stationId));
+    }
+
+    public List<Section> findAllByLineId(long lineId) {
+        String sql = "select * from section where line_id = ? ";
+        return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 }
