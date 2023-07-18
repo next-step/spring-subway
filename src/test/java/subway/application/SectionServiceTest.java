@@ -1,6 +1,7 @@
 package subway.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -82,4 +83,51 @@ class SectionServiceTest {
 
     }
 
+    @DisplayName("지하철 노선에 등록된 하행 종점역만 제거할 수 있다")
+    @Test
+    void deleteSectionTest() {
+        // given
+        Long lineId = 1L;
+        Long lastStationId = 3L;
+        SectionResponse sectionResponse1 = sectionService.saveSection(lineId,
+                new SectionRequest(1L, 2L, 10L));
+        SectionResponse sectionResponse2 = sectionService.saveSection(lineId,
+                new SectionRequest(2L, lastStationId, 10L));
+
+        // when, then
+        assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId))
+                .doesNotThrowAnyException();
+    }
+
+    @DisplayName("지하철 노선에 등록된 하행 종점역이 아니면 예외를 던진다.")
+    @Test
+    void deleteSectionNotLastDownStationIdThenThrow() {
+        // given
+        Long lineId = 1L;
+        Long lastStationId = 3L;
+        SectionResponse sectionResponse1 = sectionService.saveSection(lineId,
+                new SectionRequest(1L, 2L, 10L));
+        SectionResponse sectionResponse2 = sectionService.saveSection(lineId,
+                new SectionRequest(2L, lastStationId, 10L));
+
+        // when, then
+        assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId + 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
+    }
+
+    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @Test
+    void deleteSectionIfOneSectionThenThrow() {
+        // given
+        Long lineId = 1L;
+        Long lastStationId = 2L;
+        SectionResponse sectionResponse1 = sectionService.saveSection(lineId,
+                new SectionRequest(1L, lastStationId, 10L));
+
+        // when, then
+        assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+    }
 }
