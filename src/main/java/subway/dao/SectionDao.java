@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
@@ -72,7 +70,13 @@ public class SectionDao {
     }
 
     public Section save(Section section) {
-        SqlParameterSource params = new BeanPropertySqlParameterSource(section);
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", section.getId());
+        params.put("line_id", section.getLine().getId());
+        params.put("up_station_id", section.getUpStation().getId());
+        params.put("down_station_id", section.getDownStation().getId());
+        params.put("distance", section.getDistance());
+
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
         return new Section(sectionId, section.getLine(), section.getUpStation(), section.getDownStation(),
             section.getDistance());
