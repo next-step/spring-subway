@@ -67,9 +67,13 @@ class SectionServiceTest {
     @Test
     void createSectionWithNotEndStation() {
         // given
+        final Section section = new Section(1L, 1L, 2L, 1L, 10.0);
         final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
+
+        given(sectionDao.findByDownStationIdAndLineId(1L, 1L))
+                .willReturn(Optional.of(section));
         given(sectionDao.findByUpStationIdAndLineId(1L, 1L))
-                .willReturn(Optional.ofNullable(any(Section.class)));
+                .willReturn(Optional.of(section));
 
         // when
         assertThatIllegalArgumentException()
