@@ -1,6 +1,8 @@
 package subway.application;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -114,8 +116,48 @@ public class SectionService {
 
     public List<SectionResponse> findAllByLineId(Long lineId) {
         // TODO 순서
-        return sectionDao.findAllByLineId(lineId).stream()
+        List<Section> sections = sectionDao.findAllByLineId(lineId);
+
+        if (sections.isEmpty()) {
+            return List.of();
+        }
+
+        Section pivot = sections.get(0);
+        while (true) {
+            Optional<Section> temp = findUpSection(sections, pivot);
+            if (temp.isPresent()) {
+                pivot = temp.get();
+            } else {
+                break;
+            }
+        }
+
+        List<Section> result = new ArrayList<>();
+
+        while (true) {
+            result.add(pivot);
+            Optional<Section> temp = findDownSection(sections, pivot);
+            if (temp.isPresent()) {
+                pivot = temp.get();
+            } else {
+                break;
+            }
+        }
+
+        return result.stream()
                 .map(SectionResponse::from)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    private Optional<Section> findUpSection(List<Section> sections, Section pivot) {
+        return sections.stream()
+                .filter(section -> section.getDownStationId().equals(pivot.getUpStationId()))
+                .findAny();
+    }
+
+    private Optional<Section> findDownSection(List<Section> sections, Section pivot) {
+        return sections.stream()
+                .filter(section -> section.getUpStationId().equals(pivot.getDownStationId()))
+                .findAny();
     }
 }
