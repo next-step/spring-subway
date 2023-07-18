@@ -4,16 +4,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.application.SectionsService;
-import subway.domain.Section;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
-import subway.dto.SectionAddtionRequest;
+import subway.dto.SectionAdditionRequest;
 import subway.dto.SectionResponse;
-import subway.dto.StationResponse;
 
 @RestController
 @RequestMapping("/lines")
@@ -56,7 +54,7 @@ public class LineController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<SectionResponse> addSection(@PathVariable Long id, @RequestBody SectionAddtionRequest sectionRequest) {
+    public ResponseEntity<SectionResponse> addSection(@PathVariable Long id, @RequestBody SectionAdditionRequest sectionRequest) {
         SectionResponse section = sectionsService.addSection(id, sectionRequest);
         return ResponseEntity.created(URI.create("/line/" + id + "/sections/" +  section.getId())).body(section);
     }

@@ -8,7 +8,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.dto.SectionAddtionRequest;
+import subway.dto.SectionAdditionRequest;
 import subway.dto.SectionResponse;
 
 @Service
@@ -24,7 +24,7 @@ public class SectionsService {
         this.sectionDao = sectionDao;
     }
 
-    public SectionResponse addSection(Long id, SectionAddtionRequest request) {
+    public SectionResponse addSection(Long id, SectionAdditionRequest request) {
         Sections sections = sectionDao.findAllByLineId(id);
         Section section = createNewSectionBy(id, request);
 
@@ -33,10 +33,10 @@ public class SectionsService {
         return SectionResponse.of(sectionDao.save(section));
     }
 
-    private Section createNewSectionBy(Long id, SectionAddtionRequest request) {
+    private Section createNewSectionBy(Long id, SectionAdditionRequest request) {
         Line line = getLineOrElseThrow(id);
-        Station upStation = getStationOrElseThrow(request.getUpStationsId());
-        Station downStation = getStationOrElseThrow(request.getDownStationsId());
+        Station upStation = getStationOrElseThrow(request.getUpStationId());
+        Station downStation = getStationOrElseThrow(request.getDownStationId());
         return new Section(line, upStation, downStation, request.getDistance());
     }
 
