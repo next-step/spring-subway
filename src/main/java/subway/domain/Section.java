@@ -50,6 +50,18 @@ public class Section {
         this.prevSectionId = prevSectionId;
     }
 
+    public boolean containsStation(final Long stationId) {
+        return Objects.equals(this.upStationId, stationId) || Objects.equals(this.downStationId, stationId);
+    }
+
+    public boolean isLastPrevSection() {
+        return this.prevSectionId == null;
+    }
+
+    public boolean isSameDownStationId(final Long stationId) {
+        return this.downStationId.equals(stationId);
+    }
+
     public Long getId() {
         return this.id;
     }

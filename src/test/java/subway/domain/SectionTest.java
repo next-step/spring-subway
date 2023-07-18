@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import subway.exception.SubwayException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,33 +33,72 @@ class SectionTest {
 
     @ParameterizedTest
     @CsvSource({",4", "2,", ","})
-    @DisplayName("상행 역과 하행 역 중 하나 이상 없을 경우 구간 생성 시 IllegalArgumentException을 던진다.")
+    @DisplayName("상행 역과 하행 역 중 하나 이상 없을 경우 구간 생성 시 SubwayException을 던진다.")
     void createFailWithoutUpStation(final Long upStationId, final Long downStationId) {
         /* given */
         Section.Builder sectionBuilder = new Section.Builder(LINE_ID, upStationId, downStationId, DISTANCE);
 
         /* when & then */
-        assertThatThrownBy(sectionBuilder::build).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(sectionBuilder::build).isInstanceOf(SubwayException.class);
     }
 
     @Test
-    @DisplayName("길이 정보가 없는 경우 구간 생성 시 IllegalArgumentException을 던진다.")
+    @DisplayName("길이 정보가 없는 경우 구간 생성 시 SubwayException을 던진다.")
     void distanceExceptionWithNull() {
         /* given */
         Section.Builder sectionBuilder = new Section.Builder(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, null);
 
         /* when & then */
-        assertThatThrownBy(sectionBuilder::build).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(sectionBuilder::build).isInstanceOf(SubwayException.class);
     }
 
     @ParameterizedTest
     @ValueSource(longs = {0L, -1L})
-    @DisplayName("길이 정보가 0 이하일 경우 구간 생성 시 IllegalArgumentException을 던진다.")
+    @DisplayName("길이 정보가 0 이하일 경우 구간 생성 시 SubwayException을 던진다.")
     void distanceExceptionWithLessThanZero(final Long distance) {
         /* given */
         Section.Builder sectionBuilder = new Section.Builder(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, distance);
 
         /* when & then */
-        assertThatThrownBy(sectionBuilder::build).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(sectionBuilder::build).isInstanceOf(SubwayException.class);
+    }
+
+    @Test
+    @DisplayName("구간의 상행역과 하행역에 특정 역이 있는지 확인할 수 있다.")
+    void containsStation() {
+        /* given */
+        Section section = new Section.Builder(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE).build();
+
+        /* when & then */
+        assertThat(section.containsStation(UP_STATION_ID)).isTrue();
+        assertThat(section.containsStation(DOWN_STATION_ID)).isTrue();
+        assertThat(section.containsStation(123L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("구간이 하행 종점역인지 확인할 수 있다.")
+    void isLastPrevSection() {
+        /* given */
+        Section lastPrevSection = new Section.Builder(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE)
+                .prevSectionId(null)
+                .build();
+        Section notLastPrevSection = new Section.Builder(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE)
+                .prevSectionId(123L)
+                .build();
+
+        /* when & then */
+        assertThat(lastPrevSection.isLastPrevSection()).isTrue();
+        assertThat(notLastPrevSection.isLastPrevSection()).isFalse();
+    }
+
+    @Test
+    @DisplayName("구간의 하행역이 특정 역과 같은 지 확인할 수 있다.")
+    void isSameDownStationId() {
+        /* given */
+        Section section = new Section.Builder(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE).build();
+
+        /* when & then */
+        assertThat(section.isSameDownStationId(DOWN_STATION_ID)).isTrue();
+        assertThat(section.isSameDownStationId(UP_STATION_ID)).isFalse();
     }
 }
