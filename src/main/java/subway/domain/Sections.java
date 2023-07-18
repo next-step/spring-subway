@@ -50,11 +50,26 @@ public class Sections {
     }
 
     public Sections remove(Station station) {
+        validateDownwardTerminal(station);
+        validateSize();
+
         return new Sections(
                 sections.stream()
                         .filter(s -> !station.equals(s.getDownward()))
                         .collect(Collectors.toList())
         );
+    }
+
+    private void validateSize() {
+        if (sections.size() < 2) {
+            throw new IllegalArgumentException("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
+        }
+    }
+
+    private void validateDownwardTerminal(Station station) {
+        if (!isTerminal(station)) {
+            throw new IllegalArgumentException("하행 종점역이 아니면 지울 수 없습니다.");
+        }
     }
 
     public List<Section> getSections() {

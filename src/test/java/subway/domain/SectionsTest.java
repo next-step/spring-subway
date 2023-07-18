@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class SectionsTest {
     @Test
@@ -113,7 +114,6 @@ class SectionsTest {
         assertThat(unionSections.getSections()).containsAll(List.of(section1, section2));
     }
 
-
     @Test
     @DisplayName("한개 구간 삭제 테스트")
     void removeSectionTest() {
@@ -143,4 +143,50 @@ class SectionsTest {
         // then
         assertThat(newSections.getSections()).doesNotContain(deleteSection);
     }
+
+    @Test
+    @DisplayName("하행 종점역이 아닌 역을 삭제 할 수 없다.")
+    void validateDownwardTerminalRemoveSectionTest() {
+        // given
+        Station deleteStation = new Station("신대방역");
+        Sections sections = new Sections(List.of(
+                new Section(
+                        new Station("서울대입구역"),
+                        deleteStation,
+                        new Line("2호선", "green"),
+                        10
+                ),
+                new Section(
+                        deleteStation,
+                        new Station("상도역"),
+                        new Line("2호선", "green"),
+                        4
+                )
+        ));
+
+        // when, then
+        assertThatCode(() -> sections.remove(deleteStation)).isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("하행 종점역이 아니면 지울 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("노선에 구간이 하나일 때는 삭제할 수 없다.")
+    void validateOnlyOneSectionRemoveSectionTest() {
+        // given
+        Station deleteStation = new Station("신대방역");
+        Sections sections = new Sections(List.of(
+                new Section(
+                        new Station("서울대입구역"),
+                        deleteStation,
+                        new Line("2호선", "green"),
+                        10
+                )
+        ));
+
+        // when, then
+        assertThatCode(() -> sections.remove(deleteStation)).isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
+    }
+
+
 }
