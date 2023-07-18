@@ -89,9 +89,9 @@ class SectionTest {
         void Throw_IllegalArgumentException_When_Input_Different_Middle_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(1L, "upStation");
-            Station differentMiddleStation = new Station(1L, "upStation");
-            Station downStation = new Station(2L, "downStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station differentMiddleStation = new Station(3L, "differntMiddleStation");
+            Station downStation = new Station(4L, "downStation");
 
             Section section = Section.builder()
                     .upStation(upStation)
