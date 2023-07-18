@@ -3,6 +3,7 @@ package subway.domain;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.util.Assert;
 
 public class Line {
     private Long id;
@@ -34,6 +35,7 @@ public class Line {
     }
 
     public void addSection(Section section) {
+        Assert.notNull(section.getId(), () -> "Section.id가 null일때, Line에 추가 될 수 없습니다.");
         sectionList.add(section);
     }
 
