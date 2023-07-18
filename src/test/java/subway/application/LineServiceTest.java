@@ -71,12 +71,13 @@ class LineServiceTest {
             when(sectionDao.findAllByLineId(line.getId())).thenReturn(List.of(upSection));
             when(sectionDao.insert(downSection)).thenReturn(downSection);
 
+            when(stationDao.findById(middleStation.getId())).thenReturn(middleStation);
             when(stationDao.findById(downStation.getId())).thenReturn(downStation);
 
             // when
             Exception exception = catchException(
                     () -> lineService.connectSectionByStationId(line.getId(), middleStation.getId(),
-                            downStation.getId()));
+                            downStation.getId(), 10));
 
             // then
             assertThat(exception).isNull();

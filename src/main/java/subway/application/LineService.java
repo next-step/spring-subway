@@ -3,10 +3,13 @@ package subway.application;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
@@ -15,14 +18,6 @@ public class LineService {
     private final LineDao lineDao;
     private final SectionDao sectionDao;
     private final StationDao stationDao;
-
-    /*
-     * 1. connectSection
-     * 2. LineDao -> line에 있는 모든 section이 포함된 Line 불러오기
-     * 3. SectionRequest의 downStation에 해당하는거 찾아서, 연결
-     * 4.
-     *
-     */
 
     public LineService(LineDao lineDao, SectionDao sectionDao, StationDao stationDao) {
         this.lineDao = lineDao;
@@ -61,6 +56,28 @@ public class LineService {
 
     public void deleteLineById(Long id) {
         lineDao.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public void connectSectionByStationId(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+        Line line = lineDao.findById(lineId);
+
+        List<Section> sections = sectionDao.findAllByLineId(lineId);
+        Section section = sections.get(0).findDownSection();
+
+        Station upStation = stationDao.findById(upStationId);
+        Station downStation = stationDao.findById(downStationId);
+
+        Section downSection = Section.builder()
+                .line(line)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance)
+                .build();
+
+        section.connectDownSection(downSection);
+
+        sectionDao.insert(downSection);
     }
 
 }
