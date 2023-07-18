@@ -57,10 +57,11 @@ class LineTest {
             // given
             Station differentStation = new Station(10L, "differentStation");
 
+            Long downStationId = 3L;
             Section section = Section.builder()
                     .id(1L)
                     .upStation(new Station(2L, "upStation"))
-                    .downStation(new Station(3L, "downStation"))
+                    .downStation(new Station(downStationId, "downStation"))
                     .distance(10)
                     .build();
 
@@ -74,7 +75,7 @@ class LineTest {
             Line line = new Line("line", "red", section);
 
             // when
-            Exception result = catchException(() -> line.connectSection(connectedSection));
+            Exception result = catchException(() -> line.connectSection(downStationId, connectedSection));
 
             // then
             assertThat(result).isInstanceOf(IllegalArgumentException.class);
@@ -96,7 +97,7 @@ class LineTest {
             Line line = new Line("line", "red", section);
 
             // when
-            Exception result = catchException(() -> line.connectSection(connectedSection));
+            Exception result = catchException(() -> line.connectSection(null, connectedSection));
 
             // then
             assertThat(result).isInstanceOf(IllegalArgumentException.class);
@@ -106,7 +107,8 @@ class LineTest {
         @DisplayName("입력된 Section이 유효하면 연결된다")
         void Connect_Input_Section() {
             // given
-            Station middleStation = new Station(3L, "middleStation");
+            Long middleStationId = 3L;
+            Station middleStation = new Station(middleStationId, "middleStation");
 
             Section section = Section.builder()
                     .id(1L)
@@ -125,7 +127,7 @@ class LineTest {
             Line line = new Line("line", "red", section);
 
             // when
-            line.connectSection(connectedSection);
+            line.connectSection(middleStationId, connectedSection);
             List<Section> result = line.getSections();
 
             // then
