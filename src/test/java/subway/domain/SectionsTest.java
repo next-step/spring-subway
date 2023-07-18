@@ -26,6 +26,22 @@ class SectionsTest {
     }
 
     @Test
+    @DisplayName("정렬된 구간들을 생성한다.")
+    void createSortedSections() {
+
+        Section firstSection = new Section(lineA, stationA, stationB, 1);
+        Section secondSection = new Section(lineA, stationB, stationC, 1);
+        Section thirdSection = new Section(lineA, stationC, stationD, 1);
+
+        Sections sections = new Sections(List.of(thirdSection, secondSection, firstSection));
+
+        List<Section> expectedValues = List.of(firstSection, secondSection, thirdSection);
+        List<Section> unexpectedValues = List.of(thirdSection, secondSection, firstSection);
+        assertThat(sections.getValues()).isEqualTo(expectedValues);
+        assertThat(sections.getValues()).isNotEqualTo(unexpectedValues);
+    }
+
+    @Test
     @DisplayName("추가할 구간의 상행역은 기존 구간들의 하행 종착역과 같아야 한다.")
     void upStationOfNewSectionShouldEqualFinalDownStationOfSections() {
         Section section = new Section(lineA, stationA, stationB, 1);

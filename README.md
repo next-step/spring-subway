@@ -50,3 +50,4 @@
 ### 체크 리스트
 - Sections 빈 리스트 예외 처리 확인
 - Line 생성 자체의 validation을 체크해야함
+- Sections 정렬 로직 리팩토링 확인
