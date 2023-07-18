@@ -3,12 +3,10 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.SectionDao;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.SubwayException;
-
-import java.util.List;
-import java.util.Objects;
 
 @Service
 public class SectionService {
@@ -20,42 +18,27 @@ public class SectionService {
     }
 
     public SectionResponse createSection(final Long lineId, final SectionRequest sectionRequest) {
-        final List<Section> sections = sectionDao.findAllByLineId(lineId);
-        sections.forEach(section -> validateRequest(sectionRequest, section));
+        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
+        validateRequest(sections, sectionRequest);
 
-        final Section lastPrevSection = findLastPrevSection(lineId, sectionRequest, sections);
+        final Section lastPrevSection = sections.findLastPrevSection()
+                .orElseThrow(() -> new SubwayException("노선에 구간이 존재하지 않습니다."));
+        if (!lastPrevSection.isSameDownStationId(sectionRequest.getUpStationId())) {
+            throw new SubwayException("새로운 구간의 상행역이 해당 노선에 등록되어 있는 하행 종점역이 아닙니다.");
+        }
+
         final Section section = sectionDao.insert(sectionRequest.toSection(lineId, lastPrevSection.getId()));
         sectionDao.updatePrevSectionId(lastPrevSection, section.getId());
 
         return SectionResponse.of(section);
     }
 
-    private Section findLastPrevSection(final Long lineId, final SectionRequest sectionRequest, final List<Section> sections) {
-        return sections.stream()
-                .filter(section -> isLastPrevSection(sectionRequest, section))
-                .findAny()
-                .orElseThrow(() -> new SubwayException(
-                        String.format(
-                                "노선 %d번에 %d부터 %d까지 구간을 추가할 수 없습니다.",
-                                lineId,
-                                sectionRequest.getUpStationId(),
-                                sectionRequest.getDownStationId()
-                        ))
-                );
-    }
-
-    private boolean isLastPrevSection(final SectionRequest sectionRequest, final Section section) {
-        return Objects.equals(section.getDownStationId(), sectionRequest.getUpStationId()) && section.getPrevSectionId() == null;
-    }
-
-    private void validateRequest(final SectionRequest sectionRequest, final Section section) {
-        if (checkLineContainsRequestDownStation(sectionRequest.getDownStationId(), section)) {
-            throw new SubwayException("새로운 구간의 하행역은 해당 노선에 등록되어 있는 역일 수 없다.");
+    private void validateRequest(final Sections sections, final SectionRequest sectionRequest) {
+        if (!sections.containsStation(sectionRequest.getUpStationId())) {
+            throw new SubwayException("새로운 구간의 상행역이 해당 노선에 등록되어 있지 않습니다.");
         }
-    }
-
-    private boolean checkLineContainsRequestDownStation(final Long requestDownStationId, final Section section) {
-        return Objects.equals(requestDownStationId, section.getNextSectionId())
-                || Objects.equals(requestDownStationId, section.getDownStationId());
+        if (sections.containsStation(sectionRequest.getDownStationId())) {
+            throw new SubwayException("새로운 구간의 하행역이 해당 노선에 등록되어 있습니다.");
+        }
     }
 }
