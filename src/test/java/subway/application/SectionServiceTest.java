@@ -58,7 +58,7 @@ class SectionServiceTest {
         given(sectionDao.findByDownStationIdAndLineId(lineId, 1L))
                 .willReturn(Optional.empty());
 
-        // when
+        // when & then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> sectionService.saveSection(lineId, sectionRequest));
     }
@@ -75,8 +75,24 @@ class SectionServiceTest {
         given(sectionDao.findByUpStationIdAndLineId(1L, 1L))
                 .willReturn(Optional.of(section));
 
-        // when
+        // when & then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest));
+    }
+
+    @DisplayName("새로운 구간의 하행 역이 해당 노선에 등록되어있는 역이어서 구간 생성 실패")
+    @Test
+    void createSectionWithDuplicateStationInLine() {
+        // given
+        final Section section = new Section(1L, 1L, 2L, 1L, 10.0);
+        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
+
+        given(sectionDao.findByLineIdAndStationId(1L, 2L))
+                .willReturn(Optional.of(section));
+
+        // when & then
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest));
+
     }
 }
