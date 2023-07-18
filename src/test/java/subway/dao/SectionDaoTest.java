@@ -2,7 +2,6 @@ package subway.dao;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,7 @@ class SectionDaoTest {
             Integer distance = 10;
 
             Section section = Section.builder()
-                    .lines(List.of(line))
+                    .line(line)
                     .upStation(upStation)
                     .downStation(downStation)
                     .distance(distance)

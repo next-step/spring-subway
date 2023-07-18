@@ -16,19 +16,12 @@ create table if not exists LINE
 create table if not exists SECTIONS
 (
     id bigint auto_increment not null,
+    line_id bigint not null,
     up_section_id bigint null,
     down_section_id bigint null,
     up_station_id bigint not null,
     down_station_id bigint not null,
     distance int not null,
-    primary key(id)
+    primary key(id),
+    foreign key(line_id) references LINE(id)
 );
-
-create table if not exists SECTIONS_LINE
-(
-    section_id bigint not null,
-    line_id bigint not null,
-    foreign key(section_id) references SECTIONS(id),
-    foreign key(line_id) references LINE(id),
-    PRIMARY KEY(section_id, line_id)
-)
