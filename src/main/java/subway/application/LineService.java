@@ -12,6 +12,7 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 
 @Service
 public class LineService {
@@ -58,13 +59,15 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
-    public void connectSectionByStationId(Long lineId, Long upStationId, Long downStationId, Integer distance) {
+    public void connectSectionByStationId(Long lineId, SectionRequest sectionRequest) {
         Line line = lineDao.findById(lineId);
         List<Section> sections = sectionDao.findAllByLineId(lineId);
 
         LineManager lineManager = new LineManager(line, sections);
 
-        Section downSection = getDownSection(line, upStationId, downStationId, distance);
+        Section downSection = getDownSection(line, Long.valueOf(sectionRequest.getUpStationId()),
+                Long.valueOf(sectionRequest.getDownStationId()),
+                sectionRequest.getDistance());
         lineManager.connectDownSection(downSection);
 
         sectionDao.insert(downSection);

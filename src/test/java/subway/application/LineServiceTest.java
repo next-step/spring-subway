@@ -19,6 +19,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.dto.SectionRequest;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = LineService.class)
@@ -68,6 +69,10 @@ class LineServiceTest {
                     .distance(1)
                     .build();
 
+            SectionRequest sectionRequest = new SectionRequest(String.valueOf(middleStation.getId()),
+                    String.valueOf(downStation.getId()),
+                    downSection.getDistance());
+
             when(sectionDao.findAllByLineId(line.getId())).thenReturn(List.of(upSection));
             when(sectionDao.insert(downSection)).thenReturn(downSection);
 
@@ -76,8 +81,7 @@ class LineServiceTest {
 
             // when
             Exception exception = catchException(
-                    () -> lineService.connectSectionByStationId(line.getId(), middleStation.getId(),
-                            downStation.getId(), 10));
+                    () -> lineService.connectSectionByStationId(line.getId(), sectionRequest));
 
             // then
             assertThat(exception).isNull();
