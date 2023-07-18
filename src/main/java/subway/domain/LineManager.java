@@ -13,5 +13,7 @@ public class LineManager {
     }
 
     public void connectDownSection(Section downSection) {
+        Section lineDownSection = sections.get(0).findDownSection();
+        lineDownSection.connectDownSection(downSection);
     }
 }
