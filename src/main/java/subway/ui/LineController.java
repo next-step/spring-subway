@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -46,6 +47,12 @@ public class LineController {
     public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<LineResponse> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        LineResponse line = lineService.saveSection(sectionRequest, id);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).body(line);
     }
 
     @ExceptionHandler(SQLException.class)

@@ -2,19 +2,29 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
+import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class LineService {
-    private final LineDao lineDao;
 
-    public LineService(LineDao lineDao) {
+    private final LineDao lineDao;
+    private final StationDao stationDao;
+    private final SectionDao sectionDao;
+
+    public LineService(LineDao lineDao, StationDao stationDao, SectionDao sectionDao) {
         this.lineDao = lineDao;
+        this.stationDao = stationDao;
+        this.sectionDao = sectionDao;
     }
 
     public LineResponse saveLine(LineRequest request) {
@@ -50,4 +60,13 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
+    public LineResponse saveSection(SectionRequest request, Long id) {
+        Station upStation = stationDao.findById(request.getUpStationId());
+        Station downStation = stationDao.findById(request.getDownStationId());
+        Line line = lineDao.findById(id);
+
+        sectionDao.insert(new Section(upStation, downStation, request.getDistance()), line);
+
+        return findLineResponseById(id);
+    }
 }
