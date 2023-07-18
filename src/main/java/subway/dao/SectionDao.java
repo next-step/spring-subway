@@ -6,11 +6,11 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.SectionGroup;
 import subway.domain.Station;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -46,7 +46,7 @@ public class SectionDao {
         return new Section(sectionId, section.getUpward(), section.getDownward(), section.getLine(), section.getDistance());
     }
 
-    public List<Section> findAllByLineId(Long lineId) {
+    public SectionGroup findAllByLineId(Long lineId) {
         String sql = "select section.id, upward.id, upward.name, downward.id, downward.name, line.id, line.name, line.color, section.distance " +
                 "from SECTION section " +
                 "left join LINE line on section.line_id=line.id " +
@@ -54,6 +54,6 @@ public class SectionDao {
                 "left join STATION downward on section.downward_id = downward.id " +
                 "where section.line_id = ?";
 
-        return jdbcTemplate.query(sql, rowMapper, lineId);
+        return new SectionGroup(jdbcTemplate.query(sql, rowMapper, lineId));
     }
 }

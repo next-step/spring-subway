@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
+import subway.dto.StationRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,30 +23,52 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LineIntegrationTest extends IntegrationTest {
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
-    private SectionRequest sectionRequest1;
-    private SectionRequest sectionRequest2;
+    private StationRequest stationRequest1;
+    private StationRequest stationRequest2;
+    private StationRequest stationRequest3;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600");
+        lineRequest1 = new LineRequest("2호선", "bg-red-600");
         lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
-        sectionRequest1 = new SectionRequest("1", "2", 5);
-        sectionRequest2 = new SectionRequest("2", "3", 4);
+
+        stationRequest1 = new StationRequest("신대방역");
+        stationRequest2 = new StationRequest("서울대입구역");
+        stationRequest3 = new StationRequest("잠실역");
     }
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
+        // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(lineRequest)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -61,8 +84,8 @@ public class LineIntegrationTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest1)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -70,8 +93,8 @@ public class LineIntegrationTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest1)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -86,16 +109,16 @@ public class LineIntegrationTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest1)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
 
         ExtractableResponse<Response> createResponse2 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest2)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -125,8 +148,8 @@ public class LineIntegrationTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest1)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -152,8 +175,8 @@ public class LineIntegrationTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest1)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -178,8 +201,8 @@ public class LineIntegrationTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest1)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -194,28 +217,113 @@ public class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("아무 구간도 안가지고 있을 때, 구간 삽입 테스트")
+    @DisplayName("노선에 구간을 추가한다.")
     void createSection() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
+        ExtractableResponse<Response> createStation1Response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation3Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest3)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station3Id = Long.parseLong(createStation3Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> lineResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
                 .when().post("/lines")
-                .then().log().all().
-                extract();
+                .then().log().all()
+                .extract();
+        Long lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest1)
+                .body(sectionRequest)
                 .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    @DisplayName("기존 하행 종점역이 새로운 구간의 상행역이 아닌 경우 오류를 반환한다.")
+    void downTerminalDoesNotMatchNewUpStationSection() {
+        // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation3Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest3)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station3Id = Long.parseLong(createStation3Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> lineResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+        Long lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
+
+
+        // when
+        SectionRequest sectionRequest = new SectionRequest(station3Id, station2Id, 15);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

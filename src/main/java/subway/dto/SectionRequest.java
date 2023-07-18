@@ -1,22 +1,22 @@
 package subway.dto;
 
 public class SectionRequest {
-    private final String downStationId;
-    private final String upStationId;
+    private final Long upStationId;
+    private final Long downStationId;
     private final int distance;
-
-    public SectionRequest(String downStationId, String upStationId, int distance) {
-        this.downStationId = downStationId;
+    
+    public SectionRequest(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public String getDownStationId() {
-        return downStationId;
+    public Long getUpStationId() {
+        return upStationId;
     }
 
-    public String getUpStationId() {
-        return upStationId;
+    public Long getDownStationId() {
+        return downStationId;
     }
 
     public int getDistance() {
