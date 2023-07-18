@@ -44,6 +44,25 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어 있는 하행 종점역이 아닌 경우 400 Bad Request로 응답한다.")
+    void badRequestWithNotRegisteredLastDownStation() {
+        /* given */
+        SectionRequest sectionRequest = new SectionRequest(13L, 14L, 777L);
+
+        /* when */
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
     @DisplayName("새로운 구간의 하행역이 해당 노선에 등록되어 있는 경우 400 Bad Request로 응답한다.")
     void badRequestWithRegisteredPrevSectionOnLine() {
         /* given */
