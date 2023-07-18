@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ class SectionsTest {
     private Station station3;
     private Station station4;
     private Station station5;
+    private Station station6;
     private Line line1;
     private Section section1;
     private Section section2;
@@ -28,6 +30,7 @@ class SectionsTest {
         station3 = new Station(3L, "춘의역");
         station4 = new Station(4L, "부천종합운동장역");
         station5 = new Station(5L, "까치울역");
+        station6 = new Station(5L, "온수역");
         line1 = new Line(1L, "7호선", "주황");
 
         section1 = new Section(
@@ -88,5 +91,53 @@ class SectionsTest {
         );
         assertThatNoException()
             .isThrownBy(() -> sections.validNewSection(section4));
+    }
+
+    @Test
+    @DisplayName("상행역과 하행역이 이미 Line에 모두 등록되어있다면 추가할 수 없음")
+    void duplicateSection() {
+        Section section4 = new Section(
+            4L,
+            station1,
+            station2,
+            line1,
+            10
+        );
+        assertThatThrownBy(() -> sections.validNewSection(section4))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("상행역과 하행역 둘 중 하나라도 포함되어있지 않으면 추가할 수 없음")
+    void sectionRegistReject() {
+        Section section4 = new Section(
+            4L,
+            station5,
+            station6,
+            line1,
+            10
+        );
+        assertThatThrownBy(() -> sections.validNewSection(section4))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("하행 종점역은 삭제할 수 있다.")
+    void canDelete() {
+        assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(4L));
+    }
+
+    @Test
+    @DisplayName("하행 종점역이 아니면 삭제할 수 없다.")
+    void canNotDelete() {
+        Assertions.assertAll(
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(1L))
+                .isInstanceOf(IllegalArgumentException.class),
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(2L))
+                .isInstanceOf(IllegalArgumentException.class),
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(3L))
+                .isInstanceOf(IllegalArgumentException.class)
+        );
     }
 }

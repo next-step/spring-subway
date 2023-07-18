@@ -28,6 +28,20 @@ public class Sections {
     }
 
     private void validNewSectionUpStation(Section section) {
+        Station endStation = findEndStation();
+        if (!endStation.equals(section.getUpStation())) {
+            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
+        }
+    }
+
+    public void canDeleteStation(Long stationId) {
+        Station endStation = findEndStation();
+        if (endStation.getId() != stationId) {
+            throw new IllegalArgumentException("하행 종점역이 아니면 삭제할 수 없습니다.");
+        }
+    }
+
+    private Station findEndStation() {
         Set<Station> upStations = sections.stream()
             .map(Section::getUpStation)
             .collect(Collectors.toSet());
@@ -37,10 +51,7 @@ public class Sections {
             .filter(downStation -> !upStations.contains(downStation))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
-
-        if (!station.equals(section.getUpStation())) {
-            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
-        }
+        return station;
     }
 
 }
