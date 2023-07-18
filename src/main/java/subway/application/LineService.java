@@ -3,7 +3,6 @@ package subway.application;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -58,26 +57,28 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
     public void connectSectionByStationId(Long lineId, Long upStationId, Long downStationId, Integer distance) {
         Line line = lineDao.findById(lineId);
 
         List<Section> sections = sectionDao.findAllByLineId(lineId);
         Section section = sections.get(0).findDownSection();
 
+        Section downSection = getDownSection(line, upStationId, downStationId, distance);
+        section.connectDownSection(downSection);
+
+        sectionDao.insert(downSection);
+    }
+
+    private Section getDownSection(Line line, Long upStationId, Long downStationId, Integer distance) {
         Station upStation = stationDao.findById(upStationId);
         Station downStation = stationDao.findById(downStationId);
 
-        Section downSection = Section.builder()
+        return Section.builder()
                 .line(line)
                 .upStation(upStation)
                 .downStation(downStation)
                 .distance(distance)
                 .build();
-
-        section.connectDownSection(downSection);
-
-        sectionDao.insert(downSection);
     }
 
 }
