@@ -101,5 +101,41 @@ class LineTest {
             // then
             assertThat(result).isInstanceOf(IllegalArgumentException.class);
         }
+
+        @Test
+        @DisplayName("입력된 Section이 유효하면 연결된다")
+        void Connect_Input_Section() {
+            // given
+            Station middleStation = new Station(3L, "middleStation");
+
+            Section section = Section.builder()
+                    .id(1L)
+                    .upStation(new Station(2L, "upStation"))
+                    .downStation(middleStation)
+                    .distance(10)
+                    .build();
+
+            Section connectedSection = Section.builder()
+                    .id(2L)
+                    .upStation(middleStation)
+                    .downStation(new Station(5L, "connecetedDownStation"))
+                    .distance(10)
+                    .build();
+
+            Line line = new Line("line", "red", section);
+
+            // when
+            line.connectSection(connectedSection);
+            List<Section> result = line.getSections();
+
+            // then
+            assertIsSectionConnected(result, section, connectedSection);
+        }
+
+        private void assertIsSectionConnected(List<Section> result, Section upSection, Section downSection) {
+            assertThat(result).containsAll(List.of(upSection, downSection));
+            assertThat(upSection.getDownSection()).isEqualTo(downSection);
+            assertThat(upSection).isEqualTo(downSection.getUpSection());
+        }
     }
 }
