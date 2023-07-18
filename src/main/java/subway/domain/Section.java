@@ -1,21 +1,8 @@
 package subway.domain;
 
 import java.util.Objects;
-import java.util.StringJoiner;
 
 public class Section {
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Section.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
-                .add("lineId=" + lineId)
-                .add("upStationId=" + upStationId)
-                .add("downStationId=" + downStationId)
-                .add("distance=" + distance)
-                .add("preStationId=" + preStationId)
-                .add("postStationId=" + postStationId)
-                .toString();
-    }
 
     private Long id;
     private Long lineId;
