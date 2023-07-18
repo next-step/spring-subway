@@ -8,6 +8,7 @@ import subway.domain.Section;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -60,5 +61,15 @@ public class SectionDao {
         String sql = "select * from SECTION where id = ?";
 
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    }
+
+    public List<Section> findAllByLineId(final Long lineId) {
+        String sql = "select * from SECTION where line_id = ?";
+
+        return jdbcTemplate.query(sql, rowMapper, lineId);
+    }
+
+    public void updatePrevSectionId(final Section target, final Long newPrevSectionId) {
+        jdbcTemplate.update("update SECTION set prev_section_id = ? where id = ?", newPrevSectionId, target.getId());
     }
 }

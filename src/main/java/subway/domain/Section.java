@@ -13,10 +13,7 @@ public class Section {
     private Long prevSectionId;
 
     private Section() {
-    }
-
-    public Section(final Long upStationId, final Long downStationId, final Long distance) {
-        this(null, null, upStationId, downStationId, distance, null, null);
+        /* no-op */
     }
 
     public Section(
@@ -102,5 +99,58 @@ public class Section {
     @Override
     public int hashCode() {
         return Objects.hash(id, lineId, upStationId, downStationId, distance, nextSectionId, prevSectionId);
+    }
+
+    public static class Builder {
+
+        private Long id;
+        private Long lineId;
+        private Long upStationId;
+        private Long downStationId;
+        private Long distance;
+        private Long nextSectionId;
+        private Long prevSectionId;
+
+        private Builder() {
+            /* no-op */
+        }
+
+        public Builder(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
+            this.lineId = lineId;
+            this.upStationId = upStationId;
+            this.downStationId = downStationId;
+            this.distance = distance;
+        }
+
+        public Builder id(final Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder nextSectionId(final Long nextSectionId) {
+            this.nextSectionId = nextSectionId;
+            return this;
+        }
+
+        public Builder prevSectionId(final Long prevSectionId) {
+            this.prevSectionId = prevSectionId;
+            return this;
+        }
+
+        public Section build() {
+            return new Section(this);
+        }
+    }
+
+    private Section(final Builder builder) {
+        this(
+                builder.id,
+                builder.lineId,
+                builder.upStationId,
+                builder.downStationId,
+                builder.distance,
+                builder.nextSectionId,
+                builder.prevSectionId
+        );
     }
 }
