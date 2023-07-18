@@ -28,6 +28,16 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        Station upStation = stationDao.findById(Long.valueOf(request.getUpStationId()));
+        Station downStation = stationDao.findById(Long.valueOf(request.getDownStationId()));
+        Section section = Section.builder()
+                .line(persistLine)
+                .distance(request.getDistance())
+                .upStation(upStation)
+                .downStation(downStation)
+                .build();
+
+        sectionDao.insert(section);
         return LineResponse.of(persistLine);
     }
 

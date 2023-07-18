@@ -15,9 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.StationRequest;
+import subway.dto.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
+
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
 
@@ -26,8 +29,16 @@ class LineIntegrationTest extends IntegrationTest {
     public void setUp() {
         super.setUp();
 
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600");
-        lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
+        Long stationRequest1 = createStation(new StationRequest("강남")).body().as(StationResponse.class).getId();
+        Long stationRequest2 = createStation(new StationRequest("신도림")).body().as(StationResponse.class).getId();
+        Long stationRequest3 = createStation(new StationRequest("부천")).body().as(StationResponse.class).getId();
+        Long stationRequest4 = createStation(new StationRequest("잠실")).body().as(StationResponse.class).getId();
+
+        lineRequest1 = new LineRequest("신분당선", "bg-red-600", String.valueOf(stationRequest1),
+                String.valueOf(stationRequest2), 10);
+
+        lineRequest2 = new LineRequest("2호선", "bg-green-600", String.valueOf(stationRequest3),
+                String.valueOf(stationRequest4), 5);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -137,6 +148,28 @@ class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+//    @DisplayName("Line에 구간을 등록한다.")
+//    void createSection() {
+//        // given
+//        ExtractableResponse<Response> response = createLine(lineRequest1);
+//        LineResponse lineResponse = response.body().as(LineResponse.class);
+//
+//        // when
+//
+//        // then
+//
+//    }
+
+    private ExtractableResponse<Response> createStation(StationRequest stationRequest) {
+        return RestAssured.given().log().all()
+                .body(stationRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
     }
 
     private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
