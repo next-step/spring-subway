@@ -89,4 +89,8 @@ public class Section {
             ", distance=" + distance +
             '}';
     }
+
+    public boolean hasDownStationSameAs(Station station) {
+        return station.equals(this.downStation);
+    }
 }

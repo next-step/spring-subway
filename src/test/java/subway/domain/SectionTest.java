@@ -58,4 +58,13 @@ class SectionTest {
 
         assertThat(section.containsDownStationOf(targetSection)).isTrue();
     }
+
+    @Test
+    @DisplayName("해당 역은 구간의 하행역과 같다")
+    void hasDownStationSameAs() {
+        Section section = new Section(lineA, stationA, stationB, 1);
+
+        assertThat(section.hasDownStationSameAs(stationB)).isTrue();
+        assertThat(section.hasDownStationSameAs(stationA)).isFalse();
+    }
 }
