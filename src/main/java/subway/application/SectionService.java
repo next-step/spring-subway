@@ -18,9 +18,17 @@ public class SectionService {
     public SectionResponse saveSection(final Long lineId, final SectionRequest sectionRequest) {
         validateLine(lineId, sectionRequest.getUpStationId());
         validateDownLastStation(lineId, sectionRequest.getUpStationId());
+        validateDuplicateStationInLine(lineId, sectionRequest.getDownStationId());
 
         final Section section = sectionDao.insert(sectionRequest.toEntity(lineId));
         return SectionResponse.of(section);
+    }
+
+    private void validateDuplicateStationInLine(final long lineId, final long stationId) {
+        sectionDao.findByLineIdAndStationId(lineId, stationId)
+                .ifPresent(section -> {
+                    throw new IllegalArgumentException("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.");
+                });
     }
 
     private void validateDownLastStation(final Long lineId, final Long upStationId) {

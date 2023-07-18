@@ -54,6 +54,9 @@ public class SectionDao {
     }
 
     public Optional<Section> findByLineIdAndStationId(final long lineId, final long stationId) {
-        return null;
+        String sql = "select * from section where line_id = ? and (up_station_id = ? or down_station_id = ?)";
+        return jdbcTemplate.query(sql, rowMapper, lineId, stationId, stationId)
+                .stream()
+                .findAny();
     }
 }

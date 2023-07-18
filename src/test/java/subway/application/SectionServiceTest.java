@@ -87,6 +87,10 @@ class SectionServiceTest {
         final Section section = new Section(1L, 1L, 2L, 1L, 10.0);
         final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
 
+        given(sectionDao.findByDownStationIdAndLineId(1L, 1L))
+                .willReturn(Optional.of(section));
+        given(sectionDao.findByUpStationIdAndLineId(1L, 1L))
+                .willReturn(Optional.empty());
         given(sectionDao.findByLineIdAndStationId(1L, 2L))
                 .willReturn(Optional.of(section));
 
