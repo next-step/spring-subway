@@ -9,6 +9,7 @@ public class Section {
     private final Station upStation;
     private final Station downStation;
     private final Integer distance;
+    private final Line line;
     private Long id;
     private Section upSection;
     private Section downSection;
@@ -20,12 +21,13 @@ public class Section {
         this.upStation = builder.upStation;
         this.downStation = builder.downStation;
         this.distance = builder.distance;
+        this.line = builder.line;
         this.id = builder.id;
         this.upSection = builder.upSection;
         this.downSection = builder.downSection;
     }
 
-    public Section(Long id, Station upStation, Station downStation, Section upSection, Section downSection,
+    public Section(Long id, Line line, Station upStation, Station downStation, Section upSection, Section downSection,
             Integer distance) {
         Assert.notNull(upStation, () -> "upStation은 null이 될 수 없습니다.");
         Assert.notNull(downStation, () -> "downStation은 null이 될 수 없습니다.");
@@ -33,6 +35,7 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+        this.line = line;
         this.id = id;
         this.upSection = upSection;
         this.downSection = downSection;
@@ -54,6 +57,10 @@ public class Section {
 
     public Long getId() {
         return id;
+    }
+
+    public Line getLine() {
+        return line;
     }
 
     public Section getDownSection() {
@@ -86,13 +93,14 @@ public class Section {
         }
         Section section = (Section) o;
         return Objects.equals(upStation, section.upStation) && Objects.equals(downStation,
-                section.downStation) && Objects.equals(upSection, section.upSection) && Objects.equals(
-                downSection, section.downSection);
+                section.downStation) && Objects.equals(distance, section.distance) && Objects.equals(
+                line, section.line) && Objects.equals(id, section.id) && Objects.equals(upSection,
+                section.upSection) && Objects.equals(downSection, section.downSection);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(upStation, downStation, upSection, downSection);
+        return Objects.hash(upStation, downStation, distance, line, id, upSection, downSection);
     }
 
     @Override
@@ -100,6 +108,9 @@ public class Section {
         return "Section{" +
                 "upStation=" + upStation +
                 ", downStation=" + downStation +
+                ", distance=" + distance +
+                ", line=" + line +
+                ", id=" + id +
                 ", upSection=" + upSection +
                 ", downSection=" + downSection +
                 '}';
@@ -108,6 +119,7 @@ public class Section {
     public static final class Builder {
 
         private Long id;
+        private Line line;
         private Station upStation;
         private Station downStation;
         private Section upSection;
@@ -120,6 +132,11 @@ public class Section {
 
         public Builder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public Builder line(Line line) {
+            this.line = line;
             return this;
         }
 

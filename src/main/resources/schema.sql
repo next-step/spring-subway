@@ -5,6 +5,14 @@ create table if not exists STATION
     primary key(id)
 );
 
+create table if not exists LINE
+(
+    id bigint auto_increment not null,
+    name varchar(255) not null unique,
+    color varchar(20) not null,
+    primary key(id)
+);
+
 create table if not exists SECTIONS
 (
     id bigint auto_increment not null,
@@ -13,18 +21,9 @@ create table if not exists SECTIONS
     up_station_id bigint not null,
     down_station_id bigint not null,
     distance int not null,
+    line_id bigint not null,
     primary key(id),
-    foreign key(up_section_id) references SECTIONS(id),
-    foreign key(down_section_id) references SECTIONS(id),
-    foreign key(up_station_id) references STATION(id),
-    foreign key(down_station_id) references STATION(id)
+    foreign key(line_id) references LINE(id)
 );
 
-
-create table if not exists LINE
-(
-    id bigint auto_increment not null,
-    name varchar(255) not null unique,
-    color varchar(20) not null,
-    primary key(id)
-);
+create index idx_line_id on SECTIONS (line_id)

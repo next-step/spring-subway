@@ -29,6 +29,8 @@ Line 색(color)
   - [ ] Line에 Section을 추가할 수 있다.
     - [ ] Section이 추가될 때, 추가되는 Section의 상행Station이 자신의 하행Station과 동일한지 확인한다.
     - [ ] 새로운 Section의 하행Station은 해당 Line에 등록되어있는 Station일 수 없다. (상행은 됨)
+  - [ ] id에 해당하는 Line이 존재하지 않으면, 예외를 던진다.
+  - [ ] id에 해당하는 Station이 존재하지 않으면, 예외를 던진다.
   - [ ] Section을 삭제할 수 있다.
     - [ ] Line에 하나의 Section만 있을때, 삭제할 수 없다.
     - [ ] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
@@ -44,18 +46,13 @@ Line 색(color)
 - [x] SectionService
   - [x] UpStationId, DownStationId를 통해 Section을 생성한다.
 
+- [ ] LineService
+  - [ ] LineId랑 SectionDto를 받아서, Section을 Line에 추가할 수 있다.
+
 ### Dao
 
 - [ ] SectionDao
   - [ ] Section을 받아 저장한다.
-
-``` mermaid
-
-flowchart LR
-
-SectionController[SectionController] --> SectionService[SectionService]
-
-```
 
 ### Section 등록 기능
 
@@ -67,3 +64,9 @@ SectionController[SectionController] --> SectionService[SectionService]
 
 - [ ] Line에 하나의 Section만 있을때, 삭제할 수 없다.
 - [ ] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
+
+### TODO
+
+- [ ] SectionService.saveById 가 SectionResponse를 반환하게 한다.
+- [ ] Optional로 리팩토링
+- [ ] Section에 distance 테스트 추가

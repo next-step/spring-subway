@@ -28,4 +28,5 @@ public class LineResponse {
     public String getColor() {
         return color;
     }
+
 }
