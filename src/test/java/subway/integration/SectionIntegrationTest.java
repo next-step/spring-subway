@@ -58,10 +58,7 @@ class SectionIntegrationTest extends IntegrationTest {
         stationDao.insert(stationC);
         Section section = new Section(lineA, stationA, stationB, 2);
         sectionDao.save(section);
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", "2");
-        params.put("downStationId", "3");
-        params.put("distance", "3");
+        Map<String, String> params = createSectionAdditionRequest();
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -76,6 +73,23 @@ class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    private void setupTargetLineAndStations() {
+        lineDao.insert(lineA);
+        stationDao.insert(stationA);
+        stationDao.insert(stationB);
+        stationDao.insert(stationC);
+        Section section = new Section(lineA, stationA, stationB, 2);
+        sectionDao.save(section);
+    }
+
+    private Map<String, String> createSectionAdditionRequest() {
+        Map<String, String> params = new HashMap<>();
+        params.put("upStationId", String.valueOf(stationB.getId()));
+        params.put("downStationId", String.valueOf(stationC.getId()));
+        params.put("distance", "3");
+        return params;
     }
 
 
