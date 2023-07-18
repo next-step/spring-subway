@@ -37,9 +37,17 @@ Line 색(color)
 - [x] Section
   - [x] Station과 Station을 연결할 수 있다.
   - [x] 연결된 Section을 알고있다.
+  - [x] 라인과 연결할 수 있다.
+  - [ ] 특정 라인의 상행 Section, 하행 Section을 알 수 있다.
 - [x] Station
   - [x] 이름을 표현한다.
   - [x] 이름이 중복되면 예외를 던진다.
+
+lineId, upStationId, downStationId;
+
+1. [ ] lineId기준 DB에서 모든 section 조회
+2. [ ] 조회된 section에서 upStationId가 하행 section이 맞는지 확인
+3. [x] 하행 section이랑 연결
 
 ### 애플리케이션 서비스
 

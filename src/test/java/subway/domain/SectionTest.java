@@ -130,4 +130,5 @@ class SectionTest {
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
     }
+
 }

@@ -21,9 +21,14 @@ create table if not exists SECTIONS
     up_station_id bigint not null,
     down_station_id bigint not null,
     distance int not null,
-    line_id bigint not null,
-    primary key(id),
-    foreign key(line_id) references LINE(id)
+    primary key(id)
 );
 
-create index idx_line_id on SECTIONS (line_id)
+create table if not exists SECTIONS_LINE
+(
+    section_id bigint not null,
+    line_id bigint not null,
+    foreign key(section_id) references SECTIONS(id),
+    foreign key(line_id) references LINE(id),
+    PRIMARY KEY(section_id, line_id)
+)
