@@ -124,6 +124,60 @@ class SectionServiceTest {
         assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
     }
 
+    @DisplayName("추가구간의 하행역과 상행역이 기존 노선에 모두 존재할 시 예외를 던진다.")
+    @Test
+    void saveSectionStationsAlreadyExistInLineThenThrow() {
+        // given
+        Long lineId = 1L;
+        SectionRequest request1 = new SectionRequest(1L, 2L, 10L);
+        SectionRequest request2 = new SectionRequest(2L, 3L, 10L);
+        sectionService.saveSection(lineId, request1);
+        sectionService.saveSection(lineId, request2);
+
+        SectionRequest request = new SectionRequest(1L, 3L, 5L);
+
+        // when , then
+        assertThatCode(() -> sectionService.saveSection(lineId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
+    }
+
+    @DisplayName("추가구간의 하행역과 상행역이 기존 노선에 모두 존재하지 않을 시 예외를 던진다.")
+    @Test
+    void saveSectionStationsNotExistInLineThenThrow() {
+        // given
+        Long lineId = 1L;
+        SectionRequest request1 = new SectionRequest(1L, 2L, 10L);
+        SectionRequest request2 = new SectionRequest(2L, 3L, 10L);
+        sectionService.saveSection(lineId, request1);
+        sectionService.saveSection(lineId, request2);
+
+        SectionRequest request = new SectionRequest(4L, 5L, 5L);
+
+        // when , then
+        assertThatCode(() -> sectionService.saveSection(lineId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
+    }
+
+    @DisplayName("역사이에 역 등록시 구간이 기존 구간보다 크거나 같으면 등록시 예외를 던진다.")
+    @Test
+    void saveSectionTooMuchDistanceThenThrow() {
+        // given
+        Long lineId = 1L;
+        SectionRequest request1 = new SectionRequest(1L, 2L, 5L);
+        SectionRequest request2 = new SectionRequest(2L, 3L, 5L);
+        sectionService.saveSection(lineId, request1);
+        sectionService.saveSection(lineId, request2);
+
+        SectionRequest request = new SectionRequest(1L, 4L, 10L);
+
+        // when , then
+        assertThatCode(() -> sectionService.saveSection(lineId, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
+    }
+
 
     @DisplayName("지하철 노선에 등록된 하행 종점역만 제거할 수 있다")
     @Test
