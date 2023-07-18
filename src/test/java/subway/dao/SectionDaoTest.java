@@ -89,4 +89,31 @@ class SectionDaoTest {
         // then
         assertThat(result).isFalse();
     }
+
+    @DisplayName("구간 테이블에 특정 노선의 구간이 있는지 여부 반환 - true")
+    @Test
+    void existByLineIdTrue() {
+        // given
+        long lineId = 1L;
+        Section section1 = sectionDao.insert(new Section(lineId, 1L, 2L, 10L));
+
+        // when
+        boolean result = sectionDao.existByLineId(lineId);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("구간 테이블에 특정 노선의 구간이 있는지 여부 반환 - false")
+    @Test
+    void existByLineIdFalse() {
+        // given
+        long lineId = 1L;
+
+        // when
+        boolean result = sectionDao.existByLineId(lineId);
+
+        // then
+        assertThat(result).isFalse();
+    }
 }
