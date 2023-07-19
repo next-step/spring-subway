@@ -2,8 +2,10 @@ package subway.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,11 +65,43 @@ public class Sections {
         return station;
     }
 
+    public List<Station> sortStations() {
+        List<Station> sortedStations = new ArrayList<>();
+        Map<Station, Section> stationLayerMap = initLayerMap();
+
+        Station nowStation = findTopStation();
+        sortedStations.add(nowStation);
+
+        while (stationLayerMap.containsKey(nowStation)) {
+            Section section = stationLayerMap.get(nowStation);
+            sortedStations.add(section.getDownStation());
+            nowStation = section.getDownStation();
+        }
+
+        return sortedStations;
+    }
+
+    private Map<Station, Section> initLayerMap() {
+        return sections.stream()
+            .collect(Collectors.toMap(
+                Section::getUpStation,
+                Function.identity()
+            ));
+    }
+
+    private Station findTopStation() {
+        return findStations().stream()
+            .filter(station -> !findEndStations().contains(station))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
+    }
+
     public List<Section> registSection(Section section) {
         if (sections.size() == 0) {
             return List.of(section);
         }
-        if (findStations().contains(section.getUpStation()) && findStations().contains(section.getDownStation())) {
+        if (findStations().contains(section.getUpStation()) && findStations().contains(
+            section.getDownStation())) {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
         if (findStations().contains(section.getUpStation())) {
@@ -153,8 +187,8 @@ public class Sections {
 
     private Set<Station> findStations() {
         return Stream.concat(
-            findStartStations().stream(),
-            findEndStations().stream()
+                findStartStations().stream(),
+                findEndStations().stream()
             )
             .collect(Collectors.toSet());
     }
@@ -186,5 +220,12 @@ public class Sections {
     @Override
     public int hashCode() {
         return Objects.hash(sections);
+    }
+
+    @Override
+    public String toString() {
+        return "Sections{" +
+            "sections=" + sections +
+            '}';
     }
 }

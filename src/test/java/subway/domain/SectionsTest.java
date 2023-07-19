@@ -57,7 +57,7 @@ class SectionsTest {
             10
         );
 
-        sections = new Sections(List.of(section1, section2, section3));
+        sections = new Sections(List.of(section1, section3, section2));
     }
 
     @Test
@@ -113,7 +113,7 @@ class SectionsTest {
     @DisplayName("하행 종점역은 삭제할 수 있다.")
     void canDelete() {
         assertThatNoException()
-                .isThrownBy(() -> sections.canDeleteStation(4L));
+            .isThrownBy(() -> sections.canDeleteStation(4L));
     }
 
     @Test
@@ -157,6 +157,7 @@ class SectionsTest {
         List<Section> result = sections.registSection(addSection);
 
         Section expectedNewSection = new Section(
+            3L,
             station5,
             station4,
             line1,
@@ -193,13 +194,13 @@ class SectionsTest {
             5
         );
         Section expectedNewSection = new Section(
+            3L,
             station3,
             station5,
             line1,
             5
         );
         List<Section> result = sections.registSection(addSection);
-
         Assertions.assertAll(
             () -> assertThat(result.contains(addSection)).isTrue(),
             () -> assertThat(result.contains(expectedNewSection)).isTrue()
@@ -218,5 +219,12 @@ class SectionsTest {
 
         assertThatThrownBy(() -> sections.registSection(newSection))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("계층적으로 정렬된 Sections를 반환한다.")
+    void sort() {
+        List<Station> result = sections.sortStations();
+        assertThat(result).containsExactly(station1, station2, station3, station4);
     }
 }
