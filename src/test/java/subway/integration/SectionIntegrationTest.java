@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,10 +15,11 @@ import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
-import subway.domain.Section;
 import subway.domain.Station;
+import subway.dto.LineRequest;
+import subway.dto.SectionAdditionRequest;
 
-@DisplayName("Section 통합 테스트")
+@DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
 
     @Autowired
@@ -52,45 +51,55 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void addSectionToLine() {
         // given
-        lineDao.insert(lineA);
-        stationDao.insert(stationA);
-        stationDao.insert(stationB);
-        stationDao.insert(stationC);
-        Section section = new Section(lineA, stationA, stationB, 2);
-        sectionDao.save(section);
-        Map<String, String> params = createSectionAdditionRequest();
+        StationIntegrationTest.createInitialStations();
+        LineRequest lineRequest = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        LineIntegrationTest.createLine(lineRequest);
+        SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
+            stationC.getId(), 3);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .body(params)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .pathParam("id", lineA.getId())
-            .when()
-            .post("/lines/{id}/sections")
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = addSectionToLine(sectionAdditionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    private void setupTargetLineAndStations() {
-        lineDao.insert(lineA);
-        stationDao.insert(stationA);
-        stationDao.insert(stationB);
-        stationDao.insert(stationC);
-        Section section = new Section(lineA, stationA, stationB, 2);
-        sectionDao.save(section);
+    private ExtractableResponse<Response> addSectionToLine(
+        SectionAdditionRequest sectionAdditionRequest) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .body(sectionAdditionRequest)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", lineA.getId())
+            .when()
+            .post("/lines/{id}/sections")
+            .then().log().all()
+            .extract();
+        return response;
     }
 
-    private Map<String, String> createSectionAdditionRequest() {
-        Map<String, String> params = new HashMap<>();
-        params.put("upStationId", String.valueOf(stationB.getId()));
-        params.put("downStationId", String.valueOf(stationC.getId()));
-        params.put("distance", "3");
-        return params;
+    @DisplayName("지하철 노선의 구간을 제거한다.")
+    @Test
+    void removeSectionOfLine() {
+        // given
+        StationIntegrationTest.createInitialStations();
+        LineRequest lineRequest = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        LineIntegrationTest.createLine(lineRequest);
+        SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
+            stationC.getId(), 3);
+        addSectionToLine(sectionAdditionRequest);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", lineA.getId())
+            .param("stationId", stationC.getId())
+            .when().delete("/lines/{id}/sections")
+            .then().log().all().
+            extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
-
-
 }
