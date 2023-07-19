@@ -72,4 +72,13 @@ public class LineService {
 
         return findLineResponseById(lineId);
     }
+
+    public void deleteSectionByStationId(Long lineId, String stationId) {
+        Long deleteId = Long.parseLong(stationId);
+        Station delete = stationDao.findById(deleteId);
+
+        Sections sections = sectionDao.findAllByLineId(lineId);
+        sections.delete(delete);
+        sectionDao.deleteByStation(delete, lineId);
+    }
 }
