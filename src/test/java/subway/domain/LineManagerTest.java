@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import subway.TestHelper;
 
 @DisplayName("LineManager 클래스")
 class LineManagerTest {
@@ -25,21 +26,8 @@ class LineManagerTest {
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(1)
-                    .build();
-
-            Section downSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(middleStation)
-                    .downStation(downStation)
-                    .distance(1)
-                    .build();
+            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
+            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
 
@@ -60,21 +48,8 @@ class LineManagerTest {
             Station middleStation = new Station(2L, "middleStation");
             Station existStation = upStation;
 
-            Section upSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(1)
-                    .build();
-
-            Section existSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(middleStation)
-                    .downStation(existStation)
-                    .distance(1)
-                    .build();
+            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
+            Section existSection = TestHelper.Section.buildWithStations(middleStation, existStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
 
@@ -101,27 +76,14 @@ class LineManagerTest {
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(1)
-                    .build();
-
-            Section downSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(middleStation)
-                    .downStation(downStation)
-                    .distance(1)
-                    .build();
+            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
+            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
             lineManager.connectDownSection(downSection);
 
             // when
-            lineManager.disconnectDownSection(downStation);
+            lineManager.disconnectDownSection(middleStation);
 
             // then
             assertThat(upSection.getDownSection()).isNull();
@@ -138,21 +100,8 @@ class LineManagerTest {
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(1)
-                    .build();
-
-            Section downSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(middleStation)
-                    .downStation(downStation)
-                    .distance(1)
-                    .build();
+            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
+            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
             lineManager.connectDownSection(downSection);
@@ -173,13 +122,7 @@ class LineManagerTest {
             Station upStation = new Station(1L, "upStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(upStation)
-                    .downStation(downStation)
-                    .distance(1)
-                    .build();
+            Section upSection = TestHelper.Section.buildWithStations(upStation, downStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
 
