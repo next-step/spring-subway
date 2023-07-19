@@ -6,7 +6,6 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
-import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
 
@@ -23,7 +22,7 @@ public class SectionService {
     }
 
     public void saveSection(final Long lineId, final SectionRequest request) {
-        Line line = findById(lineId);
+        Line line = lineDao.findById(lineId);
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
         Section section = new Section(upStation, downStation, request.getDistance());
@@ -34,18 +33,11 @@ public class SectionService {
     }
 
     public void deleteStation(Long lineId, Long stationId) {
-        Line line = findById(lineId);
+        Line line = lineDao.findById(lineId);
         Station station = stationDao.findById(stationId);
 
         line.getSections().remove(station);
 
         sectionDao.deleteByLineIdAndStationId(lineId, stationId);
     }
-
-    private Line findById(Long lineId) {
-        Sections sections = sectionDao.findAllByLineId(lineId);
-        Line line = lineDao.findById(lineId).addSections(sections);
-        return line;
-    }
-
 }
