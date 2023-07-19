@@ -1,9 +1,10 @@
 package subway.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Sections {
@@ -30,43 +31,52 @@ public class Sections {
         if (sections.isEmpty()) {
             return List.of();
         }
-        Section pivot = getFirstSection(sections);
-        return getSortedSections(sections, pivot);
+
+        Map<Station, Section> upStationMap = initializeUpStationMap(
+                sections);
+
+        Map<Station, Section> downStationMap = initializeDownStationMap(
+                sections);
+
+        Section firstSection = findFirstSection(sections, downStationMap);
+
+        return sortedSections(upStationMap, firstSection);
     }
 
-    private Section getFirstSection(List<Section> sections) {
+    private static Map<Station, Section> initializeUpStationMap(List<Section> sections) {
+        Map<Station, Section> upStationMap = new HashMap<>();
+        for (Section section : sections) {
+            upStationMap.put(section.getUpStation(), section);
+        }
+        return upStationMap;
+    }
+
+    private static Map<Station, Section> initializeDownStationMap(List<Section> sections) {
+        Map<Station, Section> downStationMap = new HashMap<>();
+        for (Section section : sections) {
+            downStationMap.put(section.getDownStation(), section);
+        }
+        return downStationMap;
+    }
+
+    private static Section findFirstSection(List<Section> sections,
+            Map<Station, Section> downStationMap) {
         Section pivot = sections.get(0);
-        while (true) {
-            Optional<Section> temp = findUpSection(sections, pivot);
-            if (temp.isEmpty()) {
-                return pivot;
-            }
-            pivot = temp.get();
+        while (downStationMap.containsKey(pivot.getUpStation())) {
+            pivot = downStationMap.get(pivot.getUpStation());
         }
+        return pivot;
     }
 
-    private List<Section> getSortedSections(List<Section> sections, Section pivot) {
+    private static List<Section> sortedSections(Map<Station, Section> upStationMap,
+            Section pivot) {
         List<Section> result = new ArrayList<>();
-        while (true) {
+        result.add(pivot);
+        while (upStationMap.containsKey(pivot.getDownStation())) {
+            pivot = upStationMap.get(pivot.getDownStation());
             result.add(pivot);
-            Optional<Section> temp = findDownSection(sections, pivot);
-            if (temp.isEmpty()) {
-                return result;
-            }
-            pivot = temp.get();
         }
-    }
-
-    private Optional<Section> findUpSection(List<Section> sections, Section pivot) {
-        return sections.stream()
-                .filter(section -> section.getDownStationId().equals(pivot.getUpStationId()))
-                .findAny();
-    }
-
-    private Optional<Section> findDownSection(List<Section> sections, Section pivot) {
-        return sections.stream()
-                .filter(section -> section.getUpStationId().equals(pivot.getDownStationId()))
-                .findAny();
+        return result;
     }
 
     public Section findLastSection() {
