@@ -19,7 +19,6 @@ class SectionsTest {
                         1L,
                         new Station(1L, "서울대입구역"),
                         new Station(2L, "신대방역"),
-                        new Line(1L, "2호선", "green"),
                         10
                 )
         ));
@@ -38,7 +37,6 @@ class SectionsTest {
                         1L,
                         new Station(1L, "서울대입구역"),
                         new Station(2L, "신대방역"),
-                        new Line(1L, "2호선", "green"),
                         10
                 )
         ));
@@ -57,7 +55,6 @@ class SectionsTest {
                         1L,
                         new Station(1L, "서울대입구역"),
                         new Station(2L, "신대방역"),
-                        new Line(1L, "2호선", "green"),
                         10
                 )
         ));
@@ -76,7 +73,6 @@ class SectionsTest {
                         1L,
                         new Station(1L, "서울대입구역"),
                         new Station(2L, "신대방역"),
-                        new Line(1L, "2호선", "green"),
                         10
                 )
         ));
@@ -93,7 +89,6 @@ class SectionsTest {
                 1L,
                 new Station(1L, "서울대입구역"),
                 new Station(2L, "신대방역"),
-                new Line(1L, "2호선", "green"),
                 10
         );
         Sections sections1 = new Sections(List.of(section1));
@@ -102,7 +97,6 @@ class SectionsTest {
                 2L,
                 new Station(3L, "잠실역"),
                 new Station(4L, "상도역"),
-                new Line(1L, "2호선", "green"),
                 5
         );
         Sections sections2 = new Sections(List.of(section2));
@@ -123,7 +117,6 @@ class SectionsTest {
                 1L,
                 new Station("신대방역"),
                 deleteStation,
-                new Line("2호선", "green"),
                 4
         );
         Sections sections = new Sections(List.of(
@@ -131,7 +124,6 @@ class SectionsTest {
                         1L,
                         new Station("서울대입구역"),
                         new Station("신대방역"),
-                        new Line("2호선", "green"),
                         10
                 ),
                 deleteSection
@@ -153,13 +145,11 @@ class SectionsTest {
                 new Section(
                         new Station("서울대입구역"),
                         deleteStation,
-                        new Line("2호선", "green"),
                         10
                 ),
                 new Section(
                         deleteStation,
                         new Station("상도역"),
-                        new Line("2호선", "green"),
                         4
                 )
         ));
@@ -179,7 +169,6 @@ class SectionsTest {
                 new Section(
                         new Station("서울대입구역"),
                         deleteStation,
-                        new Line("2호선", "green"),
                         10
                 )
         ));

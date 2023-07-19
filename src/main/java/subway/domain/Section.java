@@ -4,21 +4,19 @@ public class Section {
     private final Long id;
     private final Station upStation;
     private final Station downStation;
-    private final Line line;
     private final int distance;
 
-    public Section(final Long id, final Station upStation, final Station downStation, final Line line, final int distance) {
+    public Section(final Long id, final Station upStation, final Station downStation, final int distance) {
         validate(upStation, downStation);
 
         this.id = id;
         this.upStation = upStation;
         this.downStation = downStation;
-        this.line = line;
         this.distance = distance;
     }
 
-    public Section(final Station upStation, final Station downStation, final Line line, final int distance) {
-        this(null, upStation, downStation, line, distance);
+    public Section(final Station upStation, final Station downStation, final int distance) {
+        this(null, upStation, downStation, distance);
     }
 
     private void validate(final Station upStation, final Station downStation) {
@@ -42,9 +40,5 @@ public class Section {
     public int getDistance() {
         return distance;
     }
-
-    public Line getLine() {
-        return line;
-    }
-
+    
 }

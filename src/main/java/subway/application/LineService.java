@@ -30,7 +30,7 @@ public class LineService {
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
 
-        sectionDao.insert(new Section(upStation, downStation, persistLine, request.getDistance()));
+        sectionDao.insert(new Section(upStation, downStation, request.getDistance()), persistLine.getId());
 
         return LineResponse.of(persistLine);
     }

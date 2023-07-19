@@ -26,11 +26,11 @@ public class SectionService {
         Line line = findById(lineId);
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
-        Section section = new Section(upStation, downStation, line, request.getDistance());
+        Section section = new Section(upStation, downStation, request.getDistance());
 
         line.addSection(section);
 
-        sectionDao.insert(section);
+        sectionDao.insert(section, lineId);
     }
 
     public void deleteStation(Long lineId, Long stationId) {

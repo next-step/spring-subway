@@ -11,10 +11,9 @@ class SectionTest {
     void sameStationsThrowError() {
         // given
         Station station = new Station("서울대입구역");
-        Line line = new Line("2호선", "green");
 
         // when, then
-        assertThatCode(() -> new Section(station, station, line, 10))
+        assertThatCode(() -> new Section(station, station, 10))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("상행역과 하행역이 같을 수 없습니다");
     }
@@ -25,10 +24,9 @@ class SectionTest {
         // given
         Station upStation = new Station("서울대입구역");
         Station downStation = new Station("신대방역");
-        Line line = new Line("2호선", "green");
 
         // when, then
-        assertThatCode(() -> new Section(upStation, downStation, line, 10))
+        assertThatCode(() -> new Section(upStation, downStation, 10))
                 .doesNotThrowAnyException();
     }
 }

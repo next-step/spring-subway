@@ -4,7 +4,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
@@ -23,7 +22,6 @@ public class SectionDao {
                     rs.getLong("section_id"),
                     new Station(rs.getLong("up_station_id"), rs.getString("up_station_name")),
                     new Station(rs.getLong("down_station_id"), rs.getString("down_station_name")),
-                    new Line(rs.getLong("line_id"), rs.getString("line_name"), rs.getString("line_Color")),
                     rs.getInt("section_distance")
             );
 
@@ -34,16 +32,16 @@ public class SectionDao {
                 .usingGeneratedKeyColumns("id");
     }
 
-    public Section insert(final Section section) {
+    public Section insert(final Section section, final Long lineId) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
         params.put("up_station_id", section.getUpStation().getId());
         params.put("down_station_id", section.getDownStation().getId());
-        params.put("line_id", section.getLine().getId());
+        params.put("line_id", lineId);
         params.put("distance", section.getDistance());
 
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(sectionId, section.getUpStation(), section.getDownStation(), section.getLine(), section.getDistance());
+        return new Section(sectionId, section.getUpStation(), section.getDownStation(), section.getDistance());
     }
 
     public Sections findAllByLineId(final Long lineId) {
@@ -52,12 +50,8 @@ public class SectionDao {
                 "up_station.name as up_station_name, " +
                 "down_station.id as down_station_id, " +
                 "down_station.name as down_station_name, " +
-                "line.id as line_id, " +
-                "line.name as line_name, " +
-                "line.color as line_color," +
                 "section.distance as section_distance " +
                 "from SECTION section " +
-                "left join LINE line on section.line_id=line.id " +
                 "left join STATION up_station on section.up_station_id = up_station.id " +
                 "left join STATION down_station on section.down_station_id = down_station.id " +
                 "where section.line_id = ?";

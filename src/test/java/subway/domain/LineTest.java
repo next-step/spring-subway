@@ -15,7 +15,7 @@ public class LineTest {
         Line line = new Line("2호선", "green");
         Station upStation = new Station("서울대입구역");
         Station downStation = new Station("잠실역");
-        Section section = new Section(upStation, downStation, line, 10);
+        Section section = new Section(upStation, downStation, 10);
         Sections sections = new Sections(List.of(section));
 
         // when
@@ -32,14 +32,13 @@ public class LineTest {
         Section section = new Section(
                 new Station("서울대입구역"),
                 new Station("신대방역"),
-                new Line("2호선", "green"),
                 10
         );
         Line line = new Line("2호선", "green", new Sections(List.of(section)));
 
         Station upStation = new Station("신대방역");
         Station downStation = new Station("잠실역");
-        Section newSection = new Section(upStation, downStation, line, 10);
+        Section newSection = new Section(upStation, downStation, 10);
 
         // when
         Line addedLine = line.addSection(newSection);
