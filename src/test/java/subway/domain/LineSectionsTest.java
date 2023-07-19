@@ -31,16 +31,4 @@ class LineSectionsTest {
         Assertions.assertThatCode(() -> new LineSections(lineA, section))
             .doesNotThrowAnyException();
     }
-
-    @Test
-    @DisplayName("현재 구간은 해당 노선에 속하지 않습니다")
-    void sectionDoesNotBelongToLine() {
-        Line otherLine = new Line(2L,"lineB", "red");
-        Section section = new Section(lineA, stationA, stationB, 3);
-
-        Assertions.assertThatThrownBy(() -> new LineSections(otherLine, section))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-
 }

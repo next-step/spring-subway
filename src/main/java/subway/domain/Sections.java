@@ -94,6 +94,12 @@ public class Sections {
         }
     }
 
+    void validateSectionsBelongToLine(Line line) {
+        if (!this.getLast().belongTo(line)) {
+            throw new IllegalArgumentException("현재 구간은 해당 노선에 속하지 않습니다. current line: " + line + ", section: " + this.getLast());
+        }
+    }
+
     Section getLast() {
         return this.values.get(this.values.size() - 1);
     }

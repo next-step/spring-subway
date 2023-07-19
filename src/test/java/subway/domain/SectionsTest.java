@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -121,4 +122,16 @@ class SectionsTest {
         assertThat(sections).isEqualTo(expectedSections);
         assertThat(removedSection).isEqualTo(sectionB);
     }
+
+    @Test
+    @DisplayName("현재 구간들은 해당 노선에 속하지 않습니다")
+    void sectionDoesNotBelongToLine() {
+        Line otherLine = new Line(2L,"lineB", "red");
+        Section section = new Section(lineA, stationA, stationB, 3);
+        Sections sections = new Sections(List.of(section));
+
+        Assertions.assertThatThrownBy(() -> sections.validateSectionsBelongToLine(otherLine))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
 }
