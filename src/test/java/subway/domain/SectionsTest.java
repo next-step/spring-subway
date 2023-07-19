@@ -27,23 +27,23 @@ class SectionsTest {
         assertThat(sections.isTerminal(station)).isTrue();
     }
 
-    @Test
-    @DisplayName("해당 역이 노선의 상행 종점역인 경우 true")
-    void upStationTerminalTest() {
-        // given
-        Station station = new Station(1L, "서울대입구역");
-        Sections sections = new Sections(List.of(
-                new Section(
-                        1L,
-                        new Station(1L, "서울대입구역"),
-                        new Station(2L, "신대방역"),
-                        10
-                )
-        ));
-
-        // when & then
-        assertThat(sections.isTerminal(station)).isTrue();
-    }
+//    @Test
+//    @DisplayName("해당 역이 노선의 상행 종점역인 경우 true")
+//    void upStationTerminalTest() {
+//        // given
+//        Station station = new Station(1L, "서울대입구역");
+//        Sections sections = new Sections(List.of(
+//                new Section(
+//                        1L,
+//                        new Station(1L, "서울대입구역"),
+//                        new Station(2L, "신대방역"),
+//                        10
+//                )
+//        ));
+//
+//        // when & then
+//        assertThat(sections.isTerminal(station)).isTrue();
+//    }
 
     @Test
     @DisplayName("해당 역이 노선의 상행 종점역인 경우 true")
@@ -247,17 +247,115 @@ class SectionsTest {
                 new Station("신대방역"),
                 10
         );
-        Section newSection = new Section(
-                new Station("신대방역"),
-                new Station("잠실역"),
-                4
-        );
         Sections sections = new Sections(List.of(section));
+        Section newSection = new Section
+                (
+                        new Station("신대방역"),
+                        new Station("잠실역"),
+                        4
+                );
 
         // when
         Sections newSections = sections.addSection(newSection);
 
         // then
         assertThat(newSections.getSections()).containsAll(List.of(section, newSection));
+    }
+
+    @Test
+    @DisplayName("새로운 역의 하행역이 기존 노선의 상행종점역인 경우 추가.")
+    void newDownStationMatchesUpTerminal() {
+        // given
+        Section section = new Section(
+                new Station("서울대입구역"),
+                new Station("신대방역"),
+                10
+        );
+        Sections sections = new Sections(List.of(section));
+        Section newSection = new Section(
+                new Station("잠실역"),
+                new Station("서울대입구역"),
+                4
+        );
+
+        // when
+        Sections newSections = sections.addSection(newSection);
+
+        // then
+        assertThat(newSections.getSections()).containsAll(List.of(section, newSection));
+    }
+
+    @Test
+    @DisplayName("새로운 역의 하행역이 기존 노선에 포함되고 상행종점이 아닌 경우")
+    void newDownStationNotUpTerminal() {
+        // given
+        Section section = new Section(
+                new Station("서울대입구역"),
+                new Station("신대방역"),
+                10
+        );
+        Sections sections = new Sections(List.of(section));
+        Section newSection = new Section(
+                new Station("잠실역"),
+                new Station("신대방역"),
+                4
+        );
+
+        // when
+        Sections newSections = sections.addSection(newSection);
+
+        // then
+        assertThat(newSections.getSections()).containsAll(List.of(
+                new Section(new Station("서울대입구역"), new Station("잠실역"), 6),
+                new Section(new Station("잠실역"), new Station("신대방역"), 4)
+        ));
+    }
+
+    @Test
+    @DisplayName("새로운 역의 상행역이 기존 노선에 포함되고 하행종점이 아닌 경우")
+    void newUpStationNotDownTerminal() {
+        // given
+        Section section = new Section(
+                new Station("서울대입구역"),
+                new Station("신대방역"),
+                10
+        );
+        Sections sections = new Sections(List.of(section));
+        Section newSection = new Section(
+                new Station("서울대입구역"),
+                new Station("잠실역"),
+                4
+        );
+
+        // when
+        Sections newSections = sections.addSection(newSection);
+
+        // then
+        assertThat(newSections.getSections()).containsAll(List.of(
+                new Section(new Station("서울대입구역"), new Station("잠실역"), 4),
+                new Section(new Station("잠실역"), new Station("신대방역"), 6)
+        ));
+    }
+
+    @Test
+    @DisplayName("새로운 구간의 거리가 기존 구간 거리보다 큰 경우 오류")
+    void greaterOrEqualNewSectionDistanceThrowsError() {
+        // given
+        Section section = new Section(
+                new Station("서울대입구역"),
+                new Station("신대방역"),
+                10
+        );
+        Sections sections = new Sections(List.of(section));
+        Section newSection = new Section(
+                new Station("잠실역"),
+                new Station("신대방역"),
+                10
+        );
+
+        // when, then
+        assertThatCode(() -> sections.addSection(newSection))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
     }
 }
