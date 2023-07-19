@@ -116,15 +116,15 @@ public class Section {
         downSection = null;
     }
 
-    public static final class Builder {
+    public static class Builder {
 
-        private Long id;
-        private Line line;
-        private Station upStation;
-        private Station downStation;
-        private Section upSection;
-        private Section downSection;
-        private Integer distance;
+        protected Long id;
+        protected Line line;
+        protected Station upStation;
+        protected Station downStation;
+        protected Section upSection;
+        protected Section downSection;
+        protected Integer distance;
 
         private Builder() {
 
@@ -168,6 +168,5 @@ public class Section {
         public Section build() {
             return new Section(this);
         }
-
     }
 }

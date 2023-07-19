@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import subway.TestHelper;
 
 @DisplayName("Section 클래스")
 class SectionTest {
@@ -85,19 +86,9 @@ class SectionTest {
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
             Station downStation = new Station(2L, "downStation");
-            Integer distance = 10;
 
-            Section section = Section.builder()
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(distance)
-                    .build();
-
-            Section downSection = Section.builder()
-                    .upStation(middleStation)
-                    .downStation(downStation)
-                    .distance(distance)
-                    .build();
+            Section section = TestHelper.Section.buildWithStations(upStation, middleStation);
+            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
 
             // when
             section.connectDownSection(downSection);
@@ -116,20 +107,11 @@ class SectionTest {
             // given
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(2L, "middleStation");
-            Station differentMiddleStation = new Station(3L, "differntMiddleStation");
+            Station differentMiddleStation = new Station(3L, "differentMiddleStation");
             Station downStation = new Station(4L, "downStation");
-            Integer distance = 10;
 
-            Section section = Section.builder()
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(distance)
-                    .build();
-            Section downSection = Section.builder()
-                    .upStation(differentMiddleStation)
-                    .downStation(downStation)
-                    .distance(distance)
-                    .build();
+            Section section = TestHelper.Section.buildWithStations(upStation, middleStation);
+            Section downSection = TestHelper.Section.buildWithStations(differentMiddleStation, downStation);
 
             // when
             Exception exception = catchException(() -> section.connectDownSection(downSection));
@@ -144,13 +126,8 @@ class SectionTest {
             // given
             Station upStation = new Station(2L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
-            Integer distance = 10;
 
-            Section section = Section.builder()
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(distance)
-                    .build();
+            Section section = TestHelper.Section.buildWithStations(upStation, middleStation);
 
             Section downSection = null;
 
@@ -173,19 +150,9 @@ class SectionTest {
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
             Station downStation = new Station(2L, "downStation");
-            Integer distance = 10;
 
-            Section section = Section.builder()
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(distance)
-                    .build();
-
-            Section downSection = Section.builder()
-                    .upStation(middleStation)
-                    .downStation(downStation)
-                    .distance(distance)
-                    .build();
+            Section section = TestHelper.Section.buildWithStations(upStation, middleStation);
+            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
 
             section.connectDownSection(downSection);
 
@@ -208,19 +175,9 @@ class SectionTest {
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
             Station downStation = new Station(2L, "downStation");
-            Integer distance = 10;
 
-            Section upSection = Section.builder()
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(distance)
-                    .build();
-
-            Section downSection = Section.builder()
-                    .upStation(middleStation)
-                    .downStation(downStation)
-                    .distance(distance)
-                    .build();
+            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
+            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
 
             upSection.connectDownSection(downSection);
 
@@ -238,13 +195,8 @@ class SectionTest {
             // given
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
-            Integer distance = 10;
 
-            Section section = Section.builder()
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(distance)
-                    .build();
+            Section section = TestHelper.Section.buildWithStations(upStation, middleStation);
 
             // when
             Exception exception = catchException(section::disconnectDownSection);
@@ -252,7 +204,5 @@ class SectionTest {
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
-
     }
-
 }
