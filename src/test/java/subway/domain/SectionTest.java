@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 class SectionTest {
 
     @Nested
-    @DisplayName("New 생성자는")
-    class New_Constructor {
+    @DisplayName("Builder 메소드는")
+    class Builder_Constructor {
 
         @Test
         @DisplayName("두개의 존재하는 Station이 들어오면, Station이 연결된 Section이 생성된다.")
@@ -45,6 +45,25 @@ class SectionTest {
                             .upStation(upStation)
                             .downStation(nullStation)
                             .build());
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("distance로 0 이하의 값이 들어오면, IllegalArgumentException을 던진다.")
+        void Throw_IllegalArgumentException_When_Input_Under_Zero() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station downStation = new Station(2L, "downStation");
+            Integer zeroDistance = 0;
+
+            // when
+            Exception exception = catchException(() -> Section.builder()
+                    .upStation(upStation)
+                    .downStation(downStation)
+                    .distance(zeroDistance)
+                    .build());
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
