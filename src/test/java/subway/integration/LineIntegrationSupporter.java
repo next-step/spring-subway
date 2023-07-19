@@ -59,4 +59,11 @@ class LineIntegrationSupporter {
                 .then().log().all()
                 .extract();
     }
+
+    static ExtractableResponse<Response> deleteSectionByLineIdAndStationId(String lineId, String stationId) {
+        return given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
+                .then().log().all()
+                .extract();
+    }
 }

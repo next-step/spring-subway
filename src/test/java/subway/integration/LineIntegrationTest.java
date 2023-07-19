@@ -3,6 +3,7 @@ package subway.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.integration.LineIntegrationSupporter.createLineByLineRequest;
 import static subway.integration.LineIntegrationSupporter.deleteLineByLineId;
+import static subway.integration.LineIntegrationSupporter.deleteSectionByLineIdAndStationId;
 import static subway.integration.LineIntegrationSupporter.findAllLines;
 import static subway.integration.LineIntegrationSupporter.getLineByLineId;
 import static subway.integration.LineIntegrationSupporter.registerSectionToLine;
@@ -44,11 +45,9 @@ class LineIntegrationTest extends IntegrationTest {
         stationRequest3 = createStation(new StationRequest("부천")).body().as(StationResponse.class).getId();
         stationRequest4 = createStation(new StationRequest("잠실")).body().as(StationResponse.class).getId();
 
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600", String.valueOf(stationRequest1),
-                String.valueOf(stationRequest2), 10);
+        lineRequest1 = new LineRequest("신분당선", "bg-red-600", stationRequest1, stationRequest2, 10);
 
-        lineRequest2 = new LineRequest("2호선", "bg-green-600", String.valueOf(stationRequest3),
-                String.valueOf(stationRequest4), 5);
+        lineRequest2 = new LineRequest("2호선", "bg-green-600", stationRequest3, stationRequest4, 5);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -148,13 +147,29 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
-        SectionRequest sectionRequest = new SectionRequest(String.valueOf(stationRequest2),
-                String.valueOf(stationRequest3), 5);
+        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest3, 5);
 
         // when
         ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    @DisplayName("Line의 하행 Section을 제거한다")
+    void deleteDownSectionOfLine() {
+        // given
+        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+
+        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest3, 5);
+
+        registerSectionToLine(lineId, sectionRequest);
+
+        // when
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest3);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 }
