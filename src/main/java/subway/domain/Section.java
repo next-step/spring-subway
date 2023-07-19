@@ -27,10 +27,18 @@ public class Section {
         this.distance = distance;
     }
 
-    private static void validateDifferent(Station upStation, Station downStation) {
+    private void validateDifferent(Station upStation, Station downStation) {
         if (upStation.equals(downStation)) {
             throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
         }
+    }
+
+    public boolean isUpConnected(Section other) {
+        return upStation.equals(other.downStation);
+    }
+
+    public boolean isDownConnected(Section other) {
+        return downStation.equals(other.upStation);
     }
 
     public Long getId() {
