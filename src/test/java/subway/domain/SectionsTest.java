@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SectionsTest {
 
-    @DisplayName("새로운 구간을 등록하는 테스트")
+    @DisplayName("새로운 구간으로 하행 종점역을 연장하는 테스트")
     @Test
-    void insertNewSection() {
+    void insertDownSection() {
         List<Section> originSections = new ArrayList<>();
         Station upStation = new Station(4L, "잠실역");
         Station downStation = new Station(2L, "잠실나루역");
@@ -23,7 +23,77 @@ class SectionsTest {
         originSections.add(new Section(upStation, downStation,  10));
         Sections sections = new Sections(originSections);
 
-        assertDoesNotThrow(() -> sections.insert(new Section(downStation, newDownStation,  10)));
+        sections.insert(new Section(downStation, newDownStation,  10));
+
+        Sections expectedSections = new Sections(List.of(
+                new Section(upStation, downStation, 10),
+                new Section(downStation, newDownStation, 10)
+        ));
+
+        assertEquals(expectedSections, sections);
+    }
+
+    @DisplayName("새로운 구간으로 상행 종점역을 연장하는 테스트")
+    @Test
+    void insertUpSection() {
+        Station newUpStation = new Station(4L, "잠실역");
+        Station upStation = new Station(2L, "잠실나루역");
+        Station downStation = new Station(1L, "강변역");
+
+        List<Section> originSections = new ArrayList<>();
+        originSections.add(new Section(upStation, downStation,  10));
+        Sections sections = new Sections(originSections);
+
+        sections.insert(new Section(newUpStation, upStation,  10));
+
+        Sections expectedSections = new Sections(List.of(
+                new Section(newUpStation, upStation, 10),
+                new Section(upStation, downStation, 10)
+        ));
+
+        assertEquals(expectedSections, sections);
+    }
+
+    @DisplayName("새로운 구간을 기준역 상행에 추가하는 테스트")
+    @Test
+    void insertUpSectionInMiddle() {
+        Station upStation = new Station(2L, "잠실나루역");
+        Station midStation = new Station(4L, "잠실역");
+        Station downStation = new Station(1L, "강변역");
+
+        List<Section> originSections = new ArrayList<>();
+        originSections.add(new Section(upStation, downStation,  10));
+        Sections sections = new Sections(originSections);
+
+        sections.insert(new Section(midStation, downStation,  7));
+
+        Sections expectedSections = new Sections(List.of(
+                new Section(upStation, midStation, 3),
+                new Section(midStation, downStation, 7)
+        ));
+
+        assertEquals(expectedSections, sections);
+    }
+
+    @DisplayName("새로운 구간을 기준역 하행에 추가하는 테스트")
+    @Test
+    void insertDownSectionInMiddle() {
+        Station upStation = new Station(2L, "잠실나루역");
+        Station midStation = new Station(4L, "잠실역");
+        Station downStation = new Station(1L, "강변역");
+
+        List<Section> originSections = new ArrayList<>();
+        originSections.add(new Section(upStation, downStation,  10));
+        Sections sections = new Sections(originSections);
+
+        sections.insert(new Section(upStation, midStation,  3));
+
+        Sections expectedSections = new Sections(List.of(
+                new Section(upStation, midStation, 3),
+                new Section(midStation, downStation, 7)
+        ));
+
+        assertEquals(expectedSections, sections);
     }
 
     @DisplayName("새로운 구간의 상행역이 하행 종점역과 다를 경우 예외로 처리")

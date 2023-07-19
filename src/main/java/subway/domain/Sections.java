@@ -10,16 +10,63 @@ public class Sections {
     private static final String EMPTY_EXCEPTION_MESSAGE = "최소 1개 이상의 구간이 있어야 합니다.";
 
     private final List<Section> sections;
+    private final Set<Station> upStations;
+    private final Set<Station> downStations;
 
     public Sections(final List<Section> sections) {
+        this.upStations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toSet());
+        this.downStations = sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet());
         this.sections = sorted(sections);
     }
 
     public void insert(final Section newSection) {
-        validateSameStation(newSection);
-        validateDuplicated(newSection);
-
-        sections.add(newSection);
+        boolean existUpStation = existUpStation(newSection);
+        if (!existUpStation && newSection.getDownStation().equals(this.sections.get(0).getUpStation())) {
+            sections.add(0, newSection);
+            return;
+        }
+        if (!existUpStation) {
+            Station downStation = newSection.getDownStation();
+            for (int i = 0; i < sections.size(); i++) {
+                if (sections.get(i).getDownStation().equals(downStation)) {
+                    if (newSection.getDistance() >= sections.get(i).getDistance()) {
+                        throw new IllegalArgumentException("삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.");
+                    }
+                    Station upStation = sections.get(i).getUpStation();
+                    int distance = sections.get(i).getDistance();
+                    sections.remove(i);
+                    Section preceedSection = new Section(upStation, newSection.getUpStation(), distance - newSection.getDistance());
+                    sections.add(i, preceedSection);
+                    sections.add(i+1, newSection);
+                    return;
+                }
+            }
+        }
+        if (existUpStation && newSection.getUpStation().equals(this.sections.get(this.sections.size() - 1).getDownStation())) {
+            sections.add(newSection);
+            return;
+        }
+        if (existUpStation) {
+            Station upStation = newSection.getUpStation();
+            for (int i = 0; i < sections.size(); i++) {
+                if (sections.get(i).getUpStation().equals(upStation)) {
+                    if (newSection.getDistance() >= sections.get(i).getDistance()) {
+                        throw new IllegalArgumentException("삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.");
+                    }
+                    Station downStation = sections.get(i).getDownStation();
+                    int distance = sections.get(i).getDistance();
+                    sections.remove(i);
+                    Section followSection = new Section(newSection.getDownStation(), downStation, distance - newSection.getDistance());
+                    sections.add(i, newSection);
+                    sections.add(i + 1, followSection);
+                    return;
+                }
+            }
+        }
     }
 
     public void delete(Station lastStation) {
@@ -39,7 +86,7 @@ public class Sections {
             return sections;
         }
 
-        Station first = findFirstStation(sections);
+        Station first = findFirstStation();
 
         Map<Station, Section> stationToSection = new HashMap<>();
         for (Section section : sections) {
@@ -66,22 +113,15 @@ public class Sections {
                 .orElseThrow(() -> new IllegalStateException("출발역에 해당되는 구간을 찾을 수 없습니다."));
     }
 
-    private Station findFirstStation(final List<Section> sections) {
-        Set<Station> upStations = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
+    private Station findFirstStation() {
+        Set<Station> endUpStations = new HashSet<>(this.upStations);
+        endUpStations.removeAll(downStations);
 
-        Set<Station> downStations = sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet());
-
-        upStations.removeAll(downStations);
-
-        if (upStations.size() > 1) {
+        if (endUpStations.size() > 1) {
             throw new IllegalStateException("상행 종점역이 두 개 이상입니다.");
         }
 
-        return upStations.stream()
+        return endUpStations.stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("상행 종점역을 찾을 수 없습니다."));
     }
@@ -92,35 +132,20 @@ public class Sections {
         }
     }
 
-    private void validateDuplicated(final Section newSection) {
-        Station newDownStation = newSection.getDownStation();
+    private boolean existUpStation(final Section newSection) {
+        Set<Station> allStations = new HashSet<>(upStations);
+        allStations.addAll(downStations);
 
-        // TODO : Set으로 시간복잡도 줄이는 것 논의하기
-        boolean isIncluded = sections.stream()
-                .anyMatch(section -> section.getUpStation().equals(newDownStation));
+        boolean hasUpStation = allStations.contains(newSection.getUpStation());
+        boolean hasDownStation = allStations.contains(newSection.getDownStation());
 
-        if (isIncluded) {
-            throw new IllegalArgumentException(DUPLICATED_EXCEPTION_MESSAGE);
-        }
+        validateExistOnlyOne(hasUpStation, hasDownStation);
+
+        return hasUpStation;
     }
 
-    private void validateAlreadyExist(final List<Section> sections) {
-        Set<Station> upStations = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
-
-        Set<Station> downStations = sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet());
-        
-
-        if (sections.size() != upStations.size() || sections.size() != downStations.size()) {
-            throw new IllegalArgumentException("dddfdfddfdd");
-        }
-    }
-
-    private void validateSameStation(final Section newSection) {
-        if (!this.sections.isEmpty() && !newSection.getUpStation().equals(sections.get(sections.size() - 1).getDownStation())) {
+    private void validateExistOnlyOne(boolean hasUpStation, boolean hasDownStation) {
+        if (hasUpStation == hasDownStation) {
             throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
         }
     }
