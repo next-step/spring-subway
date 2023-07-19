@@ -87,6 +87,7 @@ public class SectionDao {
                 .build();
     }
 
-    public void deleteByDownStationId(Long stationId) {
+    public void deleteByLineIdAndDownStationId(Long lineId, Long stationId) {
+
     }
 }

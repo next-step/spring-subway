@@ -81,7 +81,7 @@ public class LineService {
 
         lineManager.disconnectDownSection(station);
 
-        sectionDao.deleteByDownStationId(stationId);
+        sectionDao.deleteByLineIdAndDownStationId(lineId, stationId);
     }
 
     private Line getLineById(Long id) {

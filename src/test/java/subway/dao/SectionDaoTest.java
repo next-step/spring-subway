@@ -74,7 +74,7 @@ class SectionDaoTest {
 
             upSection = sectionDao.insert(upSection);
             downSection = sectionDao.insert(downSection);
-            
+
             upSection.connectDownSection(downSection);
 
             // when
@@ -82,6 +82,37 @@ class SectionDaoTest {
 
             // then
             assertThat(result).containsAll(List.of(upSection, downSection));
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteByLineIdAndDownStationId 메소드는")
+    class DeleteByLineIdAndDownStationId_Method {
+
+        @Test
+        @DisplayName("lineId와 stationId에 일치하는 Section을 삭제한다")
+        void Delete_Section_Equals_LineId_And_StationId() {
+            // given
+            Line line = lineDao.insert(new Line("line", "red"));
+
+            Station upStation = stationDao.insert(new Station("upStationName"));
+            Station middleStation = stationDao.insert(new Station("middleStationName"));
+            Station downStation = stationDao.insert(new Station("downStationName"));
+
+            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
+
+            upSection = sectionDao.insert(upSection);
+            downSection = sectionDao.insert(downSection);
+
+            upSection.connectDownSection(downSection);
+
+            // when
+            sectionDao.deleteByLineIdAndDownStationId(line.getId(), middleStation.getId());
+            List<Section> sections = sectionDao.findAllByLineId(line.getId());
+
+            // then
+            assertThat(sections).hasSize(1).doesNotContain(downSection);
         }
 
     }
