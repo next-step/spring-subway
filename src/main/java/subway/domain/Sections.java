@@ -1,7 +1,7 @@
 package subway.domain;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Sections {
 
@@ -12,8 +12,7 @@ public class Sections {
     private final List<Section> sections;
 
     public Sections(final List<Section> sections) {
-        validateEmpty(sections);
-        this.sections = sections;
+        this.sections = sorted(sections);
     }
 
     public void insert(final Section newSection) {
@@ -21,6 +20,58 @@ public class Sections {
         validateDuplicated(newSection);
 
         sections.add(newSection);
+    }
+
+    private List<Section> sorted(final List<Section> sections) {
+        if (sections.isEmpty()) {
+            return sections;
+        }
+
+        Station first = findFirstStation(sections);
+
+        Map<Station, Section> stationToSection = new HashMap<>();
+        for (Section section : sections) {
+            stationToSection.put(section.getUpStation(), section);
+        }
+
+        List<Section> sortedSection = new ArrayList<>();
+
+        Section nextSection = findByUpStation(sections, first);
+        sortedSection.add(nextSection);
+        for (int i = 1; i < sections.size(); i++) {
+            Station lastDownStation = nextSection.getDownStation();
+            nextSection = stationToSection.get(lastDownStation);
+            sortedSection.add(nextSection);
+        }
+
+        return sortedSection;
+    }
+
+    private Section findByUpStation(List<Section> sections, Station upStation) {
+        return sections.stream()
+                .filter(section -> section.getUpStation().equals(upStation))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("출발역에 해당되는 구간을 찾을 수 없습니다."));
+    }
+
+    private Station findFirstStation(final List<Section> sections) {
+        Set<Station> upStations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toSet());
+
+        Set<Station> downStations = sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet());
+
+        upStations.removeAll(downStations);
+
+        if (upStations.size() > 1) {
+            throw new IllegalStateException("상행 종점역이 두 개 이상입니다.");
+        }
+
+        return upStations.stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("상행 종점역을 찾을 수 없습니다."));
     }
 
     private static void validateEmpty(final List<Section> sections) {
@@ -41,8 +92,23 @@ public class Sections {
         }
     }
 
+    private void validateAlreadyExist(final List<Section> sections) {
+        Set<Station> upStations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toSet());
+
+        Set<Station> downStations = sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet());
+        
+
+        if (sections.size() != upStations.size() || sections.size() != downStations.size()) {
+            throw new IllegalArgumentException("dddfdfddfdd");
+        }
+    }
+
     private void validateSameStation(final Section newSection) {
-        if (!newSection.getUpStation().equals(sections.get(sections.size() - 1).getDownStation())) {
+        if (!sections.isEmpty() && !newSection.getUpStation().equals(sections.get(sections.size() - 1).getDownStation())) {
             throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
         }
     }

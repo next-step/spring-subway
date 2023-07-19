@@ -4,8 +4,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Sections;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -35,15 +35,20 @@ public class SectionDao {
                 );
     }
 
-    public Section insert(Section section, Line line) {
+    public Section insert(Section section, Long lineId) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
         params.put("up_station_id", section.getUpStation().getId());
         params.put("down_station_id", section.getDownStation().getId());
-        params.put("line_id", line.getId());
+        params.put("line_id", lineId);
         params.put("distance", section.getDistance());
 
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
         return new Section(sectionId, section.getUpStation(), section.getDownStation(), section.getDistance());
+    }
+
+    public Sections findAllByLineId(Long lineId) {
+        String sql = "select * from SECTION where line_id = ?";
+        return new Sections(jdbcTemplate.query(sql, rowMapper, lineId));
     }
 }
