@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
+import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
@@ -44,7 +45,7 @@ public class SectionDao {
         this.stationDao = stationDao;
     }
 
-    public Sections findAllByLineId(Long id){
+    public LineSections findAllByLineId(Long id){
         String sql = "select s.id, line_id, up_station_id, down_station_id, distance, "
             + "name, color "
             + "from SECTION s join LINE l on s.line_id = l.id "
@@ -53,7 +54,8 @@ public class SectionDao {
         List<Section> values = jdbcTemplate.query(sql, rowToSectionRowMapper, id).stream()
             .map(this::toSection)
             .collect(Collectors.toUnmodifiableList());
-        return new Sections(values);
+
+        return new LineSections(values.get(0).getLine(), new Sections(values));
     }
 
     private Section toSection(SectionRow sectionRow) {

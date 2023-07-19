@@ -2,7 +2,12 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
+import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.LineSections;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
@@ -11,22 +16,34 @@ import java.util.stream.Collectors;
 
 @Service
 public class LineService {
-    private final LineDao lineDao;
 
-    public LineService(LineDao lineDao) {
+    private final LineDao lineDao;
+    private final SectionDao sectionDao;
+    private final StationDao stationDao;
+
+    public LineService(LineDao lineDao, SectionDao sectionDao, StationDao stationDao) {
         this.lineDao = lineDao;
+        this.sectionDao = sectionDao;
+        this.stationDao = stationDao;
     }
 
     public LineResponse saveLine(LineRequest request) {
+
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        Station upStation = getStationOrElseThrow(request.getUpStationId());
+        Station downStation = getStationOrElseThrow(request.getDownStationId());
+        Section persistSection = sectionDao.save(new Section(persistLine, upStation, downStation, request.getDistance()));
+
+        new LineSections(persistLine, persistSection);
+
         return LineResponse.of(persistLine);
     }
 
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(LineResponse::of)
-                .collect(Collectors.toList());
+            .map(LineResponse::of)
+            .collect(Collectors.toList());
     }
 
     public List<Line> findLines() {
@@ -34,11 +51,17 @@ public class LineService {
     }
 
     public LineResponse findLineResponseById(Long id) {
-        Line persistLine = findLineById(id);
+        Line persistLine = getLineOrElseThrow(id);
         return LineResponse.of(persistLine);
     }
 
-    public Line findLineById(Long id) {
+    private Station getStationOrElseThrow(Long id) {
+        return stationDao.findById(id)
+            .orElseThrow(
+                () -> new RuntimeException("존재하지 않는 station id입니다. id: \"" + id + "\""));
+    }
+
+    private Line getLineOrElseThrow(Long id) {
         return lineDao.findById(id)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }

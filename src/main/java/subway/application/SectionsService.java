@@ -5,8 +5,8 @@ import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.LineSections;
 import subway.domain.Section;
-import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
 import subway.dto.SectionResponse;
@@ -25,12 +25,12 @@ public class SectionsService {
     }
 
     public SectionResponse addSection(Long id, SectionAdditionRequest request) {
-        Sections sections = sectionDao.findAllByLineId(id);
+        LineSections lineSections = sectionDao.findAllByLineId(id);
         Section section = createNewSectionBy(id, request);
 
-        sections.addLast(section);
+        Section addedSection = lineSections.addLast(section);
 
-        return SectionResponse.of(sectionDao.save(section));
+        return SectionResponse.of(sectionDao.save(addedSection));
     }
 
     private Section createNewSectionBy(Long id, SectionAdditionRequest request) {
@@ -41,10 +41,10 @@ public class SectionsService {
     }
 
     public void removeLast(Long lineId, Long stationId) {
-        Sections sections = sectionDao.findAllByLineId(lineId);
+        LineSections lineSections = sectionDao.findAllByLineId(lineId);
         Station station = getStationOrElseThrow(stationId);
 
-        Section removedSection = sections.removeLast(station);
+        Section removedSection = lineSections.removeLast(station);
 
         sectionDao.deleteById(removedSection.getId());
     }
@@ -57,6 +57,6 @@ public class SectionsService {
 
     private Line getLineOrElseThrow(Long id) {
         return lineDao.findById(id)
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 station id입니다. id: \"" + id + "\""));
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 }

@@ -53,10 +53,11 @@ public class Sections {
             .collect(Collectors.toSet());
     }
 
-    public void addLast(Section section) {
+    public Section addLast(Section section) {
         validateAddable(section);
         validateNotContainDownStationOf(section);
         this.values.add(section);
+        return section;
     }
 
     private void validateNotContainDownStationOf(Section section) {
