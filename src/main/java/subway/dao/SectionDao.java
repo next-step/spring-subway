@@ -59,4 +59,10 @@ public class SectionDao {
         String sql = "delete from SECTION where line_id = ? and down_station_id = ?";
         jdbcTemplate.update(sql, lineId, stationId);
     }
+
+    public long count(final long lineId) {
+        String sql = "select id from section where line_id = ?";
+        return jdbcTemplate.query(sql, rowMapper, lineId)
+                .size();
+    }
 }

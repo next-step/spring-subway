@@ -126,4 +126,21 @@ class SectionServiceTest {
                 .hasMessage("해당 역은 노선의 하행 종점역이 아닙니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
+
+    @DisplayName("지하철 노선에 구간이 1개일 때 구간 제거 실패")
+    @Test
+    void deleteSectionAtLineHasOneSection() {
+        // given
+        final long lineId = 1L;
+        final long stationId = 2L;
+
+        given(sectionDao.findLastSection(lineId))
+                .willReturn(Optional.of(new Section(lineId, 1L, 2L, 10)));
+        given(sectionDao.count(lineId)).willReturn(1L);
+
+        // when & then
+        assertThatThrownBy(() -> sectionService.deleteSection(lineId, stationId))
+                .hasMessage("")
+                .isInstanceOf(IllegalSectionException.class);
+    }
 }
