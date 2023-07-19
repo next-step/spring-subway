@@ -127,6 +127,42 @@ class LineManagerTest {
             assertThat(upSection.getDownSection()).isNull();
             assertThat(downSection.getUpSection()).isNull();
         }
+
+        @Test
+        @DisplayName("입력된 Station이 line의 하행 Station과 일치 하지 않으면, IllegalArgumentException을 던진다")
+        void Throw_IllegalArgumentException_When_Not_Equal_Station() {
+            // given
+            Line line = new Line(1L, "line", "red");
+
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section upSection = Section.builder()
+                    .id(1L)
+                    .line(line)
+                    .upStation(upStation)
+                    .downStation(middleStation)
+                    .distance(1)
+                    .build();
+
+            Section downSection = Section.builder()
+                    .id(1L)
+                    .line(line)
+                    .upStation(middleStation)
+                    .downStation(downStation)
+                    .distance(1)
+                    .build();
+
+            LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
+            lineManager.connectDownSection(downSection);
+
+            // when
+            Exception exception = catchException(() -> lineManager.disconnectDownSection(upStation));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
 }
