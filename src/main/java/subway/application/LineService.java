@@ -1,6 +1,7 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -27,6 +28,7 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
 
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
@@ -39,6 +41,7 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
@@ -46,10 +49,12 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<Line> findLines() {
         return lineDao.findAll();
     }
 
+    @Transactional
     public LineResponse findLineResponseById(Long id) {
         Line persistLine = getLineOrElseThrow(id);
         return LineResponse.of(persistLine);
@@ -66,10 +71,12 @@ public class LineService {
             .orElseThrow(() -> new RuntimeException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 
+    @Transactional
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    @Transactional
     public void deleteLineById(Long id) {
         lineDao.deleteById(id);
     }
