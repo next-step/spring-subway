@@ -115,7 +115,7 @@ class SectionIntegrationTest extends IntegrationTest {
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
+                .body(stationRequest3)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();

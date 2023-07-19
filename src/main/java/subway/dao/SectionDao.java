@@ -61,7 +61,7 @@ public class SectionDao {
     }
 
     public long count(final long lineId) {
-        String sql = "select id from section where line_id = ?";
+        String sql = "select * from section where line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId)
                 .size();
     }
