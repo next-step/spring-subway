@@ -140,7 +140,7 @@ class SectionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> sectionService.deleteSection(lineId, stationId))
-                .hasMessage("")
+                .hasMessage("해당 노선은 구간이 한개입니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
 }
