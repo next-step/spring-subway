@@ -17,15 +17,15 @@ public class SectionService {
     }
 
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
-        validate(lineId, sectionRequest);
+        validateLineAndLastStation(lineId, sectionRequest.getUpStationId());
+        validateDuplicateStationInLine(lineId, sectionRequest.getDownStationId());
 
         final Section section = sectionDao.insert(sectionRequest.to(lineId));
         return SectionResponse.of(section);
     }
 
-    private void validate(final long lineId, final SectionRequest sectionRequest) {
-        validateLineAndLastStation(lineId, sectionRequest.getUpStationId());
-        validateDuplicateStationInLine(lineId, sectionRequest.getDownStationId());
+    public void deleteSection(final long stationId) {
+        throw new UnsupportedOperationException();
     }
 
     private void validateLineAndLastStation(final long lineId, final long upStationId) {

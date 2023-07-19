@@ -28,11 +28,6 @@ class SectionServiceTest {
 
     @Mock private SectionDao sectionDao;
 
-    @BeforeEach
-    public void setUpLine() {
-
-    }
-
     @DisplayName("구간 생성 성공")
     @Test
     void createSection() {
@@ -101,5 +96,15 @@ class SectionServiceTest {
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
                 .describedAs("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.")
                 .isInstanceOf(IllegalSectionException.class);
+    }
+
+    @DisplayName("구간 삭제 성공")
+    @Test
+    void deleteSection() {
+        // given
+        final long stationId = 3;
+
+        // when & then
+        assertThatNoException().isThrownBy(() -> sectionService.deleteSection(stationId));
     }
 }
