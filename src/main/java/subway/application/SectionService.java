@@ -53,11 +53,12 @@ public class SectionService {
     }
 
     private void validateRequest(final Sections sections, final SectionRequest sectionRequest) {
+        if (sections.containsStation(sectionRequest.getUpStationId())
+                && sections.containsStation(sectionRequest.getDownStationId())) {
+            throw new SubwayException("상행 역과 하행 역이 이미 노선에 모두 등록되어 있습니다.");
+        }
         if (!sections.containsStation(sectionRequest.getUpStationId())) {
             throw new SubwayException("새로운 구간의 상행역이 해당 노선에 등록되어 있지 않습니다.");
-        }
-        if (sections.containsStation(sectionRequest.getDownStationId())) {
-            throw new SubwayException("새로운 구간의 하행역이 해당 노선에 등록되어 있습니다.");
         }
     }
 }
