@@ -3,11 +3,15 @@ package subway.integration;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.domain.Line;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
@@ -18,21 +22,29 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-public class LineIntegrationTest extends IntegrationTest {
-    private LineRequest lineRequest1;
-    private LineRequest lineRequest2;
+class LineIntegrationTest extends IntegrationTest {
+    LineRequest lineRequest1;
+    LineRequest lineRequest2;
+
+    Line lineA;
+    Station stationA;
+    Station stationB;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
-
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600");
-        lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
+        lineA = new Line(1L, "A", "red");
+        stationA = new Station(1L, "A");
+        stationB = new Station(2L, "B");
     }
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
+        //given
+        createInitialStations();
+        lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -51,13 +63,9 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLineWithDuplicateName() {
         // given
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        createInitialStations();
+        lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        createLine(lineRequest1);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -76,21 +84,11 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
-
-        ExtractableResponse<Response> createResponse2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest2)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        createInitialStations();
+        lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        lineRequest2 = new LineRequest("경강선", 1L, 2L, 3, "bg-red-600");
+        ExtractableResponse<Response> createResponse1 = createLine(lineRequest1);
+        ExtractableResponse<Response> createResponse2 = createLine(lineRequest2);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -115,13 +113,9 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        createInitialStations();
+        lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -142,13 +136,10 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        createInitialStations();
+        lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        lineRequest2 = new LineRequest("경강선", 1L, 2L, 3, "bg-red-600");
+        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -168,13 +159,9 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        createInitialStations();
+        lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -186,5 +173,23 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(lineRequest)
+            .when().post("/lines")
+            .then().log().all().
+            extract();
+    }
+
+    private static void createInitialStations() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "A");
+        StationIntegrationTest.createStation(params);
+        params.put("name", "B");
+        StationIntegrationTest.createStation(params);
     }
 }
