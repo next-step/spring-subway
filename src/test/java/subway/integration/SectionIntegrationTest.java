@@ -38,29 +38,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSection() {
         // given
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest1)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest2)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        createInitialLine();
 
         RestAssured
                 .given().log().all()
@@ -84,33 +62,48 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
+    @DisplayName("존재하지 않는 노선으로 인한 구간 생성 실패")
+    @Test
+    void createSectionWithUnmatchedLineId() {
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("새로운 구간의 상행 역이 해당 노선의 하행 종점역이 아니어서 구간 생성 실패")
+    @Test
+    void createSectionWithNotEndStation() {
+        // given
+        createInitialLine();
+
+        SectionRequest request = new SectionRequest("1", "4", 10);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("지하철 구간을 삭제한다.")
     @Test
     void deleteSection() {
         // given
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest1)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest2)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        createInitialLine();
 
         RestAssured
                 .given().log().all()
@@ -138,5 +131,83 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 노선의 하행 종점역이 아닐 때 구간 제거 실패")
+    @Test
+    void deleteSectionWithNotLastStation() {
+        // given
+        createInitialLine();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest3)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/1/sections?stationId=1")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("지하철 노선에 구간이 1개일 때 구간 제거 실패")
+    @Test
+    void deleteSectionAtLineHasOneSection() {
+        // given
+        createInitialLine();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/1/sections?stationId=2")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private void createInitialLine() {
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
     }
 }
