@@ -28,7 +28,7 @@ public class SectionController {
     }
 
     @DeleteMapping("/lines/{lineId}/sections")
-    public ResponseEntity<Void> createSection(
+    public ResponseEntity<Void> deleteSection(
             @PathVariable Long lineId,
             @RequestParam Long stationId
     ) {
