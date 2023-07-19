@@ -15,7 +15,6 @@ import subway.domain.Line;
 public class LineDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-
     private final RowMapper<Line> rowMapper;
 
     public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource, RowMapper<Line> rowMapper) {
