@@ -219,6 +219,7 @@ class SectionsTest {
     @Test
     @DisplayName("새로운 구간의 두 역 모두 기존 노선에 포함되지 않으면 오류.")
     void noStationsContainThrowError() {
+        // given
         Section section = new Section(
                 new Station("서울대입구역"),
                 new Station("신대방역"),
@@ -231,9 +232,32 @@ class SectionsTest {
         );
         Sections sections = new Sections(List.of(section));
 
-
+        // when, then
         assertThatCode(() -> sections.addSection(section2))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("두 역 중 하나는 기존 노선에 포함되어야 합니다");
+    }
+
+    @Test
+    @DisplayName("새로운 역의 상행역이 기존 노선의 하행종점역인 경우 추가.")
+    void name() {
+        // given
+        Section section = new Section(
+                new Station("서울대입구역"),
+                new Station("신대방역"),
+                10
+        );
+        Section newSection = new Section(
+                new Station("신대방역"),
+                new Station("잠실역"),
+                4
+        );
+        Sections sections = new Sections(List.of(section));
+
+        // when
+        Sections newSections = sections.addSection(newSection);
+
+        // then
+        assertThat(newSections.getSections()).containsAll(List.of(section, newSection));
     }
 }

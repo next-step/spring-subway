@@ -24,6 +24,10 @@ public class Sections {
                 .map(Section::getUpStation)
                 .collect(Collectors.toSet());
 
+        Set<Station> downStations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toSet());
+
         Station terminal = sections.stream()
                 .map(Section::getDownStation)
                 .filter(downStation -> !upStations.contains(downStation))
@@ -76,12 +80,13 @@ public class Sections {
         return sections;
     }
 
-    public void addSection(Section section) {
+    public Sections addSection(Section section) {
         if (contains(section.getUpStation()) && contains(section.getDownStation())) {
             throw new IllegalArgumentException("두 역 모두 기존 노선에 포함될 수 없습니다.");
         }
         if (!contains(section.getUpStation()) && !contains(section.getDownStation())) {
             throw new IllegalArgumentException("두 역 중 하나는 기존 노선에 포함되어야 합니다");
         }
+        return null;
     }
 }
