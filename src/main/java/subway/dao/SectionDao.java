@@ -39,20 +39,6 @@ public class SectionDao {
         return new Section(id, section.getLineId(), section.getDownStationId(), section.getUpStationId(), section.getDistance());
     }
 
-    public Optional<Section> findByDownStationIdAndLineId(final long lineId, final long downStationId) {
-        String sql = "select * from section where line_id = ? and down_station_id = ?";
-        return jdbcTemplate.query(sql, rowMapper, lineId, downStationId)
-                .stream()
-                .findAny();
-    }
-
-    public Optional<Section> findByUpStationIdAndLineId(final long lineId, final long upStationId) {
-        String sql = "select * from section where line_id = ? and up_station_id = ?";
-        return jdbcTemplate.query(sql, rowMapper, lineId, upStationId)
-                .stream()
-                .findAny();
-    }
-
     public Optional<Section> findByLineIdAndStationId(final long lineId, final long stationId) {
         String sql = "select * from section where line_id = ? and (up_station_id = ? or down_station_id = ?)";
         return jdbcTemplate.query(sql, rowMapper, lineId, stationId, stationId)

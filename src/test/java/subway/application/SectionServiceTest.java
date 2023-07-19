@@ -1,5 +1,6 @@
 package subway.application;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.SectionDao;
+import subway.domain.Line;
 import subway.domain.Section;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
@@ -26,16 +28,22 @@ class SectionServiceTest {
 
     @Mock private SectionDao sectionDao;
 
+    @BeforeEach
+    public void setUpLine() {
+
+    }
+
     @DisplayName("구간 생성 성공")
     @Test
     void createSection() {
         // given
-        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
-        final Section section = new Section(1L, 1L, 2L, 1L, 10.0);
+        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10.0);
+        final SectionRequest sectionRequest = new SectionRequest("3", "2", 10.0);
+        final Section newSection = new Section(2L, 1L, 3L, 2L, 10.0);
 
-        given(sectionDao.insert(any(Section.class))).willReturn(section);
-        given(sectionDao.findByDownStationIdAndLineId(1L, 1L))
-                .willReturn(Optional.of(section));
+        given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
+        given(sectionDao.findByLineIdAndStationId(1L, 3L)).willReturn(Optional.empty());
+        given(sectionDao.insert(any(Section.class))).willReturn(newSection);
 
         // when
         final SectionResponse sectionResponse = sectionService.saveSection(1L, sectionRequest);
@@ -43,60 +51,54 @@ class SectionServiceTest {
         // then
         assertThat(sectionResponse.getId()).isNotNull();
         assertThat(sectionResponse.getLineId()).isNotNull();
-        assertThat(sectionResponse.getDownStationId()).isEqualTo(2);
-        assertThat(sectionResponse.getUpStationId()).isEqualTo(1);
+        assertThat(sectionResponse.getDownStationId()).isEqualTo(3);
+        assertThat(sectionResponse.getUpStationId()).isEqualTo(2);
         assertThat(sectionResponse.getDistance()).isEqualTo(10, withPrecision(1d));
     }
 
-    @DisplayName("일치하지 않는 노선으로 인한 구간 생성 실패")
+    @DisplayName("존재하지 않는 노선으로 인한 구간 생성 실패")
     @Test
     void createSectionWithUnmatchedLineId() {
         // given
-        final Long lineId = 3L;
+        final long lineId = 3L;
         final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
 
-        given(sectionDao.findByDownStationIdAndLineId(lineId, 1L))
-                .willReturn(Optional.empty());
+        given(sectionDao.findLastSection(lineId)).willReturn(Optional.empty());
 
         // when & then
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> sectionService.saveSection(lineId, sectionRequest));
+                .isThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
+                .withMessageContaining("해당 노선은 생성되지 않았습니다.");
     }
 
     @DisplayName("새로운 구간의 상행 역이 해당 노선의 하행 종점역이 아니어서 구간 생성 실패")
     @Test
     void createSectionWithNotEndStation() {
         // given
-        final Section section = new Section(1L, 1L, 2L, 1L, 10.0);
-        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
+        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10.0);
+        final SectionRequest sectionRequest = new SectionRequest("1", "3", 10.0);
 
-        given(sectionDao.findByDownStationIdAndLineId(1L, 1L))
-                .willReturn(Optional.of(section));
-        given(sectionDao.findByUpStationIdAndLineId(1L, 1L))
-                .willReturn(Optional.of(section));
+        given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
 
         // when & then
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest));
+                .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
+                .withMessageContaining("새로운 구간의 상행 역은 해당 노선에 등록되어있는 하행 종점역이어야 힙니다.");
     }
 
     @DisplayName("새로운 구간의 하행 역이 해당 노선에 등록되어있는 역이어서 구간 생성 실패")
     @Test
     void createSectionWithDuplicateStationInLine() {
         // given
-        final Section section = new Section(1L, 1L, 2L, 1L, 10.0);
-        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
+        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10.0);
+        final SectionRequest sectionRequest = new SectionRequest("1", "2", 10.0);
 
-        given(sectionDao.findByDownStationIdAndLineId(1L, 1L))
-                .willReturn(Optional.of(section));
-        given(sectionDao.findByUpStationIdAndLineId(1L, 1L))
-                .willReturn(Optional.empty());
-        given(sectionDao.findByLineIdAndStationId(1L, 2L))
-                .willReturn(Optional.of(section));
+        given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
+        given(sectionDao.findByLineIdAndStationId(1L, 1L)).willReturn(Optional.of(lastSection));
 
         // when & then
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest));
-
+                .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
+                .withMessageContaining("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.");
     }
 }
