@@ -28,7 +28,7 @@ public class SectionResponse {
                 section.getDownStationId(),
                 section.getDistance());
     }
-    
+
 
     public SectionResponse() {
     }
