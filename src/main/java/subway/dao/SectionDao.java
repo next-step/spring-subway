@@ -36,7 +36,7 @@ public class SectionDao {
     }
 
     public Section insert(Section section) {
-        Map<String, Object> params = new HashMap<>();
+        final Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
         params.put("line_id", section.getLineId());
         params.put("up_station_id", section.getUpStationId());
@@ -45,7 +45,7 @@ public class SectionDao {
         params.put("next_section_id", section.getNextSectionId());
         params.put("prev_section_id", section.getPrevSectionId());
 
-        Long sectionId = insertAction.executeAndReturnKey(params).longValue();
+        final Long sectionId = insertAction.executeAndReturnKey(params).longValue();
         return new Section(
                 sectionId,
                 section.getLineId(),
@@ -58,13 +58,13 @@ public class SectionDao {
     }
 
     public Section findById(Long id) {
-        String sql = "select * from SECTION where id = ?";
+        final String sql = "select * from SECTION where id = ?";
 
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
     public List<Section> findAllByLineId(final Long lineId) {
-        String sql = "select * from SECTION where line_id = ?";
+        final String sql = "select * from SECTION where line_id = ?";
 
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
