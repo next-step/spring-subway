@@ -32,5 +32,9 @@ public class LineManager {
     }
 
     public void disconnectDownSection(Station downStation) {
+        Section downSection = sections.get(0).findDownSection();
+        Section upSection = downSection.getUpSection();
+        upSection.disconnectDownSection();
+        sections.remove(downSection);
     }
 }
