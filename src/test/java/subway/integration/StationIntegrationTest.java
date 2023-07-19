@@ -60,14 +60,15 @@ class StationIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.findAllStation();
 
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<String> expectedStationIds = Stream.of(createResponse1, createResponse2)
                 .map(it -> it.header("Location").split("/")[2])
                 .collect(Collectors.toList());
         List<String> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
                 .map(StationResponse::getId)
                 .collect(Collectors.toList());
+        
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(resultStationIds).containsAll(expectedStationIds);
     }
 
