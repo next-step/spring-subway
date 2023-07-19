@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import subway.DomainFixture;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -54,21 +55,8 @@ class LineServiceTest {
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(1)
-                    .build();
-
-            Section downSection = Section.builder()
-                    .id(1L)
-                    .line(line)
-                    .upStation(middleStation)
-                    .downStation(downStation)
-                    .distance(1)
-                    .build();
+            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
 
             SectionRequest sectionRequest = new SectionRequest(String.valueOf(middleStation.getId()),
                     String.valueOf(downStation.getId()),
