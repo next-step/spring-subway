@@ -1,5 +1,6 @@
 package subway.domain;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -126,12 +127,32 @@ class SectionsTest {
     @Test
     @DisplayName("현재 구간들은 해당 노선에 속하지 않습니다")
     void sectionDoesNotBelongToLine() {
-        Line otherLine = new Line(2L,"lineB", "red");
+        Line otherLine = new Line(2L, "lineB", "red");
         Section section = new Section(lineA, stationA, stationB, 3);
         Sections sections = new Sections(List.of(section));
 
-        Assertions.assertThatThrownBy(() -> sections.validateSectionsBelongToLine(otherLine))
+        assertThatThrownBy(() -> sections.validateSectionsBelongToLine(otherLine))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    @DisplayName("끊어진 구간들로 생성할 수 없습니다.")
+    void cannotCreateWithSeperatedSections() {
+        Section sectionA = new Section(lineA, stationA, stationB, 3);
+        Section sectionB = new Section(lineA, stationC, stationD, 3);
+
+        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("다른 노선에 속한 구간들로 생성할 수 없습니다.")
+    void cannotCreateWithSectionsOfOtherLines() {
+        Line otherLine = new Line(2L, "lineB", "red");
+        Section sectionA = new Section(lineA, stationA, stationB, 3);
+        Section sectionB = new Section(otherLine, stationB, stationC, 3);
+
+        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 }

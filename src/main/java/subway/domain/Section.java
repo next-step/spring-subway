@@ -40,7 +40,8 @@ public class Section {
     }
 
     public boolean containsDownStationOf(Section section) {
-        return this.upStation.equals(section.downStation) || this.downStation.equals(section.downStation);
+        return this.upStation.equals(section.downStation) || this.downStation.equals(
+            section.downStation);
     }
 
     public Long getId() {
@@ -61,6 +62,10 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public boolean belongToSameLine(Section section) {
+        return this.line.equals(section.line);
     }
 
     @Override
