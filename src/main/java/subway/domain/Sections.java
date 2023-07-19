@@ -73,12 +73,19 @@ public class Sections {
             .collect(Collectors.toSet());
     }
 
-    public Section addLast(Section section) {
+    public Section add(Section section) {
         validateAddable(section);
         validateNotContainDownStationOf(section);
         this.values.add(section);
         return section;
     }
+//
+//    public Section addLast(Section section) {
+//        validateAddable(section);
+//        validateNotContainDownStationOf(section);
+//        this.values.add(section);
+//        return section;
+//    }
 
     private void validateNotContainDownStationOf(Section section) {
         if (this.values.stream()

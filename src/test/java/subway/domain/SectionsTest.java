@@ -1,11 +1,9 @@
 package subway.domain;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +49,7 @@ class SectionsTest {
 
         Sections sections = new Sections(List.of(section));
 
-        assertThatThrownBy(() -> sections.addLast(unaddableSection))
+        assertThatThrownBy(() -> sections.add(unaddableSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -65,7 +63,7 @@ class SectionsTest {
 
         Sections sections = new Sections(List.of(section));
 
-        assertThatThrownBy(() -> sections.addLast(unaddableSection))
+        assertThatThrownBy(() -> sections.add(unaddableSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -79,7 +77,7 @@ class SectionsTest {
         Section addableSection = new Section(lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(section));
 
-        sections.addLast(addableSection);
+        sections.add(addableSection);
 
         assertThat(sections.getLast()).isEqualTo(addableSection);
     }
