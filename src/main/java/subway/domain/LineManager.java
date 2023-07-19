@@ -19,7 +19,7 @@ public class LineManager {
 
         Section lineDownSection = sections.get(0).findDownSection();
         lineDownSection.connectDownSection(downSection);
-        
+
         sections.add(downSection);
     }
 
@@ -35,8 +35,6 @@ public class LineManager {
     }
 
     public void disconnectDownSection(Station downStation) {
-        sections.stream().forEach(section -> System.out.println("section = " + section));
-        System.out.println(sections.size());
         Assert.isTrue(sections.size() > 1, () -> "line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.");
         Section downSection = sections.get(0).findDownSection();
         Assert.isTrue(downSection.getUpStation().equals(downStation),

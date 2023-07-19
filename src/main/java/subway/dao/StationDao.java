@@ -15,19 +15,14 @@ import subway.domain.Station;
 public class StationDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
+    private final RowMapper<Station> rowMapper;
 
-    private RowMapper<Station> rowMapper = (rs, rowNum) ->
-            new Station(
-                    rs.getLong("id"),
-                    rs.getString("name")
-            );
-
-
-    public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource, RowMapper<Station> rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("station")
                 .usingGeneratedKeyColumns("id");
+        this.rowMapper = rowMapper;
     }
 
     public Station insert(Station station) {
@@ -48,11 +43,18 @@ public class StationDao {
 
     public void update(Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{newStation.getName(), newStation.getId()});
+        jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
     }
 
     public void deleteById(Long id) {
         String sql = "delete from STATION where id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    public List<Station> findAllByLineId(Long lineId) {
+        String sql = "SELECT DISTINCT S.* FROM STATION as S "
+                + "JOIN SECTIONS as SE ON SE.line_id = ? AND (SE.up_station_id = S.id OR SE.down_station_id = S.id)";
+
+        return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 }

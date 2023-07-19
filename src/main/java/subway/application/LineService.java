@@ -14,6 +14,7 @@ import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
+import subway.dto.StationResponse;
 
 @Service
 public class LineService {
@@ -39,23 +40,33 @@ public class LineService {
                 .build();
 
         sectionDao.insert(section);
-        return LineResponse.of(persistLine);
+        return LineResponse.from(persistLine, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
     }
 
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
+
         return persistLines.stream()
-                .map(LineResponse::of)
+                .map(line -> LineResponse.from(line,
+                        stationsToStationResponses(stationDao.findAllByLineId(line.getId()))))
                 .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
+    private List<Line> findLines() {
         return lineDao.findAll();
     }
 
     public LineResponse findLineResponseById(Long id) {
         Line persistLine = getLineById(id);
-        return LineResponse.of(persistLine);
+        List<Station> stations = stationDao.findAllByLineId(persistLine.getId());
+
+        return LineResponse.from(persistLine, stationsToStationResponses(stations));
+    }
+
+    private List<StationResponse> stationsToStationResponses(List<Station> stations) {
+        return stations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
     }
 
     public void connectSectionByStationId(Long lineId, SectionRequest sectionRequest) {
