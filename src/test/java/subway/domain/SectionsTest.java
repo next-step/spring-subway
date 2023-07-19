@@ -26,18 +26,35 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("Sections에 특정 Station이 있는지 확인할 수 있다.")
-    void containsStation() {
+    @DisplayName("Sections에 두 Section이 있는지 확인할 수 있다.")
+    void containsBoth() {
         /* given */
-        Sections sections = new Sections(List.of(
-                new Section(1L, 1L, 1L, 1L),
-                new Section(2L, 2L, 2L, 2L),
-                new Section(3L, 3L, 3L, 3L)
+        final Sections sections = new Sections(List.of(
+                new Section(1L, 1L, 1L, 1L, 1L),
+                new Section(2L, 2L, 2L, 2L, 2L),
+                new Section(3L, 3L, 3L, 3L, 3L)
         ));
 
         /* when & then */
-        assertThat(sections.containsStation(3L)).isTrue();
-        assertThat(sections.containsStation(1234L)).isFalse();
+        assertThat(sections.containsBoth(2L, 3L)).isTrue();
+        assertThat(sections.containsBoth(3L, 4L)).isFalse();
+        assertThat(sections.containsBoth(4L, 5L)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Sections에 두 Section이 없는지 확인할 수 있다.")
+    void containsNeither() {
+        /* given */
+        final Sections sections = new Sections(List.of(
+                new Section(1L, 1L, 1L, 1L, 1L),
+                new Section(2L, 2L, 2L, 2L, 2L),
+                new Section(3L, 3L, 3L, 3L, 3L)
+        ));
+
+        /* when & then */
+        assertThat(sections.containsNeither(4L, 5L)).isTrue();
+        assertThat(sections.containsNeither(3L, 4L)).isFalse();
+        assertThat(sections.containsNeither(2L, 3L)).isFalse();
     }
 
     @Test

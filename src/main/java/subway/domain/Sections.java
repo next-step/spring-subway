@@ -1,9 +1,7 @@
 package subway.domain;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Sections {
@@ -14,28 +12,44 @@ public class Sections {
         this.values = Collections.unmodifiableList(values);
     }
 
-    public boolean containsStation(final Long stationId) {
-        return values.stream().anyMatch(section -> section.containsStation(stationId));
+    public boolean containsBoth(final Long upStationId, final Long downStationId) {
+        return containsStations(upStationId, downStationId) == 2;
+    }
+
+    public boolean containsNeither(final Long upStationId, final Long downStationId) {
+        return containsStations(upStationId, downStationId) == 0;
     }
 
     public Optional<Section> findLastSection() {
-        final Set<Long> upStationIds = values.stream()
-                .map(Section::getUpStationId)
-                .collect(Collectors.toSet());
-
-        final Set<Long> downStationIds = values.stream()
-                .map(Section::getDownStationId)
-                .collect(Collectors.toSet());
+        final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
+        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
 
         upStationIds.retainAll(downStationIds);
         downStationIds.removeAll(upStationIds);
 
         return values.stream()
-                .filter(section -> downStationIds.contains(section.getDownStationId()))
+                .filter(section -> upStationIds.contains(section.getDownStationId()))
                 .findAny();
     }
 
     public boolean isEqualSizeToOne() {
         return this.values.size() == 1;
+    }
+
+    private Set<Long> toSetWithMapper(final Function<Section, Long> mapper) {
+        return values.stream()
+                .map(mapper)
+                .collect(Collectors.toSet());
+    }
+
+    private int containsStations(final Long... targetIds) {
+        final Set<Long> stationIds = new HashSet<>();
+        for (Section section : values) {
+            stationIds.add(section.getUpStationId());
+            stationIds.add(section.getDownStationId());
+        }
+        stationIds.retainAll(Arrays.asList(targetIds));
+
+        return stationIds.size();
     }
 }
