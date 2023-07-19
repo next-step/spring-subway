@@ -59,4 +59,13 @@ public class SectionDao {
                 .stream()
                 .findAny();
     }
+
+    public Optional<Section> findLastSection(final Long lineId) {
+        String sql = "select * from SECTION S1 " +
+                "where S1.line_id = ? " +
+                "and not exist(select * from section S2 where S1.down_station_id = S2.up_station_id)";
+        return jdbcTemplate.query(sql, rowMapper, lineId)
+                .stream()
+                .findAny();
+    }
 }
