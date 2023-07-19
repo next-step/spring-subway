@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
+import subway.domain.SectionStation;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -65,5 +66,9 @@ public class LineDao {
         return jdbcTemplate.query(sql, rowMapper, name)
                 .stream()
                 .findAny();
+    }
+
+    public List<SectionStation> findAllSectionStation(final Long lineId) {
+        return null;
     }
 }
