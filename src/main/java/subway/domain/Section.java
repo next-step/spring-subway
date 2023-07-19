@@ -111,6 +111,8 @@ public class Section {
     }
 
     public void disconnectDownSection() {
+        downSection.upSection = null;
+        downSection = null;
     }
 
     public static final class Builder {
