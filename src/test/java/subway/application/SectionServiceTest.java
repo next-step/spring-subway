@@ -105,6 +105,6 @@ class SectionServiceTest {
         final long stationId = 3;
 
         // when & then
-        assertThatNoException().isThrownBy(() -> sectionService.deleteSection(stationId));
+        assertThatNoException().isThrownBy(() -> sectionService.deleteSection(1L, stationId));
     }
 }

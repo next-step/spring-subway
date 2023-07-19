@@ -54,4 +54,9 @@ public class SectionDao {
                 .stream()
                 .findAny();
     }
+
+    public void deleteLastSection(final long lineId, final long stationId) {
+        String sql = "delete from SECTION where line_id = ? and down_station_id = ?";
+        jdbcTemplate.update(sql, lineId, stationId);
+    }
 }

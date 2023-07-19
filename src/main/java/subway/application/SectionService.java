@@ -24,8 +24,8 @@ public class SectionService {
         return SectionResponse.of(section);
     }
 
-    public void deleteSection(final long stationId) {
-        throw new UnsupportedOperationException();
+    public void deleteSection(final long lineId, final long stationId) {
+        sectionDao.deleteLastSection(lineId, stationId);
     }
 
     private void validateLineAndLastStation(final long lineId, final long upStationId) {
