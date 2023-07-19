@@ -107,4 +107,20 @@ class SectionServiceTest {
         // when & then
         assertThatNoException().isThrownBy(() -> sectionService.deleteSection(1L, stationId));
     }
+
+    @DisplayName("지하철 노선의 하행 종점역이 아닐 때 구간 제거 실패")
+    @Test
+    void deleteSectionWithNotLastStation() {
+        // given
+        final long lineId = 1L;
+        final long stationId = 1L;
+
+        given(sectionDao.findLastSection(lineId))
+                .willReturn(Optional.of(new Section(lineId, 2L, 3L, 10)));
+
+        // when & then
+        assertThatThrownBy(() -> sectionService.deleteSection(lineId, stationId))
+                .describedAs("")
+                .isInstanceOf(IllegalSectionException.class);
+    }
 }
