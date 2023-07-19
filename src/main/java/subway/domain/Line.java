@@ -1,6 +1,5 @@
 package subway.domain;
 
-import java.util.List;
 import java.util.Objects;
 
 public class Line {
@@ -33,14 +32,7 @@ public class Line {
     }
 
     public Line addSection(final Section section) {
-        validateSection(section);
-        return addSections(new Sections(List.of(section)));
-    }
-
-    private void validateSection(final Section section) {
-        if (!sections.isTerminal(section.getUpStation()) || sections.contains(section.getDownStation())) {
-            throw new IllegalArgumentException("새로운 상행역은 기존의 하행 종점역만 설정 가능합니다.");
-        }
+        return new Line(name, color, sections.addSection(section));
     }
 
     public Long getId() {
