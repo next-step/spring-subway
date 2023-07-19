@@ -9,6 +9,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.domain.vo.SectionRegistVo;
 import subway.dto.request.SectionRegistRequest;
 
 @Service
@@ -37,9 +38,13 @@ public class SectionService {
         );
 
         Sections sections = sectionDao.findAllByLineId(lineId);
-        sections.validNewSection(section);
+        SectionRegistVo result = sections.registSection(section);
 
-        sectionDao.insert(section);
+        sectionDao.insert(result.getAddSection());
+
+        if (result.getUpdateSection().isPresent()) {
+            sectionDao.update(result.getUpdateSection().get());
+        }
     }
 
     public void deleteSection(Long stationId, Long lineId) {

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.domain.vo.SectionRegistVo;
 
 class SectionsTest {
 
@@ -154,7 +155,7 @@ class SectionsTest {
             5
         );
 
-        List<Section> result = sections.registSection(addSection);
+        SectionRegistVo result = sections.registSection(addSection);
 
         Section expectedNewSection = new Section(
             3L,
@@ -165,8 +166,8 @@ class SectionsTest {
         );
 
         Assertions.assertAll(
-            () -> assertThat(result.contains(addSection)).isTrue(),
-            () -> assertThat(result.contains(expectedNewSection)).isTrue()
+            () -> assertThat(result.getAddSection().equals(addSection)).isTrue(),
+            () -> assertThat(result.getUpdateSection().get().equals(expectedNewSection)).isTrue()
         );
     }
 
@@ -200,10 +201,10 @@ class SectionsTest {
             line1,
             5
         );
-        List<Section> result = sections.registSection(addSection);
+        SectionRegistVo result = sections.registSection(addSection);
         Assertions.assertAll(
-            () -> assertThat(result.contains(addSection)).isTrue(),
-            () -> assertThat(result.contains(expectedNewSection)).isTrue()
+            () -> assertThat(result.getAddSection().equals(addSection)).isTrue(),
+            () -> assertThat(result.getUpdateSection().get().equals(expectedNewSection)).isTrue()
         );
     }
 

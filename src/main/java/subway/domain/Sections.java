@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import subway.domain.vo.SectionRegistVo;
 
 public class Sections {
 
@@ -15,31 +16,6 @@ public class Sections {
 
     public Sections(List<Section> sections) {
         this.sections = sections;
-    }
-
-    public void validNewSection(Section section) {
-        if (sections.size() == 0) {
-            return;
-        }
-        validNewSectionDownStation(section);
-        validNewSectionUpStation(section);
-    }
-
-    private void validNewSectionDownStation(Section section) {
-        sections.stream()
-            .filter(s -> !s.getUpStation().equals(section.getDownStation()))
-            .filter(s -> !s.getDownStation().equals(section.getDownStation()))
-            .findFirst()
-            .orElseThrow(
-                () -> new IllegalArgumentException("입력하고자 하는 하행역이 해당 노선에 등록되어 있습니다.")
-            );
-    }
-
-    private void validNewSectionUpStation(Section section) {
-        Station endStation = findEndStation();
-        if (!endStation.equals(section.getUpStation())) {
-            throw new IllegalArgumentException("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
-        }
     }
 
     public void canDeleteStation(Long stationId) {
@@ -96,9 +72,9 @@ public class Sections {
             .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
     }
 
-    public List<Section> registSection(Section section) {
+    public SectionRegistVo registSection(Section section) {
         if (sections.size() == 0) {
-            return List.of(section);
+            return new SectionRegistVo(section);
         }
         if (findStations().contains(section.getUpStation()) && findStations().contains(
             section.getDownStation())) {
@@ -113,29 +89,20 @@ public class Sections {
         throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
     }
 
-    private List<Section> registUpSection(Section section) {
+    private SectionRegistVo registUpSection(Section section) {
         if (!findStartStations().contains(section.getUpStation())) {
-            return List.of(section);
+            return new SectionRegistVo(section);
         }
 
         return registMiddleUpSection(section);
     }
 
-    private List<Section> registDownSection(Section section) {
-        if (!findEndStations().contains(section.getDownStation())) {
-            return List.of(section);
-        }
-
-        return registMiddleDownSection(section);
-    }
-
-    private List<Section> registMiddleUpSection(Section section) {
+    private SectionRegistVo registMiddleUpSection(Section section) {
         int distance = section.getDistance().getDistance();
         Section duplicatedUpSection = findSectionByUpStation(section.getUpStation());
 
         validateDistance(distance, duplicatedUpSection);
 
-        List<Section> sections = new ArrayList<>(List.of(section));
         Section modifySection = new Section(
             duplicatedUpSection.getId(),
             section.getDownStation(),
@@ -143,17 +110,23 @@ public class Sections {
             section.getLine(),
             duplicatedUpSection.getDistance().getDistance() - distance
         );
-        sections.add(modifySection);
-        return sections;
+        return new SectionRegistVo(section, modifySection);
     }
 
-    private List<Section> registMiddleDownSection(Section section) {
+    private SectionRegistVo registDownSection(Section section) {
+        if (!findEndStations().contains(section.getDownStation())) {
+            return new SectionRegistVo(section);
+        }
+
+        return registMiddleDownSection(section);
+    }
+
+    private SectionRegistVo registMiddleDownSection(Section section) {
         int distance = section.getDistance().getDistance();
         Section duplicatedDownSection = findSectionByDownStation(section.getDownStation());
 
         validateDistance(distance, duplicatedDownSection);
 
-        List<Section> sections = new ArrayList<>(List.of(section));
         Section modifySection = new Section(
             duplicatedDownSection.getId(),
             duplicatedDownSection.getUpStation(),
@@ -161,8 +134,7 @@ public class Sections {
             section.getLine(),
             duplicatedDownSection.getDistance().getDistance() - distance
         );
-        sections.add(modifySection);
-        return sections;
+        return new SectionRegistVo(section, modifySection);
     }
 
     private void validateDistance(int distance, Section duplicatedUpSection) {
