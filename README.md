@@ -21,7 +21,7 @@ Line 색(color)
 
 ### 도메인
 
-- [ ] Line
+- [x] Line
   - [x] Line 이름은 중복될 수 없다.
 - [x] Section
   - [x] Station과 Station을 연결할 수 있다.
@@ -42,8 +42,8 @@ Line 색(color)
 lineId, upStationId, downStationId;
 
 1. [x] lineId기준 DB에서 모든 section 조회
-2. [ ] 조회된 section에서 upStationId가 하행 section이 맞는지 확인
-3. [ ] 하행 section이랑 연결
+2. [x] 조회된 section에서 upStationId가 하행 section이 맞는지 확인
+3. [x] 하행 section이랑 연결
 
 ### 애플리케이션 서비스
 
@@ -55,14 +55,14 @@ lineId, upStationId, downStationId;
 
 ### Dao
 
-- [ ] SectionDao
-  - [ ] Section을 받아 저장한다.
+- [x] SectionDao
+  - [x] Section을 받아 저장한다.
 
 ### Section 등록 기능
 
-- [ ] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 같으면 등록 가능 하다.
-- [ ] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 다르면 예외를 던진다.
-- [ ] 새로운 Section의 끝Station은 기존 Section에 등록되어 있으면 예외를 던진다.
+- [x] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 같으면 등록 가능 하다.
+- [x] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 다르면 예외를 던진다.
+- [x] 새로운 Section의 끝Station은 기존 Section에 등록되어 있으면 예외를 던진다.
 
 ### Section 제거 기능
 
@@ -72,6 +72,6 @@ lineId, upStationId, downStationId;
 ### TODO
 
 - [x] Optional로 리팩토링
-- [ ] Section에 distance 테스트 추가
+- [x] Section에 distance 테스트 추가
 - [x] DTO에 equals, hascode, toString 붙이기
 - [x] DTO에 response Long -> String 으로 변경
