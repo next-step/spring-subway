@@ -71,7 +71,6 @@ lineId, upStationId, downStationId;
 
 ### TODO
 
-- [ ] SectionService.saveById 가 SectionResponse를 반환하게 한다.
 - [x] Optional로 리팩토링
 - [ ] Section에 distance 테스트 추가
 - [x] DTO에 equals, hascode, toString 붙이기
