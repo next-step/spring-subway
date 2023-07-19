@@ -1,15 +1,19 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.tags.form.SelectTag;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.SectionStation;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.StationResponse;
 import subway.exception.IllegalLineException;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +61,25 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
+        List<SectionStation> sectionStations = lineDao.findAllSectionStation(id);
+
+        final Map<Station, Station> stationMap = sectionStations.stream()
+                .collect(Collectors.toMap(SectionStation::getStation, SectionStation::getDownStation));
+
+        // 상행 종점 구하기
+        Set<Station> keySet = new HashSet<>(stationMap.keySet());
+        keySet.removeAll(new HashSet<>(stationMap.values()));
+        Station lastUpStation = keySet.stream().findAny().orElseThrow();
+
+        List<StationResponse> stationResponses = new ArrayList<>();
+
+        Station curStation = lastUpStation;
+        while(curStation != null) {
+            stationResponses.add(StationResponse.of(curStation));
+            curStation = stationMap.get(curStation);
+        }
+
+        return LineResponse.of(persistLine, stationResponses);
     }
 
     public Line findLineById(Long id) {

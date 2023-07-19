@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
+import subway.domain.Line;
 import subway.domain.SectionStation;
 import subway.domain.Station;
 import subway.dto.LineResponse;
@@ -33,16 +34,16 @@ class LineServiceTest {
     void findStationsInLine() {
         // given
         Long lineId = 1L;
-        Station station1 = new Station("오이도");
-        Station station2 = new Station("정왕");
-        Station station3 = new Station("안산");
-        Station station4 = new Station("한대앞");
+        Station station1 = new Station(1L, "오이도");
+        Station station2 = new Station(2L, "정왕");
+        Station station3 = new Station(3L, "안산");
+        Station station4 = new Station(4L, "한대앞");
 
+        given(lineDao.findById(lineId)).willReturn(new Line(1L, "1호선", "blue"));
         given(lineDao.findAllSectionStation(lineId)).willReturn(List.of(
                 new SectionStation(station4, station1),
                 new SectionStation(station1, station3),
-                new SectionStation(station3, station2),
-                new SectionStation(station2, null)
+                new SectionStation(station3, station2)
         ));
 
         // when
@@ -50,10 +51,14 @@ class LineServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(lineResponse.getStations().get(0)).isEqualTo(StationResponse.of(station4)),
-                () -> assertThat(lineResponse.getStations().get(1)).isEqualTo(StationResponse.of(station1)),
-                () -> assertThat(lineResponse.getStations().get(2)).isEqualTo(StationResponse.of(station3)),
-                () -> assertThat(lineResponse.getStations().get(3)).isEqualTo(StationResponse.of(station2))
+                () -> assertThat(lineResponse.getStations().get(0).getId())
+                        .isEqualTo(StationResponse.of(station4).getId()),
+                () -> assertThat(lineResponse.getStations().get(1).getId())
+                        .isEqualTo(StationResponse.of(station1).getId()),
+                () -> assertThat(lineResponse.getStations().get(2).getId())
+                        .isEqualTo(StationResponse.of(station3).getId()),
+                () -> assertThat(lineResponse.getStations().get(3).getId())
+                        .isEqualTo(StationResponse.of(station2).getId())
         );
     }
 }
