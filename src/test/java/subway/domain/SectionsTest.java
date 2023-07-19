@@ -49,7 +49,7 @@ class SectionsTest {
 
         Sections sections = new Sections(List.of(section));
 
-        assertThatThrownBy(() -> sections.add(unaddableSection))
+        assertThatThrownBy(() -> sections.addLast(unaddableSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -63,7 +63,7 @@ class SectionsTest {
 
         Sections sections = new Sections(List.of(section));
 
-        assertThatThrownBy(() -> sections.add(unaddableSection))
+        assertThatThrownBy(() -> sections.addLast(unaddableSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -77,7 +77,7 @@ class SectionsTest {
         Section addableSection = new Section(lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(section));
 
-        sections.add(addableSection);
+        sections.addLast(addableSection);
 
         assertThat(sections.getLast()).isEqualTo(addableSection);
     }
