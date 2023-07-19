@@ -28,7 +28,7 @@ public class SectionService {
         }
 
         final Section section = sectionDao.insert(sectionRequest.toSection(lineId, lastPrevSection.getId()));
-        sectionDao.updatePrevSectionId(lastPrevSection, section.getId());
+        sectionDao.updatePrevSectionId(lastPrevSection.getId(), section.getId());
 
         return SectionResponse.of(section);
     }

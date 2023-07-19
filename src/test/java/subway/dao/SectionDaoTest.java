@@ -17,19 +17,6 @@ class SectionDaoTest {
     SectionDao sectionDao;
 
     @Test
-    @DisplayName("구간 식별자로 구간을 조회한다.")
-    void findById() {
-        /* given */
-        final Long sectionId = 5L;
-
-        /* when */
-        Section section = sectionDao.findById(sectionId);
-
-        /* then */
-        assertThat(section.getId()).isEqualTo(sectionId);
-    }
-
-    @Test
     @DisplayName("구간을 하나 추가한다.")
     void insert() {
         /* given */
@@ -44,10 +31,22 @@ class SectionDaoTest {
         );
 
         /* when */
-        Section insert = sectionDao.insert(section);
+        final Section insert = sectionDao.insert(section);
 
         /* then */
         assertThat(insert).isEqualTo(section);
+    }
+
+    @Test
+    @DisplayName("구간의 이전 구간 정보를 수정한다.")
+    void updatePrevSectionId() {
+        /* given */
+
+        /* when */
+        final int result = sectionDao.updatePrevSectionId(2L, 3L);
+
+        /* then */
+        assertThat(result).isEqualTo(1);
     }
 
     @Test

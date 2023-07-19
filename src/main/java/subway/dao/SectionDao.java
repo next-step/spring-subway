@@ -57,20 +57,16 @@ public class SectionDao {
         );
     }
 
-    public Section findById(Long id) {
-        final String sql = "select * from SECTION where id = ?";
-
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
-    }
-
     public List<Section> findAllByLineId(final Long lineId) {
         final String sql = "select * from SECTION where line_id = ?";
 
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
-    public void updatePrevSectionId(final Section target, final Long newPrevSectionId) {
-        jdbcTemplate.update("update SECTION set prev_section_id = ? where id = ?", newPrevSectionId, target.getId());
+    public int updatePrevSectionId(final Long targetSectionId, final Long newPrevSectionId) {
+        final String sql = "update SECTION set prev_section_id = ? where id = ?";
+
+        return jdbcTemplate.update(sql, newPrevSectionId, targetSectionId);
     }
 
     public int delete(final Long lineId, final Long downStationId) {

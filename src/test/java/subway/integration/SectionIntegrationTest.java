@@ -28,13 +28,14 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("지하철 구간을 생성한다.")
     void createSection() {
         /* given */
+        final Long lineId = 1L;
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
-                .when().post("/lines/1/sections")
+                .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
 
@@ -47,14 +48,15 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어 있는 하행 종점역이 아닌 경우 400 Bad Request로 응답한다.")
     void badRequestWithNotRegisteredLastDownStation() {
         /* given */
-        SectionRequest sectionRequest = new SectionRequest(11L, 14L, 777L);
+        final SectionRequest sectionRequest = new SectionRequest(11L, 14L, 777L);
+        final Long lineId = 1L;
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
-                .when().post("/lines/1/sections")
+                .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
 
@@ -68,14 +70,15 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("새로운 구간의 하행역이 해당 노선에 등록되어 있는 경우 400 Bad Request로 응답한다.")
     void badRequestWithRegisteredPrevSectionOnLine() {
         /* given */
-        SectionRequest sectionRequest = new SectionRequest(11L, 12L, 777L);
+        final SectionRequest sectionRequest = new SectionRequest(11L, 12L, 777L);
+        final Long lineId = 1L;
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
-                .when().post("/lines/1/sections")
+                .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
 
@@ -89,14 +92,15 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어 있지 않은 경우 400 Bad Request로 응답한다.")
     void badRequestWithNotExistStationOnLine() {
         /* given */
-        SectionRequest sectionRequest = new SectionRequest(21L, 22L, 777L);
+        final SectionRequest sectionRequest = new SectionRequest(21L, 22L, 777L);
+        final Long lineId = 1L;
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
-                .when().post("/lines/1/sections")
+                .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
 
