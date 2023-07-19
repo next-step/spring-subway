@@ -5,56 +5,64 @@ import org.springframework.util.Assert;
 
 public class Section {
 
-    private static final long MIN_DISTANCE = 1L;
     private Long id;
-    private Long lineId;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
+    private Line line;
+    private Station upStation;
+    private Station downStation;
+    private Distance distance;
 
-    public Section(Long id, Long lineId, Long upStationId, Long downStationId, Long distance) {
-        this(lineId, upStationId, downStationId, distance);
-        this.id = id;
-    }
-
-    public Section(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        validate(lineId, upStationId, downStationId, distance);
-
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+    public Section(Line line, Station upStation, Station downStation, Distance distance) {
+        Assert.notNull(line, "노선은 null일 수 없습니다.");
+        Assert.notNull(upStation, "상행역 null일 수 없습니다.");
+        Assert.notNull(downStation, "하행역 null일 수 없습니다.");
+        Assert.notNull(distance, "거리는 null일 수 없습니다.");
+        Assert.isTrue(!upStation.getId().equals(downStation.getId()), "상행역과 하행역은 같을 수 없습니다.");
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    private void validate(Long lineId, Long upStationId, Long downStationId,
-            Long distance) {
-        Assert.notNull(lineId, "노선 아이디는 null일 수 없습니다.");
-        Assert.notNull(upStationId, "상행역 아이디는 null일 수 없습니다.");
-        Assert.notNull(downStationId, "하행역 아이디는 null일 수 없습니다.");
-        Assert.notNull(distance, "거리는 null일 수 없습니다.");
-        Assert.isTrue(!upStationId.equals(downStationId), "상행역 아이디와 하행역 아이디는 같을 수 없습니다.");
-        Assert.isTrue(distance >= MIN_DISTANCE, "거리는 " + MIN_DISTANCE + "이상이어야 합니다.");
+    public Section(Long id, Line line, Station upStation, Station downStation, Distance distance) {
+        this(line, upStation, downStation, distance);
+        this.id = id;
+    }
+
+    public Section() {
     }
 
     public Long getId() {
         return id;
     }
 
+    public Line getLine() {
+        return line;
+    }
+
     public Long getLineId() {
-        return lineId;
+        return line.getId();
+    }
+
+    public Station getUpStation() {
+        return upStation;
     }
 
     public Long getUpStationId() {
-        return upStationId;
+        return upStation.getId();
+    }
+
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Long getDownStationId() {
-        return downStationId;
+        return downStation.getId();
     }
 
     public Long getDistance() {
-        return distance;
+        return distance.getValue();
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -65,24 +73,24 @@ public class Section {
             return false;
         }
         Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(lineId,
-                section.lineId) && Objects.equals(upStationId, section.upStationId)
-                && Objects.equals(downStationId, section.downStationId)
+        return Objects.equals(id, section.id) && Objects.equals(line,
+                section.line) && Objects.equals(upStation, section.upStation)
+                && Objects.equals(downStation, section.downStation)
                 && Objects.equals(distance, section.distance);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, lineId, upStationId, downStationId, distance);
+        return Objects.hash(id, line, upStation, downStation, distance);
     }
 
     @Override
     public String toString() {
         return "Section{" +
                 "id=" + id +
-                ", lineId=" + lineId +
-                ", upStationId=" + upStationId +
-                ", downStationId=" + downStationId +
+                ", line=" + line +
+                ", upStation=" + upStation +
+                ", downStation=" + downStation +
                 ", distance=" + distance +
                 '}';
     }

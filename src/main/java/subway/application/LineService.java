@@ -5,9 +5,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineWithStationsResponse;
 import subway.dto.SectionRequest;
 
 @Service
@@ -15,10 +18,13 @@ public class LineService {
 
     private final LineDao lineDao;
 
+    private final StationDao stationDao;
+
     private final SectionService sectionService;
 
-    public LineService(LineDao lineDao, SectionService sectionService) {
+    public LineService(LineDao lineDao, StationDao stationDao, SectionService sectionService) {
         this.lineDao = lineDao;
+        this.stationDao = stationDao;
         this.sectionService = sectionService;
     }
 
@@ -42,9 +48,11 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineResponseById(Long id) {
+    public LineWithStationsResponse findLineResponseById(Long id) {
         Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
+        List<Station> stations = sectionService.findStationByLineId(id);
+
+        return LineWithStationsResponse.of(persistLine, stations);
     }
 
     public Line findLineById(Long id) {

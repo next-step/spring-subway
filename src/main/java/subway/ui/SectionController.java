@@ -1,8 +1,10 @@
 package subway.ui;
 
 import java.net.URI;
+import java.sql.SQLException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,5 +40,18 @@ public class SectionController {
     ) {
         sectionService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<Void> handleSQLException(SQLException sqlException) {
+        sqlException.printStackTrace();
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Void> handleIllegalArgumentException(
+            IllegalArgumentException sqlException) {
+        sqlException.printStackTrace();
+        return ResponseEntity.badRequest().build();
     }
 }

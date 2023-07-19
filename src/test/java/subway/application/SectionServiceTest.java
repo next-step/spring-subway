@@ -3,13 +3,12 @@ package subway.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dao.SectionDao;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 
@@ -19,6 +18,9 @@ class SectionServiceTest {
 
     @Autowired
     private SectionService sectionService;
+
+    @Autowired
+    private SectionDao sectionDao;
 
     @DisplayName("첫번째 구간 저장 성공")
     @Test
@@ -61,7 +63,7 @@ class SectionServiceTest {
                 .doesNotThrowAnyException();
 
         // then
-        assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
+        assertThat(sectionDao.findAllByLineId(lineId)).hasSize(3);
     }
 
     @DisplayName("추가구간의 상행역과 기존 구간의 상행역이 겹치지 않을 때 추가구간의 하행역이 하행종점역으로 삽입 성공")
@@ -81,7 +83,7 @@ class SectionServiceTest {
                 .doesNotThrowAnyException();
 
         // then
-        assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
+        assertThat(sectionDao.findAllByLineId(lineId)).hasSize(3);
     }
 
 
@@ -102,7 +104,7 @@ class SectionServiceTest {
                 .doesNotThrowAnyException();
 
         // then
-        assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
+        assertThat(sectionDao.findAllByLineId(lineId)).hasSize(3);
     }
 
 
@@ -123,7 +125,7 @@ class SectionServiceTest {
                 .doesNotThrowAnyException();
 
         // then
-        assertThat(sectionService.findAllByLineId(lineId)).hasSize(3);
+        assertThat(sectionDao.findAllByLineId(lineId)).hasSize(3);
     }
 
     @DisplayName("추가구간의 하행역과 상행역이 기존 노선에 모두 존재할 시 예외를 던진다.")
@@ -227,41 +229,5 @@ class SectionServiceTest {
         assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
-    }
-
-    @DisplayName("노선 조회시 응답이 상행부터 하행 순서대로 조회되야한다.")
-    @Test
-    void findAllByLineId() {
-        // given
-        Long lineId = 1L;
-        SectionRequest request1 = new SectionRequest(5L, 4L, 10L);
-        SectionRequest request2 = new SectionRequest(4L, 3L, 10L);
-        SectionRequest request3 = new SectionRequest(4L, 1L, 4L);
-        sectionService.saveSection(lineId, request1);
-        sectionService.saveSection(lineId, request2);
-        sectionService.saveSection(lineId, request3);
-
-        // when
-        List<SectionResponse> responses = sectionService.findAllByLineId(lineId);
-
-        // then
-
-        Assertions.assertThat(responses.get(0)).extracting(
-                        SectionResponse::getUpStationId,
-                        SectionResponse::getDownStationId,
-                        SectionResponse::getDistance)
-                .contains(5L, 4L, 10L);
-
-        Assertions.assertThat(responses.get(1)).extracting(
-                        SectionResponse::getUpStationId,
-                        SectionResponse::getDownStationId,
-                        SectionResponse::getDistance)
-                .contains(4L, 1L, 4L);
-
-        Assertions.assertThat(responses.get(2)).extracting(
-                        SectionResponse::getUpStationId,
-                        SectionResponse::getDownStationId,
-                        SectionResponse::getDistance)
-                .contains(1L, 3L, 6L);
     }
 }

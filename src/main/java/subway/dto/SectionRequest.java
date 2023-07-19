@@ -1,7 +1,6 @@
 package subway.dto;
 
 import java.util.Objects;
-import subway.domain.Section;
 
 public class SectionRequest {
 
@@ -15,9 +14,6 @@ public class SectionRequest {
         this.distance = distance;
     }
 
-    public Section toEntity(Long lineId) {
-        return new Section(lineId, upStationId, downStationId, distance);
-    }
 
     public SectionRequest() {
     }

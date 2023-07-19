@@ -2,81 +2,70 @@ package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class SectionTest {
 
+    Line line;
+    Station upStation;
+    Station downStation;
+    Distance distance;
+
+    @BeforeEach
+    void setUp() {
+        line = new Line(1L, "1호선", "green");
+        upStation = new Station(1L, "낙성대");
+        downStation = new Station(2L, "사당");
+        distance = new Distance(10L);
+
+    }
+
     @DisplayName("구간 정상 생성")
     @Test
     void validationSuccess() {
-        // given
-        Long lineId = 1001L;
-        Long upStationId = 1001L;
-        Long downStationId = 1002L;
-        Long distance = 10L;
-
-        // when, then
-        assertThatCode(() -> new Section(lineId, upStationId, downStationId, distance))
+        // given, when, then
+        assertThatCode(() -> new Section(line, upStation, downStation, distance))
                 .doesNotThrowAnyException();
     }
 
     @DisplayName("노선 아이디가 null 일시 구간 생성 실패")
     @Test
     void validationLineIdNotNull() {
-        // given
-        Long lineId = null;
-        Long upStationId = 1001L;
-        Long downStationId = 1002L;
-        Long distance = 10L;
-
-        // when, then
-        assertThatCode(() -> new Section(lineId, upStationId, downStationId, distance))
+        // given, when, then
+        assertThatCode(() -> new Section(null,
+                upStation, downStation, distance))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("노선 아이디는 null일 수 없습니다.");
+                .hasMessage("노선은 null일 수 없습니다.");
     }
 
     @DisplayName("상행역 아이디가 null 일시 구간 생성 실패")
     @Test
     void validationUpStationIdNotNull() {
-        // given
-        Long lineId = 1001L;
-        Long upStationId = null;
-        Long downStationId = 1002L;
-        Long distance = 10L;
-
-        // when, then
-        assertThatCode(() -> new Section(lineId, upStationId, downStationId, distance))
+        // given , when, then
+        assertThatCode(() -> new Section(
+                line, null, downStation, distance))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("상행역 아이디는 null일 수 없습니다.");
+                .hasMessage("상행역 null일 수 없습니다.");
     }
 
     @DisplayName("하행역 아이디가 null 일시 구간 생성 실패")
     @Test
     void validationDownStationIdNotNull() {
-        // given
-        Long lineId = 1001L;
-        Long upStationId = 1001L;
-        Long downStationId = null;
-        Long distance = 10L;
-
-        // when, then
-        assertThatCode(() -> new Section(lineId, upStationId, downStationId, distance))
+        // given,  when, then
+        assertThatCode(() -> new Section(
+                line, upStation, null, distance))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("하행역 아이디는 null일 수 없습니다.");
+                .hasMessage("하행역 null일 수 없습니다.");
     }
 
     @DisplayName("거리가 null 일시 구간 생성 실패")
     @Test
     void validationDistanceNotNull() {
-        // given
-        Long lineId = 1001L;
-        Long upStationId = 1001L;
-        Long downStationId = 1002L;
-        Long distance = null;
-
-        // when, then
-        assertThatCode(() -> new Section(lineId, upStationId, downStationId, distance))
+        // given , when, then
+        assertThatCode(() ->
+                new Section(line, upStation, downStation, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("거리는 null일 수 없습니다.");
     }
@@ -84,30 +73,11 @@ class SectionTest {
     @DisplayName("상행역 아이디와 하행역 아이디는 같을 시 구간 생성 실패")
     @Test
     void validationUpStationIdNotEqualDownStationId() {
-        // given
-        Long lineId = 1001L;
-        Long upStationId = 1001L;
-        Long downStationId = 1001L;
-        Long distance = 10L;
-
-        // when, then
-        assertThatCode(() -> new Section(lineId, upStationId, downStationId, distance))
+        // given, when, then
+        assertThatCode(() ->
+                new Section(line, upStation, upStation, distance))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("상행역 아이디와 하행역 아이디는 같을 수 없습니다.");
+                .hasMessage("상행역과 하행역은 같을 수 없습니다.");
     }
 
-    @DisplayName("상행역 아이디와 하행역 아이디는 같을 시 구간 생성 실패")
-    @Test
-    void validationPositiveDistance() {
-        // given
-        Long lineId = 1001L;
-        Long upStationId = 1001L;
-        Long downStationId = 1002L;
-        Long distance = -1L;
-
-        // when, then
-        assertThatCode(() -> new Section(lineId, upStationId, downStationId, distance))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("거리는 " + 1L + "이상이어야 합니다.");
-    }
 }
