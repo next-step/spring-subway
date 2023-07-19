@@ -84,6 +84,7 @@ public class Section {
     @Override
     public String toString() {
         return "Section{" +
+            "lineId=" + this.line.getId() +
             "upStation=" + upStation +
             ", downStation=" + downStation +
             ", distance=" + distance +
