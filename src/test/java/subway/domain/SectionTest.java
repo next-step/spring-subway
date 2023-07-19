@@ -232,6 +232,27 @@ class SectionTest {
             assertThat(downSection.getUpSection()).isNull();
         }
 
+        @Test
+        @DisplayName("downSection이 null 이라면, IllegalStateException을 던진다")
+        void Throw_IllegalStateException_When_Null_DownSection() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Integer distance = 10;
+
+            Section section = Section.builder()
+                    .upStation(upStation)
+                    .downStation(middleStation)
+                    .distance(distance)
+                    .build();
+
+            // when
+            Exception exception = catchException(section::disconnectDownSection);
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalStateException.class);
+        }
+
     }
 
 }
