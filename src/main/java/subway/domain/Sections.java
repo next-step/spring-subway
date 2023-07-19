@@ -77,6 +77,8 @@ public class Sections {
     }
 
     public void addSection(Section section) {
-        
+        if (contains(section.getUpStation()) && contains(section.getDownStation())) {
+            throw new IllegalArgumentException("두 역 모두 기존 노선에 포함될 수 없습니다.");
+        }
     }
 }
