@@ -37,28 +37,14 @@ values (10, '소요산'),
        (38, '원흥'),
        (39, '삼송');
 
-insert into SECTION(`id`, `line_id`, `up_station_id`, `down_station_id`, `distance`, `next_section_id`,
-                    `prev_section_id`)
-values (DEFAULT, 1, 11, 12, 777, null, null),
+insert into SECTION(`id`, `line_id`, `up_station_id`, `down_station_id`, `distance`)
+values (DEFAULT, 1, 11, 12, 777),
 
-       (DEFAULT, 2, 23, 24, 777, null, null),
-       (DEFAULT, 2, 24, 25, 777, null, null),
+       (DEFAULT, 2, 23, 24, 777),
+       (DEFAULT, 2, 24, 25, 777),
 
-       (DEFAULT, 3, 36, 37, 777, null, null),
-       (DEFAULT, 3, 37, 38, 777, null, null);
-
-update SECTION
-set prev_section_id = 3
-where id = 2;
-update SECTION
-set next_section_id = 2
-where id = 3;
-update SECTION
-set prev_section_id = 5
-where id = 4;
-update SECTION
-set next_section_id = 4
-where id = 5;
+       (DEFAULT, 3, 36, 37, 777),
+       (DEFAULT, 3, 37, 38, 777);
 
 
 

@@ -23,9 +23,7 @@ public class SectionDao {
                     rs.getLong("line_id"),
                     rs.getLong("up_station_id"),
                     rs.getLong("down_station_id"),
-                    rs.getLong("distance"),
-                    rs.getObject("next_section_id", Long.class),
-                    rs.getObject("prev_section_id", Long.class)
+                    rs.getLong("distance")
             );
 
     public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
@@ -42,8 +40,6 @@ public class SectionDao {
         params.put("up_station_id", section.getUpStationId());
         params.put("down_station_id", section.getDownStationId());
         params.put("distance", section.getDistance());
-        params.put("next_section_id", section.getNextSectionId());
-        params.put("prev_section_id", section.getPrevSectionId());
 
         final Long sectionId = insertAction.executeAndReturnKey(params).longValue();
         return new Section(
@@ -51,9 +47,7 @@ public class SectionDao {
                 section.getLineId(),
                 section.getUpStationId(),
                 section.getDownStationId(),
-                section.getDistance(),
-                section.getNextSectionId(),
-                section.getPrevSectionId()
+                section.getDistance()
         );
     }
 
@@ -63,22 +57,9 @@ public class SectionDao {
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
-    public int updatePrevSectionId(final Long targetSectionId, final Long newPrevSectionId) {
-        final String sql = "update SECTION set prev_section_id = ? where id = ?";
+    public int delete(final Long targetSectionId) {
+        final String sql = "delete from SECTION where id = ?";
 
-        return jdbcTemplate.update(sql, newPrevSectionId, targetSectionId);
-    }
-
-    public int delete(final Long lineId, final Long downStationId) {
-        final String sql = "delete from SECTION where line_id = ? and down_station_id = ? and prev_section_id is NULL";
-
-        return jdbcTemplate.update(sql, lineId, downStationId);
-    }
-
-    public Long countByNotExistNextSectionAndPrevSection(final Long lineId) {
-        final String readSql = "select count(id) from SECTION " +
-                "where line_id = ? and next_section_id is NULL and prev_section_id is NULL";
-
-        return jdbcTemplate.queryForObject(readSql, Long.class, lineId);
+        return jdbcTemplate.update(sql, targetSectionId);
     }
 }

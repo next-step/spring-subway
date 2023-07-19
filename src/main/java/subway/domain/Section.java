@@ -11,23 +11,13 @@ public class Section {
     private Long upStationId;
     private Long downStationId;
     private Long distance;
-    private Long nextSectionId;
-    private Long prevSectionId;
 
     private Section() {
         /* no-op */
     }
 
-    private Section(final Builder builder) {
-        this(
-                builder.id,
-                builder.lineId,
-                builder.upStationId,
-                builder.downStationId,
-                builder.distance,
-                builder.nextSectionId,
-                builder.prevSectionId
-        );
+    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
+        this(null, lineId, upStationId, downStationId, distance);
     }
 
     public Section(
@@ -35,9 +25,7 @@ public class Section {
             final Long lineId,
             final Long upStationId,
             final Long downStationId,
-            final Long distance,
-            final Long nextSectionId,
-            final Long prevSectionId
+            final Long distance
     ) {
         validate(upStationId, downStationId, distance);
 
@@ -46,16 +34,10 @@ public class Section {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-        this.nextSectionId = nextSectionId;
-        this.prevSectionId = prevSectionId;
     }
 
     public boolean containsStation(final Long stationId) {
         return Objects.equals(this.upStationId, stationId) || Objects.equals(this.downStationId, stationId);
-    }
-
-    public boolean isLastPrevSection() {
-        return this.prevSectionId == null;
     }
 
     public boolean isSameDownStationId(final Long stationId) {
@@ -80,14 +62,6 @@ public class Section {
 
     public Long getDistance() {
         return this.distance;
-    }
-
-    public Long getNextSectionId() {
-        return this.nextSectionId;
-    }
-
-    public Long getPrevSectionId() {
-        return this.prevSectionId;
     }
 
     private void validate(final Long upStationId, final Long downStationId, final Long distance) {
@@ -119,54 +93,15 @@ public class Section {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(lineId, section.lineId) && Objects.equals(upStationId, section.upStationId) && Objects.equals(downStationId, section.downStationId) && Objects.equals(distance, section.distance) && Objects.equals(nextSectionId, section.nextSectionId) && Objects.equals(prevSectionId, section.prevSectionId);
+        return Objects.equals(id, section.id)
+                && Objects.equals(lineId, section.lineId)
+                && Objects.equals(upStationId, section.upStationId)
+                && Objects.equals(downStationId, section.downStationId)
+                && Objects.equals(distance, section.distance);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, lineId, upStationId, downStationId, distance, nextSectionId, prevSectionId);
-    }
-
-    public static class Builder {
-
-        private Long id;
-        private Long lineId;
-        private Long upStationId;
-        private Long downStationId;
-        private Long distance;
-        private Long nextSectionId;
-
-        private Long prevSectionId;
-
-        private Builder() {
-            /* no-op */
-        }
-
-        public Builder(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
-            this.lineId = lineId;
-            this.upStationId = upStationId;
-            this.downStationId = downStationId;
-            this.distance = distance;
-        }
-
-        public Builder id(final Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder nextSectionId(final Long nextSectionId) {
-            this.nextSectionId = nextSectionId;
-            return this;
-        }
-
-        public Builder prevSectionId(final Long prevSectionId) {
-            this.prevSectionId = prevSectionId;
-            return this;
-        }
-
-        public Section build() {
-            return new Section(this);
-        }
-
+        return Objects.hash(id, lineId, upStationId, downStationId, distance);
     }
 }

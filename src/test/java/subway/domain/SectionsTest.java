@@ -16,9 +16,9 @@ class SectionsTest {
     void create() {
         /* given */
         List<Section> sections = List.of(
-                new Section.Builder(1L, 1L, 1L, 1L).build(),
-                new Section.Builder(2L, 2L, 2L, 2L).build(),
-                new Section.Builder(3L, 3L, 3L, 3L).build()
+                new Section(1L, 1L, 1L, 1L),
+                new Section(2L, 2L, 2L, 2L),
+                new Section(3L, 3L, 3L, 3L)
         );
 
         /* when & then */
@@ -30,9 +30,9 @@ class SectionsTest {
     void containsStation() {
         /* given */
         Sections sections = new Sections(List.of(
-                new Section.Builder(1L, 1L, 1L, 1L).build(),
-                new Section.Builder(2L, 2L, 2L, 2L).build(),
-                new Section.Builder(3L, 3L, 3L, 3L).build()
+                new Section(1L, 1L, 1L, 1L),
+                new Section(2L, 2L, 2L, 2L),
+                new Section(3L, 3L, 3L, 3L)
         ));
 
         /* when & then */
@@ -45,18 +45,26 @@ class SectionsTest {
     void findLastPrevSection() {
         /* given */
         Sections sections = new Sections(List.of(
-                new Section.Builder(2L, 2L, 2L, 2L)
-                        .prevSectionId(1234L)
-                        .build(),
-                new Section.Builder(3L, 3L, 3L, 3L)
-                        .prevSectionId(null)
-                        .build()
+                new Section(2L, 2L, 3L, 2L),
+                new Section(3L, 3L, 4L, 3L)
         ));
 
         /* when */
-        Optional<Section> lastPrevSection = sections.findLastPrevSection();
+        final Optional<Section> lastSection = sections.findLastSection();
 
         /* then */
-        assertThat(lastPrevSection).isPresent();
+        assertThat(lastSection).isPresent();
+    }
+
+    @Test
+    @DisplayName("Section의 크기가 1인지 확인할 수 있다.")
+    void isEqualSizeToOne() {
+        /* given */
+        Sections sections = new Sections(List.of(
+                new Section(2L, 2L, 3L, 2L)
+        ));
+
+        /* when & then */
+        assertThat(sections.isEqualSizeToOne()).isTrue();
     }
 }

@@ -18,11 +18,9 @@ public class SectionRequest {
         this.distance = distance;
     }
 
-    public Section toSection(final Long lineId, final Long nextSectionId) {
+    public Section toSection(final Long lineId) {
 
-        return new Section.Builder(lineId, this.upStationId, this.downStationId, this.distance)
-                .nextSectionId(nextSectionId)
-                .build();
+        return new Section(lineId, this.upStationId, this.downStationId, this.distance);
     }
 
     public Long getUpStationId() {
