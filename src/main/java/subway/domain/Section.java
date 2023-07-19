@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.exception.IllegalSectionException;
+
 public class Section {
 
     private Long id;
@@ -24,7 +26,7 @@ public class Section {
 
     private void validate(final int distance) {
         if (distance <= 0) {
-            throw new IllegalArgumentException("구간 길이는 0보다 커야한다.");
+            throw new IllegalSectionException("구간 길이는 0보다 커야한다.");
         }
     }
 
