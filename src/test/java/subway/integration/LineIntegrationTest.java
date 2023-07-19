@@ -173,7 +173,7 @@ class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+    static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
         return RestAssured
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
