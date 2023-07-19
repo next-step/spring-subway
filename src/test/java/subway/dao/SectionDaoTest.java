@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import subway.domain.Line;
+import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
@@ -46,11 +47,9 @@ class SectionDaoTest {
         stationDao.insert(stationA);
         stationDao.insert(stationB);
         stationDao.insert(stationC);
-        Section section = new Section(lineA, stationA, stationB, 2);
-        Section section2 = new Section(lineA, stationB, stationC, 2);
-        sectionDao.save(section);
-        sectionDao.save(section2);
+        Section section = sectionDao.save(new Section(lineA, stationA, stationB, 2));
+        Section section2 = sectionDao.save(new Section(lineA, stationB, stationC, 2));
 
-        Assertions.assertThat(sectionDao.findAllByLineId(lineA.getId())).isEqualTo(new Sections(List.of(section, section2)));
+        Assertions.assertThat(sectionDao.findAllByLineId(lineA.getId())).isEqualTo(new LineSections(lineA, new Sections(List.of(section, section2))));
     }
 }

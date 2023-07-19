@@ -1,6 +1,7 @@
 package subway.domain;
 
 import java.util.List;
+import java.util.Objects;
 
 public class LineSections {
 
@@ -23,5 +24,31 @@ public class LineSections {
 
     public Section removeLast(Station station) {
         return sections.removeLast(station);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof LineSections)) {
+            return false;
+        }
+        LineSections that = (LineSections) o;
+        return Objects.equals(line, that.line) && Objects.equals(sections,
+            that.sections);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, sections);
+    }
+
+    @Override
+    public String toString() {
+        return "LineSections{" +
+            "line=" + line +
+            ", sections=" + sections +
+            '}';
     }
 }
