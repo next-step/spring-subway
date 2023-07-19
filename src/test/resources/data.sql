@@ -42,9 +42,23 @@ insert into SECTION(`id`, `line_id`, `up_station_id`, `down_station_id`, `distan
 values (DEFAULT, 1, 11, 12, 777, null, null),
 
        (DEFAULT, 2, 23, 24, 777, null, null),
-       (DEFAULT, 2, 24, 25, 777, 2, null),
+       (DEFAULT, 2, 24, 25, 777, null, null),
 
        (DEFAULT, 3, 36, 37, 777, null, null),
-       (DEFAULT, 3, 37, 38, 777, 4, null);
+       (DEFAULT, 3, 37, 38, 777, null, null);
+
+update SECTION
+set prev_section_id = 3
+where id = 2;
+update SECTION
+set next_section_id = 2
+where id = 3;
+update SECTION
+set prev_section_id = 5
+where id = 4;
+update SECTION
+set next_section_id = 4
+where id = 5;
+
 
 
