@@ -10,6 +10,7 @@ import subway.dao.StationDao;
 import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
@@ -17,7 +18,6 @@ import subway.dto.SectionResponse;
 @Service
 public class SectionService {
 
-    private static final int MINIMUM_SIZE = 1;
     private final SectionDao sectionDao;
 
     private final LineDao lineDao;
@@ -114,30 +114,13 @@ public class SectionService {
         });
     }
 
-    private Optional<Section> findUpSection(List<Section> sections, Section pivot) {
-        return sections.stream()
-                .filter(section -> section.getDownStationId().equals(pivot.getUpStationId()))
-                .findAny();
-    }
-
-    private Optional<Section> findDownSection(List<Section> sections, Section pivot) {
-        return sections.stream()
-                .filter(section -> section.getUpStationId().equals(pivot.getDownStationId()))
-                .findAny();
-    }
-
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
-        Section lastSection = findLastSection(lineId, stationId);
-        sectionDao.deleteById(lastSection.getId());
-    }
-
-    private Section findLastSection(Long lineId, Long stationId) {
-        List<Section> sections = sectionDao.findAllByLineId(lineId);
-        validateSize(sections);
-        Section lastSection = getLastSection(sections);
+        List<Section> sectionList = sectionDao.findAllByLineId(lineId);
+        Sections sections = new Sections(sectionList);
+        Section lastSection = sections.findLastSection();
         validateIsNotLast(stationId, lastSection);
-        return lastSection;
+        sectionDao.deleteById(lastSection.getId());
     }
 
     private static void validateIsNotLast(Long stationId, Section lastSection) {
@@ -145,23 +128,4 @@ public class SectionService {
             throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
         }
     }
-
-    private static void validateSize(List<Section> sections) {
-        if (sections.size() <= MINIMUM_SIZE) {
-            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
-        }
-    }
-
-    private Section getLastSection(List<Section> sections) {
-        Section pivot = sections.get(0);
-        while (true) {
-            Optional<Section> temp = findDownSection(sections, pivot);
-            if (temp.isEmpty()) {
-                return pivot;
-            }
-            pivot = temp.get();
-        }
-    }
-
-
 }
