@@ -8,7 +8,8 @@ import java.util.stream.Collectors;
 
 public class Sections {
 
-    private List<Section> sections;
+    private static final int MINIMUM_SIZE = 1;
+    private final List<Section> sections;
 
     public Sections(List<Section> sections) {
         this.sections = sort(sections);
@@ -66,6 +67,17 @@ public class Sections {
         return sections.stream()
                 .filter(section -> section.getUpStationId().equals(pivot.getDownStationId()))
                 .findAny();
+    }
+
+    public Section findLastSection() {
+        validateSize(sections);
+        return sections.get(sections.size() - 1);
+    }
+
+    private static void validateSize(List<Section> sections) {
+        if (sections.size() <= MINIMUM_SIZE) {
+            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+        }
     }
 
     public List<Section> getSections() {

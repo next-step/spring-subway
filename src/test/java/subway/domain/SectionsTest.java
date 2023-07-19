@@ -46,4 +46,28 @@ class SectionsTest {
         assertThat(stations).containsExactly(station4, station1, station2, station3);
     }
 
+    @DisplayName("Sections 의 가장 마지막 Section을 반환")
+    @Test
+    void givenSectionsWhenFindLastSectionThenReturnLastSection() {
+        // given
+
+        Line line = new Line(1L, "1호선", "green");
+        Station station1 = new Station(1L, "낙성대");
+        Station station2 = new Station(2L, "사당");
+        Station station3 = new Station(3L, "이수");
+        Station station4 = new Station(4L, "잠실");
+
+        List<Section> sectionList = List.of(
+                new Section(line, station1, station2, new Distance(10L)),
+                new Section(line, station2, station3, new Distance(10L)),
+                new Section(line, station4, station1, new Distance(10L))
+        );
+        Sections sections = new Sections(sectionList);
+
+        // when
+        Section lastSection = sections.findLastSection();
+
+        // then
+        assertThat(lastSection).isEqualTo(new Section(line, station2, station3, new Distance(10L)));
+    }
 }
