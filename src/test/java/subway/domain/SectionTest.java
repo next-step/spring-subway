@@ -21,11 +21,13 @@ class SectionTest {
             // given
             Station upStation = new Station(1L, "upStation");
             Station downStation = new Station(2L, "downStation");
+            Integer distance = 10;
 
             // when
             Throwable throwable = Assertions.catchThrowable(() -> Section.builder()
                     .upStation(upStation)
                     .downStation(downStation)
+                    .distance(distance)
                     .build());
 
             // then
@@ -38,12 +40,14 @@ class SectionTest {
             // given
             Station upStation = new Station(1L, "upStation");
             Station nullStation = null;
+            Integer distance = 10;
 
             // when
             Exception exception = catchException(
                     () -> Section.builder()
                             .upStation(upStation)
                             .downStation(nullStation)
+                            .distance(distance)
                             .build());
 
             // then
@@ -81,15 +85,18 @@ class SectionTest {
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
             Station downStation = new Station(2L, "downStation");
+            Integer distance = 10;
 
             Section section = Section.builder()
                     .upStation(upStation)
                     .downStation(middleStation)
+                    .distance(distance)
                     .build();
 
             Section downSection = Section.builder()
                     .upStation(middleStation)
                     .downStation(downStation)
+                    .distance(distance)
                     .build();
 
             // when
@@ -111,14 +118,17 @@ class SectionTest {
             Station middleStation = new Station(2L, "middleStation");
             Station differentMiddleStation = new Station(3L, "differntMiddleStation");
             Station downStation = new Station(4L, "downStation");
+            Integer distance = 10;
 
             Section section = Section.builder()
                     .upStation(upStation)
                     .downStation(middleStation)
+                    .distance(distance)
                     .build();
             Section downSection = Section.builder()
                     .upStation(differentMiddleStation)
                     .downStation(downStation)
+                    .distance(distance)
                     .build();
 
             // when
@@ -134,10 +144,12 @@ class SectionTest {
             // given
             Station upStation = new Station(2L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
+            Integer distance = 10;
 
             Section section = Section.builder()
                     .upStation(upStation)
                     .downStation(middleStation)
+                    .distance(distance)
                     .build();
 
             Section downSection = null;
@@ -161,15 +173,18 @@ class SectionTest {
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
             Station downStation = new Station(2L, "downStation");
+            Integer distance = 10;
 
             Section section = Section.builder()
                     .upStation(upStation)
                     .downStation(middleStation)
+                    .distance(distance)
                     .build();
 
             Section downSection = Section.builder()
                     .upStation(middleStation)
                     .downStation(downStation)
+                    .distance(distance)
                     .build();
 
             section.connectDownSection(downSection);
