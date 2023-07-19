@@ -29,7 +29,9 @@ public class LineService {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
+
         sectionDao.insert(new Section(upStation, downStation, persistLine, request.getDistance()));
+
         return LineResponse.of(persistLine);
     }
 

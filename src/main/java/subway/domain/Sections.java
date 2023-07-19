@@ -20,13 +20,13 @@ public class Sections {
     }
 
     public boolean isTerminal(final Station station) {
-        Set<Station> upward = sections.stream()
-                .map(Section::getUpward)
+        Set<Station> upStations = sections.stream()
+                .map(Section::getUpStation)
                 .collect(Collectors.toSet());
 
         Station terminal = sections.stream()
-                .map(Section::getDownward)
-                .filter(s -> !upward.contains(s))
+                .map(Section::getDownStation)
+                .filter(downStation -> !upStations.contains(downStation))
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("하행 종점이 존재하지 않습니다."));
 
@@ -35,7 +35,7 @@ public class Sections {
 
     public boolean contains(final Station station) {
         return sections.stream()
-                .flatMap(section -> Stream.of(section.getUpward(), section.getDownward()))
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
                 .distinct()
                 .collect(Collectors.toList())
                 .contains(station);
@@ -50,12 +50,12 @@ public class Sections {
     }
 
     public Sections remove(final Station station) {
-        validateDownwardTerminal(station);
+        validateDownStationTerminal(station);
         validateSize();
 
         return new Sections(
                 sections.stream()
-                        .filter(s -> !station.equals(s.getDownward()))
+                        .filter(s -> !station.equals(s.getDownStation()))
                         .collect(Collectors.toList())
         );
     }
@@ -66,7 +66,7 @@ public class Sections {
         }
     }
 
-    private void validateDownwardTerminal(final Station station) {
+    private void validateDownStationTerminal(final Station station) {
         if (!isTerminal(station)) {
             throw new IllegalArgumentException("하행 종점역이 아니면 지울 수 없습니다.");
         }

@@ -16,8 +16,8 @@ create table if not exists LINE
 create table if not exists SECTION
 (
     id bigint auto_increment not null,
-    upward_id bigint not null,
-    downward_id bigint not null,
+    up_station_id bigint not null,
+    down_station_id bigint not null,
     line_id bigint not null,
     distance int not null,
     primary key(id)

@@ -401,7 +401,7 @@ public class LineIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("노선에서 하행 종점역을 삭제할 수 있다.")
-    void removeDownwardStation() {
+    void removeDownStation() {
         // given
         ExtractableResponse<Response> createStation1Response = RestAssured
                 .given().log().all()
@@ -462,7 +462,7 @@ public class LineIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("노선의 하행 종점역이 아니면 삭제할 수 없다.")
-    void removeNotDownwardStationBadRequest() {
+    void removeNotDownStationBadRequest() {
         // given
         ExtractableResponse<Response> createStation1Response = RestAssured
                 .given().log().all()

@@ -21,8 +21,8 @@ public class SectionDao {
     private final RowMapper<Section> rowMapper = (rs, rowNum) ->
             new Section(
                     rs.getLong("section_id"),
-                    new Station(rs.getLong("upward_id"), rs.getString("upward_name")),
-                    new Station(rs.getLong("downward_id"), rs.getString("downward_name")),
+                    new Station(rs.getLong("up_station_id"), rs.getString("up_station_name")),
+                    new Station(rs.getLong("down_station_id"), rs.getString("down_station_name")),
                     new Line(rs.getLong("line_id"), rs.getString("line_name"), rs.getString("line_Color")),
                     rs.getInt("section_distance")
             );
@@ -37,36 +37,36 @@ public class SectionDao {
     public Section insert(final Section section) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
-        params.put("upward_id", section.getUpward().getId());
-        params.put("downward_id", section.getDownward().getId());
+        params.put("up_station_id", section.getUpStation().getId());
+        params.put("down_station_id", section.getDownStation().getId());
         params.put("line_id", section.getLine().getId());
         params.put("distance", section.getDistance());
 
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(sectionId, section.getUpward(), section.getDownward(), section.getLine(), section.getDistance());
+        return new Section(sectionId, section.getUpStation(), section.getDownStation(), section.getLine(), section.getDistance());
     }
 
     public Sections findAllByLineId(final Long lineId) {
         String sql = "select section.id as section_id, " +
-                "upward.id as upward_id, " +
-                "upward.name as upward_name, " +
-                "downward.id as downward_id, " +
-                "downward.name as downward_name, " +
+                "up_station.id as up_station_id, " +
+                "up_station.name as up_station_name, " +
+                "down_station.id as down_station_id, " +
+                "down_station.name as down_station_name, " +
                 "line.id as line_id, " +
                 "line.name as line_name, " +
                 "line.color as line_color," +
                 "section.distance as section_distance " +
                 "from SECTION section " +
                 "left join LINE line on section.line_id=line.id " +
-                "left join STATION upward on section.upward_id = upward.id " +
-                "left join STATION downward on section.downward_id = downward.id " +
+                "left join STATION up_station on section.up_station_id = up_station.id " +
+                "left join STATION down_station on section.down_station_id = down_station.id " +
                 "where section.line_id = ?";
 
         return new Sections(jdbcTemplate.query(sql, rowMapper, lineId));
     }
 
     public void deleteByLineIdAndStationId(Long lineId, Long stationId) {
-        String sql = "delete from SECTION where line_id = ? and downward_id = ?";
+        String sql = "delete from SECTION where line_id = ? and down_station_id = ?";
         jdbcTemplate.update(sql, lineId, stationId);
     }
 }

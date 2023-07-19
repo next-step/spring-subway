@@ -23,11 +23,10 @@ public class SectionService {
     }
 
     public void saveSection(final Long lineId, final SectionRequest request) {
-        Sections sections = sectionDao.findAllByLineId(lineId);
-        Line line = lineDao.findById(lineId).addSections(sections);
-        Station upward = stationDao.findById(request.getUpStationId());
-        Station downward = stationDao.findById(request.getDownStationId());
-        Section section = new Section(upward, downward, line, request.getDistance());
+        Line line = findById(lineId);
+        Station upStation = stationDao.findById(request.getUpStationId());
+        Station downStation = stationDao.findById(request.getDownStationId());
+        Section section = new Section(upStation, downStation, line, request.getDistance());
 
         line.addSection(section);
 
@@ -35,12 +34,18 @@ public class SectionService {
     }
 
     public void deleteStation(Long lineId, Long stationId) {
-        Sections sections = sectionDao.findAllByLineId(lineId);
-        Line line = lineDao.findById(lineId).addSections(sections);
+        Line line = findById(lineId);
         Station station = stationDao.findById(stationId);
 
         line.getSections().remove(station);
 
         sectionDao.deleteByLineIdAndStationId(lineId, stationId);
     }
+
+    private Line findById(Long lineId) {
+        Sections sections = sectionDao.findAllByLineId(lineId);
+        Line line = lineDao.findById(lineId).addSections(sections);
+        return line;
+    }
+
 }

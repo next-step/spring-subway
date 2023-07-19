@@ -146,7 +146,7 @@ class SectionsTest {
 
     @Test
     @DisplayName("하행 종점역이 아닌 역을 삭제 할 수 없다.")
-    void validateDownwardTerminalRemoveSectionTest() {
+    void validateDownStationTerminalRemoveSectionTest() {
         // given
         Station deleteStation = new Station("신대방역");
         Sections sections = new Sections(List.of(
@@ -165,7 +165,8 @@ class SectionsTest {
         ));
 
         // when, then
-        assertThatCode(() -> sections.remove(deleteStation)).isInstanceOf(IllegalArgumentException.class)
+        assertThatCode(() -> sections.remove(deleteStation))
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("하행 종점역이 아니면 지울 수 없습니다.");
     }
 
@@ -184,7 +185,8 @@ class SectionsTest {
         ));
 
         // when, then
-        assertThatCode(() -> sections.remove(deleteStation)).isInstanceOf(IllegalArgumentException.class)
+        assertThatCode(() -> sections.remove(deleteStation))
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
     }
 

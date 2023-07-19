@@ -2,27 +2,27 @@ package subway.domain;
 
 public class Section {
     private final Long id;
-    private final Station upward;
-    private final Station downward;
+    private final Station upStation;
+    private final Station downStation;
     private final Line line;
     private final int distance;
 
-    public Section(final Long id, final Station upward, final Station downward, final Line line, final int distance) {
-        validate(upward, downward);
+    public Section(final Long id, final Station upStation, final Station downStation, final Line line, final int distance) {
+        validate(upStation, downStation);
 
         this.id = id;
-        this.upward = upward;
-        this.downward = downward;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.line = line;
         this.distance = distance;
     }
 
-    public Section(final Station upward, final Station downward, final Line line, final int distance) {
-        this(null, upward, downward, line, distance);
+    public Section(final Station upStation, final Station downStation, final Line line, final int distance) {
+        this(null, upStation, downStation, line, distance);
     }
 
-    private void validate(final Station upward, final Station downward) {
-        if (upward == downward) {
+    private void validate(final Station upStation, final Station downStation) {
+        if (upStation == downStation) {
             throw new IllegalArgumentException("상행역과 하행역이 같을 수 없습니다");
         }
     }
@@ -31,12 +31,12 @@ public class Section {
         return id;
     }
 
-    public Station getDownward() {
-        return downward;
+    public Station getDownStation() {
+        return downStation;
     }
 
-    public Station getUpward() {
-        return upward;
+    public Station getUpStation() {
+        return upStation;
     }
 
     public int getDistance() {
