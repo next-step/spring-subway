@@ -197,4 +197,41 @@ class SectionTest {
         }
     }
 
+    @Nested
+    @DisplayName("disconnectDownSection 메소드는")
+    class DisconnectDownSection_Method {
+
+        @Test
+        @DisplayName("호출되면, DownSection과 연결을 해제한다")
+        void Disconnect_DownSection() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Station downStation = new Station(2L, "downStation");
+            Integer distance = 10;
+
+            Section upSection = Section.builder()
+                    .upStation(upStation)
+                    .downStation(middleStation)
+                    .distance(distance)
+                    .build();
+
+            Section downSection = Section.builder()
+                    .upStation(middleStation)
+                    .downStation(downStation)
+                    .distance(distance)
+                    .build();
+
+            upSection.connectDownSection(downSection);
+
+            // when
+            upSection.disconnectDownSection();
+
+            // then
+            assertThat(upSection.getDownSection()).isNull();
+            assertThat(downSection.getUpSection()).isNull();
+        }
+
+    }
+
 }

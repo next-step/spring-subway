@@ -110,6 +110,9 @@ public class Section {
                 '}';
     }
 
+    public void disconnectDownSection() {
+    }
+
     public static final class Builder {
 
         private Long id;
