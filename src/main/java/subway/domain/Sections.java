@@ -22,6 +22,18 @@ public class Sections {
         sections.add(newSection);
     }
 
+    public void delete(Station lastStation) {
+        validateEmpty();
+        if (this.sections.size() <= 1) {
+            throw new IllegalStateException("구간은 0개가 될 수 없습니다.");
+        }
+        int lastIndex = this.sections.size() - 1;
+        if (!this.sections.get(lastIndex).getDownStation().equals(lastStation)) {
+            throw new IllegalArgumentException("마지막 구간만 삭제할 수 있습니다.");
+        }
+        this.sections.remove(lastIndex);
+    }
+
     private List<Section> sorted(final List<Section> sections) {
         if (sections.isEmpty()) {
             return sections;
@@ -74,8 +86,8 @@ public class Sections {
                 .orElseThrow(() -> new IllegalStateException("상행 종점역을 찾을 수 없습니다."));
     }
 
-    private static void validateEmpty(final List<Section> sections) {
-        if (sections.isEmpty()) {
+    private void validateEmpty() {
+        if (this.sections.isEmpty()) {
             throw new IllegalArgumentException(EMPTY_EXCEPTION_MESSAGE);
         }
     }
@@ -108,8 +120,21 @@ public class Sections {
     }
 
     private void validateSameStation(final Section newSection) {
-        if (!sections.isEmpty() && !newSection.getUpStation().equals(sections.get(sections.size() - 1).getDownStation())) {
+        if (!this.sections.isEmpty() && !newSection.getUpStation().equals(sections.get(sections.size() - 1).getDownStation())) {
             throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sections sections1 = (Sections) o;
+        return Objects.equals(sections, sections1.sections);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sections);
     }
 }
