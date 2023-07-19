@@ -4,22 +4,22 @@ public class Section {
 
     private Long id;
     private Long lineId;
-    private Long downStationId;
     private Long upStationId;
+    private Long downStationId;
     private Integer distance;
 
-    public Section(final Long id, final Long lineId, final Long downStationId, final Long upStationId, final Integer distance) {
+    public Section(final Long id, final Long lineId, final Long upStationId, final Long downStationId, final Integer distance) {
         validate(distance);
 
         this.id = id;
         this.lineId = lineId;
-        this.downStationId = downStationId;
         this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public Section(final Long lineId, final Long downStationId, final Long upStationId, final Integer distance) {
-        this(null, lineId, downStationId, upStationId, distance);
+    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Integer distance) {
+        this(null, lineId, upStationId, downStationId, distance);
     }
 
     private void validate(final int distance) {
@@ -36,12 +36,12 @@ public class Section {
         return lineId;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
     public Long getUpStationId() {
         return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
     }
 
     public Integer getDistance() {

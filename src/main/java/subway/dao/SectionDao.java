@@ -21,8 +21,8 @@ public class SectionDao {
             new Section(
                     rs.getLong("id"),
                     rs.getLong("line_id"),
-                    rs.getLong("down_station_id"),
                     rs.getLong("up_station_id"),
+                    rs.getLong("down_station_id"),
                     rs.getInt("distance")
             );
 
@@ -36,7 +36,7 @@ public class SectionDao {
     public Section insert(final Section section) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(section);
         Long id = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(id, section.getLineId(), section.getDownStationId(), section.getUpStationId(), section.getDistance());
+        return new Section(id, section.getLineId(), section.getUpStationId(), section.getDownStationId(), section.getDistance());
     }
 
     public Optional<Section> findByLineIdAndStationId(final long lineId, final long stationId) {
@@ -49,7 +49,7 @@ public class SectionDao {
     public Optional<Section> findLastSection(final Long lineId) {
         String sql = "select * from SECTION S1 " +
                 "where S1.line_id = ? " +
-                "and not exist(select * from section S2 where S1.down_station_id = S2.up_station_id)";
+                "and not exists(select * from section S2 where S1.down_station_id = S2.up_station_id)";
         return jdbcTemplate.query(sql, rowMapper, lineId)
                 .stream()
                 .findAny();

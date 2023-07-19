@@ -6,19 +6,19 @@ public class SectionResponse {
 
     private final Long id;
     private final Long lineId;
-    private final Long downStationId;
     private final Long upStationId;
+    private final Long downStationId;
     private final Integer distance;
 
     public SectionResponse(final Long id,
                            final Long lineId,
-                           final Long downStationId,
                            final Long upStationId,
+                           final Long downStationId,
                            final Integer distance) {
         this.id = id;
         this.lineId = lineId;
-        this.downStationId = downStationId;
         this.upStationId = upStationId;
+        this.downStationId = downStationId;
         this.distance = distance;
     }
 
@@ -26,8 +26,8 @@ public class SectionResponse {
         return new SectionResponse(
                 section.getId(),
                 section.getLineId(),
-                section.getDownStationId(),
                 section.getUpStationId(),
+                section.getDownStationId(),
                 section.getDistance()
         );
     }
@@ -40,12 +40,12 @@ public class SectionResponse {
         return lineId;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
     public Long getUpStationId() {
         return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
     }
 
     public Integer getDistance() {
