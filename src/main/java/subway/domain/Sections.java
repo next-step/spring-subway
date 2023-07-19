@@ -87,6 +87,9 @@ public class Sections {
         if (!contains(section.getUpStation()) && !contains(section.getDownStation())) {
             throw new IllegalArgumentException("두 역 중 하나는 기존 노선에 포함되어야 합니다");
         }
-        return null;
+        List<Section> newSection = new ArrayList<>(this.sections);
+        newSection.add(section);
+        return new Sections(newSection);
+        
     }
 }

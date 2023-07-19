@@ -240,7 +240,7 @@ class SectionsTest {
 
     @Test
     @DisplayName("새로운 역의 상행역이 기존 노선의 하행종점역인 경우 추가.")
-    void name() {
+    void newUpStationMatchesDownTerminal() {
         // given
         Section section = new Section(
                 new Station("서울대입구역"),
