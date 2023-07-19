@@ -62,7 +62,7 @@ class SectionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
-                .describedAs("해당 노선은 생성되지 않았습니다.")
+                .hasMessage("해당 노선은 생성되지 않았습니다.")
                 .isInstanceOf(IllegalSectionException.class);
 
     }
@@ -78,7 +78,7 @@ class SectionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
-                .describedAs("새로운 구간의 상행 역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.")
+                .hasMessage("해당 역은 노선의 하행 종점역이 아닙니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
 
@@ -94,7 +94,7 @@ class SectionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
-                .describedAs("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.")
+                .hasMessage("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
 
@@ -103,6 +103,9 @@ class SectionServiceTest {
     void deleteSection() {
         // given
         final long stationId = 3;
+
+        given(sectionDao.findLastSection(1L))
+                .willReturn(Optional.of(new Section(1L, 2L, 3L, 10)));
 
         // when & then
         assertThatNoException().isThrownBy(() -> sectionService.deleteSection(1L, stationId));
@@ -120,7 +123,7 @@ class SectionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> sectionService.deleteSection(lineId, stationId))
-                .describedAs("")
+                .hasMessage("해당 역은 노선의 하행 종점역이 아닙니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
 }

@@ -25,15 +25,17 @@ public class SectionService {
     }
 
     public void deleteSection(final long lineId, final long stationId) {
+        validateLineAndLastStation(lineId, stationId);
+
         sectionDao.deleteLastSection(lineId, stationId);
     }
 
-    private void validateLineAndLastStation(final long lineId, final long upStationId) {
+    private void validateLineAndLastStation(final long lineId, final long stationId) {
         final Section lastSection = sectionDao.findLastSection(lineId)
                 .orElseThrow(() -> new IllegalSectionException("해당 노선은 생성되지 않았습니다."));
 
-        if(!lastSection.getDownStationId().equals(upStationId)) {
-            throw new IllegalSectionException("새로운 구간의 상행 역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.");
+        if(!lastSection.getDownStationId().equals(stationId)) {
+            throw new IllegalSectionException("해당 역은 노선의 하행 종점역이 아닙니다.");
         }
     }
 

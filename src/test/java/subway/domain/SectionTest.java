@@ -18,7 +18,7 @@ class SectionTest {
     @Test
     void validateDistanceTest() {
         assertThatThrownBy(() -> new Section(1L, 2L, 4L,0))
-                .describedAs("구간 길이는 0보다 커야한다.")
+                .hasMessage("구간 길이는 0보다 커야한다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
 }
