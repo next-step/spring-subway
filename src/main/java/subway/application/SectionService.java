@@ -33,6 +33,10 @@ public class SectionService {
         return SectionResponse.of(section);
     }
 
+    public void deleteSection(final Long lineId, final Long downStationId) {
+        sectionDao.delete(lineId, downStationId);
+    }
+
     private void validateRequest(final Sections sections, final SectionRequest sectionRequest) {
         if (!sections.containsStation(sectionRequest.getUpStationId())) {
             throw new SubwayException("새로운 구간의 상행역이 해당 노선에 등록되어 있지 않습니다.");

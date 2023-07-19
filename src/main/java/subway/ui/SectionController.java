@@ -1,10 +1,7 @@
 package subway.ui;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import subway.application.SectionService;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
@@ -28,5 +25,15 @@ public class SectionController {
         SectionResponse sectionResponse = sectionService.createSection(lineId, sectionRequest);
 
         return ResponseEntity.created(URI.create("/sections/" + sectionResponse.getId())).body(sectionResponse);
+    }
+
+    @DeleteMapping("/lines/{lineId}/sections")
+    public ResponseEntity<Void> createSection(
+            @PathVariable Long lineId,
+            @RequestParam Long stationId
+    ) {
+        sectionService.deleteSection(lineId, stationId);
+
+        return ResponseEntity.noContent().build();
     }
 }

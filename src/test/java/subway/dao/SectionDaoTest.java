@@ -9,7 +9,6 @@ import subway.domain.Section;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-// TODO: data.sql 파일을 2번 읽는 것 같다. 테스트 메서드를 각각 실행하면 pass 하는데, 두 개 이상을 실행하면 ScriptStatementFailedException
 @SpringBootTest
 @Transactional
 class SectionDaoTest {
@@ -49,5 +48,19 @@ class SectionDaoTest {
 
         /* then */
         assertThat(insert).isEqualTo(section);
+    }
+
+    @Test
+    @DisplayName("구간을 하나 삭제한다.")
+    void delete() {
+        /* given */
+        final Long targetLineId = 2L;
+        final Long targetDownSectionId = 25L;
+
+        /* when */
+        final int result = sectionDao.delete(targetLineId, targetDownSectionId);
+
+        /* then */
+        assertThat(result).isEqualTo(1);
     }
 }

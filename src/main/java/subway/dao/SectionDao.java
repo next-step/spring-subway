@@ -72,4 +72,10 @@ public class SectionDao {
     public void updatePrevSectionId(final Section target, final Long newPrevSectionId) {
         jdbcTemplate.update("update SECTION set prev_section_id = ? where id = ?", newPrevSectionId, target.getId());
     }
+
+    public int delete(final Long lineId, final Long downStationId) {
+        final String sql = "delete from SECTION where line_id = ? and down_station_id = ?";
+
+        return jdbcTemplate.update(sql, lineId, downStationId);
+    }
 }

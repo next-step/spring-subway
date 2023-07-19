@@ -27,6 +27,6 @@ create table if not exists SECTION
     foreign key (line_id) references LINE(id),
     foreign key (up_station_id) references STATION(id),
     foreign key (down_station_id) references STATION(id),
-    foreign key (next_section_id) references SECTION(id),
-    foreign key (prev_section_id) references SECTION(id)
+    foreign key (next_section_id) references SECTION(id) on delete set null,
+    foreign key (prev_section_id) references SECTION(id) on delete set null
 );
