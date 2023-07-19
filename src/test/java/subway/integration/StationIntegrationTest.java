@@ -21,6 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 class StationIntegrationTest extends IntegrationTest {
 
+    static void createInitialStations() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "A");
+        createStation(params);
+        params.put("name", "B");
+        createStation(params);
+    }
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {

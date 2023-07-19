@@ -3,8 +3,6 @@ package subway.integration;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +40,7 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLine() {
         //given
-        createInitialStations();
+        StationIntegrationTest.createInitialStations();
         lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
 
         // when
@@ -63,7 +61,7 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLineWithDuplicateName() {
         // given
-        createInitialStations();
+        StationIntegrationTest.createInitialStations();
         lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
         createLine(lineRequest1);
 
@@ -84,7 +82,7 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLines() {
         // given
-        createInitialStations();
+        StationIntegrationTest.createInitialStations();
         lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
         lineRequest2 = new LineRequest("경강선", 1L, 2L, 3, "bg-red-600");
         ExtractableResponse<Response> createResponse1 = createLine(lineRequest1);
@@ -113,7 +111,7 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLine() {
         // given
-        createInitialStations();
+        StationIntegrationTest.createInitialStations();
         lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
         ExtractableResponse<Response> createResponse = createLine(lineRequest1);
 
@@ -136,7 +134,7 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void updateLine() {
         // given
-        createInitialStations();
+        StationIntegrationTest.createInitialStations();
         lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
         lineRequest2 = new LineRequest("경강선", 1L, 2L, 3, "bg-red-600");
         ExtractableResponse<Response> createResponse = createLine(lineRequest1);
@@ -159,7 +157,7 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void deleteLine() {
         // given
-        createInitialStations();
+        StationIntegrationTest.createInitialStations();
         lineRequest1 = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
         ExtractableResponse<Response> createResponse = createLine(lineRequest1);
 
@@ -183,13 +181,5 @@ class LineIntegrationTest extends IntegrationTest {
             .when().post("/lines")
             .then().log().all().
             extract();
-    }
-
-    private static void createInitialStations() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "A");
-        StationIntegrationTest.createStation(params);
-        params.put("name", "B");
-        StationIntegrationTest.createStation(params);
     }
 }
