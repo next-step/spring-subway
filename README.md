@@ -41,7 +41,6 @@
 - 요청 
 - [ ] DELETE ```/lines/{노선 id}/sections``` 로 보낸다.
 - [ ] query parameter로 ```역의 id(stationId)``` 를 요청한다.
-  - [ ] 역의 노선 id와 노선 id는 같다.
 - 응답
 - [ ] 성공적으로 구간이 삭제되면 Status Code는 200을 보낸다.
 - [ ] 올바르지 않은 요청으로 삭제 실패시 Status Code 400과 에러 메세지를 보낸다.

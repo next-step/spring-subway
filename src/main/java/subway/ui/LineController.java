@@ -60,4 +60,9 @@ public class LineController {
                 .created(URI.create("/sections/" + sectionResponse.getId()))
                 .body(sectionResponse);
     }
+
+    @DeleteMapping ("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id) {
+        return ResponseEntity.noContent().build();
+    }
 }

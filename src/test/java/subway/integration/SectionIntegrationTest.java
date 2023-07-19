@@ -21,6 +21,7 @@ class SectionIntegrationTest extends IntegrationTest {
     private StationRequest stationRequest1;
     private StationRequest stationRequest2;
     private StationRequest stationRequest3;
+    private SectionRequest sectionRequest;
 
     @BeforeEach
     public void setUp() {
@@ -30,6 +31,7 @@ class SectionIntegrationTest extends IntegrationTest {
         stationRequest1 = new StationRequest("인천");
         stationRequest2 = new StationRequest("부평");
         stationRequest3 = new StationRequest("서울");
+        sectionRequest = new SectionRequest( "2", "3",10);
     }
 
     @DisplayName("지하철 구간을 생성한다.")
@@ -68,13 +70,11 @@ class SectionIntegrationTest extends IntegrationTest {
                 .then().log().all()
                 .extract();
 
-        SectionRequest request = new SectionRequest( "2", "3",10);
-
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(request)
+                .body(sectionRequest)
                 .when().post("/lines/1/sections")
                 .then().log().all()
                 .extract();
@@ -82,5 +82,61 @@ class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    @DisplayName("지하철 구간을 삭제한다.")
+    @Test
+    void deleteSection() {
+        // given
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/1/sections?stationId=3")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
