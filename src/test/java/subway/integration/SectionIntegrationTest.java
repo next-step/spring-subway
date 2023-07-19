@@ -114,7 +114,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("지하철 구간을 제거한다.")
     void deleteSection() {
         /* given */
-        final Long lineId = 1L;
+        final Long lineId = 2L;
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
