@@ -54,12 +54,12 @@ public class LineService {
     }
 
     public LineResponse findLineResponseById(Long id) {
-        Line persistLine = findLineById(id);
+        Line persistLine = getLineById(id);
         return LineResponse.of(persistLine);
     }
 
     public void connectSectionByStationId(Long lineId, SectionRequest sectionRequest) {
-        Line line = findLineById(lineId);
+        Line line = getLineById(lineId);
         List<Section> sections = sectionDao.findAllByLineId(lineId);
 
         LineManager lineManager = new LineManager(line, sections);
@@ -72,7 +72,19 @@ public class LineService {
         sectionDao.insert(downSection);
     }
 
-    public Line findLineById(Long id) {
+    public void disconnectSectionByStationId(Long lineId, Long stationId) {
+        Line line = getLineById(lineId);
+        List<Section> sections = sectionDao.findAllByLineId(lineId);
+        Station station = getStation(stationId);
+
+        LineManager lineManager = new LineManager(line, sections);
+
+        lineManager.disconnectDownSection(station);
+
+        sectionDao.deleteByDownStationId(stationId);
+    }
+
+    private Line getLineById(Long id) {
         return lineDao.findById(id)
                 .orElseThrow(() -> new IllegalStateException(
                         MessageFormat.format("lineId \"{0}\"에 해당하는 line이 존재하지 않습니다", id)
@@ -105,4 +117,5 @@ public class LineService {
                 )
         );
     }
+
 }

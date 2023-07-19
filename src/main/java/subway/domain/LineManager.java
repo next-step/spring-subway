@@ -33,7 +33,9 @@ public class LineManager {
     }
 
     public void disconnectDownSection(Station downStation) {
-        Assert.isTrue(sections.size() == 1, () -> "line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.");
+        sections.stream().forEach(section -> System.out.println("section = " + section));
+        System.out.println(sections.size());
+        Assert.isTrue(sections.size() > 1, () -> "line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.");
         Section downSection = sections.get(0).findDownSection();
         Assert.isTrue(downSection.getUpStation().equals(downStation),
                 () -> MessageFormat.format("삭제할 station \"{0}\" 은 하행의 upStation \"{1}\" 과 일치해야 합니다.",
