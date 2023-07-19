@@ -164,5 +164,4 @@ class LineManagerTest {
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
     }
-
 }

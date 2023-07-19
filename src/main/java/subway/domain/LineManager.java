@@ -2,6 +2,7 @@ package subway.domain;
 
 import java.text.MessageFormat;
 import java.util.List;
+import org.springframework.util.Assert;
 
 public class LineManager {
 
@@ -33,6 +34,10 @@ public class LineManager {
 
     public void disconnectDownSection(Station downStation) {
         Section downSection = sections.get(0).findDownSection();
+        Assert.isTrue(downSection.getUpStation().equals(downStation),
+                () -> MessageFormat.format("삭제할 station \"{0}\" 은 하행의 upStation \"{1}\" 과 일치해야 합니다.",
+                        downStation, downSection.getUpStation()));
+
         Section upSection = downSection.getUpSection();
         upSection.disconnectDownSection();
         sections.remove(downSection);
