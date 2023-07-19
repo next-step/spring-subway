@@ -71,7 +71,14 @@ public class SectionDao {
 
     public int delete(final Long lineId, final Long downStationId) {
         final String sql = "delete from SECTION where line_id = ? and down_station_id = ? and prev_section_id is NULL";
-        
+
         return jdbcTemplate.update(sql, lineId, downStationId);
+    }
+
+    public Long countByNotExistNextSectionAndPrevSection(final Long lineId) {
+        final String readSql = "select count(id) from SECTION " +
+                "where line_id = ? and next_section_id is NULL and prev_section_id is NULL";
+
+        return jdbcTemplate.queryForObject(readSql, Long.class, lineId);
     }
 }

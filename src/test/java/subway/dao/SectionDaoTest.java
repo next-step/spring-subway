@@ -62,4 +62,17 @@ class SectionDaoTest {
         /* then */
         assertThat(result).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("노선에 앞뒤로 구간이 존재하지 않는 구간의 개수를 센다.")
+    void countByNotExistNextSectionAndPrevSection() {
+        /* given */
+        final Long targetLineId = 1L;
+
+        /* when */
+        final Long result = sectionDao.countByNotExistNextSectionAndPrevSection(targetLineId);
+
+        /* then */
+        assertThat(result).isEqualTo(1L);
+    }
 }
