@@ -67,4 +67,12 @@ class SectionTest {
         assertThat(section.hasDownStationSameAs(stationB)).isTrue();
         assertThat(section.hasDownStationSameAs(stationA)).isFalse();
     }
+
+    @Test
+    @DisplayName("구간은 주어진 라인의 소속이다")
+    void sectionBelongToLine() {
+        Section section = new Section(lineA, stationA, stationB, 1);
+        
+        assertThat(section.belongTo(lineA)).isTrue();
+    }
 }

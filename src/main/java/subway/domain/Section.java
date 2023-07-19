@@ -93,4 +93,8 @@ public class Section {
     public boolean hasDownStationSameAs(Station station) {
         return station.equals(this.downStation);
     }
+
+    public boolean belongTo(Line line) {
+        return this.line.equals(line);
+    }
 }
