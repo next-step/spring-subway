@@ -1,5 +1,6 @@
 package subway.application;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,8 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = stationDao.findById(Long.valueOf(request.getUpStationId()));
-        Station downStation = stationDao.findById(Long.valueOf(request.getDownStationId()));
+        Station upStation = getStation(Long.valueOf(request.getUpStationId()));
+        Station downStation = getStation(Long.valueOf(request.getDownStationId()));
         Section section = Section.builder()
                 .line(persistLine)
                 .distance(request.getDistance())
@@ -57,20 +58,8 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
-    public Line findLineById(Long id) {
-        return lineDao.findById(id);
-    }
-
-    public void updateLine(Long id, LineRequest lineUpdateRequest) {
-        lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
-    }
-
-    public void deleteLineById(Long id) {
-        lineDao.deleteById(id);
-    }
-
     public void connectSectionByStationId(Long lineId, SectionRequest sectionRequest) {
-        Line line = lineDao.findById(lineId);
+        Line line = findLineById(lineId);
         List<Section> sections = sectionDao.findAllByLineId(lineId);
 
         LineManager lineManager = new LineManager(line, sections);
@@ -83,9 +72,24 @@ public class LineService {
         sectionDao.insert(downSection);
     }
 
+    public Line findLineById(Long id) {
+        return lineDao.findById(id)
+                .orElseThrow(() -> new IllegalStateException(
+                        MessageFormat.format("lineId \"{0}\"에 해당하는 line이 존재하지 않습니다", id)
+                ));
+    }
+
+    public void updateLine(Long id, LineRequest lineUpdateRequest) {
+        lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
+    }
+
+    public void deleteLineById(Long id) {
+        lineDao.deleteById(id);
+    }
+
     private Section getDownSection(Line line, Long upStationId, Long downStationId, Integer distance) {
-        Station upStation = stationDao.findById(upStationId);
-        Station downStation = stationDao.findById(downStationId);
+        Station upStation = getStation(upStationId);
+        Station downStation = getStation(downStationId);
 
         return Section.builder()
                 .line(line)
@@ -95,4 +99,10 @@ public class LineService {
                 .build();
     }
 
+    private Station getStation(Long stationId) {
+        return stationDao.findById(stationId).orElseThrow(() -> new IllegalStateException(
+                        MessageFormat.format("stationId \"{0}\"에 해당하는 station이 존재하지 않습니다", stationId)
+                )
+        );
+    }
 }

@@ -3,6 +3,7 @@ package subway.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -43,8 +44,9 @@ class SectionServiceTest {
             Long downStationId = 2L;
             String downStationName = "downStation";
 
-            when(stationDao.findById(upStationId)).thenReturn(new Station(upStationId, upStationName));
-            when(stationDao.findById(downStationId)).thenReturn(new Station(downStationId, downStationName));
+            when(stationDao.findById(upStationId)).thenReturn(Optional.of(new Station(upStationId, upStationName)));
+            when(stationDao.findById(downStationId)).thenReturn(
+                    Optional.of(new Station(downStationId, downStationName)));
 
             // when
             Exception exception = Assertions.catchException(

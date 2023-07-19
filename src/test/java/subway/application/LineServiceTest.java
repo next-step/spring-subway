@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.catchException;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class LineServiceTest {
 
 
         @Test
-        @DisplayName("line의 하행과 새로운 section의 상행이 일치하는 section이 들어오면, section이 추가된 line을 반환한다")
+        @DisplayName("line의 하행과 새로운 section의 상행이 일치하는 section이 들어오면, section이 추가된다")
         void Connect_Section_When_Valid_Section_Input() {
             // given
             Line line = new Line(1L, "line", "red");
@@ -73,11 +74,13 @@ class LineServiceTest {
                     String.valueOf(downStation.getId()),
                     downSection.getDistance());
 
+            when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
+
             when(sectionDao.findAllByLineId(line.getId())).thenReturn(List.of(upSection));
             when(sectionDao.insert(downSection)).thenReturn(downSection);
 
-            when(stationDao.findById(middleStation.getId())).thenReturn(middleStation);
-            when(stationDao.findById(downStation.getId())).thenReturn(downStation);
+            when(stationDao.findById(middleStation.getId())).thenReturn(Optional.of(middleStation));
+            when(stationDao.findById(downStation.getId())).thenReturn(Optional.of(downStation));
 
             // when
             Exception exception = catchException(
