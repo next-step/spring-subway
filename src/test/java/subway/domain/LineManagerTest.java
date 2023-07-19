@@ -163,5 +163,31 @@ class LineManagerTest {
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
+
+        @Test
+        @DisplayName("line에 구간이 하나만 있다면, IllegalArgumentException을 던진다")
+        void Throw_IllegalArgumentException_When_Line_Size_1() {
+            // given
+            Line line = new Line(1L, "line", "red");
+
+            Station upStation = new Station(1L, "upStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section upSection = Section.builder()
+                    .id(1L)
+                    .line(line)
+                    .upStation(upStation)
+                    .downStation(downStation)
+                    .distance(1)
+                    .build();
+
+            LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
+
+            // when
+            Exception exception = catchException(() -> lineManager.disconnectDownSection(downStation));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 }
