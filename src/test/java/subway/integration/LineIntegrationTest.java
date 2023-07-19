@@ -138,7 +138,7 @@ public class LineIntegrationTest extends IntegrationTest {
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
-        
+
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -385,7 +385,6 @@ public class LineIntegrationTest extends IntegrationTest {
                 .extract();
         Long lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
 
-
         // when
         SectionRequest sectionRequest = new SectionRequest(station3Id, station2Id, 15);
         ExtractableResponse<Response> response = RestAssured
@@ -393,6 +392,171 @@ public class LineIntegrationTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
                 .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("노선에서 하행 종점역을 삭제할 수 있다.")
+    void removeDownwardStation() {
+        // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation3Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest3)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station3Id = Long.parseLong(createStation3Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> lineResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+        Long lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
+
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station3Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("노선의 하행 종점역이 아니면 삭제할 수 없다.")
+    void removeNotDownwardStationBadRequest() {
+        // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation3Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest3)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station3Id = Long.parseLong(createStation3Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> lineResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+        Long lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
+
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station2Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("노선에서 구간이 하나인 경우 역을 삭제할 수 없다.")
+    void removeOnlyOneSectionBadRequest() {
+        // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> lineResponse = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+        Long lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station2Id)
                 .then().log().all()
                 .extract();
 

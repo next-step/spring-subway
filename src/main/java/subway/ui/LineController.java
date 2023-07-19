@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
 import subway.application.SectionService;
@@ -65,6 +66,12 @@ public class LineController {
     public ResponseEntity<Void> createSection(@PathVariable final Long id, @RequestBody final SectionRequest sectionRequest) {
         sectionService.saveSection(id, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
+    }
+
+    @DeleteMapping("/{lineId}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable final Long lineId, @RequestParam final Long stationId) {
+        sectionService.deleteStation(lineId, stationId);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(SQLException.class)

@@ -49,7 +49,7 @@ public class Sections {
         );
     }
 
-    public Sections remove(Station station) {
+    public Sections remove(final Station station) {
         validateDownwardTerminal(station);
         validateSize();
 
@@ -66,7 +66,7 @@ public class Sections {
         }
     }
 
-    private void validateDownwardTerminal(Station station) {
+    private void validateDownwardTerminal(final Station station) {
         if (!isTerminal(station)) {
             throw new IllegalArgumentException("하행 종점역이 아니면 지울 수 없습니다.");
         }

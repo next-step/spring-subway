@@ -33,4 +33,14 @@ public class SectionService {
 
         sectionDao.insert(section);
     }
+
+    public void deleteStation(Long lineId, Long stationId) {
+        Sections sections = sectionDao.findAllByLineId(lineId);
+        Line line = lineDao.findById(lineId).addSections(sections);
+        Station station = stationDao.findById(stationId);
+
+        line.getSections().remove(station);
+
+        sectionDao.deleteByLineIdAndStationId(lineId, stationId);
+    }
 }
