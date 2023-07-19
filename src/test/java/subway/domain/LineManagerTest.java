@@ -85,7 +85,7 @@ class LineManagerTest {
             lineManager.connectDownSection(downSection);
 
             // when
-            lineManager.disconnectDownSection(middleStation);
+            lineManager.disconnectDownSection(downStation);
 
             // then
             assertThat(upSection.getDownSection()).isNull();
@@ -130,6 +130,34 @@ class LineManagerTest {
 
             // when
             Exception exception = catchException(() -> lineManager.disconnectDownSection(downStation));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("line의 중간에 있는 section을 삭제하려고 할 경우, IllegalArgumentException을 던진다")
+        void Throw_IllegalArgumentException_When_Disconnect_Middle_Section() {
+            // given
+            Line line = new Line(1L, "line", "red");
+
+            Station upStation = new Station(1L, "upStation");
+            Station middleUpStation = new Station(2L, "middleUpStation");
+            Station middleDownStation = new Station(3L, "middleDownStation");
+            Station downStation = new Station(4L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleUpStation);
+            Section middleUpSection = DomainFixture.Section.buildWithStations(middleUpStation, middleDownStation);
+            Section middleDownSection = DomainFixture.Section.buildWithStations(middleDownStation, downStation);
+
+            upSection.connectDownSection(middleUpSection);
+            middleUpSection.connectDownSection(middleDownSection);
+
+            LineManager lineManager = new LineManager(line,
+                    Arrays.asList(upSection, middleUpSection, middleDownSection));
+
+            // when
+            Exception exception = catchException(() -> lineManager.disconnectDownSection(middleUpStation));
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);

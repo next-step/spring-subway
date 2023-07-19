@@ -108,7 +108,7 @@ class LineServiceTest {
 
             // when
             Exception exception = catchException(
-                    () -> lineService.disconnectSectionByStationId(line.getId(), middleStation.getId()));
+                    () -> lineService.disconnectSectionByStationId(line.getId(), downStation.getId()));
 
             // then
             assertThat(exception).isNull();

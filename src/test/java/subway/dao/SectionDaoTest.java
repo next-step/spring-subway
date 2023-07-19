@@ -108,7 +108,7 @@ class SectionDaoTest {
             upSection.connectDownSection(downSection);
 
             // when
-            sectionDao.deleteByLineIdAndDownStationId(line.getId(), middleStation.getId());
+            sectionDao.deleteByLineIdAndDownStationId(line.getId(), downStation.getId());
             List<Section> sections = sectionDao.findAllByLineId(line.getId());
 
             // then
