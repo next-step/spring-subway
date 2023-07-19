@@ -98,6 +98,71 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
+    @DisplayName("지하철 구간을 생성할 때 상행역과 하행역이 같으면 예외를 던진다.")
+    @Test
+    void createSame() {
+        // given
+        createStation("강남역");
+        Long lineId = createLine("2호선", "bg-123");
+
+        ExtractableResponse<Response> stations = RestAssured.given().log().all()
+                .when()
+                .get("/stations")
+                .then().log().all()
+                .extract();
+        List<Long> stationIds = stations.jsonPath().getList(".", StationResponse.class).stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+
+        SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(0), 10);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{id}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @DisplayName("하행 종점역과 새로운 구간의 상행역이 다르면 예외를 던진다.")
+    @Test
+    void createNotSame() {
+        // given
+        createStation("강남역");
+        createStation("역삼역");
+        createStation("잠실역");
+        createStation("강변역");
+        Long lineId = createLine("2호선", "bg-123");
+
+        ExtractableResponse<Response> stations = RestAssured.given().log().all()
+                .when()
+                .get("/stations")
+                .then().log().all()
+                .extract();
+        List<Long> stationIds = stations.jsonPath().getList(".", StationResponse.class).stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+
+        SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(0), 10);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{id}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
     private static Long createLine(String name, String color) {
         Line line = new Line(name, color);
         ExtractableResponse<Response> lineResponse = RestAssured.given()
