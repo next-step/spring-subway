@@ -32,14 +32,7 @@ class SectionIntegrationTest extends IntegrationTest {
 
         Long lineId = createLine("2호선", "bg-123");
 
-        ExtractableResponse<Response> stations = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-        List<Long> stationIds = stations.jsonPath().getList(".", StationResponse.class).stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
+        List<Long> stationIds = getStationIds();
 
         SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(1), 10);
 
@@ -65,14 +58,7 @@ class SectionIntegrationTest extends IntegrationTest {
         createStation("역삼역");
         Long lineId = createLine("2호선", "bg-123");
 
-        ExtractableResponse<Response> stations = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-        List<Long> stationIds = stations.jsonPath().getList(".", StationResponse.class).stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
+        List<Long> stationIds = getStationIds();
 
         SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(1), 10);
         RestAssured.given().log().all()
@@ -105,14 +91,7 @@ class SectionIntegrationTest extends IntegrationTest {
         createStation("강남역");
         Long lineId = createLine("2호선", "bg-123");
 
-        ExtractableResponse<Response> stations = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-        List<Long> stationIds = stations.jsonPath().getList(".", StationResponse.class).stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
+        List<Long> stationIds = getStationIds();
 
         SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(0), 10);
 
@@ -139,14 +118,7 @@ class SectionIntegrationTest extends IntegrationTest {
         createStation("강변역");
         Long lineId = createLine("2호선", "bg-123");
 
-        ExtractableResponse<Response> stations = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-        List<Long> stationIds = stations.jsonPath().getList(".", StationResponse.class).stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
+        List<Long> stationIds = getStationIds();
 
         SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(0), 10);
 
@@ -161,6 +133,53 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @DisplayName("지하철 구간을 제거한다.")
+    @Test
+    void deleteSection() {
+        // given
+        createStation("강남역");
+        createStation("역삼역");
+        createStation("잠실역");
+        Long lineId = createLine("2호선", "bg-123");
+
+        List<Long> stationIds = getStationIds();
+        createSection(stationIds, 0, 1, lineId);
+        createSection(stationIds, 1, 2, lineId);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationIds.get(2))
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private static void createSection(List<Long> stationIds, int index, int index1, Long lineId) {
+        SectionRequest params = new SectionRequest(stationIds.get(index), stationIds.get(index1), 10);
+        RestAssured.given()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/lines/{id}/sections", lineId)
+                .then()
+                .extract();
+    }
+
+    private static List<Long> getStationIds() {
+        ExtractableResponse<Response> stations = RestAssured.given().log().all()
+                .when()
+                .get("/stations")
+                .then().log().all()
+                .extract();
+        List<Long> stationIds = stations.jsonPath().getList(".", StationResponse.class).stream()
+                .map(StationResponse::getId)
+                .collect(Collectors.toList());
+        return stationIds;
     }
 
     private static Long createLine(String name, String color) {
