@@ -80,5 +80,8 @@ public class Sections {
         if (contains(section.getUpStation()) && contains(section.getDownStation())) {
             throw new IllegalArgumentException("두 역 모두 기존 노선에 포함될 수 없습니다.");
         }
+        if (!contains(section.getUpStation()) && !contains(section.getDownStation())) {
+            throw new IllegalArgumentException("두 역 중 하나는 기존 노선에 포함되어야 합니다");
+        }
     }
 }
