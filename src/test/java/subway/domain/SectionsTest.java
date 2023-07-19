@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 class SectionsTest {
     @Test
-    @DisplayName("해당 역이 노선의 하행 종점역인지 검증하는 기능")
-    void terminalTest() {
+    @DisplayName("해당 역이 노선의 하행 종점역인 경우 true")
+    void downStationTerminalTest() {
         // given
         Station station = new Station(2L, "신대방역");
         Sections sections = new Sections(List.of(
@@ -28,8 +28,8 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("해당 역이 노선의 하행역이 아닌 경우")
-    void notTerminalTest() {
+    @DisplayName("해당 역이 노선의 상행 종점역인 경우 true")
+    void upStationTerminalTest() {
         // given
         Station station = new Station(1L, "서울대입구역");
         Sections sections = new Sections(List.of(
@@ -37,6 +37,28 @@ class SectionsTest {
                         1L,
                         new Station(1L, "서울대입구역"),
                         new Station(2L, "신대방역"),
+                        10
+                )
+        ));
+
+        // when & then
+        assertThat(sections.isTerminal(station)).isTrue();
+    }
+
+    @Test
+    @DisplayName("해당 역이 노선의 상행 종점역인 경우 true")
+    void notTerminalTest() {
+        // given
+        Station station = new Station("신대방역");
+        Sections sections = new Sections(List.of(
+                new Section(
+                        new Station("서울대입구역"),
+                        station,
+                        10
+                ),
+                new Section(
+                        station,
+                        new Station("잠실역"),
                         10
                 )
         ));
