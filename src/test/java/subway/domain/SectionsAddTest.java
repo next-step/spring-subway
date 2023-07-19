@@ -35,4 +35,16 @@ class SectionsAddTest {
         Assertions.assertThatThrownBy(() -> sections.add(otherLineSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    @DisplayName("추가할 구간의 두 역 모두 기존 노선에 포함되어있을 수 없다")
+    void cannotAddSectionToLineContainingBothStation() {
+        Section firstSection = new Section(lineA, stationA, stationB, 5);
+        Section secondSection = new Section(lineA, stationB, stationC, 5);
+        Section invalidSection = new Section(lineA, stationA, stationC, 3);
+        Sections sections = new Sections(List.of(firstSection, secondSection));
+
+        Assertions.assertThatThrownBy(() -> sections.add(invalidSection))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 }
