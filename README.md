@@ -32,9 +32,10 @@ Line 색(color)
   - [x] Section과 Station이 Line에 포함되어있는지 알 수 있다.
     - [x] Section이 추가될 때, 추가되는 Section의 상행Station이 자신의 하행Station과 동일한지 확인한다.
     - [x] 새로운 Section의 하행Station은 해당 Line에 등록되어있는 Station일 수 없다. (상행은 됨)
-  - [ ] Section을 삭제할 수 있다.
+  - [ ] 마지막 Section을 삭제할 수 있다.
     - [ ] Line에 하나의 Section만 있을때, 삭제할 수 없다.
     - [ ] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
+    - [ ] Line의 하행 Section의 하행 Station이 삭제할 StationId와 같지 않다면, 예외를 던진다.
 - [x] Station
   - [x] 이름을 표현한다.
   - [x] 이름이 중복되면 예외를 던진다.
@@ -70,8 +71,3 @@ lineId, upStationId, downStationId;
 - [ ] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
 
 ### TODO
-
-- [x] Optional로 리팩토링
-- [x] Section에 distance 테스트 추가
-- [x] DTO에 equals, hascode, toString 붙이기
-- [x] DTO에 response Long -> String 으로 변경

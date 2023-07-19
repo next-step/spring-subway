@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.context.ContextConfiguration;
+import subway.DomainFixture;
 import subway.dao.mapper.LineRowMapper;
 import subway.dao.mapper.SectionRowMapper;
 import subway.dao.mapper.StationRowMapper;
@@ -39,23 +40,12 @@ class SectionDaoTest {
         @DisplayName("Section을 받아 아이디를 생성하고 저장한다.")
         void Insert_Section_And_Return_Section() {
             // given
-            Line line = new Line("line", "red");
-            line = lineDao.insert(line);
+            Line line = lineDao.insert(new Line("line", "red"));
 
-            String upStationName = "upStation";
-            Station upStation = stationDao.insert(new Station(upStationName));
+            Station upStation = stationDao.insert(new Station("upStationName"));
+            Station downStation = stationDao.insert(new Station("downStationName"));
 
-            String downStationName = "downStation";
-            Station downStation = stationDao.insert(new Station(downStationName));
-
-            Integer distance = 10;
-
-            Section section = Section.builder()
-                    .line(line)
-                    .upStation(upStation)
-                    .downStation(downStation)
-                    .distance(distance)
-                    .build();
+            Section section = DomainFixture.Section.buildWithStations(line, upStation, downStation);
 
             // when
             Section result = sectionDao.insert(section);
@@ -73,36 +63,18 @@ class SectionDaoTest {
         @DisplayName("lineId에 연결된 모든 Section들을 반환한다.")
         void Return_All_Section_Connected_With_Line_Id() {
             // given
-            Line line = new Line("line", "red");
-            line = lineDao.insert(line);
+            Line line = lineDao.insert(new Line("line", "red"));
 
-            String upStationName = "upStation";
-            Station upStation = stationDao.insert(new Station(upStationName));
+            Station upStation = stationDao.insert(new Station("upStationName"));
+            Station middleStation = stationDao.insert(new Station("middleStationName"));
+            Station downStation = stationDao.insert(new Station("downStationName"));
 
-            String middleStationName = "middleStation";
-            Station middleStation = stationDao.insert(new Station(middleStationName));
-
-            String downStationName = "downStation";
-            Station downStation = stationDao.insert(new Station(downStationName));
-
-            Section upSection = Section.builder()
-                    .line(line)
-                    .upStation(upStation)
-                    .downStation(middleStation)
-                    .distance(1)
-                    .build();
-
-            Section downSection = Section.builder()
-                    .line(line)
-                    .upStation(middleStation)
-                    .downStation(downStation)
-                    .distance(2)
-                    .build();
-
-            upSection.connectDownSection(downSection);
+            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
 
             upSection = sectionDao.insert(upSection);
             downSection = sectionDao.insert(downSection);
+            
             upSection.connectDownSection(downSection);
 
             // when

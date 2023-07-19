@@ -7,7 +7,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import subway.TestHelper;
+import subway.DomainFixture;
 
 @DisplayName("LineManager 클래스")
 class LineManagerTest {
@@ -26,8 +26,8 @@ class LineManagerTest {
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
-            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
 
@@ -48,8 +48,8 @@ class LineManagerTest {
             Station middleStation = new Station(2L, "middleStation");
             Station existStation = upStation;
 
-            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
-            Section existSection = TestHelper.Section.buildWithStations(middleStation, existStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section existSection = DomainFixture.Section.buildWithStations(middleStation, existStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
 
@@ -76,8 +76,8 @@ class LineManagerTest {
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
-            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
             lineManager.connectDownSection(downSection);
@@ -100,8 +100,8 @@ class LineManagerTest {
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = TestHelper.Section.buildWithStations(upStation, middleStation);
-            Section downSection = TestHelper.Section.buildWithStations(middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
             lineManager.connectDownSection(downSection);
@@ -122,7 +122,7 @@ class LineManagerTest {
             Station upStation = new Station(1L, "upStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = TestHelper.Section.buildWithStations(upStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, downStation);
 
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
 
