@@ -18,4 +18,10 @@ public class SubwayControllerAdvice {
     public ResponseEntity<String> illegalSectionExceptionHandler(IllegalSectionException exception) {
         return ResponseEntity.badRequest().body(exception.getLocalizedMessage());
     }
+
+    @ExceptionHandler(IllegalLineException.class)
+    public ResponseEntity<String> illegalLineExceptionHandler(IllegalLineException exception) {
+        return ResponseEntity.badRequest().body(exception.getLocalizedMessage());
+    }
+
 }

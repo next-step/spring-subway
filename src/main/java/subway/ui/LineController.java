@@ -60,9 +60,4 @@ public class LineController {
                 .created(URI.create("/sections/" + sectionResponse.getId()))
                 .body(sectionResponse);
     }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
-    }
 }

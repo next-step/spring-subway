@@ -7,6 +7,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.exception.IllegalLineException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,14 +24,24 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        validateDuplicateName(request.getName());
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+
         sectionDao.insert(new Section(
                 persistLine.getId(),
                 request.getUpStationId(),
                 request.getDownStationId(),
                 request.getDistance())
         );
+
         return LineResponse.of(persistLine);
+    }
+
+    private void validateDuplicateName(final String name) {
+        lineDao.findByName(name)
+                .ifPresent(line -> {
+                    throw new IllegalLineException("노선 이름은 중복될 수 없습니다.");
+                });
     }
 
     public List<LineResponse> findLineResponses() {
