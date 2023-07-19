@@ -75,4 +75,4 @@ lineId, upStationId, downStationId;
 - [x] Optional로 리팩토링
 - [ ] Section에 distance 테스트 추가
 - [x] DTO에 equals, hascode, toString 붙이기
-- [ ] DTO에 response Long -> String 으로 변경
+- [x] DTO에 response Long -> String 으로 변경

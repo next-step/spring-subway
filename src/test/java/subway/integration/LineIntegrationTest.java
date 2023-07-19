@@ -22,10 +22,10 @@ import subway.dto.StationResponse;
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
 
-    private Long stationRequest1;
-    private Long stationRequest2;
-    private Long stationRequest3;
-    private Long stationRequest4;
+    private String stationRequest1;
+    private String stationRequest2;
+    private String stationRequest3;
+    private String stationRequest4;
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
 
@@ -87,10 +87,10 @@ class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+        List<String> expectedLineIds = Stream.of(createResponse1, createResponse2)
+                .map(it -> it.header("Location").split("/")[2])
                 .collect(Collectors.toList());
-        List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
+        List<String> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
                 .map(LineResponse::getId)
                 .collect(Collectors.toList());
         assertThat(resultLineIds).containsAll(expectedLineIds);
@@ -103,7 +103,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = createLine(lineRequest1);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        String lineId = createResponse.header("Location").split("/")[2];
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -159,7 +159,7 @@ class LineIntegrationTest extends IntegrationTest {
     @DisplayName("Line에 구간을 등록한다.")
     void createSection() {
         // given
-        Long lineId = createLine(lineRequest1).body().as(LineResponse.class).getId();
+        String lineId = createLine(lineRequest1).body().as(LineResponse.class).getId();
 
         SectionRequest sectionRequest = new SectionRequest(String.valueOf(stationRequest2),
                 String.valueOf(stationRequest3), 5);

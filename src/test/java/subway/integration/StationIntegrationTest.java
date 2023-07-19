@@ -100,10 +100,10 @@ class StationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+        List<String> expectedStationIds = Stream.of(createResponse1, createResponse2)
+                .map(it -> it.header("Location").split("/")[2])
                 .collect(Collectors.toList());
-        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
+        List<String> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
                 .map(StationResponse::getId)
                 .collect(Collectors.toList());
         assertThat(resultStationIds).containsAll(expectedStationIds);
@@ -124,7 +124,7 @@ class StationIntegrationTest extends IntegrationTest {
                 .extract();
 
         // when
-        Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        String stationId = createResponse.header("Location").split("/")[2];
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
                 .get("/stations/{stationId}", stationId)

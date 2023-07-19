@@ -4,19 +4,19 @@ import java.util.Objects;
 import subway.domain.Station;
 
 public class StationResponse {
-    private Long id;
+    private String id;
     private String name;
 
-    public StationResponse(Long id, String name) {
+    public StationResponse(String id, String name) {
         this.id = id;
         this.name = name;
     }
 
     public static StationResponse of(Station station) {
-        return new StationResponse(station.getId(), station.getName());
+        return new StationResponse(String.valueOf(station.getId()), station.getName());
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
