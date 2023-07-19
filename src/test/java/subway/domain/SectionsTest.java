@@ -193,4 +193,25 @@ class SectionsTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("두 역 모두 기존 노선에 포함될 수 없습니다.");
     }
+
+    @Test
+    @DisplayName("새로운 구간의 두 역 모두 기존 노선에 포함되지 않으면 오류.")
+    void noStationsContainThrowError() {
+        Section section = new Section(
+                new Station("서울대입구역"),
+                new Station("신대방역"),
+                10
+        );
+        Section section2 = new Section(
+                new Station("상도역"),
+                new Station("잠실역"),
+                10
+        );
+        Sections sections = new Sections(List.of(section));
+
+
+        assertThatCode(() -> sections.addSection(section2))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("두 역 중 하나는 기존 노선에 포함되어야 합니다");
+    }
 }
