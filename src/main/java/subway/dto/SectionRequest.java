@@ -8,12 +8,12 @@ public class SectionRequest {
 
     private Long upStationId;
 
-    private Double distance;
+    private Integer distance;
 
     private SectionRequest() {
     }
 
-    public SectionRequest(final String downStationId, final String upStationId, final Double distance) {
+    public SectionRequest(final String downStationId, final String upStationId, final Integer distance) {
         this.downStationId = Long.parseLong(downStationId);
         this.upStationId = Long.parseLong(upStationId);
         this.distance = distance;
@@ -31,7 +31,7 @@ public class SectionRequest {
         return upStationId;
     }
 
-    public Double getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 }

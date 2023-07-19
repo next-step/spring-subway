@@ -23,7 +23,7 @@ public class SectionDao {
                     rs.getLong("line_id"),
                     rs.getLong("down_station_id"),
                     rs.getLong("up_station_id"),
-                    rs.getDouble("distance")
+                    rs.getInt("distance")
             );
 
     public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {

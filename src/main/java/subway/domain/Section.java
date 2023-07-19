@@ -6,9 +6,9 @@ public class Section {
     private Long lineId;
     private Long downStationId;
     private Long upStationId;
-    private Double distance;
+    private Integer distance;
 
-    public Section(final Long id, final Long lineId, final Long downStationId, final Long upStationId, final Double distance) {
+    public Section(final Long id, final Long lineId, final Long downStationId, final Long upStationId, final Integer distance) {
         validate(distance);
 
         this.id = id;
@@ -18,12 +18,12 @@ public class Section {
         this.distance = distance;
     }
 
-    public Section(final Long lineId, final Long downStationId, final Long upStationId, final Double distance) {
+    public Section(final Long lineId, final Long downStationId, final Long upStationId, final Integer distance) {
         this(null, lineId, downStationId, upStationId, distance);
     }
 
-    private void validate(final Double distance) {
-        if (distance <= 0.0) {
+    private void validate(final int distance) {
+        if (distance <= 0) {
             throw new IllegalArgumentException("구간 길이는 0보다 커야한다.");
         }
     }
@@ -44,7 +44,7 @@ public class Section {
         return upStationId;
     }
 
-    public Double getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 }

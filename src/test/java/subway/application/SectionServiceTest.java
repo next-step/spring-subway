@@ -37,9 +37,9 @@ class SectionServiceTest {
     @Test
     void createSection() {
         // given
-        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10.0);
-        final SectionRequest sectionRequest = new SectionRequest("3", "2", 10.0);
-        final Section newSection = new Section(2L, 1L, 3L, 2L, 10.0);
+        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10);
+        final SectionRequest sectionRequest = new SectionRequest("3", "2", 10);
+        final Section newSection = new Section(2L, 1L, 3L, 2L, 10);
 
         given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
         given(sectionDao.findByLineIdAndStationId(1L, 3L)).willReturn(Optional.empty());
@@ -53,7 +53,7 @@ class SectionServiceTest {
         assertThat(sectionResponse.getLineId()).isNotNull();
         assertThat(sectionResponse.getDownStationId()).isEqualTo(3);
         assertThat(sectionResponse.getUpStationId()).isEqualTo(2);
-        assertThat(sectionResponse.getDistance()).isEqualTo(10, withPrecision(1d));
+        assertThat(sectionResponse.getDistance()).isEqualTo(10);
     }
 
     @DisplayName("존재하지 않는 노선으로 인한 구간 생성 실패")
@@ -61,7 +61,7 @@ class SectionServiceTest {
     void createSectionWithUnmatchedLineId() {
         // given
         final long lineId = 3L;
-        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10.0);
+        final SectionRequest sectionRequest = new SectionRequest("2", "1", 10);
 
         given(sectionDao.findLastSection(lineId)).willReturn(Optional.empty());
 
@@ -75,8 +75,8 @@ class SectionServiceTest {
     @Test
     void createSectionWithNotEndStation() {
         // given
-        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10.0);
-        final SectionRequest sectionRequest = new SectionRequest("1", "3", 10.0);
+        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10);
+        final SectionRequest sectionRequest = new SectionRequest("1", "3", 10);
 
         given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
 
@@ -90,8 +90,8 @@ class SectionServiceTest {
     @Test
     void createSectionWithDuplicateStationInLine() {
         // given
-        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10.0);
-        final SectionRequest sectionRequest = new SectionRequest("1", "2", 10.0);
+        final Section lastSection = new Section(1L, 1L, 2L, 1L, 10);
+        final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
 
         given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
         given(sectionDao.findByLineIdAndStationId(1L, 1L)).willReturn(Optional.of(lastSection));
