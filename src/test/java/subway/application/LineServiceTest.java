@@ -64,7 +64,7 @@ class LineServiceTest {
 
             when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
 
-            when(sectionDao.findAllByLineId(line.getId())).thenReturn(List.of(upSection));
+            when(sectionDao.findAllByLineId(line.getId())).thenReturn(new ArrayList<>(List.of(upSection)));
             when(sectionDao.insert(downSection)).thenReturn(downSection);
 
             when(stationDao.findById(middleStation.getId())).thenReturn(Optional.of(middleStation));

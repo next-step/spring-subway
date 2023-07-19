@@ -3,7 +3,9 @@ package subway.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,7 @@ class LineManagerTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
+            LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(upSection)));
 
             // when
             lineManager.connectDownSection(downSection);
@@ -79,7 +81,7 @@ class LineManagerTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
+            LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(upSection)));
             lineManager.connectDownSection(downSection);
 
             // when
@@ -103,7 +105,7 @@ class LineManagerTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
+            LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(upSection)));
             lineManager.connectDownSection(downSection);
 
             // when

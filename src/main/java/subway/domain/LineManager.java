@@ -19,6 +19,8 @@ public class LineManager {
 
         Section lineDownSection = sections.get(0).findDownSection();
         lineDownSection.connectDownSection(downSection);
+        
+        sections.add(downSection);
     }
 
     private void validNotDuplicatedDownStation(Station downStation) {

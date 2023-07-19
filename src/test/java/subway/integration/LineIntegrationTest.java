@@ -167,7 +167,7 @@ class LineIntegrationTest extends IntegrationTest {
         registerSectionToLine(lineId, sectionRequest);
 
         // when
-        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest3);
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest2);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
