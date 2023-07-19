@@ -30,4 +30,7 @@ public class LineManager {
                             MessageFormat.format("line에 이미 존재하는 station 입니다. \"{0}\"", downStation));
                 });
     }
+
+    public void disconnectDownSection(Station downStation) {
+    }
 }

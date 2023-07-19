@@ -87,4 +87,46 @@ class LineManagerTest {
 
     }
 
+    @Nested
+    @DisplayName("disconnectDownSection 메소드는")
+    class DisconnectDownSection_Method {
+
+        @Test
+        @DisplayName("line의 하행 Station과 일치하는 Station이 들어오면 연결을 끊는다")
+        void Return_True_When_Input_Station() {
+            // given
+            Line line = new Line(1L, "line", "red");
+
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section upSection = Section.builder()
+                    .id(1L)
+                    .line(line)
+                    .upStation(upStation)
+                    .downStation(middleStation)
+                    .distance(1)
+                    .build();
+
+            Section downSection = Section.builder()
+                    .id(1L)
+                    .line(line)
+                    .upStation(middleStation)
+                    .downStation(downStation)
+                    .distance(1)
+                    .build();
+
+            LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
+            lineManager.connectDownSection(downSection);
+
+            // when
+            lineManager.disconnectDownSection(downStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isNull();
+            assertThat(downSection.getUpSection()).isNull();
+        }
+    }
+
 }
