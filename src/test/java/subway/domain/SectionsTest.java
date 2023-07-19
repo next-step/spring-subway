@@ -179,5 +179,18 @@ class SectionsTest {
                 .hasMessage("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
     }
 
+    @Test
+    @DisplayName("새로운 구간의 두 역 모두 기존 노선에 포함되어 있으면 오류.")
+    void allStationsContainThrowError() {
+        Section section = new Section(
+                new Station("서울대입구역"),
+                new Station("신대방역"),
+                10
+        );
+        Sections sections = new Sections(List.of(section));
 
+        assertThatCode(() -> sections.addSection(section))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("두 역 모두 기존 노선에 포함될 수 없습니다.");
+    }
 }
