@@ -11,6 +11,7 @@ import subway.dao.SectionDao;
 import subway.domain.Section;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.IllegalSectionException;
 
 import java.util.Optional;
 
@@ -65,9 +66,10 @@ class SectionServiceTest {
         given(sectionDao.findLastSection(lineId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
-                .withMessageContaining("해당 노선은 생성되지 않았습니다.");
+        assertThatThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
+                .describedAs("해당 노선은 생성되지 않았습니다.")
+                .isInstanceOf(IllegalSectionException.class);
+
     }
 
     @DisplayName("새로운 구간의 상행 역이 해당 노선의 하행 종점역이 아니어서 구간 생성 실패")
@@ -80,9 +82,9 @@ class SectionServiceTest {
         given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
 
         // when & then
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
-                .withMessageContaining("새로운 구간의 상행 역은 해당 노선에 등록되어있는 하행 종점역이어야 힙니다.");
+        assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
+                .describedAs("새로운 구간의 상행 역은 해당 노선에 등록되어있는 하행 종점역이어야 합니다.")
+                .isInstanceOf(IllegalSectionException.class);
     }
 
     @DisplayName("새로운 구간의 하행 역이 해당 노선에 등록되어있는 역이어서 구간 생성 실패")
@@ -96,8 +98,8 @@ class SectionServiceTest {
         given(sectionDao.findByLineIdAndStationId(1L, 1L)).willReturn(Optional.of(lastSection));
 
         // when & then
-        assertThatIllegalArgumentException()
-                .isThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
-                .withMessageContaining("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.");
+        assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
+                .describedAs("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.")
+                .isInstanceOf(IllegalSectionException.class);
     }
 }
