@@ -126,4 +126,21 @@ class SectionIntegrationTest extends IntegrationTest {
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    @Test
+    @DisplayName("지하철 노선에 등록된 하행 종점역이 아닌 경우 삭제 시 400 Bad Request로 응답한다.")
+    void badRequestWithNotPrevSectionOnLine() {
+        /* given */
+        final Long lineId = 2L;
+
+        /* when */
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all().queryParam("stationId", "24")
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }

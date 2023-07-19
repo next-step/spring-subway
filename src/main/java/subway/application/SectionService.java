@@ -34,7 +34,10 @@ public class SectionService {
     }
 
     public void deleteSection(final Long lineId, final Long downStationId) {
-        sectionDao.delete(lineId, downStationId);
+        final int result = sectionDao.delete(lineId, downStationId);
+        if (result == 0) {
+            throw new SubwayException("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다.");
+        }
     }
 
     private void validateRequest(final Sections sections, final SectionRequest sectionRequest) {
