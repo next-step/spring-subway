@@ -43,8 +43,28 @@ public class Section {
         return distance;
     }
 
+    public Section subtract(final Section other) {
+        if (distance <= other.distance) {
+            throw new IllegalArgumentException("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
+        }
+
+        if (upStation.equals(other.upStation)) {
+            return new Section(other.downStation, downStation, distance - other.distance);
+        }
+
+        if (downStation.equals(other.downStation)) {
+            return new Section(upStation, other.upStation, distance - other.distance);
+        }
+
+        throw new IllegalArgumentException("일치하는 역이 없습니다.");
+    }
+
+    public boolean isOneStationMatch(final Section other) {
+        return downStation.equals(other.downStation) || upStation.equals(other.upStation);
+    }
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Section section = (Section) o;

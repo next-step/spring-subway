@@ -80,49 +80,33 @@ public class Sections {
         return sections;
     }
 
-    public Sections addSection(Section section) {
+    public Sections addSection(final Section section) {
         validateBothMatches(section);
         validateNoMatches(section);
 
-        Section resultSection = sections.stream()
-                .filter(s -> s.getDownStation().equals(section.getDownStation()))
+        List<Section> newSections = new ArrayList<>(this.sections);
+
+        Section oldSection = sections.stream()
+                .filter(section::isOneStationMatch)
                 .findAny()
                 .orElse(null);
 
-        List<Section> newSection = new ArrayList<>(this.sections);
-
-        if (resultSection != null) {
-            if (resultSection.getDistance() <= section.getDistance()) {
-                throw new IllegalArgumentException("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
-            }
-            newSection.remove(resultSection);
-            newSection.add(new Section(resultSection.getUpStation(), section.getUpStation(), resultSection.getDistance() - section.getDistance()));
+        if (oldSection != null) {
+            newSections.add(oldSection.subtract(section));
+            newSections.remove(oldSection);
         }
 
-        resultSection = sections.stream()
-                .filter(s -> s.getUpStation().equals(section.getUpStation()))
-                .findAny()
-                .orElse(null);
-
-        if (resultSection != null) {
-            if (resultSection.getDistance() <= section.getDistance()) {
-                throw new IllegalArgumentException("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
-            }
-            newSection.remove(resultSection);
-            newSection.add(new Section(section.getDownStation(), resultSection.getDownStation(), resultSection.getDistance() - section.getDistance()));
-        }
-
-        newSection.add(section);
-        return new Sections(newSection);
+        newSections.add(section);
+        return new Sections(newSections);
     }
 
-    private void validateNoMatches(Section section) {
+    private void validateNoMatches(final Section section) {
         if (!contains(section.getUpStation()) && !contains(section.getDownStation())) {
             throw new IllegalArgumentException("두 역 중 하나는 기존 노선에 포함되어야 합니다");
         }
     }
 
-    private void validateBothMatches(Section section) {
+    private void validateBothMatches(final Section section) {
         if (contains(section.getUpStation()) && contains(section.getDownStation())) {
             throw new IllegalArgumentException("두 역 모두 기존 노선에 포함될 수 없습니다.");
         }
