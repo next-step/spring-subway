@@ -1,24 +1,33 @@
 package subway.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.domain.Line;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import subway.dto.SectionRequest;
 
 @Service
 public class LineService {
+
     private final LineDao lineDao;
 
-    public LineService(LineDao lineDao) {
+    private final SectionService sectionService;
+
+    public LineService(LineDao lineDao, SectionService sectionService) {
         this.lineDao = lineDao;
+        this.sectionService = sectionService;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        sectionService.saveSection(persistLine.getId(),
+                new SectionRequest(request.getUpStationId(), request.getDownStationId(),
+                        request.getDistance()));
         return LineResponse.of(persistLine);
     }
 
