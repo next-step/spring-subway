@@ -1,9 +1,11 @@
 package subway.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Sections {
 
@@ -59,6 +61,114 @@ public class Sections {
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
         return station;
+    }
+
+    public List<Section> registSection(Section section) {
+        if (sections.size() == 0) {
+            return List.of(section);
+        }
+        if (findStations().contains(section.getUpStation()) && findStations().contains(section.getDownStation())) {
+            throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
+        }
+        if (findStations().contains(section.getUpStation())) {
+            return registUpSection(section);
+        }
+        if (findStations().contains(section.getDownStation())) {
+            return registDownSection(section);
+        }
+        throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
+    }
+
+    private List<Section> registUpSection(Section section) {
+        if (!findStartStations().contains(section.getUpStation())) {
+            return List.of(section);
+        }
+
+        return registMiddleUpSection(section);
+    }
+
+    private List<Section> registDownSection(Section section) {
+        if (!findEndStations().contains(section.getDownStation())) {
+            return List.of(section);
+        }
+
+        return registMiddleDownSection(section);
+    }
+
+    private List<Section> registMiddleUpSection(Section section) {
+        int distance = section.getDistance().getDistance();
+        Section duplicatedUpSection = findSectionByUpStation(section.getUpStation());
+
+        validateDistance(distance, duplicatedUpSection);
+
+        List<Section> sections = new ArrayList<>(List.of(section));
+        Section modifySection = new Section(
+            duplicatedUpSection.getId(),
+            section.getDownStation(),
+            duplicatedUpSection.getDownStation(),
+            section.getLine(),
+            duplicatedUpSection.getDistance().getDistance() - distance
+        );
+        sections.add(modifySection);
+        return sections;
+    }
+
+    private List<Section> registMiddleDownSection(Section section) {
+        int distance = section.getDistance().getDistance();
+        Section duplicatedDownSection = findSectionByDownStation(section.getDownStation());
+
+        validateDistance(distance, duplicatedDownSection);
+
+        List<Section> sections = new ArrayList<>(List.of(section));
+        Section modifySection = new Section(
+            duplicatedDownSection.getId(),
+            duplicatedDownSection.getUpStation(),
+            section.getUpStation(),
+            section.getLine(),
+            duplicatedDownSection.getDistance().getDistance() - distance
+        );
+        sections.add(modifySection);
+        return sections;
+    }
+
+    private void validateDistance(int distance, Section duplicatedUpSection) {
+        if (distance >= duplicatedUpSection.getDistance().getDistance()) {
+            throw new IllegalArgumentException("기존 구간에 비해 거리가 길어 추가가 불가능 합니다.");
+        }
+    }
+
+    private Section findSectionByDownStation(Station station) {
+        return sections.stream()
+            .filter(section -> section.getDownStation().equals(station))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
+    }
+
+    private Section findSectionByUpStation(Station station) {
+        return sections.stream()
+            .filter(section -> section.getUpStation().equals(station))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
+    }
+
+    private Set<Station> findStations() {
+        return Stream.concat(
+            findStartStations().stream(),
+            findEndStations().stream()
+            )
+            .collect(Collectors.toSet());
+    }
+
+    private Set<Station> findStartStations() {
+        return sections.stream()
+            .map(Section::getUpStation)
+            .collect(Collectors.toSet());
+    }
+
+    private Set<Station> findEndStations() {
+        return sections.stream()
+            .map(Section::getDownStation)
+            .collect(Collectors.toSet());
     }
 
     @Override

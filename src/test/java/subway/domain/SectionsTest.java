@@ -1,5 +1,6 @@
 package subway.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -60,23 +61,9 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.")
+    @DisplayName("새로운 구간의 상행과 하행이 기존 섹션에 있을 경우 예외가 발생한다.")
     void validNewSectionDownStation() {
-        assertThatThrownBy(() -> sections.validNewSection(section1))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("새로운 구간의 상행역은 해당 노선에 등록되어있는 하행 종점역이어야 한다.")
-    void validNewSectionUpStation() {
-        Section section4 = new Section(
-            4L,
-            station3,
-            station5,
-            line1,
-            10
-        );
-        assertThatThrownBy(() -> sections.validNewSection(section4))
+        assertThatThrownBy(() -> sections.registSection(section1))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -91,7 +78,7 @@ class SectionsTest {
             10
         );
         assertThatNoException()
-            .isThrownBy(() -> sections.validNewSection(section4));
+            .isThrownBy(() -> sections.registSection(section4));
     }
 
     @Test
@@ -104,7 +91,7 @@ class SectionsTest {
             line1,
             10
         );
-        assertThatThrownBy(() -> sections.validNewSection(section4))
+        assertThatThrownBy(() -> sections.registSection(section4))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -118,7 +105,7 @@ class SectionsTest {
             line1,
             10
         );
-        assertThatThrownBy(() -> sections.validNewSection(section4))
+        assertThatThrownBy(() -> sections.registSection(section4))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -146,7 +133,7 @@ class SectionsTest {
     @DisplayName("Line에 역이 하나도 없다면 구간이 무조건 등록된다")
     void registSectionInEmptyLine() {
         Sections sections = new Sections(Collections.emptyList());
-        assertThatNoException().isThrownBy(() -> sections.validNewSection(section1));
+        assertThatNoException().isThrownBy(() -> sections.registSection(section1));
     }
 
     @Test
@@ -155,5 +142,81 @@ class SectionsTest {
         Sections sections = new Sections(List.of(section1));
         assertThatThrownBy(() -> sections.canDeleteStation(2L))
             .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("상행에서 추가: 새로운 구간을 등록할 때 기존 구간의 거리보다 짧으면 등록할 수 있다.")
+    void registMiddleUpSection() {
+        Section addSection = new Section(
+            station3,
+            station5,
+            line1,
+            5
+        );
+
+        List<Section> result = sections.registSection(addSection);
+
+        Section expectedNewSection = new Section(
+            station5,
+            station4,
+            line1,
+            5
+        );
+
+        Assertions.assertAll(
+            () -> assertThat(result.contains(addSection)).isTrue(),
+            () -> assertThat(result.contains(expectedNewSection)).isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("상행에서 추가: 새로운 구간을 등록할 때 기존 구간의 거리보다 길면 예외가 발생한다.")
+    void registMiddleUpSectionException() {
+        Section newSection = new Section(
+            station3,
+            station5,
+            line1,
+            15
+        );
+
+        assertThatThrownBy(() -> sections.registSection(newSection))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("하행에서 추가: 새로운 구간을 등록할 때 기존 구간의 거리보다 짧으면 등록할 수 있다.")
+    void registMiddleDownSection() {
+        Section addSection = new Section(
+            station5,
+            station4,
+            line1,
+            5
+        );
+        Section expectedNewSection = new Section(
+            station3,
+            station5,
+            line1,
+            5
+        );
+        List<Section> result = sections.registSection(addSection);
+
+        Assertions.assertAll(
+            () -> assertThat(result.contains(addSection)).isTrue(),
+            () -> assertThat(result.contains(expectedNewSection)).isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("하행에서 추가: 새로운 구간을 등록할 때 기존 구간의 거리보다 길면 예외가 발생한다.")
+    void registMiddleDownSectionException() {
+        Section newSection = new Section(
+            station5,
+            station4,
+            line1,
+            15
+        );
+
+        assertThatThrownBy(() -> sections.registSection(newSection))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }
