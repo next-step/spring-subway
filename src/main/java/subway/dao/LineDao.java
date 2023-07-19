@@ -34,7 +34,7 @@ public class LineDao {
                     ),
                     new Station(
                             rs.getLong("s2_id"),
-                            rs.getString("s2_id")
+                            rs.getString("s2_name")
                     )
             );
 

@@ -8,10 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.StationRequest;
+import subway.dto.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -215,6 +214,44 @@ class LineIntegrationTest extends IntegrationTest {
                 .then().log().all().
                 extract();
 
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest3)
+                .when().post("/stations")
+                .then().log().all().
+                extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new SectionRequest("2", "3", 10))
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest4)
+                .when().post("/stations")
+                .then().log().all().
+                extract();
+
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new SectionRequest("3", "4", 10))
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        List<StationResponse> stationResponses = new ArrayList<>();
+        stationResponses.add(new StationResponse(1L, "오이도"));
+        stationResponses.add(new StationResponse(2L, "장지"));
+        stationResponses.add(new StationResponse(3L, "용산"));
+        stationResponses.add(new StationResponse(4L, "삼각지"));
+
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
         ExtractableResponse<Response> response = RestAssured
@@ -228,6 +265,11 @@ class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineResponse resultResponse = response.as(LineResponse.class);
         assertThat(resultResponse.getId()).isEqualTo(lineId);
+
+        assertThat(resultResponse.getStations().get(0).getId()).isEqualTo(stationResponses.get(0).getId());
+        assertThat(resultResponse.getStations().get(1).getId()).isEqualTo(stationResponses.get(1).getId());
+        assertThat(resultResponse.getStations().get(2).getId()).isEqualTo(stationResponses.get(2).getId());
+        assertThat(resultResponse.getStations().get(3).getId()).isEqualTo(stationResponses.get(3).getId());
     }
 
     @DisplayName("지하철 노선을 수정한다.")

@@ -68,7 +68,7 @@ public class LineService {
 
         // 상행 종점 구하기
         Set<Station> keySet = new HashSet<>(stationMap.keySet());
-        keySet.removeAll(new HashSet<>(stationMap.values()));
+        keySet.removeAll(stationMap.values());
         Station lastUpStation = keySet.stream().findAny().orElseThrow();
 
         List<StationResponse> stationResponses = new ArrayList<>();
