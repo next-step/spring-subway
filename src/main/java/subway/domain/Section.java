@@ -7,10 +7,10 @@ import org.springframework.util.Assert;
 public class Section {
 
     private final Long id;
-    private final Station upStation;
-    private final Station downStation;
-    private final Integer distance;
     private final Line line;
+    private Integer distance;
+    private Station upStation;
+    private Station downStation;
     private Section upSection;
     private Section downSection;
 
@@ -33,14 +33,70 @@ public class Section {
         return new Builder();
     }
 
-    public void connectDownSection(Section downSection) {
-        Assert.notNull(downSection, () -> "downSection은 null이 될 수 없습니다.");
-        Assert.isTrue(downSection.upStation.equals(downStation), () -> MessageFormat.format(
-                "추가되는 downSection.upStation은 현재의 section.downStation과 동일해야합니다. downSection.upStation \"{0}\" current.downStation \"{1}\"",
-                downSection.upStation, downStation));
+    public void connectDownSection(Section requestSection) {
+        Assert.notNull(requestSection, () -> "requestSection null이 될 수 없습니다.");
+        Assert.isTrue(requestSection.upStation.equals(downStation), () -> MessageFormat.format(
+                "추가되는 requestSection.upStation은 현재의 section.downStation과 동일해야합니다. requestSection.upStation \"{0}\" current.downStation \"{1}\"",
+                requestSection.upStation, downStation));
 
-        this.downSection = downSection;
-        downSection.upSection = this;
+        this.downSection = requestSection;
+        requestSection.upSection = this;
+    }
+
+    public void connectSection(Section requestSection) {
+        SectionConnector.findSectionConnector(this, requestSection)
+                .ifPresentOrElse(sectionConnector1 -> sectionConnector1.connectSection(this, requestSection),
+                        () -> connectSectionIfDownSectionPresent(requestSection));
+    }
+
+    private void connectSectionIfDownSectionPresent(Section requestSection) {
+        Assert.notNull(downSection,
+                () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection));
+
+        downSection.connectSection(requestSection);
+    }
+
+    void connectUpSection(Section requestSection) {
+        this.upSection = requestSection;
+        requestSection.downSection = this;
+    }
+
+    void connectMiddleUpSection(Section requestSection) {
+        Section newDownSection = Section.builder()
+                .id(requestSection.getId())
+                .line(line)
+                .upSection(this)
+                .downSection(this.downSection)
+                .upStation(requestSection.downStation)
+                .downStation(this.downStation)
+                .distance(this.distance - requestSection.getDistance())
+                .build();
+
+        this.downStation = requestSection.downStation;
+        if (this.downSection != null) {
+            this.downSection.upSection = newDownSection;
+        }
+        this.downSection = newDownSection;
+        this.distance = requestSection.getDistance();
+    }
+
+    void connectMiddleDownSection(Section requestSection) {
+        Section newUpSection = Section.builder()
+                .id(requestSection.getId())
+                .line(line)
+                .upSection(this.upSection)
+                .downSection(this)
+                .upStation(this.upStation)
+                .downStation(requestSection.upStation)
+                .distance(this.distance - requestSection.getDistance())
+                .build();
+
+        this.upStation = requestSection.upStation;
+        if (this.upSection != null) {
+            this.upSection.downSection = newUpSection;
+        }
+        this.upSection = newUpSection;
+        this.distance = requestSection.getDistance();
     }
 
     public Section findDownSection() {
@@ -123,15 +179,6 @@ public class Section {
         downSection = null;
     }
 
-    public void connectSection(Section section) {
-        if (downStation.equals(section.getUpStation())) {
-            section.upSection = this;
-            section.downSection = downSection;
-            downSection.upSection = section;
-            downSection = section;
-        }
-    }
-
     public static class Builder {
 
         protected Long id;
@@ -143,7 +190,6 @@ public class Section {
         protected Integer distance;
 
         private Builder() {
-
         }
 
         public Builder id(Long id) {

@@ -3,6 +3,7 @@ package subway.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -262,36 +263,106 @@ class SectionTest {
 
         @Test
         @DisplayName("중간 위치에 상행 Station을 기준으로 Section을 삽입한다")
-        void Return_Connectable_Section() {
+        void Connect_Section_By_UpStation_On_Middle() {
             // given
             Station upStation = new Station("upStation");
             Station middleStation1 = new Station("middleStation1");
             Station middleStation2 = new Station("middleStation2");
             Station downStation = new Station("downStation");
 
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1);
-            Section downSection = DomainFixture.Section.buildWithStations(middleStation1, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 10);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation1, downStation, 10);
 
             upSection.connectDownSection(downSection);
 
-            Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2);
+            Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 9);
 
             // when
             upSection.connectSection(middleSection);
+            upSection = upSection.findUpSection();
 
             // then
-            assertSectionConnectedStatus(upSection, middleSection, downSection);
+            assertSectionConnectedStatus(upSection, List.of(upStation, middleStation1, middleStation2, downStation));
         }
 
-        private void assertSectionConnectedStatus(Section upSection, Section middleSection, Section downSection) {
-            assertThat(upSection.getUpSection()).isNull();
-            assertThat(upSection.getDownSection()).isEqualTo(middleSection);
+        @Test
+        @DisplayName("중간 위치에 하행 Station을 기준으로 Section을 삽입한다")
+        void Connect_Section_By_DownStation_On_Middle() {
+            // given
+            Station upStation = new Station("upStation");
+            Station middleStation1 = new Station("middleStation1");
+            Station middleStation2 = new Station("middleStation2");
+            Station downStation = new Station("downStation");
 
-            assertThat(middleSection.getUpSection()).isEqualTo(upSection);
-            assertThat(middleSection.getDownSection()).isEqualTo(downSection);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation2, 10);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 10);
 
-            assertThat(downSection.getUpSection()).isEqualTo(middleSection);
-            assertThat(downSection.getDownSection()).isNull();
+            upSection.connectDownSection(downSection);
+
+            Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 9);
+
+            // when
+            upSection.connectSection(middleSection);
+            upSection = upSection.findUpSection();
+
+            // then
+            assertSectionConnectedStatus(upSection, List.of(upStation, middleStation1, middleStation2, downStation));
+        }
+
+        @Test
+        @DisplayName("상행 끝 지점에 Section을 삽입한다")
+        void Connect_Section_By_DownStation_On_Up() {
+            // given
+            Station upStation = new Station("upStation");
+            Station middleStation1 = new Station("middleStation1");
+            Station middleStation2 = new Station("middleStation2");
+            Station downStation = new Station("downStation");
+
+            Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 10);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 10);
+
+            middleSection.connectDownSection(downSection);
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 100);
+
+            // when
+            middleSection.connectSection(upSection);
+            upSection = middleSection.findUpSection();
+
+            // then
+            assertSectionConnectedStatus(upSection, List.of(upStation, middleStation1, middleStation2, downStation));
+        }
+
+        @Test
+        @DisplayName("하행 끝 지점에 Section을 삽입한다")
+        void Connect_Section_By_UpStation_On_Down() {
+            // given
+            Station upStation = new Station("upStation");
+            Station middleStation1 = new Station("middleStation1");
+            Station middleStation2 = new Station("middleStation2");
+            Station downStation = new Station("downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 10);
+            Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 10);
+
+            upSection.connectDownSection(middleSection);
+
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 100);
+
+            // when
+            upSection.connectSection(downSection);
+            upSection = upSection.findUpSection();
+
+            // then
+            assertSectionConnectedStatus(upSection, List.of(upStation, middleStation1, middleStation2, downStation));
+        }
+
+        private void assertSectionConnectedStatus(Section section, List<Station> stations) {
+            for (int stationIdx = 0; stationIdx < stations.size() - 1; stationIdx++) {
+                assertThat(section.getUpStation()).isEqualTo(stations.get(stationIdx));
+                assertThat(section.getDownStation()).isEqualTo(stations.get(stationIdx + 1));
+                section = section.getDownSection();
+            }
         }
     }
 }

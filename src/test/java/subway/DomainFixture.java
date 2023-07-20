@@ -11,6 +11,11 @@ public class DomainFixture {
             return buildWithStations(1L, line, upStation, downStation, 10);
         }
 
+        public static subway.domain.Section buildWithStations(Station upStation, Station downStation,
+                Integer distance) {
+            return buildWithStations(1L, null, upStation, downStation, distance);
+        }
+
         public static subway.domain.Section buildWithStations(Station upStation, Station downStation) {
             return buildWithStations(1L, null, upStation, downStation, 10);
         }
