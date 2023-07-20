@@ -12,7 +12,7 @@ public class Section {
     private final Station downStation;
     private final int distance;
 
-    public Section(Line line, Station upStation, Station downStation, int distance) {
+    public Section(Long id, Line line, Station upStation, Station downStation, int distance) {
         validatePositive(distance);
 
         if (upStation.equals(downStation)) {
@@ -20,15 +20,23 @@ public class Section {
                 "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
                     + downStation);
         }
+        this.id = id;
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
     }
 
-    public Section(Long id, Line line, Station upStation, Station downStation, int distance) {
-        this(line, upStation, downStation, distance);
-        this.id = id;
+    public Section(Line line, Station upStation, Station downStation, int distance) {
+        this(null, line, upStation, downStation, distance);
+    }
+
+    public Section(Station upStation, Station downStation, int distance) {
+        this(null, null, upStation, downStation, distance);
+    }
+
+    public Section(Line line, Section section) {
+        this(section.getId(), line, section.getUpStation(), section.getDownStation(), section.getDistance());
     }
 
     private void validatePositive(int distance) {

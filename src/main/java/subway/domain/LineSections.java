@@ -28,8 +28,7 @@ public class LineSections {
     }
 
     public SectionAdditionResult add(Section section) {
-        //여기없음
-        return sections.add(section);
+        return sections.add(new Section(this.line, section));
     }
 
     public Section removeLast(Station station) {

@@ -27,20 +27,21 @@ public class SectionsService {
 
     public SectionResponse addSection(Long id, SectionAdditionRequest request) {
         LineSections lineSections = sectionDao.findAllByLineId(id);
-        Section section = createNewSectionBy(id, request);
+        Section section = createNewSectionBy(request);
 
         SectionAdditionResult sectionAdditionResult = lineSections.add(section);
 
         sectionAdditionResult.getSectionToRemove().ifPresent(sectionDao::delete);
         sectionAdditionResult.getSectionsToAdd().forEach(sectionDao::save);
+
+        //TODO: front 스펙 보고 id null인 부분 처리하기
         return SectionResponse.of(section);
     }
 
-    private Section createNewSectionBy(Long id, SectionAdditionRequest request) {
-        Line line = getLineOrElseThrow(id);
+    private Section createNewSectionBy(SectionAdditionRequest request) {
         Station upStation = getStationOrElseThrow(request.getUpStationId());
         Station downStation = getStationOrElseThrow(request.getDownStationId());
-        return new Section(line, upStation, downStation, request.getDistance());
+        return new Section(upStation, downStation, request.getDistance());
     }
 
     public void removeLast(Long lineId, Long stationId) {
@@ -56,10 +57,5 @@ public class SectionsService {
         return stationDao.findById(id)
             .orElseThrow(
                 () -> new RuntimeException("존재하지 않는 station id입니다. id: \"" + id + "\""));
-    }
-
-    private Line getLineOrElseThrow(Long id) {
-        return lineDao.findById(id)
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 }
