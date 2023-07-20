@@ -66,19 +66,19 @@ public class Section {
         }
 
         List<Section> sections = new ArrayList<>();
-        if (section.upStation.equals(this.upStation)) {
+        if (section.upStation.equals(this.upStation) && !section.downStation.equals(this.downStation)) {
             sections.add(section);
             sections.add(new Section(section.line, section.downStation, this.downStation, this.distance - section.distance));
             return sections;
         }
 
-        if (section.downStation.equals(this.downStation)) {
+        if (!section.upStation.equals(this.upStation) && section.downStation.equals(this.downStation)) {
             sections.add(new Section(section.line, this.upStation,  section.upStation, this.distance - section.distance));
             sections.add(section);
             return sections;
         }
 
-        throw new IllegalStateException("여기 오면 안되는데?");
+        throw new IllegalArgumentException("추가할 구간의 상행역 하행역이 모두 같거나 모두 다를 수 없습니다. 기존 구간: " + this + " 추가할 구간: " + section);
     }
 
     public Long getId() {
