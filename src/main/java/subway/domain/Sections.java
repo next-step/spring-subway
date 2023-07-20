@@ -7,6 +7,6 @@ public class Sections {
     private final List<Section> sections;
 
     public Sections(final List<Section> sections) {
-        throw new UnsupportedOperationException();
+        this.sections = sections;
     }
 }
