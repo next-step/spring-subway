@@ -50,6 +50,35 @@ class SectionsTest {
         assertThat(result).isTrue();
     }
 
+    @DisplayName("두 역이 모두 노선에 존재하는 경우 검증에 실패한다.")
+    @Test
+    void validateSectionFailBothContainTest() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest("1", "4", 10);
+        Sections sections = new Sections(createSections());
+
+        // when
+        boolean result = sections.checkInsertion(sectionRequest.to(1L));
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("두 역이 모두 노선에 존재하지 않는 경우 검증에 실패한다.")
+    @Test
+    void validateSectionFailNeitherContainTest() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest("1", "4", 10);
+        Sections sections = new Sections(createSections());
+
+        // when
+        boolean result = sections.checkInsertion(sectionRequest.to(1L));
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+
     private List<Section> createSections() {
         List<Section> sections = new ArrayList<>();
         sections.add(new Section(1L, 1L, 4L, 3L, 10));
