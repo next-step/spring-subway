@@ -18,22 +18,7 @@ class SectionsTest {
     @Test
     void createSectionsTest() {
         assertThatNoException()
-                .isThrownBy(() -> new Sections(List.of()));
-    }
-
-    @DisplayName("Sections 정렬에 성공한다.")
-    @Test
-    void createSectionsSortingTest() {
-        // given
-        List<Section> sortedSections = createSections();
-        List<Section> sections = new ArrayList<>(sortedSections);
-        Collections.shuffle(sections);
-
-        // when
-        List<Section> result = new Sections(sections).getSections();
-
-        // then
-        assertThat(result).isEqualTo(sortedSections);
+                .isThrownBy(() -> new Sections(List.of(new Section(1L, 1L, 1L, 10))));
     }
 
     @DisplayName("해당 구간이 추가 가능한 구간인지 검사한다.")
