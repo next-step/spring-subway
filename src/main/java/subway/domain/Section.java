@@ -69,24 +69,49 @@ public class Section {
 
     public List<Section> mergeSections(Section section) {
 
-        if (this.distance <= section.getDistance()) {
-            throw new IllegalArgumentException("기존 구간의 길이가 같거나 작습니다");
+        validateLongerDistanceThan(section);
+
+        if (isOnlyUpStationMatch(section)) {
+            return mergeUp(section);
         }
 
-        List<Section> sections = new ArrayList<>();
-        if (section.upStation.equals(this.upStation) && !section.downStation.equals(this.downStation)) {
-            sections.add(section);
-            sections.add(new Section(section.line, section.downStation, this.downStation, this.distance - section.distance));
-            return sections;
-        }
-
-        if (!section.upStation.equals(this.upStation) && section.downStation.equals(this.downStation)) {
-            sections.add(new Section(section.line, this.upStation,  section.upStation, this.distance - section.distance));
-            sections.add(section);
-            return sections;
+        if (isOnlyDownStationMatch(section)) {
+            return mergeDown(section);
         }
 
         throw new IllegalArgumentException("추가할 구간의 상행역 하행역이 모두 같거나 모두 다를 수 없습니다. 기존 구간: " + this + " 추가할 구간: " + section);
+    }
+
+    private boolean isOnlyUpStationMatch(Section section) {
+        return section.upStation.equals(this.upStation) && !section.downStation.equals(
+            this.downStation);
+    }
+
+    private List<Section> mergeUp(Section section) {
+        List<Section> mergedSections = new ArrayList<>();
+        mergedSections.add(section);
+        mergedSections.add(new Section(
+            section.line, section.downStation, this.downStation, this.distance - section.distance));
+        return mergedSections;
+    }
+
+    private boolean isOnlyDownStationMatch(Section section) {
+        return !section.upStation.equals(this.upStation) && section.downStation.equals(
+            this.downStation);
+    }
+
+    private List<Section> mergeDown(Section section) {
+        List<Section> mergedSections = new ArrayList<>();
+        mergedSections.add(new Section(
+            section.line, this.upStation,  section.upStation, this.distance - section.distance));
+        mergedSections.add(section);
+        return mergedSections;
+    }
+
+    private void validateLongerDistanceThan(Section section) {
+        if (this.distance <= section.getDistance()) {
+            throw new IllegalArgumentException("기존 구간의 길이가 같거나 작습니다");
+        }
     }
 
     public Long getId() {
