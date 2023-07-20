@@ -51,7 +51,7 @@ public class SectionsService {
 
         Section removedSection = lineSections.removeLast(station);
 
-        sectionDao.deleteById(removedSection.getId());
+        sectionDao.delete(removedSection);
     }
 
     private Line getLineOrElseThrow(Long id) {

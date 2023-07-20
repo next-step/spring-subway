@@ -19,7 +19,6 @@ public class SectionDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-    private final StationDao stationDao;
 
     private RowMapper<Line> rowToLineMapper = (rs, rowNum) ->
         new Line(
@@ -48,12 +47,11 @@ public class SectionDao {
             rs.getInt("distance")
         );
 
-    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource, StationDao stationDao) {
+    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
             .withTableName("section")
             .usingGeneratedKeyColumns("id");
-        this.stationDao = stationDao;
     }
 
     public LineSections findAllByLine(Line line){
@@ -82,10 +80,6 @@ public class SectionDao {
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
         return new Section(sectionId, section.getLine(), section.getUpStation(), section.getDownStation(),
             section.getDistance());
-    }
-
-    public void deleteById(Long id) {
-        jdbcTemplate.update("delete from Section where id = ?", id);
     }
 
     public void delete(Section section) {
