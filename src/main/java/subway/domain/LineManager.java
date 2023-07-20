@@ -46,8 +46,23 @@ public class LineManager {
     }
 
     public void connectSection(Section requestSection) {
+        validExistStations(requestSection.getUpStation(), requestSection.getDownStation());
         Section upSection = sections.get(0).findUpSection();
         upSection.connectSection(requestSection);
+    }
+
+    private void validExistStations(Station upStation, Station downStation) {
+        boolean isUpStationExists = false;
+        boolean isDownStationExists = false;
+        for (Section section : sections) {
+            isUpStationExists = section.getUpStation().equals(upStation) || section.getDownStation().equals(upStation);
+            isDownStationExists =
+                    section.getDownStation().equals(downStation) || section.getUpStation().equals(downStation);
+        }
+        boolean isAllExist = isDownStationExists && isUpStationExists;
+        Assert.isTrue(!isAllExist,
+                () -> MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재합니다.", upStation,
+                        downStation, sections));
     }
 
     public void disconnectDownSection(Station downStation) {
