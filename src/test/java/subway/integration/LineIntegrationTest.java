@@ -222,7 +222,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = registerSectionToLine(lineId, middleSectionRequest);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -243,7 +243,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest3);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
