@@ -22,14 +22,6 @@ public class Section {
         this.distance = distance;
     }
 
-    private static void validateUpAndDownStationNotEqual(final Station upStation, final Station downStation) {
-        if (upStation.equals(downStation)) {
-            throw new IllegalArgumentException(
-                "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
-                    + downStation);
-        }
-    }
-
     public Section(Line line, Station upStation, Station downStation, int distance) {
         this(null, line, upStation, downStation, distance);
     }
@@ -48,8 +40,12 @@ public class Section {
         }
     }
 
-    public boolean cannotPrecede(Section other) {
-        return !downStation.equals(other.upStation);
+    private void validateUpAndDownStationNotEqual(final Station upStation, final Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new IllegalArgumentException(
+                "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
+                    + downStation);
+        }
     }
 
     public boolean canPrecede(Section other) {
@@ -59,11 +55,6 @@ public class Section {
     public boolean containsStation(Station station) {
         return this.upStation.equals(station) || this.downStation.equals(
             station);
-    }
-
-    public boolean containsDownStationOf(Section section) {
-        return this.upStation.equals(section.downStation) || this.downStation.equals(
-            section.downStation);
     }
 
     public boolean hasSameUpStationOrDownStation(Section section) {
@@ -135,10 +126,6 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
-    }
-
-    public boolean belongToSameLine(Section section) {
-        return this.line.equals(section.line);
     }
 
     @Override
