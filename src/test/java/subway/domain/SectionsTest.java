@@ -35,6 +35,6 @@ class SectionsTest {
         List<Section> result = new Sections(sections).getSections();
 
         // then
-        assertThat(result).isSameAs(sortedSections);
+        assertThat(result).isEqualTo(sortedSections);
     }
 }
