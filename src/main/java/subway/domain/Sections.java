@@ -40,19 +40,16 @@ public class Sections {
     }
 
     private List<Section> sorted(final List<Section> sections) {
-        if (sections.isEmpty()) {
-            return sections;
-        }
-
         Station first = findFirstStation();
 
         Map<Station, Section> stationToSection = new HashMap<>();
-        for (Section section : sections) {
-            stationToSection.put(section.getUpStation(), section);
-        }
+        sections.forEach(section -> stationToSection.put(section.getUpStation(), section));
 
+        return sortSections(sections, first, stationToSection);
+    }
+
+    private List<Section> sortSections(List<Section> sections, Station first, Map<Station, Section> stationToSection) {
         List<Section> sortedSection = new ArrayList<>();
-
         Section nextSection = findByUpStation(sections, first);
         sortedSection.add(nextSection);
         for (int i = 1; i < sections.size(); i++) {
@@ -60,7 +57,6 @@ public class Sections {
             nextSection = stationToSection.get(lastDownStation);
             sortedSection.add(nextSection);
         }
-
         return sortedSection;
     }
 
