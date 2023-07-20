@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,7 +61,7 @@ public class Sections {
 
     private Section findFirstSection(List<Section> values) {
 
-        Set<Station> downStations = extractDownStations(values);
+        List<Station> downStations = extractDownStations(values);
 
         return values.stream()
             .filter(section -> !downStations.contains(section.getUpStation()))
@@ -70,10 +69,10 @@ public class Sections {
             .orElseThrow(() -> new IllegalArgumentException("노선은 순환할 수 없습니다."));
     }
 
-    private Set<Station> extractDownStations(List<Section> values) {
+    private List<Station> extractDownStations(List<Section> values) {
         return values.stream()
             .map(Section::getDownStation)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toList());
     }
 
     public SectionAdditionResult add(Section section) {
