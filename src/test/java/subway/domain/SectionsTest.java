@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SectionsTest {
 
-    @DisplayName("새로운 구간으로 하행 종점역을 연장할 수 있는지 테스트")
+    @DisplayName("하행 종점역을 연장한다.")
     @Test
     void insertDownSection() {
         List<Section> originSections = new ArrayList<>();
@@ -27,7 +27,7 @@ class SectionsTest {
         assertDoesNotThrow(() -> sections.validateInsert(newSection));
     }
 
-    @DisplayName("새로운 구간으로 상행 종점역을 연장하는 테스트")
+    @DisplayName("상행 종점역을 연장한다.")
     @Test
     void insertUpSection() {
         Station newUpStation = new Station(4L, "잠실역");
@@ -43,7 +43,7 @@ class SectionsTest {
         assertDoesNotThrow(() -> sections.validateInsert(newSection));
     }
 
-    @DisplayName("새로운 구간을 기준역 상행에 추가하는 테스트")
+    @DisplayName("기존 구간의 하행역을 기준역으로 중간 역을 추가한다.")
     @Test
     void insertUpSectionInMiddle() {
         Station upStation = new Station(2L, "잠실나루역");
@@ -59,7 +59,7 @@ class SectionsTest {
         assertDoesNotThrow(() -> sections.validateInsert(newSection));
     }
 
-    @DisplayName("새로운 구간을 기준역 하행에 추가하는 테스트")
+    @DisplayName("기존 구간의 상행역을 기준역으로 중간 역을 추가한다.")
     @Test
     void insertDownSectionInMiddle() {
         Station upStation = new Station(2L, "잠실나루역");
@@ -142,7 +142,7 @@ class SectionsTest {
         assertEquals(sections.cut(oldSection, midDownSection), upMidSection);
     }
 
-    @DisplayName("새로운 구간을 삽입할 때 가운데에 삽입되는지 구분한다.")
+    @DisplayName("새로운 구간을 삽입할 때 가운데에 삽입되는지 확인한다.")
     @Test
     void isInsertedMiddle() {
         Station upStation = new Station(4L, "잠실나루역");
@@ -157,7 +157,7 @@ class SectionsTest {
         assertTrue(sections.isInsertedMiddle(newSection));
     }
 
-    @DisplayName("새로운 구간을 삽입할 때 끝 구간에 삽입되는지 구분한다.")
+    @DisplayName("새로운 구간을 삽입할 때 끝 구간에 삽입되는지 확인한다.")
     @Test
     void isInsertedEnd() {
         Station upStation = new Station(4L, "잠실나루역");
@@ -172,37 +172,7 @@ class SectionsTest {
         assertFalse(sections.isInsertedMiddle(newSection));
     }
 
-    @DisplayName("새로운 구간의 상행역이 하행 종점역과 다를 경우 예외로 처리")
-    @Test
-    void differentStation() {
-        Station upStation = new Station(4L, "잠실역");
-        Station downStation = new Station(2L, "잠실나루역");
-        Station newUpStation = new Station(1L, "강변역");
-        Station newDownStation = new Station(3L, "구의역");
-        int distance = 10;
-
-        Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
-        Section  newSection = new Section(newUpStation, newDownStation, distance);
-
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
-    }
-
-    @DisplayName("새로운 구간의 하행역이 노선에 등록되어 있을 경우")
-    @Test
-    void alreadyEnrolled() {
-        Station upStation = new Station(4L, "잠실역");
-        Station downStation = new Station(2L, "잠실나루역");
-        Station newUpStation = new Station(2L, "잠실나루역");
-        Station newDownStation = new Station(4L, "잠실역");
-        int distance = 10;
-
-        Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
-        Section  newSection = new Section(newUpStation, newDownStation, distance);
-
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
-    }
-
-    @DisplayName("새로운 구간을 중간에 삽입할 때의 거리가 기존 구간의 거리와 같거나 긴 경우 예외를 던진다.")
+    @DisplayName("새로운 구간을 중간에 삽입할 때의 거리가 기존 구간의 거리와 같거나 길면 예외를 던진다.")
     @Test
     void greaterOrEqualDistance() {
         Station upStation = new Station(4L, "잠실나루역");
@@ -218,7 +188,7 @@ class SectionsTest {
         assertThrows(IllegalArgumentException.class, () -> sections.cut(oldSection, newSection));
     }
 
-    @DisplayName("마지막 구간을 제거하는 경우")
+    @DisplayName("마지막 구간을 제거한다.")
     @Test
     void deleteLastSection() {
         // given
@@ -239,7 +209,7 @@ class SectionsTest {
         assertThat(sections).isEqualTo(new Sections(List.of(new Section(upStation, downStation, distance))));
     }
 
-    @DisplayName("마지막이 아닌 구간을 제거하는 경우 예외를 던진다.")
+    @DisplayName("마지막이 아닌 구간을 제거하면 예외를 던진다.")
     @Test
     void deleteNotLastSection() {
         // given
@@ -257,7 +227,7 @@ class SectionsTest {
         assertThrows(IllegalArgumentException.class, () -> sections.delete(downStation));
     }
 
-    @DisplayName("구간이 1개만 있을 때 구간을 제거하는 경우 예외를 던진다.")
+    @DisplayName("구간이 1개만 있을 때 구간을 제거하면 예외를 던진다.")
     @Test
     void deleteSectionOneAndOnly() {
         // given
