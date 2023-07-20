@@ -114,4 +114,32 @@ class SectionDaoTest {
         }
 
     }
+
+    @Nested
+    @DisplayName("update 메소드는")
+    class Update_Method {
+
+        @Test
+        @DisplayName("SECTIONS.id에 해당하는 Section을 업데이트 한다")
+        void Update_Section_Equals_Sections_Id() {
+            // given
+            Line line = lineDao.insert(new Line("line", "red"));
+
+            Station upStation = stationDao.insert(new Station("upStationName"));
+            Station downStation = stationDao.insert(new Station("downStationName"));
+            Station updateStation = stationDao.insert(new Station("updateStationName"));
+
+            Section section = DomainFixture.Section.buildWithStations(line, upStation, downStation);
+            section = sectionDao.insert(section);
+
+            Section updatedSection = DomainFixture.Section.buildWithSectionAndStation(section, updateStation);
+
+            // when
+            sectionDao.update(updatedSection);
+            Section result = sectionDao.findAllByLineId(line.getId()).get(0);
+
+            // then
+            assertThat(result).isEqualTo(updatedSection);
+        }
+    }
 }

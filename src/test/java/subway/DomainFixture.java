@@ -7,6 +7,12 @@ public class DomainFixture {
 
     public static final class Section {
 
+        public static subway.domain.Section buildWithSectionAndStation(subway.domain.Section section,
+                Station downStation) {
+            return buildWithStations(section.getId(), section.getLine(), section.getUpStation(), downStation,
+                    section.getDistance());
+        }
+
         public static subway.domain.Section buildWithStations(Line line, Station upStation, Station downStation) {
             return buildWithStations(1L, line, upStation, downStation, 10);
         }
