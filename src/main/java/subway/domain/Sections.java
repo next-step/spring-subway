@@ -2,6 +2,7 @@ package subway.domain;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Sections {
@@ -24,11 +25,9 @@ public class Sections {
         final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
         final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
 
-        final Set<Long> intersectionIds = intersection(upStationIds, downStationIds);
-        downStationIds.removeAll(intersectionIds);
+        downStationIds.removeAll(intersection(upStationIds, downStationIds));
 
-        return values.stream().filter(section -> downStationIds.contains(section.getDownStationId()))
-                .findAny();
+        return find(section -> downStationIds.contains(section.getDownStationId()));
     }
 
     public boolean isEqualSizeToOne() {
@@ -43,6 +42,16 @@ public class Sections {
                 difference(union(upStationsIds, downStationIds), intersection(upStationsIds, downStationIds));
 
         return differenceIds.contains(upStationId) || differenceIds.contains(downStationId);
+    }
+
+    public Optional<Section> findContainStationSection(final Long upStationId, final Long downStationId) {
+        return find(section -> section.containsStations(upStationId, downStationId));
+    }
+
+    private Optional<Section> find(final Predicate<Section> predicate) {
+        return values.stream()
+                .filter(predicate)
+                .findAny();
     }
 
     private Set<Long> union(final Set<Long> upStationIds, final Set<Long> downStationIds) {

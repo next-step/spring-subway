@@ -44,6 +44,21 @@ public class Section {
         return this.downStationId.equals(stationId);
     }
 
+    public Long subtractDistance(final Long distance) {
+        return this.distance - distance;
+    }
+
+    public boolean containsStations(final Long upStationId, final Long downStationId) {
+        return Objects.equals(this.upStationId, upStationId) || Objects.equals(this.downStationId, downStationId);
+    }
+
+    public Section subtract(final Section requestSection) {
+        if (Objects.equals(this.upStationId, requestSection.upStationId)) {
+            return new Section(this.lineId, requestSection.upStationId, this.downStationId, this.distance - requestSection.distance);
+        }
+        return new Section(this.lineId, this.upStationId, requestSection.downStationId, this.distance - requestSection.distance);
+    }
+
     public Long getId() {
         return this.id;
     }

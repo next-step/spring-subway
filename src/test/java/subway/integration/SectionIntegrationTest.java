@@ -15,6 +15,82 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SectionIntegrationTest extends IntegrationTest {
 
     @Test
+    @DisplayName("요청의 상행역과 노선에 속한 구간의 상행역이 같은 구간을 등록할 수 있다.")
+    void createSectionWhenRequestUpStationExists() {
+        /* given */
+        final Long lineId = 2L;
+        final SectionRequest sectionRequest = new SectionRequest(24L, 26L, 66L);
+
+        /* when */
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("요청의 하행역과 노선에 속한 구간의 하행역이 같은 구간을 등록할 수 있다.")
+    void createSectionWhenRequestDownStationExists() {
+        /* given */
+        final Long lineId = 2L;
+        final SectionRequest sectionRequest = new SectionRequest(26L, 24L, 66L);
+
+        /* when */
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("새로운 구간의 길이가 기존 구간의 길이보다 크거나 같으면 400 Bad Request로 응답한다.")
+    void badRequestWithGreaterThanOrEqualExistSectionDistance() {
+        /* given */
+        final Long lineId = 2L;
+        final SectionRequest sectionRequest1 = new SectionRequest(26L, 24L, 888L);
+        final SectionRequest sectionRequest2 = new SectionRequest(24L, 26L, 888L);
+
+        /* when */
+        ExtractableResponse<Response> response1 = RestAssured // TODO: final
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest1)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        ExtractableResponse<Response> response2 = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest2)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response1.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response1.body().jsonPath().getString("message"))
+                .isEqualTo("새로운 구간의 길이는 기존 구간의 길이보다 짧아야 합니다.");
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response2.body().jsonPath().getString("message"))
+                .isEqualTo("새로운 구간의 길이는 기존 구간의 길이보다 짧아야 합니다.");
+    }
+
+    @Test
     @DisplayName("새로운 역을 상행 종점역으로 등록할 수 있다.")
     void createFirstSection() {
         /* given */
