@@ -59,7 +59,7 @@ class SectionsAddTest {
 
     @Test
     @DisplayName("노선의 특정 구간과 상행역만 같은 경우 노선에 추가한다.")
-    void tes1() {
+    void addSectionOfSameUpStationAsLinesSection() {
         Section firstSection = new Section(lineA, stationA, stationB, 5);
         Section secondSection = new Section(lineA, stationB, stationD, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
@@ -77,7 +77,7 @@ class SectionsAddTest {
 
     @Test
     @DisplayName("노선의 특정 구간과 하행역만 같은 경우 노선에 추가한다.")
-    void tes2() {
+    void addSectionOfSameDownStationAsLinesSection() {
         Section firstSection = new Section(lineA, stationA, stationB, 5);
         Section secondSection = new Section(lineA, stationB, stationD, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
@@ -95,7 +95,7 @@ class SectionsAddTest {
 
     @Test
     @DisplayName("추가할 구간의 하행역이 기존 노선의 상행 종점역과 같은 경우 노선의 맨 앞에 추가한다.")
-    void tes3() {
+    void addFirst() {
         Section firstSection = new Section(lineA, stationB, stationC, 5);
         Section secondSection = new Section(lineA, stationC, stationD, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
@@ -111,7 +111,7 @@ class SectionsAddTest {
 
     @Test
     @DisplayName("추가할 구간의 상행역이 기존 노선의 하행 종점역과 같은 경우 노선의 맨 뒤에 추가한다.")
-    void tes4() {
+    void addLast() {
         Section firstSection = new Section(lineA, stationA, stationB, 5);
         Section secondSection = new Section(lineA, stationB, stationC, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
