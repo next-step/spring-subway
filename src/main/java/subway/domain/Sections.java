@@ -42,6 +42,13 @@ public class Sections {
     }
 
     public boolean checkInsertion(final Section section) {
-        return false;
+        final boolean upCheck = checkStationExist(section.getUpStationId());
+        final boolean downCheck = checkStationExist(section.getDownStationId());
+        return upCheck ^ downCheck;
+    }
+
+    private boolean checkStationExist(final long stationId) {
+        return sections.stream()
+                .anyMatch(section -> section.containsStation(stationId));
     }
 }

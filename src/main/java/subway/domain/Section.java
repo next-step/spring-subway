@@ -49,4 +49,8 @@ public class Section {
     public Integer getDistance() {
         return distance;
     }
+
+    public boolean containsStation(final long stationId) {
+        return upStationId == stationId || downStationId == stationId;
+    }
 }
