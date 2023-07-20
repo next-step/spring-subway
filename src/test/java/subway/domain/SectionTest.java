@@ -255,4 +255,43 @@ class SectionTest {
 
 
     }
+
+    @Nested
+    @DisplayName("connectSection 메소드는")
+    class ConnectSection_Method {
+
+        @Test
+        @DisplayName("중간 위치에 상행 Station을 기준으로 Section을 삽입한다")
+        void Return_Connectable_Section() {
+            // given
+            Station upStation = new Station("upStation");
+            Station middleStation1 = new Station("middleStation1");
+            Station middleStation2 = new Station("middleStation2");
+            Station downStation = new Station("downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation1, downStation);
+
+            upSection.connectDownSection(downSection);
+
+            Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2);
+
+            // when
+            upSection.connectSection(middleSection);
+
+            // then
+            assertSectionConnectedStatus(upSection, middleSection, downSection);
+        }
+
+        private void assertSectionConnectedStatus(Section upSection, Section middleSection, Section downSection) {
+            assertThat(upSection.getUpSection()).isNull();
+            assertThat(upSection.getDownSection()).isEqualTo(middleSection);
+
+            assertThat(middleSection.getUpSection()).isEqualTo(upSection);
+            assertThat(middleSection.getDownSection()).isEqualTo(downSection);
+
+            assertThat(downSection.getUpSection()).isEqualTo(middleSection);
+            assertThat(downSection.getDownSection()).isNull();
+        }
+    }
 }

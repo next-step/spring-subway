@@ -78,4 +78,5 @@ lineId, upStationId, downStationId;
 
 - [ ] 뼈대코드 전체적으로 접근제어자 리팩토링
 - [ ] 에러 반환 ControllerAdvice 만들기
-- 
+- [ ] findDownSection, upDownSection 중 하나만 남겨야 하는지
+- [ ] domain find를 get으로 바꾸고 `도메인서비스`가 아니라 `도메인`에서 예외를 던지게 리팩토링
