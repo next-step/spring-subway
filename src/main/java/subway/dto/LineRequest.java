@@ -8,12 +8,7 @@ public class LineRequest {
     private Integer distance;
     private String color;
 
-    public LineRequest() {
-    }
-
-    public LineRequest(String name, String color) {
-        this.name = name;
-        this.color = color;
+    private LineRequest() {
     }
 
     public LineRequest(String name, Long upStationId, Long downStationId, Integer distance,
