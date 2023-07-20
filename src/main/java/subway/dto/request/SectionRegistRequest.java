@@ -11,7 +11,11 @@ public final class SectionRegistRequest {
     public SectionRegistRequest() {
     }
 
-    public SectionRegistRequest(final Long upStationId, final Long downStationId, final int distance) {
+    public SectionRegistRequest(
+        Long upStationId,
+        Long downStationId,
+        int distance
+    ) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;

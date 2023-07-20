@@ -104,7 +104,8 @@ public class SectionDao {
     }
 
     public void deleteByDownStationIdAndLineId(Long downStationId, Long lineId) {
-        jdbcTemplate.update("delete from section where down_station_id = ? and line_id = ?", downStationId, lineId);
+        jdbcTemplate.update("delete from section where down_station_id = ? and line_id = ?",
+            downStationId, lineId);
     }
 
     public void deleteByLineId(Long lineId) {

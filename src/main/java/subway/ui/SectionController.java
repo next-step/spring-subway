@@ -23,7 +23,7 @@ public class SectionController {
     public ResponseEntity<Void> registSection(
         @RequestBody SectionRegistRequest sectionRegistRequest,
         @PathVariable Long lineId
-        ) {
+    ) {
         sectionService.registSection(sectionRegistRequest, lineId);
 
         return ResponseEntity.ok().build();

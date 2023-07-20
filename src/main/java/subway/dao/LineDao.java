@@ -13,21 +13,22 @@ import java.util.Map;
 
 @Repository
 public class LineDao {
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
     private RowMapper<Line> rowMapper = (rs, rowNum) ->
-            new Line(
-                    rs.getLong("id"),
-                    rs.getString("name"),
-                    rs.getString("color")
-            );
+        new Line(
+            rs.getLong("id"),
+            rs.getString("name"),
+            rs.getString("color")
+        );
 
     public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("line")
-                .usingGeneratedKeyColumns("id");
+            .withTableName("line")
+            .usingGeneratedKeyColumns("id");
     }
 
     public Line insert(Line line) {
@@ -52,7 +53,8 @@ public class LineDao {
 
     public void update(Line newLine) {
         String sql = "update LINE set name = ?, color = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
+        jdbcTemplate.update(sql,
+            new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
     }
 
     public void deleteById(Long id) {

@@ -69,10 +69,11 @@ public class Section {
             return false;
         }
         Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(upStation,
-            section.upStation) && Objects.equals(downStation, section.downStation)
-            && Objects.equals(line, section.line) && Objects.equals(distance,
-            section.distance);
+        return Objects.equals(id, section.id)
+            && Objects.equals(upStation, section.upStation)
+            && Objects.equals(downStation, section.downStation)
+            && Objects.equals(line, section.line)
+            && Objects.equals(distance, section.distance);
     }
 
     @Override

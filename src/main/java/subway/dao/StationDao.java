@@ -13,21 +13,22 @@ import java.util.List;
 
 @Repository
 public class StationDao {
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
     private RowMapper<Station> rowMapper = (rs, rowNum) ->
-            new Station(
-                    rs.getLong("id"),
-                    rs.getString("name")
-            );
+        new Station(
+            rs.getLong("id"),
+            rs.getString("name")
+        );
 
 
     public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("station")
-                .usingGeneratedKeyColumns("id");
+            .withTableName("station")
+            .usingGeneratedKeyColumns("id");
     }
 
     public Station insert(Station station) {
