@@ -14,17 +14,21 @@ public class Section {
 
     public Section(Long id, Line line, Station upStation, Station downStation, int distance) {
         validatePositive(distance);
+        validateStationsNotEqual(upStation, downStation);
 
-        if (upStation.equals(downStation)) {
-            throw new IllegalArgumentException(
-                "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
-                    + downStation);
-        }
         this.id = id;
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    private void validateStationsNotEqual(Station upStation, Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new IllegalArgumentException(
+                "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
+                    + downStation);
+        }
     }
 
     public Section(Line line, Station upStation, Station downStation, int distance) {
