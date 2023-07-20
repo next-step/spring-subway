@@ -124,6 +124,12 @@ public class Section {
     }
 
     public void connectSection(Section section) {
+        if (downStation.equals(section.getUpStation())) {
+            section.upSection = this;
+            section.downSection = downSection;
+            downSection.upSection = section;
+            downSection = section;
+        }
     }
 
     public static class Builder {
