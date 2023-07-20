@@ -30,6 +30,33 @@ public class Sections {
         return find(section -> downStationIds.contains(section.getDownStationId()));
     }
 
+    public Optional<Section> findFirstSection() {
+        final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
+        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
+
+        upStationIds.removeAll(intersection(upStationIds, downStationIds));
+
+        return find(section -> upStationIds.contains(section.getUpStationId()));
+    }
+
+    public List<Long> getSortedStationIds() {
+        final Map<Long, Section> upStationKeyMap = values.stream()
+                .collect(Collectors.toMap(Section::getUpStationId, section -> section));
+
+        final Section firstSection = findFirstSection().orElseThrow(IllegalArgumentException::new);
+
+        final List<Long> result =
+                new ArrayList<>(List.of(firstSection.getUpStationId(), firstSection.getDownStationId()));
+        Section next = upStationKeyMap.get(firstSection.getDownStationId());
+
+        while (next != null) {
+            result.add(next.getDownStationId());
+            next = upStationKeyMap.get(next.getDownStationId());
+        }
+
+        return result;
+    }
+
     public boolean isEqualSizeToOne() {
         return this.values.size() == 1;
     }
