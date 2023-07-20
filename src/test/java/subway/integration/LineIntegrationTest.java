@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineStationsResponse;
 import subway.helper.CreateHelper;
 
 import java.util.List;
@@ -140,7 +141,7 @@ class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        LineResponse resultResponse = response.as(LineResponse.class);
+        LineResponse resultResponse = response.as(LineStationsResponse.class);
         assertThat(resultResponse.getId()).isEqualTo(lineId);
     }
 

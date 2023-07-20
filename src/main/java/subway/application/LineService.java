@@ -1,6 +1,7 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -10,6 +11,7 @@ import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
 
 import java.util.List;
@@ -28,6 +30,7 @@ public class LineService {
         this.sectionDao = sectionDao;
     }
 
+    @Transactional
     public LineResponse saveLine(final LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Section section = newSection(SectionRequest.of(request));
@@ -46,24 +49,29 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineResponseById(final Long id) {
+    @Transactional(readOnly = true)
+    public LineStationsResponse findLineResponseById(final Long id) {
         Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
+        Sections sections = sectionDao.findAllByLineId(id);
+        return LineStationsResponse.from(persistLine, sections.toStations());
     }
 
     public Line findLineById(final Long id) {
         return lineDao.findById(id);
     }
 
+    @Transactional
     public void updateLine(final Long id, final LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    @Transactional
     public void deleteLineById(final Long id) {
         lineDao.deleteById(id);
     }
 
-    public LineResponse saveSection(final SectionRequest request, final Long lineId) {
+    @Transactional
+    public void saveSection(final SectionRequest request, final Long lineId) {
         Section newSection = newSection(request);
 
         Sections sections = sectionDao.findAllByLineId(lineId);
@@ -75,10 +83,9 @@ public class LineService {
             sectionDao.insert(sections.cut(oldSection, newSection), lineId);
         }
         sectionDao.insert(newSection, lineId);
-
-        return findLineResponseById(lineId);
     }
 
+    @Transactional
     public void deleteSectionByStationId(final Long lineId, final String stationId) {
         Long deleteId = Long.parseLong(stationId);
         Station delete = stationDao.findById(deleteId);

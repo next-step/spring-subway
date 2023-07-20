@@ -115,14 +115,18 @@ public class Sections {
                 .orElseThrow();
     }
 
+    public List<Station> toStations() {
+        List<Station> stations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+        stations.add(lastSection().getDownStation());
+
+        return stations;
+    }
+
     public void validateInsert(final Section newSection) {
         Set<Station> allStations = new HashSet<>(upStations);
         allStations.addAll(downStations);
-
-        // TODO: 라인 생성 시 구간 삽입하는 기능 만들면 삭제하기
-        if (allStations.isEmpty()) {
-            return;
-        }
 
         boolean hasUpStation = allStations.contains(newSection.getUpStation());
         boolean hasDownStation = allStations.contains(newSection.getDownStation());
