@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -73,9 +72,7 @@ public class LineService {
 
     public void connectSectionByStationId(Long lineId, SectionRequest sectionRequest) {
         Line line = getLineById(lineId);
-        List<Section> sections = sectionDao.findAllByLineId(lineId);
-
-        LineManager lineManager = new LineManager(line, sections);
+        LineManager lineManager = new LineManager(line, sectionDao.findAllByLineId(lineId));
 
         Section newSection = getNewSection(line, Long.valueOf(sectionRequest.getUpStationId()),
                 Long.valueOf(sectionRequest.getDownStationId()),
@@ -94,7 +91,6 @@ public class LineService {
         sectionDao.update(section);
     }
 
-    @Transactional
     public void disconnectSectionByStationId(Long lineId, Long stationId) {
         Line line = getLineById(lineId);
         List<Section> sections = sectionDao.findAllByLineId(lineId);

@@ -7,6 +7,8 @@ import org.springframework.util.Assert;
 
 public class Section {
 
+    private static final int MIN_DISTANCE_SIZE = 0;
+
     private final Long id;
     private final Line line;
     private Integer distance;
@@ -16,12 +18,7 @@ public class Section {
     private Section downSection;
 
     private Section(Builder builder) {
-        Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.");
-        Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.");
-        Assert.isTrue(builder.distance > 0,
-                () -> MessageFormat.format("distance \"{0}\"는 0 이하가 될 수 없습니다.", builder.distance));
-        Assert.isTrue(!builder.upStation.equals(builder.downStation),
-                () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation));
+        validate(builder);
 
         this.upStation = builder.upStation;
         this.downStation = builder.downStation;
@@ -34,6 +31,15 @@ public class Section {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    private void validate(Builder builder) {
+        Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.");
+        Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.");
+        Assert.isTrue(builder.distance > MIN_DISTANCE_SIZE,
+                () -> MessageFormat.format("distance \"{0}\"는 0 이하가 될 수 없습니다.", builder.distance));
+        Assert.isTrue(!builder.upStation.equals(builder.downStation),
+                () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation));
     }
 
     Section connectSection(Section requestSection) {
@@ -122,6 +128,12 @@ public class Section {
         return upSection.findUpSection();
     }
 
+    public void disconnectDownSection() {
+        Assert.notNull(downSection, () -> "downSection이 null 일때, \"disconnectDownSection()\" 를 호출할 수 없습니다");
+        downSection.upSection = null;
+        downSection = null;
+    }
+
     public Long getId() {
         return id;
     }
@@ -180,12 +192,6 @@ public class Section {
                 ", line=" + line +
                 ", downSection=" + downSection +
                 '}';
-    }
-
-    public void disconnectDownSection() {
-        Assert.notNull(downSection, () -> "downSection이 null 일때, \"disconnectDownSection()\" 를 호출할 수 없습니다");
-        downSection.upSection = null;
-        downSection = null;
     }
 
     public static class Builder {
