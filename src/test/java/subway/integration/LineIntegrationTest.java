@@ -79,6 +79,26 @@ public class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("노선의 두 역이 같으면, 노선을 생성할 수 없다.")
+    void createLineWithDuplicateStation() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", station2Id, station2Id, 14);
+        createLine(lineRequest);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
     @DisplayName("지하철 노선 목록을 조회한다.")
     void getLines() {
         // given

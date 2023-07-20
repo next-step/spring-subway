@@ -41,14 +41,14 @@ public class SectionIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createStation3Response = createStation(stationRequest3);
         station3Id = Long.parseLong(createStation3Response.header("Location").split("/")[2]);
 
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 15);
         ExtractableResponse<Response> lineResponse = createLine(lineRequest);
         lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
     }
 
     @Test
-    @DisplayName("노선에 구간을 추가한다.")
-    void createSectionTest() {
+    @DisplayName("노선 하행 종점이 상행역인 구간을 추가한다.")
+    void createSectionTest1() {
         // when
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         ExtractableResponse<Response> response = RestAssured
@@ -63,11 +63,123 @@ public class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
+    // 31
     @Test
-    @DisplayName("기존 하행 종점역이 새로운 구간의 상행역이 아닌 경우 오류를 반환한다.")
-    void downTerminalDoesNotMatchNewUpStationSection() {
+    @DisplayName("노선 상행 종점이 하행역인 구간을 추가한다.")
+    void createSectionTest2() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(station3Id, station1Id, 15);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    //13
+    @Test
+    @DisplayName("상행역이 일치하는 구간에, 새로운 구간을 추가한다.")
+    void createSectionTest3() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(station1Id, station3Id, 14);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    //32
+    @Test
+    @DisplayName("하행역이 일치하는 구간에, 새로운 구간을 추가한다.")
+    void createSectionTest4() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(station3Id, station2Id, 14);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    // 12
+    @Test
+    @DisplayName("두 역이 모두 기존 노선에 존재하면, 추가할 수 없다.")
+    void createSectionTest5() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(station1Id, station2Id, 14);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    //34
+    @Test
+    @DisplayName("노선에 구간이 하나도 포함 되지 않으면, 구간을 추가할 수 없다.")
+    void createSectionTest6() {
+        // when
+        StationRequest stationRequest = new StationRequest("공릉역");
+        ExtractableResponse<Response> createStationResponse = createStation(stationRequest);
+        Long station4Id = Long.parseLong(createStationResponse.header("Location").split("/")[2]);
+
+        SectionRequest sectionRequest = new SectionRequest(station3Id, station4Id, 14);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    // 32
+    @Test
+    @DisplayName("새로운 구간의 길이가 기존 구간의 길이보다 크거나 같으면, 추가할 수 없다.")
+    void createSectionTest7() {
         // when
         SectionRequest sectionRequest = new SectionRequest(station3Id, station2Id, 15);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("구간의 두 역이 같은 역일 경우, 구간을 추가할 수 없다.")
+    void createSectionTest8() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station2Id, 14);
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
