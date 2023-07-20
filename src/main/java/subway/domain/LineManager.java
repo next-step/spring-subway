@@ -13,10 +13,10 @@ public class LineManager {
     public LineManager(Line line, List<Section> sections) {
         this.line = line;
         this.sections = sections;
-        connectSection(this.sections);
+        initSectionConnection(this.sections);
     }
 
-    private void connectSection(List<Section> sections) {
+    private void initSectionConnection(List<Section> sections) {
         for (Section currentSection : sections) {
             Optional<Section> downSection = sections.stream()
                     .filter(section -> currentSection.getDownStation().equals(section.getUpStation())).findFirst();
