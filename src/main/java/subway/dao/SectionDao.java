@@ -17,16 +17,13 @@ public class SectionDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-    private final StationDao stationDao;
+    private final RowMapper<Section> rowMapper;
 
-    private RowMapper<Section> rowMapper;
-
-    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource, StationDao stationDao) {
+    public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource, final StationDao stationDao) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("section")
                 .usingGeneratedKeyColumns("id");
-        this.stationDao = stationDao;
         this.rowMapper = (rs, rowNum) ->
                 new Section(
                         rs.getLong("id"),
@@ -36,7 +33,7 @@ public class SectionDao {
                 );
     }
 
-    public void insert(Section section, Long lineId) {
+    public void insert(final Section section, final Long lineId) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
         params.put("up_station_id", section.getUpStation().getId());
@@ -47,17 +44,17 @@ public class SectionDao {
         insertAction.executeAndReturnKey(params);
     }
 
-    public Sections findAllByLineId(Long lineId) {
+    public Sections findAllByLineId(final Long lineId) {
         String sql = "select * from SECTION where line_id = ?";
         return new Sections(jdbcTemplate.query(sql, rowMapper, lineId));
     }
 
-    public void deleteByStation(Station station, Long lineId) {
+    public void deleteByStation(final Station station, final Long lineId) {
         jdbcTemplate.update("delete from SECTION where down_station_id = ? and line_id = ?",
                 station.getId(), lineId);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(final Long id) {
         String sql = "delete from SECTION where id = ?";
         jdbcTemplate.update(sql, id);
     }

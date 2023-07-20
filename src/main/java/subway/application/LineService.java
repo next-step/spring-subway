@@ -22,13 +22,13 @@ public class LineService {
     private final StationDao stationDao;
     private final SectionDao sectionDao;
 
-    public LineService(LineDao lineDao, StationDao stationDao, SectionDao sectionDao) {
+    public LineService(final LineDao lineDao, final StationDao stationDao, final SectionDao sectionDao) {
         this.lineDao = lineDao;
         this.stationDao = stationDao;
         this.sectionDao = sectionDao;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(final LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         return LineResponse.of(persistLine);
     }
@@ -44,24 +44,24 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineResponseById(Long id) {
+    public LineResponse findLineResponseById(final Long id) {
         Line persistLine = findLineById(id);
         return LineResponse.of(persistLine);
     }
 
-    public Line findLineById(Long id) {
+    public Line findLineById(final Long id) {
         return lineDao.findById(id);
     }
 
-    public void updateLine(Long id, LineRequest lineUpdateRequest) {
+    public void updateLine(final Long id, final LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
-    public void deleteLineById(Long id) {
+    public void deleteLineById(final Long id) {
         lineDao.deleteById(id);
     }
 
-    public LineResponse saveSection(SectionRequest request, Long lineId) {
+    public LineResponse saveSection(final SectionRequest request, final Long lineId) {
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
         Section newSection = new Section(upStation, downStation, request.getDistance());
@@ -79,7 +79,7 @@ public class LineService {
         return findLineResponseById(lineId);
     }
 
-    public void deleteSectionByStationId(Long lineId, String stationId) {
+    public void deleteSectionByStationId(final Long lineId, final String stationId) {
         Long deleteId = Long.parseLong(stationId);
         Station delete = stationDao.findById(deleteId);
 

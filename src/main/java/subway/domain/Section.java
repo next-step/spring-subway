@@ -14,11 +14,11 @@ public class Section {
     public Section() {
     }
 
-    public Section(Station upStation, Station downStation, Integer distance) {
+    public Section(final Station upStation, final Station downStation, final Integer distance) {
         this(null, upStation, downStation, distance);
     }
 
-    public Section(Long id, Station upStation, Station downStation, Integer distance) {
+    public Section(final Long id, final Station upStation, final Station downStation, final Integer distance) {
         validateDifferent(upStation, downStation);
 
         this.id = id;
@@ -27,17 +27,17 @@ public class Section {
         this.distance = distance;
     }
 
-    private void validateDifferent(Station upStation, Station downStation) {
+    private void validateDifferent(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
             throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
         }
     }
 
-    public boolean isSameUpStation(Section other) {
+    public boolean isSameUpStation(final Section other) {
         return upStation.equals(other.upStation);
     }
 
-    public boolean isSameDownStation(Section other) {
+    public boolean isSameDownStation(final Section other) {
         return downStation.equals(other.downStation);
     }
 
