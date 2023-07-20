@@ -12,6 +12,7 @@ import subway.vo.SectionAdditionResult;
 
 public class Sections {
 
+    public static final int MIN_SECTION_COUNT = 1;
     private final List<Section> values;
 
     public Sections(List<Section> values) {
@@ -55,7 +56,7 @@ public class Sections {
             .collect(Collectors.toList());
     }
 
-    private static Section getNextSection(Section section, Map<Station, Section> nextSectionMap) {
+    private Section getNextSection(Section section, Map<Station, Section> nextSectionMap) {
         return nextSectionMap.get(section.getDownStation());
     }
 
@@ -89,10 +90,6 @@ public class Sections {
         }
 
         return addSectionInMiddle(section);
-    }
-
-    private void addLast(Section section) {
-        this.values.add(section);
     }
 
     private SectionAdditionResult addSectionInMiddle(Section section) {
@@ -133,6 +130,10 @@ public class Sections {
         this.values.add(0, section);
     }
 
+    private void addLast(Section section) {
+        this.values.add(section);
+    }
+
     public Section removeLast(Station station) {
         validateSize();
         validateFinalDownStationSameAs(station);
@@ -148,8 +149,8 @@ public class Sections {
     }
 
     private void validateSize() {
-        if (values.size() <= 1) {
-            throw new IllegalStateException("노선의 구간이 1개인 경우 삭제할 수 없습니다.");
+        if (values.size() <= MIN_SECTION_COUNT) {
+            throw new IllegalStateException("노선의 구간이 " + MIN_SECTION_COUNT + "개인 경우 삭제할 수 없습니다.");
         }
     }
 
@@ -161,12 +162,12 @@ public class Sections {
         return stations;
     }
 
-    Section getFirst() {
+    private Section getFirst() {
         return this.values.get(0);
     }
 
 
-    Section getLast() {
+    private Section getLast() {
         return this.values.get(this.values.size() - 1);
     }
 
