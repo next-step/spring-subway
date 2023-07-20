@@ -192,5 +192,27 @@ class LineManagerTest {
             assertThat(requestSection.getDownSection()).isEqualTo(section);
             assertThat(section.getUpSection()).isEqualTo(requestSection);
         }
+
+        @Test
+        @DisplayName("입력으로 들어온 Section의 상행, 하행 역이 line에 모두 존재할 경우, IllegalArgumentException을 던진다")
+        void Throw_IllegalArgumentException_When_UpStation_And_DownStation_All_Exists() {
+            // given
+            Line line = new Line(1L, "line", "red");
+
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+
+            Section section = DomainFixture.Section.buildWithStations(upStation, middleStation, 2);
+
+            LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(section)));
+
+            Section requestSection = DomainFixture.Section.buildWithStations(upStation, middleStation, 1);
+
+            // when
+            Exception exception = catchException(() -> lineManager.connectSection(requestSection));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 }
