@@ -1,5 +1,6 @@
 package subway.ui;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
@@ -11,7 +12,6 @@ import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
 import subway.dto.SectionAdditionRequest;
-import subway.dto.SectionResponse;
 
 @RestController
 @RequestMapping("/lines")
@@ -54,9 +54,9 @@ public class LineController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<SectionResponse> addSection(@PathVariable Long id, @RequestBody SectionAdditionRequest sectionRequest) {
-        SectionResponse section = sectionsService.addSection(id, sectionRequest);
-        return ResponseEntity.created(URI.create("/line/" + id + "/sections/" +  section.getId())).body(section);
+    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionAdditionRequest sectionRequest) {
+        sectionsService.addSection(id, sectionRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{id}/sections")

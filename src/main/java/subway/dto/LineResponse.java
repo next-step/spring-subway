@@ -34,7 +34,7 @@ public class LineResponse {
     public static LineResponse of(LineSections lineSections) {
         Line line = lineSections.getLine();
         List<Station> stations = lineSections.getSections().getStations();
-        
+
         return new LineResponse(line.getId(), line.getName(), line.getColor(), StationResponse.listOf(stations));
     }
 
@@ -48,5 +48,9 @@ public class LineResponse {
 
     public String getColor() {
         return color;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 }
