@@ -205,4 +205,54 @@ class SectionTest {
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
     }
+
+    @Nested
+    @DisplayName("findUpSection 메소드는")
+    class FindUpSection_Method {
+
+        @Test
+        @DisplayName("Section이 2개일때, 연결된 상단 종점 Section을 반환한다")
+        void Return_Up_Section_When_Two_Section() {
+            // given
+            Station upStation = new Station("upStation");
+            Station middleStation = new Station("middleStation");
+            Station downStation = new Station("downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            upSection.connectDownSection(downSection);
+
+            // when
+            Section result = downSection.findUpSection();
+
+            // then
+            assertThat(result).isEqualTo(upSection);
+        }
+
+        @Test
+        @DisplayName("Section이 2개 초과일때, 연결된 상단 종점 Section을 반환한다")
+        void Return_Up_Section_When_More_Then_Two_Section() {
+            // given
+            Station upStation = new Station("upStation");
+            Station middleStation1 = new Station("middleStation1");
+            Station middleStation2 = new Station("middleStation2");
+            Station downStation = new Station("downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1);
+            Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation);
+
+            upSection.connectDownSection(middleSection);
+            middleSection.connectDownSection(downSection);
+
+            // when
+            Section result = downSection.findUpSection();
+
+            // then
+            assertThat(result).isEqualTo(upSection);
+        }
+
+
+    }
 }
