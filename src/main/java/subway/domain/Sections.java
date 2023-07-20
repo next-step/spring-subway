@@ -44,17 +44,18 @@ public class Sections {
             return sections;
         }
 
-        Station first = findFirstStation();
+        Map<Station, Section> stationToSection = sections.stream()
+                .collect(Collectors.toMap(Section::getUpStation, section -> section));
 
-        Map<Station, Section> stationToSection = new HashMap<>();
-        for (Section section : sections) {
-            stationToSection.put(section.getUpStation(), section);
-        }
+        return combineUnsortedSections(sections, stationToSection);
+    }
 
+    private List<Section> combineUnsortedSections(final List<Section> sections, final Map<Station, Section> stationToSection) {
         List<Section> sortedSection = new ArrayList<>();
 
-        Section nextSection = findByUpStation(sections, first);
+        Section nextSection = findByUpStation(sections, findFirstStation());
         sortedSection.add(nextSection);
+
         for (int i = 1; i < sections.size(); i++) {
             Station lastDownStation = nextSection.getDownStation();
             nextSection = stationToSection.get(lastDownStation);
