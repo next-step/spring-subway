@@ -64,10 +64,10 @@ lineId, upStationId, downStationId;
 - [x] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 같으면 등록 가능 하다.
 - [x] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 다르면 예외를 던진다.
 - [x] 새로운 Section의 끝Station은 기존 Section에 등록되어 있으면 예외를 던진다.
-- [ ] 새로운 Section의 상행, 하행이 Line의 하행 혹은 상행과 일치한다면 삽입될수있다
-  - [ ] 중간에 삽입하는 Section의 길이가,기존 역 사이의 길이보다 크거나 같으면, 삽입할 수 없음
-  - [ ] 상행과, 하행이 모두 Section에 있다면, 추가할 수 없음
-  - [ ] 상행과 하행이 둘 다 포함되지 않다면, 추가할 수 없음
+- [x] 새로운 Section의 상행, 하행이 Line의 하행 혹은 상행과 일치한다면 삽입될수있다
+  - [x] 중간에 삽입하는 Section의 길이가,기존 역 사이의 길이보다 크거나 같으면, 삽입할 수 없음
+  - [x] 상행과, 하행이 모두 Section에 있다면, 추가할 수 없음
+  - [x] 상행과 하행이 둘 다 포함되지 않다면, 추가할 수 없음
 
 ### Section 제거 기능
 
@@ -76,7 +76,4 @@ lineId, upStationId, downStationId;
 
 ### TODO
 
-- [ ] 뼈대코드 전체적으로 접근제어자 리팩토링
 - [ ] 에러 반환 ControllerAdvice 만들기
-- [ ] findDownSection, upDownSection 중 하나만 남겨야 하는지
-- [ ] domain find를 get으로 바꾸고 `도메인서비스`가 아니라 `도메인`에서 예외를 던지게 리팩토링

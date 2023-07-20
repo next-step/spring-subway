@@ -3,9 +3,9 @@ package subway.domain;
 import java.util.Objects;
 
 public class Line {
-    private Long id;
-    private String name;
-    private String color;
+    private final Long id;
+    private final String name;
+    private final String color;
 
     public Line(Long id, String name, String color) {
         this.id = id;
@@ -14,11 +14,9 @@ public class Line {
     }
 
     public Line(String name, String color) {
+        this.id = null;
         this.name = name;
         this.color = color;
-    }
-
-    public Line() {
     }
 
     public Long getId() {
