@@ -35,14 +35,18 @@ public class Section {
         validateDistance(section);
 
         if (this.upStation.equals(section.upStation)) {
-            return new Section(section.line,
+            return new Section(
+                    this.id,
+                    section.line,
                     section.downStation,
                     this.downStation,
                     new Distance(this.getDistance() - section.getDistance()));
         }
 
         if (this.downStation.equals(section.downStation)) {
-            return new Section(section.line,
+            return new Section(
+                    this.id,
+                    section.line,
                     this.upStation,
                     section.upStation,
                     new Distance(this.getDistance() - section.getDistance()));

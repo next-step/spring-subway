@@ -142,4 +142,21 @@ public class SectionDao {
                 DataAccessUtils.singleResult(
                         jdbcTemplate.query(sql, rowMapper, lineId, downStationId)));
     }
+
+    public void update(Section section) {
+        String sql = "update section set "
+                + " line_id = ?, "
+                + " up_station_id = ?, "
+                + " down_station_id = ?, "
+                + " distance = ? "
+                + " where id = ? ";
+        Object[] mapper = new Object[]{
+                section.getLineId(),
+                section.getUpStationId(),
+                section.getDownStationId(),
+                section.getDistance(),
+                section.getId()
+        };
+        jdbcTemplate.update(sql, mapper);
+    }
 }

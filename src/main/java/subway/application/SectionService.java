@@ -102,8 +102,7 @@ public class SectionService {
 
     private void updateOriginalSection(Section section, Section originalSection) {
         Section generatedSection = originalSection.cuttedSection(section);
-        sectionDao.deleteById(originalSection.getId());
-        sectionDao.insert(generatedSection);
+        sectionDao.update(generatedSection);
     }
 
     @Transactional
