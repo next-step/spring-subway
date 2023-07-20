@@ -1,6 +1,9 @@
 package subway.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -11,11 +14,10 @@ import subway.domain.Station;
 import subway.dto.request.LineRequest;
 import subway.dto.response.LineResponse;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
+@Transactional(readOnly = true)
 public class LineService {
+
     private final LineDao lineDao;
     private final SectionDao sectionDao;
     private final StationDao stationDao;
@@ -26,6 +28,7 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = stationDao.findById(request.getUpStationId());
@@ -43,8 +46,8 @@ public class LineService {
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(LineResponse::of)
-                .collect(Collectors.toList());
+            .map(LineResponse::of)
+            .collect(Collectors.toList());
     }
 
     public List<Line> findLines() {
@@ -62,10 +65,12 @@ public class LineService {
         return lineDao.findById(id);
     }
 
+    @Transactional
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    @Transactional
     public void deleteLineById(Long id) {
         sectionDao.deleteByLineId(id);
         lineDao.deleteById(id);

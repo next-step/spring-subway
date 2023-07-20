@@ -13,7 +13,7 @@ import subway.domain.vo.SectionRegistVo;
 import subway.dto.request.SectionRegistRequest;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class SectionService {
 
     private final SectionDao sectionDao;
@@ -26,6 +26,7 @@ public class SectionService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public void registSection(SectionRegistRequest sectionRegistRequest, Long lineId) {
         Station upStation = stationDao.findById(sectionRegistRequest.getUpStationId());
         Station downStation = stationDao.findById(sectionRegistRequest.getDownStationId());
@@ -47,6 +48,7 @@ public class SectionService {
         }
     }
 
+    @Transactional
     public void deleteSection(Long stationId, Long lineId) {
         Sections sections = sectionDao.findAllByLineId(lineId);
         sections.canDeleteStation(stationId);
