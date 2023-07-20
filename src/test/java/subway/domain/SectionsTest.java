@@ -15,7 +15,7 @@ class SectionsTest {
     @DisplayName("Sections를 정상적으로 생성한다.")
     void create() {
         /* given */
-        List<Section> sections = List.of(
+        final List<Section> sections = List.of(
                 new Section(1L, 1L, 1L, 1L),
                 new Section(2L, 2L, 2L, 2L),
                 new Section(3L, 3L, 3L, 3L)
@@ -61,7 +61,7 @@ class SectionsTest {
     @DisplayName("Sections에 마지막 하행 종점을 찾을 수 있다.")
     void findLastPrevSection() {
         /* given */
-        Sections sections = new Sections(List.of(
+        final Sections sections = new Sections(List.of(
                 new Section(2L, 2L, 3L, 2L),
                 new Section(3L, 3L, 4L, 3L)
         ));
@@ -77,7 +77,7 @@ class SectionsTest {
     @DisplayName("Section의 크기가 1인지 확인할 수 있다.")
     void isEqualSizeToOne() {
         /* given */
-        Sections sections = new Sections(List.of(
+        final Sections sections = new Sections(List.of(
                 new Section(2L, 2L, 3L, 2L)
         ));
 
