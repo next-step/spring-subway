@@ -27,22 +27,6 @@ public class Section {
         }
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Station getDownStation() {
-        return downStation;
-    }
-
-    public Station getUpStation() {
-        return upStation;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
     public Section subtract(final Section other) {
         if (distance <= other.distance) {
             throw new IllegalArgumentException("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
@@ -59,8 +43,24 @@ public class Section {
         return this;
     }
 
-    public boolean isOneStationMatch(final Section other) {
+    public boolean matchOneStation(final Section other) {
         return downStation.equals(other.downStation) || upStation.equals(other.upStation);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Station getDownStation() {
+        return downStation;
+    }
+
+    public Station getUpStation() {
+        return upStation;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
     @Override

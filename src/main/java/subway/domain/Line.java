@@ -31,6 +31,10 @@ public class Line {
         return new Line(name, color, sections.addSection(section));
     }
 
+    public Line removeStation(final Station station) {
+        return new Line(id, name, color, sections.removeStation(station));
+    }
+
     public Long getId() {
         return id;
     }

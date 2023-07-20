@@ -33,12 +33,7 @@ public class SectionDao {
         return new Section(sectionId, section.getUpStation(), section.getDownStation(), section.getDistance());
     }
 
-    public void deleteByLineIdAndStationId(Long lineId, Long stationId) {
-        String sql = "delete from SECTION where line_id = ? and down_station_id = ?";
-        jdbcTemplate.update(sql, lineId, stationId);
-    }
-
-    public void delete(Section section) {
+    public void delete(final Section section) {
         String sql = "delete from SECTION where id= ?";
         jdbcTemplate.update(sql, section.getId());
     }

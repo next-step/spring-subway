@@ -10,98 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 class SectionsTest {
     @Test
-    @DisplayName("해당 역이 노선의 하행 종점역인 경우 true")
-    void downStationTerminalTest() {
-        // given
-        Station station = new Station("신대방역");
-        Sections sections = new Sections(List.of(
-                new Section(
-                        1L,
-                        new Station("서울대입구역"),
-                        new Station("신대방역"),
-                        10
-                )
-        ));
-
-        // when & then
-        assertThat(sections.isTerminalDownStation(station)).isTrue();
-    }
-
-//    @Test
-//    @DisplayName("해당 역이 노선의 상행 종점역인 경우 true")
-//    void upStationTerminalTest() {
-//        // given
-//        Station station = new Station(1L, "서울대입구역");
-//        Sections sections = new Sections(List.of(
-//                new Section(
-//                        1L,
-//                        new Station(1L, "서울대입구역"),
-//                        new Station(2L, "신대방역"),
-//                        10
-//                )
-//        ));
-//
-//        // when & then
-//        assertThat(sections.isTerminal(station)).isTrue();
-//    }
-
-    @Test
-    @DisplayName("해당 역이 노선의 상행 종점역인 경우 true")
-    void notTerminalTest() {
-        // given
-        Station station = new Station("신대방역");
-        Sections sections = new Sections(List.of(
-                new Section(
-                        new Station("서울대입구역"),
-                        station,
-                        10
-                ),
-                new Section(
-                        station,
-                        new Station("잠실역"),
-                        10
-                )
-        ));
-
-        // when & then
-        assertThat(sections.isTerminalDownStation(station)).isFalse();
-    }
-
-    @Test
-    @DisplayName("입력 구간의 하행역이 노선에 포함되어 있는 경우")
-    void containStationTest() {
-        //given
-        Station station = new Station("신대방역");
-        Sections sections = new Sections(List.of(
-                new Section(
-                        new Station("서울대입구역"),
-                        new Station("신대방역"),
-                        10
-                )
-        ));
-
-        //when
-        assertThat(sections.contains(station)).isTrue();
-    }
-
-    @Test
-    @DisplayName("입력 구간의 하행역이 노선에 포함되어 있지 않은 경우")
-    void notContainStationTest() {
-        //given
-        Station station = new Station("상도역");
-        Sections sections = new Sections(List.of(
-                new Section(
-                        new Station("서울대입구역"),
-                        new Station("신대방역"),
-                        10
-                )
-        ));
-
-        //when
-        assertThat(sections.contains(station)).isFalse();
-    }
-
-    @Test
     @DisplayName("한개 구간 삭제 테스트")
     void removeSectionTest() {
         // given
@@ -121,7 +29,7 @@ class SectionsTest {
         ));
 
         // when
-        Sections newSections = sections.remove(deleteStation);
+        Sections newSections = sections.removeStation(deleteStation);
 
         // then
         assertThat(newSections.getSections()).doesNotContain(deleteSection);
@@ -146,7 +54,7 @@ class SectionsTest {
         ));
 
         // when, then
-        assertThatCode(() -> sections.remove(deleteStation))
+        assertThatCode(() -> sections.removeStation(deleteStation))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("하행 종점역이 아니면 지울 수 없습니다.");
     }
@@ -165,7 +73,7 @@ class SectionsTest {
         ));
 
         // when, then
-        assertThatCode(() -> sections.remove(deleteStation))
+        assertThatCode(() -> sections.removeStation(deleteStation))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
     }

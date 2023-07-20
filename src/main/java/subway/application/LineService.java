@@ -1,6 +1,7 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -25,14 +26,15 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public LineResponse saveLine(final LineRequest request) {
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        Line line = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
 
-        sectionDao.insert(new Section(upStation, downStation, request.getDistance()), persistLine.getId());
+        sectionDao.insert(new Section(upStation, downStation, request.getDistance()), line.getId());
 
-        return LineResponse.of(persistLine);
+        return LineResponse.of(line);
     }
 
     public List<LineResponse> findLineResponses() {
@@ -47,18 +49,20 @@ public class LineService {
     }
 
     public LineResponse findLineResponseById(final Long id) {
-        Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
+        Line line = findLineById(id);
+        return LineResponse.of(line);
     }
 
     public Line findLineById(final Long id) {
         return lineDao.findById(id);
     }
 
+    @Transactional
     public void updateLine(final Long id, final LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    @Transactional
     public void deleteLineById(final Long id) {
         lineDao.deleteById(id);
     }

@@ -79,10 +79,28 @@ public class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLineWithDuplicateName() {
         // given
+        ExtractableResponse<Response> createStation1Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest1)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+        ExtractableResponse<Response> createStation2Response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(stationRequest2)
+                .when().post("/stations")
+                .then().log().all()
+                .extract();
+        Long station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(lineRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
@@ -91,7 +109,7 @@ public class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(lineRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
