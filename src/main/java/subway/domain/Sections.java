@@ -12,6 +12,7 @@ import subway.vo.SectionAdditionResult;
 
 public class Sections {
 
+    public static final int MIN_SECTION_SIZE = 1;
     private final List<Section> values;
 
     public Sections(List<Section> values) {
@@ -116,17 +117,20 @@ public class Sections {
         Station upStation = section.getUpStation();
         Station downStation = section.getDownStation();
 
-        boolean upStationExists = this.values.stream()
-            .anyMatch(value -> value.containsStation(upStation));
-        boolean downStationExists = this.values.stream()
-            .anyMatch(value -> value.containsStation(downStation));
+        boolean upStationExists = isStationExists(upStation);
+        boolean downStationExists = isStationExists(downStation);
 
         if (upStationExists && downStationExists) {
-            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다.");
+            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다. upStation: " + upStation + " downStation: " + downStation);
         }
         if (!upStationExists && !downStationExists) {
-            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다.");
+            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다. upStation: " + upStation + " downStation: " + downStation);
         }
+    }
+
+    private boolean isStationExists(Station upStation) {
+        return this.values.stream()
+            .anyMatch(value -> value.containsStation(upStation));
     }
 
     private void addFirst(Section section) {
@@ -134,7 +138,7 @@ public class Sections {
     }
 
     public Section removeLast(Station station) {
-        validateSize();
+        validateMinSectionSize();
         validateFinalDownStationSameAs(station);
 
         return values.remove(values.size() - 1);
@@ -147,8 +151,8 @@ public class Sections {
         }
     }
 
-    private void validateSize() {
-        if (values.size() <= 1) {
+    private void validateMinSectionSize() {
+        if (values.size() <= MIN_SECTION_SIZE) {
             throw new IllegalStateException("노선의 구간이 1개인 경우 삭제할 수 없습니다.");
         }
     }

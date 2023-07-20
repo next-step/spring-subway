@@ -118,6 +118,14 @@ public class Section {
         }
     }
 
+    public boolean hasDownStationSameAs(Station station) {
+        return station.equals(this.downStation);
+    }
+
+    public boolean belongTo(Line line) {
+        return this.line.equals(line);
+    }
+
     public Long getId() {
         return id;
     }
@@ -136,10 +144,6 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
-    }
-
-    public boolean belongToSameLine(Section section) {
-        return this.line.equals(section.line);
     }
 
     @Override
@@ -169,13 +173,5 @@ public class Section {
             ", downStation=" + downStation +
             ", distance=" + distance +
             '}';
-    }
-
-    public boolean hasDownStationSameAs(Station station) {
-        return station.equals(this.downStation);
-    }
-
-    public boolean belongTo(Line line) {
-        return this.line.equals(line);
     }
 }
