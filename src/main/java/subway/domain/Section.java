@@ -44,6 +44,7 @@ public class Section {
     }
 
     public void connectSection(Section requestSection) {
+        Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다");
         SectionConnector.findSectionConnector(this, requestSection)
                 .ifPresentOrElse(sectionConnector1 -> sectionConnector1.connectSection(this, requestSection),
                         () -> connectSectionIfDownSectionPresent(requestSection));
