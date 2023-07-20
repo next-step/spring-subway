@@ -203,7 +203,7 @@ class SectionsTest {
                 new Section(newUpStation, newDownStation, distance)));
 
         // when
-        sections.delete(newDownStation);
+        sections.validateDelete(newDownStation);
 
         // then
         assertThat(sections).isEqualTo(new Sections(List.of(new Section(upStation, downStation, distance))));
@@ -224,7 +224,7 @@ class SectionsTest {
                 new Section(newUpStation, newDownStation, distance)));
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> sections.delete(downStation));
+        assertThrows(IllegalArgumentException.class, () -> sections.validateDelete(downStation));
     }
 
     @DisplayName("구간이 1개만 있을 때 구간을 제거하면 예외를 던진다.")
@@ -238,6 +238,6 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
 
         // when & then
-        assertThrows(IllegalStateException.class, () -> sections.delete(downStation));
+        assertThrows(IllegalStateException.class, () -> sections.validateDelete(downStation));
     }
 }

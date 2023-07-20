@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 public class Sections {
 
-    private static final String SAME_STATION_EXCEPTION_MESSAGE = "새로운 구간의 상행역은 기존 하행 종점역과 같아야 합니다.";
+    private static final String SAME_STATION_EXCEPTION_MESSAGE = "새로운 구간은 기존 구간고 1개 역만 겹쳐야 합니다.";
     private static final String EMPTY_EXCEPTION_MESSAGE = "최소 1개 이상의 구간이 있어야 합니다.";
     private static final String AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE = "구간은 0개가 될 수 없습니다.";
     private static final String DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE = "마지막 구간만 삭제할 수 있습니다.";
@@ -28,15 +28,13 @@ public class Sections {
         this.sections = sorted(sections);
     }
 
-    public void delete(final Station lastStation) {
+    public void validateDelete(final Station lastStation) {
         if (this.sections.size() <= 1) {
             throw new IllegalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
         }
-        int lastIndex = this.sections.size() - 1;
         if (!lastSection().getDownStation().equals(lastStation)) {
             throw new IllegalArgumentException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
         }
-        this.sections.remove(lastIndex);
     }
 
     private List<Section> sorted(final List<Section> sections) {
