@@ -28,6 +28,18 @@ public class Section {
         this.distance = new Distance(distance);
     }
 
+    public boolean upStationEquals(Station station) {
+        return upStation.equals(station);
+    }
+
+    public boolean downStationEquals(Station station) {
+        return downStation.equals(station);
+    }
+
+    public boolean isOverDistance(Distance distance) {
+        return (this.distance.compareDistance(distance) <= 0);
+    }
+
     public Long getId() {
         return id;
     }

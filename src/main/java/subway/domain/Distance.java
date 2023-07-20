@@ -11,14 +11,22 @@ public class Distance {
         this.distance = distance;
     }
 
-    public int getDistance() {
-        return distance;
-    }
-
     private void validateDistance(int distance) {
         if (distance <= 0) {
             throw new IllegalArgumentException("거리는 0 이하일 수 없습니다.");
         }
+    }
+
+    public int compareDistance(Distance otherDistance) {
+        return Integer.compare(this.distance, otherDistance.distance);
+    }
+
+    public int subtract(Distance otherDistance) {
+        return this.distance - otherDistance.distance;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 
     @Override

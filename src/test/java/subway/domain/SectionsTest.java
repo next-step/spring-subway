@@ -62,6 +62,21 @@ class SectionsTest {
     }
 
     @Test
+    @DisplayName("Sections의 노선이 다른 경우 예외가 발생한다.")
+    void validLine() {
+        Section otherLineSection = new Section(
+            100L,
+            station3,
+            station4,
+            new Line(2L, "10호선", "무지개"),
+            10
+        );
+
+        assertThatThrownBy(() -> new Sections(List.of(section1, section3, otherLineSection)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     @DisplayName("새로운 구간의 상행과 하행이 기존 섹션에 있을 경우 예외가 발생한다.")
     void validNewSectionDownStation() {
         assertThatThrownBy(() -> sections.registSection(section1))
@@ -142,7 +157,7 @@ class SectionsTest {
     void canNotRemoveStation() {
         Sections sections = new Sections(List.of(section1));
         assertThatThrownBy(() -> sections.canDeleteStation(2L))
-            .isInstanceOf(IllegalStateException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
