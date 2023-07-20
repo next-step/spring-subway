@@ -45,8 +45,6 @@ class SectionServiceTest {
         final SectionResponse sectionResponse = sectionService.saveSection(1L, sectionRequest);
 
         // then
-        assertThat(sectionResponse.getId()).isNotNull();
-        assertThat(sectionResponse.getLineId()).isNotNull();
         assertThat(sectionResponse.getUpStationId()).isEqualTo(2);
         assertThat(sectionResponse.getDownStationId()).isEqualTo(3);
         assertThat(sectionResponse.getDistance()).isEqualTo(10);

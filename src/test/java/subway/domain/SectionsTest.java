@@ -17,7 +17,7 @@ class SectionsTest {
     @Test
     void createSectionsTest() {
         assertThatNoException()
-                .isThrownBy(() -> new Sections(List.of(new Section(1L, 1L, 1L, 10))));
+                .isThrownBy(() -> new Sections(List.of(new Section(1L, 1L, 2L, 10))));
     }
 
     @DisplayName("해당 구간이 추가 가능한 구간인지 검증에 성공한다.")

@@ -17,20 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
 
-    private LineRequest lineRequest;
-    private StationRequest stationRequest1;
-    private StationRequest stationRequest2;
-    private StationRequest stationRequest3;
+    private StationRequest stationRequest;
     private SectionRequest sectionRequest;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        lineRequest = new LineRequest("1호선", 1L, 2L, 10, "blue");
-        stationRequest1 = new StationRequest("인천");
-        stationRequest2 = new StationRequest("부평");
-        stationRequest3 = new StationRequest("서울");
+        stationRequest = new StationRequest("서울");
         sectionRequest = new SectionRequest( "2", "3",10);
     }
 
@@ -43,7 +37,7 @@ class SectionIntegrationTest extends IntegrationTest {
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest3)
+                .body(stationRequest)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
@@ -52,7 +46,7 @@ class SectionIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest("2", "3", 5))
+                .body(sectionRequest)
                 .when().post("/lines/1/sections")
                 .then().log().all()
                 .extract();
@@ -92,14 +86,13 @@ class SectionIntegrationTest extends IntegrationTest {
     void createSectionWithBothExistingStation() {
         // given
         createInitialLine();
-
-        SectionRequest request = new SectionRequest("1", "2", 5);
+        final SectionRequest badSectionRequest = new SectionRequest("1", "2", 5);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(request)
+                .body(badSectionRequest)
                 .when().post("/lines/1/sections")
                 .then().log().all()
                 .extract();
@@ -113,14 +106,13 @@ class SectionIntegrationTest extends IntegrationTest {
     void createSectionWithBothNotExistingStation() {
         // given
         createInitialLine();
-
-        SectionRequest request = new SectionRequest("5", "6", 5);
+        final SectionRequest badSectionRequest = new SectionRequest("5", "6", 5);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(request)
+                .body(badSectionRequest)
                 .when().post("/lines/1/sections")
                 .then().log().all()
                 .extract();
@@ -138,7 +130,7 @@ class SectionIntegrationTest extends IntegrationTest {
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest3)
+                .body(stationRequest)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
@@ -172,7 +164,7 @@ class SectionIntegrationTest extends IntegrationTest {
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest3)
+                .body(stationRequest)
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
@@ -216,6 +208,10 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     private void createInitialLine() {
+        final LineRequest lineRequest = new LineRequest("1호선", 1L, 2L, 10, "blue");
+        final StationRequest stationRequest1 = new StationRequest("인천");
+        final StationRequest stationRequest2 = new StationRequest("부평");
+
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

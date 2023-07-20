@@ -5,23 +5,20 @@ import org.springframework.util.Assert;
 public class LineRequest {
 
     private String name;
-    private Long upStationId;
-    private Long downStationId;
-    private Integer distance;
+    private long upStationId;
+    private long downStationId;
+    private int distance;
     private String color;
 
     public LineRequest() {
     }
 
     public LineRequest(final String name,
-                       final Long upStationId,
-                       final Long downStationId,
-                       final Integer distance,
+                       final long upStationId,
+                       final long downStationId,
+                       final int distance,
                        final String color) {
         Assert.notNull(name, "이름을 입력해야 합니다.");
-        Assert.notNull(upStationId, "상행역을 입력해야 합니다.");
-        Assert.notNull(downStationId, "하행역을 입력해야 합니다.");
-        Assert.notNull(distance, "거리를 입력해야 합니다.");
         Assert.notNull(color, "색깔을 입력해야 합니다.");
 
         this.name = name;
@@ -35,15 +32,15 @@ public class LineRequest {
         return name;
     }
 
-    public Long getUpStationId() {
+    public long getUpStationId() {
         return upStationId;
     }
 
-    public Long getDownStationId() {
+    public long getDownStationId() {
         return downStationId;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 

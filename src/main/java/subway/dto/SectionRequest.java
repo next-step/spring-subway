@@ -24,4 +24,16 @@ public class SectionRequest {
     public Section to(final long lineId) {
         return new Section(lineId, upStationId, downStationId, distance);
     }
+
+    public long getUpStationId() {
+        return upStationId;
+    }
+
+    public long getDownStationId() {
+        return downStationId;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
 }
