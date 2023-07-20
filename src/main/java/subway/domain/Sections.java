@@ -1,5 +1,8 @@
 package subway.domain;
 
+import subway.exception.IncorrectRequestException;
+import subway.exception.InternalStateException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,10 +33,10 @@ public class Sections {
 
     public void validateDelete(final Station lastStation) {
         if (this.sections.size() <= 1) {
-            throw new IllegalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
+            throw new InternalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
         }
         if (!lastSection().getDownStation().equals(lastStation)) {
-            throw new IllegalArgumentException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
         }
     }
 
@@ -62,7 +65,7 @@ public class Sections {
         return sections.stream()
                 .filter(section -> section.getUpStation().equals(upStation))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException(CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new InternalStateException(CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
     }
 
     private Station findFirstStation() {
@@ -70,12 +73,12 @@ public class Sections {
         endUpStations.removeAll(downStations);
 
         if (endUpStations.size() > 1) {
-            throw new IllegalStateException(TWO_MORE_START_STATION_EXCEPTION_MESSAGE);
+            throw new InternalStateException(TWO_MORE_START_STATION_EXCEPTION_MESSAGE);
         }
 
         return endUpStations.stream()
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException(CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new InternalStateException(CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE));
     }
 
     private Section lastSection() {
@@ -130,19 +133,19 @@ public class Sections {
 
     private void validateDistance(final Section oldSection, final Section newSection) {
         if (oldSection.shorterOrEqualTo(newSection)) {
-            throw new IllegalArgumentException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
         }
     }
 
     private void validateEmpty() {
         if (this.sections.isEmpty()) {
-            throw new IllegalArgumentException(EMPTY_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(EMPTY_EXCEPTION_MESSAGE);
         }
     }
 
     private void validateExistOnlyOne(final boolean hasUpStation, final boolean hasDownStation) {
         if (hasUpStation == hasDownStation) {
-            throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(SAME_STATION_EXCEPTION_MESSAGE);
         }
     }
 

@@ -2,6 +2,7 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.IncorrectRequestException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -12,7 +13,7 @@ class SectionTest {
     void validateDifferent() {
         Station station = new Station(4L, "잠실역");
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(IncorrectRequestException.class,
                 () -> new Section(station, station, 10));
     }
 }

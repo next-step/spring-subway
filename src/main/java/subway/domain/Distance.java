@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.exception.IncorrectRequestException;
+
 import java.util.Objects;
 
 public class Distance {
@@ -14,7 +16,7 @@ public class Distance {
 
     private void validatePositive(final int distance) {
         if (distance <= 0) {
-            throw new IllegalArgumentException(DISTANCE_POSITIVE_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(DISTANCE_POSITIVE_EXCEPTION_MESSAGE);
         }
     }
 

@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.exception.IncorrectRequestException;
+
 import java.util.Objects;
 
 public class Section {
@@ -37,7 +39,7 @@ public class Section {
 
     private void validateDifferent(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(SAME_STATION_EXCEPTION_MESSAGE);
         }
     }
 

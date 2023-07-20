@@ -3,6 +3,7 @@ package subway.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import subway.exception.IncorrectRequestException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -12,6 +13,6 @@ class DistanceTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, 0})
     void notPositiveDistance(int distance) {
-        assertThrows(IllegalArgumentException.class, () -> new Distance(distance));
+        assertThrows(IncorrectRequestException.class, () -> new Distance(distance));
     }
 }

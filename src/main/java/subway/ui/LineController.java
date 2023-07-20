@@ -7,6 +7,8 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.exception.IncorrectRequestException;
+import subway.exception.InternalStateException;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -64,6 +66,16 @@ public class LineController {
 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<Void> handleSQLException() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(IncorrectRequestException.class)
+    public ResponseEntity<Void> handleIncorrectRequestException() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(InternalStateException.class)
+    public ResponseEntity<Void> handleInternalStateException() {
         return ResponseEntity.badRequest().build();
     }
 }
