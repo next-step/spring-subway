@@ -3,6 +3,7 @@ package subway.dao;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import subway.domain.Distance;
 import subway.domain.Section;
 
 import javax.sql.DataSource;
@@ -30,7 +31,7 @@ public class SectionDao {
         params.put("distance", section.getDistance());
 
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(sectionId, section.getUpStation(), section.getDownStation(), section.getDistance());
+        return new Section(sectionId, section.getUpStation(), section.getDownStation(), new Distance(section.getDistance()));
     }
 
     public void delete(final Section section) {

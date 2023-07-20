@@ -6,9 +6,9 @@ public class Section {
     private final Long id;
     private final Station upStation;
     private final Station downStation;
-    private final int distance;
+    private final Distance distance;
 
-    public Section(final Long id, final Station upStation, final Station downStation, final int distance) {
+    public Section(final Long id, final Station upStation, final Station downStation, final Distance distance) {
         validate(upStation, downStation);
 
         this.id = id;
@@ -18,6 +18,10 @@ public class Section {
     }
 
     public Section(final Station upStation, final Station downStation, final int distance) {
+        this(null, upStation, downStation, new Distance(distance));
+    }
+
+    public Section(final Station upStation, final Station downStation, final Distance distance) {
         this(null, upStation, downStation, distance);
     }
 
@@ -28,16 +32,12 @@ public class Section {
     }
 
     public Section subtract(final Section other) {
-        if (distance <= other.distance) {
-            throw new IllegalArgumentException("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
-        }
-
         if (upStation.equals(other.upStation)) {
-            return new Section(other.downStation, downStation, distance - other.distance);
+            return new Section(other.downStation, downStation, distance.subtract(other.distance));
         }
 
         if (downStation.equals(other.downStation)) {
-            return new Section(upStation, other.upStation, distance - other.distance);
+            return new Section(upStation, other.upStation, distance.subtract(other.distance));
         }
 
         return this;
@@ -60,15 +60,15 @@ public class Section {
     }
 
     public int getDistance() {
-        return distance;
+        return distance.getDistance();
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Section section = (Section) o;
-        return distance == section.distance && Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation);
+        return Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation) && Objects.equals(distance, section.distance);
     }
 
     @Override

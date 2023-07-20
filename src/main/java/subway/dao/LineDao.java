@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
@@ -42,7 +43,7 @@ public class LineDao {
                             rs.getLong("section_id"),
                             new Station(rs.getLong("up_station_id"), rs.getString("up_station_name")),
                             new Station(rs.getLong("down_station_id"), rs.getString("down_station_name")),
-                            rs.getInt("section_distance")
+                            new Distance(rs.getInt("section_distance"))
                     )
             );
             isNext = rs.next();
