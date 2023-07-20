@@ -9,16 +9,24 @@ public class Section {
     private Long id;
     private Station upStation;
     private Station downStation;
-    private Integer distance;
+    private Distance distance;
 
     public Section() {
     }
 
     public Section(final Station upStation, final Station downStation, final Integer distance) {
-        this(null, upStation, downStation, distance);
+        this(null, upStation, downStation, new Distance(distance));
     }
 
     public Section(final Long id, final Station upStation, final Station downStation, final Integer distance) {
+        this(id, upStation, downStation, new Distance(distance));
+    }
+
+    public Section(final Station upStation, final Station downStation, final Distance distance) {
+        this(null, upStation, downStation, distance);
+    }
+
+    public Section(final Long id, final Station upStation, final Station downStation, final Distance distance) {
         validateDifferent(upStation, downStation);
 
         this.id = id;
@@ -41,6 +49,14 @@ public class Section {
         return downStation.equals(other.downStation);
     }
 
+    public boolean shorterOrEqualTo(final Section other) {
+        return distance.shorterOrEqualTo(other.distance);
+    }
+
+    public Distance distanceDifference(final Section other) {
+        return this.distance.difference(other.distance);
+    }
+
     public Long getId() {
         return id;
     }
@@ -53,7 +69,7 @@ public class Section {
         return downStation;
     }
 
-    public Integer getDistance() {
+    public Distance getDistance() {
         return distance;
     }
 

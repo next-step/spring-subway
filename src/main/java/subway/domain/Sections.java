@@ -98,7 +98,7 @@ public class Sections {
 
     public Section cut(final Section oldSection, final Section newSection) {
         validateDistance(oldSection, newSection);
-        int reducedDistance = oldSection.getDistance() - newSection.getDistance();
+        Distance reducedDistance = oldSection.distanceDifference(newSection);
 
         if (oldSection.isSameUpStation(newSection)) {
             return new Section(newSection.getDownStation(), oldSection.getDownStation(), reducedDistance);
@@ -131,7 +131,7 @@ public class Sections {
     }
 
     private void validateDistance(final Section oldSection, final Section newSection) {
-        if (oldSection.getDistance() <= newSection.getDistance()) {
+        if (oldSection.shorterOrEqualTo(newSection)) {
             throw new IllegalArgumentException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
         }
     }

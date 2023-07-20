@@ -39,7 +39,7 @@ public class SectionDao {
         params.put("up_station_id", section.getUpStation().getId());
         params.put("down_station_id", section.getDownStation().getId());
         params.put("line_id", lineId);
-        params.put("distance", section.getDistance());
+        params.put("distance", section.getDistance().getValue());
 
         insertAction.executeAndReturnKey(params);
     }
