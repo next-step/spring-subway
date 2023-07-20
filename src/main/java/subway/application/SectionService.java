@@ -6,6 +6,7 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.SectionsChange;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
 
@@ -27,9 +28,11 @@ public class SectionService {
         Station downStation = stationDao.findById(request.getDownStationId());
         Section section = new Section(upStation, downStation, request.getDistance());
 
-        line.addSection(section);
+        Line newLine = line.addSection(section);
 
-        sectionDao.insert(section, lineId);
+        SectionsChange changes = SectionsChange.of(line.getSections(), newLine.getSections());
+        changes.getDeletes().forEach(sectionDao::delete);
+        changes.getInserts().forEach(s -> sectionDao.insert(s, lineId));
     }
 
     public void deleteStation(Long lineId, Long stationId) {

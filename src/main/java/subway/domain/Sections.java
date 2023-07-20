@@ -19,12 +19,8 @@ public class Sections {
         this(new ArrayList<>());
     }
 
-    public boolean isTerminal(final Station station) {
+    public boolean isTerminalDownStation(final Station station) {
         Set<Station> upStations = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
-
-        Set<Station> downStations = sections.stream()
                 .map(Section::getUpStation)
                 .collect(Collectors.toSet());
 
@@ -71,7 +67,7 @@ public class Sections {
     }
 
     private void validateDownStationTerminal(final Station station) {
-        if (!isTerminal(station)) {
+        if (!isTerminalDownStation(station)) {
             throw new IllegalArgumentException("하행 종점역이 아니면 지울 수 없습니다.");
         }
     }
@@ -86,18 +82,22 @@ public class Sections {
 
         List<Section> newSections = new ArrayList<>(this.sections);
 
-        Section oldSection = sections.stream()
-                .filter(section::isOneStationMatch)
-                .findAny()
-                .orElse(null);
+        Section oldSection = findOldSection(section);
 
         if (oldSection != null) {
-            newSections.add(oldSection.subtract(section));
             newSections.remove(oldSection);
+            newSections.add(oldSection.subtract(section));
         }
 
         newSections.add(section);
         return new Sections(newSections);
+    }
+
+    public Section findOldSection(final Section section) {
+        return sections.stream()
+                .filter(section::isOneStationMatch)
+                .findAny()
+                .orElse(null);
     }
 
     private void validateNoMatches(final Section section) {

@@ -13,18 +13,18 @@ class SectionsTest {
     @DisplayName("해당 역이 노선의 하행 종점역인 경우 true")
     void downStationTerminalTest() {
         // given
-        Station station = new Station(2L, "신대방역");
+        Station station = new Station("신대방역");
         Sections sections = new Sections(List.of(
                 new Section(
                         1L,
-                        new Station(1L, "서울대입구역"),
-                        new Station(2L, "신대방역"),
+                        new Station("서울대입구역"),
+                        new Station("신대방역"),
                         10
                 )
         ));
 
         // when & then
-        assertThat(sections.isTerminal(station)).isTrue();
+        assertThat(sections.isTerminalDownStation(station)).isTrue();
     }
 
 //    @Test
@@ -64,19 +64,18 @@ class SectionsTest {
         ));
 
         // when & then
-        assertThat(sections.isTerminal(station)).isFalse();
+        assertThat(sections.isTerminalDownStation(station)).isFalse();
     }
 
     @Test
     @DisplayName("입력 구간의 하행역이 노선에 포함되어 있는 경우")
     void containStationTest() {
         //given
-        Station station = new Station(2L, "신대방역");
+        Station station = new Station("신대방역");
         Sections sections = new Sections(List.of(
                 new Section(
-                        1L,
-                        new Station(1L, "서울대입구역"),
-                        new Station(2L, "신대방역"),
+                        new Station("서울대입구역"),
+                        new Station("신대방역"),
                         10
                 )
         ));
@@ -89,12 +88,11 @@ class SectionsTest {
     @DisplayName("입력 구간의 하행역이 노선에 포함되어 있지 않은 경우")
     void notContainStationTest() {
         //given
-        Station station = new Station(3L, "상도역");
+        Station station = new Station("상도역");
         Sections sections = new Sections(List.of(
                 new Section(
-                        1L,
-                        new Station(1L, "서울대입구역"),
-                        new Station(2L, "신대방역"),
+                        new Station("서울대입구역"),
+                        new Station("신대방역"),
                         10
                 )
         ));
@@ -108,17 +106,15 @@ class SectionsTest {
     void unionSectionsTest() {
         // given
         Section section1 = new Section(
-                1L,
-                new Station(1L, "서울대입구역"),
-                new Station(2L, "신대방역"),
+                new Station("서울대입구역"),
+                new Station("신대방역"),
                 10
         );
         Sections sections1 = new Sections(List.of(section1));
 
         Section section2 = new Section(
-                2L,
-                new Station(3L, "잠실역"),
-                new Station(4L, "상도역"),
+                new Station("잠실역"),
+                new Station("상도역"),
                 5
         );
         Sections sections2 = new Sections(List.of(section2));
@@ -136,14 +132,12 @@ class SectionsTest {
         // given
         Station deleteStation = new Station("상도역");
         Section deleteSection = new Section(
-                1L,
                 new Station("신대방역"),
                 deleteStation,
                 4
         );
         Sections sections = new Sections(List.of(
                 new Section(
-                        1L,
                         new Station("서울대입구역"),
                         new Station("신대방역"),
                         10

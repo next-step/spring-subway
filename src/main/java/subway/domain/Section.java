@@ -56,7 +56,7 @@ public class Section {
             return new Section(upStation, other.upStation, distance - other.distance);
         }
 
-        throw new IllegalArgumentException("일치하는 역이 없습니다.");
+        return this;
     }
 
     public boolean isOneStationMatch(final Section other) {
