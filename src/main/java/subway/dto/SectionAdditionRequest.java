@@ -1,9 +1,12 @@
 package subway.dto;
 
 public class SectionAdditionRequest {
-    private final Long upStationId;
-    private final Long downStationId;
-    private final int distance;
+    private Long upStationId;
+    private Long downStationId;
+    private int distance;
+
+    private SectionAdditionRequest() {
+    }
 
     public SectionAdditionRequest(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
