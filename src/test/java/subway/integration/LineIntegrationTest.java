@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.helper.CreateHelper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-public class LineIntegrationTest extends IntegrationTest {
+class LineIntegrationTest extends IntegrationTest {
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
 
@@ -26,8 +27,13 @@ public class LineIntegrationTest extends IntegrationTest {
     public void setUp() {
         super.setUp();
 
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600");
-        lineRequest2 = new LineRequest("구신분당선", "bg-red-600");
+        CreateHelper.createStation("잠실역");
+        CreateHelper.createStation("역삼역");
+        CreateHelper.createStation("교대역");
+        CreateHelper.createStation("강변역");
+
+        lineRequest1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
+        lineRequest2 = new LineRequest("구신분당선", "bg-red-600", 3L, 4L, 11);
     }
 
     @DisplayName("지하철 노선을 생성한다.")

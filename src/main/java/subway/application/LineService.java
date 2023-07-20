@@ -30,6 +30,8 @@ public class LineService {
 
     public LineResponse saveLine(final LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        Section section = newSection(SectionRequest.of(request));
+        sectionDao.insert(section, persistLine.getId());
         return LineResponse.of(persistLine);
     }
 
@@ -62,9 +64,7 @@ public class LineService {
     }
 
     public LineResponse saveSection(final SectionRequest request, final Long lineId) {
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
-        Section newSection = new Section(upStation, downStation, request.getDistance());
+        Section newSection = newSection(request);
 
         Sections sections = sectionDao.findAllByLineId(lineId);
         sections.validateInsert(newSection);
@@ -86,5 +86,11 @@ public class LineService {
         Sections sections = sectionDao.findAllByLineId(lineId);
         sections.delete(delete);
         sectionDao.deleteByStation(delete, lineId);
+    }
+
+    private Section newSection(SectionRequest request) {
+        Station upStation = stationDao.findById(request.getUpStationId());
+        Station downStation = stationDao.findById(request.getDownStationId());
+        return new Section(upStation, downStation, request.getDistance());
     }
 }

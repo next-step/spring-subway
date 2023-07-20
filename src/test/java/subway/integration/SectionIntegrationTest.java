@@ -7,15 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.domain.Line;
-import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
-import subway.dto.StationResponse;
+import subway.helper.CreateHelper;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,15 +21,12 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSection() {
         // given
-        createStation("강남역");
+        CreateHelper.createStation("교대역");
+        Long lineId = CreateHelper.createLine("2호선", "bg-123");
 
-        createStation("역삼역");
+        List<Long> stationIds = CreateHelper.getStationIds();
 
-        Long lineId = createLine("2호선", "bg-123");
-
-        List<Long> stationIds = getStationIds();
-
-        SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(1), 10);
+        SectionRequest params = new SectionRequest(stationIds.get(1), stationIds.get(2), 10);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -54,11 +46,9 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createAlreadyExist() {
         // given
-        createStation("강남역");
-        createStation("역삼역");
-        Long lineId = createLine("2호선", "bg-123");
+        Long lineId = CreateHelper.createLine("2호선", "bg-123");
 
-        List<Long> stationIds = getStationIds();
+        List<Long> stationIds = CreateHelper.getStationIds();
 
         SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(1), 10);
         RestAssured.given().log().all()
@@ -88,10 +78,9 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSame() {
         // given
-        createStation("강남역");
-        Long lineId = createLine("2호선", "bg-123");
+        Long lineId = CreateHelper.createLine("2호선", "bg-123");
 
-        List<Long> stationIds = getStationIds();
+        List<Long> stationIds = CreateHelper.getStationIds();
 
         SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(0), 10);
 
@@ -112,13 +101,13 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createNotSame() {
         // given
-        createStation("강남역");
-        createStation("역삼역");
-        createStation("잠실역");
-        createStation("강변역");
-        Long lineId = createLine("2호선", "bg-123");
+        CreateHelper.createStation("강남역");
+        CreateHelper.createStation("역삼역");
+        CreateHelper.createStation("잠실역");
+        CreateHelper.createStation("강변역");
+        Long lineId = CreateHelper.createLine("2호선", "bg-123");
 
-        List<Long> stationIds = getStationIds();
+        List<Long> stationIds = CreateHelper.getStationIds();
 
         SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(0), 10);
 
@@ -139,14 +128,12 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteSection() {
         // given
-        createStation("강남역");
-        createStation("역삼역");
-        createStation("잠실역");
-        Long lineId = createLine("2호선", "bg-123");
+        CreateHelper.createStation("잠실역");
+        Long lineId = CreateHelper.createLine("2호선", "bg-123");
 
-        List<Long> stationIds = getStationIds();
-        createSection(stationIds, 0, 1, lineId);
-        createSection(stationIds, 1, 2, lineId);
+        List<Long> stationIds = CreateHelper.getStationIds();
+        CreateHelper.createSection(stationIds, 0, 1, lineId);
+        CreateHelper.createSection(stationIds, 1, 2, lineId);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -157,52 +144,5 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    private static void createSection(List<Long> stationIds, int index, int index1, Long lineId) {
-        SectionRequest params = new SectionRequest(stationIds.get(index), stationIds.get(index1), 10);
-        RestAssured.given()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{id}/sections", lineId)
-                .then()
-                .extract();
-    }
-
-    private static List<Long> getStationIds() {
-        ExtractableResponse<Response> stations = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-        List<Long> stationIds = stations.jsonPath().getList(".", StationResponse.class).stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
-        return stationIds;
-    }
-
-    private static Long createLine(String name, String color) {
-        Line line = new Line(name, color);
-        ExtractableResponse<Response> lineResponse = RestAssured.given()
-                .body(line)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines")
-                .then()
-                .extract();
-        return lineResponse.as(LineResponse.class).getId();
-    }
-
-    private static void createStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
     }
 }
