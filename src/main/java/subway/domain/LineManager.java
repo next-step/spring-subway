@@ -46,6 +46,8 @@ public class LineManager {
     }
 
     public void connectSection(Section requestSection) {
+        Section upSection = sections.get(0).findUpSection();
+        upSection.connectSection(requestSection);
     }
 
     public void disconnectDownSection(Station downStation) {
