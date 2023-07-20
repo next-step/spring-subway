@@ -1,5 +1,7 @@
 package subway.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Section {
@@ -39,9 +41,44 @@ public class Section {
         return !downStation.equals(other.upStation);
     }
 
+    public boolean canPrecede(Section other) {
+        return downStation.equals(other.upStation);
+    }
+
+    public boolean containsStation(Station station) {
+        return this.upStation.equals(station) || this.downStation.equals(
+            station);
+    }
+
     public boolean containsDownStationOf(Section section) {
         return this.upStation.equals(section.downStation) || this.downStation.equals(
             section.downStation);
+    }
+
+    public boolean hasSameUpStationOrDownStation(Section section) {
+        return this.upStation.equals(section.upStation) || this.downStation.equals(section.downStation);
+    }
+
+    public List<Section> mergeSections(Section section) {
+
+        if (this.distance <= section.getDistance()) {
+            throw new IllegalArgumentException("기존 구간의 길이가 같거나 작습니다");
+        }
+
+        List<Section> sections = new ArrayList<>();
+        if (section.upStation.equals(this.upStation)) {
+            sections.add(section);
+            sections.add(new Section(section.line, section.downStation, this.downStation, this.distance - section.distance));
+            return sections;
+        }
+
+        if (section.downStation.equals(this.downStation)) {
+            sections.add(new Section(section.line, this.upStation,  section.upStation, this.distance - section.distance));
+            sections.add(section);
+            return sections;
+        }
+
+        throw new IllegalStateException("여기 오면 안되는데?");
     }
 
     public Long getId() {

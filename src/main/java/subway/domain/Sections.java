@@ -3,10 +3,12 @@ package subway.domain;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import subway.vo.SectionAdditionResult;
 
 public class Sections {
 
@@ -73,19 +75,69 @@ public class Sections {
             .collect(Collectors.toSet());
     }
 
-    public Section add(Section section) {
+    public SectionAdditionResult add(Section section) {
+        //해당 섹션이 같인 라인인지 확인한다
+        this.validateSectionsBelongToLine(section.getLine());
+        // 특정 스테이션이 이 섹션즈 안에 포함되는지
+        validateOneInOneOut(section);
+
+        // 상이나 하 중에 하나 맞을 떄
+        Optional<Section> foundSectionOptional = values.stream()
+            .filter(value -> value.hasSameUpStationOrDownStation(section))
+            .findAny();
+
+        if (foundSectionOptional.isPresent()) {
+            Section foundSection = foundSectionOptional.get();
+            List<Section> sectionsToAdd = foundSection.mergeSections(section);
+            //replace
+            int index = values.indexOf(foundSection);
+            this.values.remove(index);
+            this.values.add(index, sectionsToAdd.get(1));
+            this.values.add(index, sectionsToAdd.get(0));
+
+            return new SectionAdditionResult(Optional.of(foundSection), sectionsToAdd);
+        }
+
+        // 맨앞일 때
+        if (section.canPrecede(getFirst())) {
+            addFirst(section);
+            return new SectionAdditionResult(Optional.empty(), List.of(getFirst()));
+        }
+
+        //맨 뒤일때
+        if (getLast().canPrecede(section)) {
+            addLast(section);
+            return new SectionAdditionResult(Optional.empty(), List.of(getLast()));
+        }
+
+        throw new IllegalStateException("여기 오면 안되는데?");
+    }
+
+    private void validateOneInOneOut(Section section) {
+        Station upStation = section.getUpStation();
+        Station downStation = section.getDownStation();
+
+        boolean upStationExists = this.values.stream().anyMatch(value -> value.containsStation(upStation));
+        boolean downStationExists = this.values.stream().anyMatch(value -> value.containsStation(downStation));
+
+        if (upStationExists && downStationExists) {
+            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다.");
+        }
+        if (!upStationExists && !downStationExists) {
+            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다.");
+        }
+    }
+
+    private void addFirst(Section section) {
+        this.values.add(0, section);
+    }
+
+    public Section addLast(Section section) {
         validateAddable(section);
         validateNotContainDownStationOf(section);
         this.values.add(section);
         return section;
     }
-//
-//    public Section addLast(Section section) {
-//        validateAddable(section);
-//        validateNotContainDownStationOf(section);
-//        this.values.add(section);
-//        return section;
-//    }
 
     private void validateNotContainDownStationOf(Section section) {
         if (this.values.stream()
@@ -127,6 +179,11 @@ public class Sections {
                 "현재 구간은 해당 노선에 속하지 않습니다. current line: " + line + ", section: " + this.getLast());
         }
     }
+
+    Section getFirst() {
+        return this.values.get(0);
+    }
+
 
     Section getLast() {
         return this.values.get(this.values.size() - 1);

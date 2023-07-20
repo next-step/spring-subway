@@ -19,7 +19,7 @@ public class LineSections {
     }
 
     public Section addLast(Section section) {
-        return sections.add(section);
+        return sections.addLast(section);
     }
 
     public Section removeLast(Station station) {
