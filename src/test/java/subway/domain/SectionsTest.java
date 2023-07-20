@@ -202,11 +202,8 @@ class SectionsTest {
                 new Section(upStation, downStation, distance),
                 new Section(newUpStation, newDownStation, distance)));
 
-        // when
-        sections.validateDelete(newDownStation);
-
-        // then
-        assertThat(sections).isEqualTo(new Sections(List.of(new Section(upStation, downStation, distance))));
+        // when & then
+        assertDoesNotThrow(() -> sections.validateDelete(newDownStation));
     }
 
     @DisplayName("마지막이 아닌 구간을 제거하면 예외를 던진다.")
