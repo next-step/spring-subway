@@ -52,7 +52,7 @@ class SectionIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest("1", "3", 5))
+                .body(new SectionRequest("2", "3", 5))
                 .when().post("/lines/1/sections")
                 .then().log().all()
                 .extract();

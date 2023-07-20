@@ -40,13 +40,6 @@ public class SectionDao {
         return new Section(id, section.getLineId(), section.getUpStationId(), section.getDownStationId(), section.getDistance());
     }
 
-    public Optional<Section> findByLineIdAndStationId(final long lineId, final long stationId) {
-        String sql = "select * from section where line_id = ? and (up_station_id = ? or down_station_id = ?)";
-        return jdbcTemplate.query(sql, rowMapper, lineId, stationId, stationId)
-                .stream()
-                .findAny();
-    }
-
     public Optional<Section> findLastSection(final Long lineId) {
         String sql = "select * from SECTION S1 " +
                 "where S1.line_id = ? " +
@@ -74,10 +67,12 @@ public class SectionDao {
 
     public void update(final Section newSection) {
         String sql = "update SECTION set up_station_id = ?, down_station_id = ?, distance = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{
+        jdbcTemplate.update(
+                sql,
                 newSection.getUpStationId(),
                 newSection.getDownStationId(),
                 newSection.getDistance(),
-                newSection.getId()});
+                newSection.getId()
+        );
     }
 }

@@ -3,19 +3,24 @@ package subway.dto;
 import subway.domain.Station;
 
 public class StationResponse {
-    private Long id;
+
+    private long id;
     private String name;
 
-    public StationResponse(Long id, String name) {
+    private StationResponse(final long id, final String name) {
         this.id = id;
         this.name = name;
     }
 
-    public static StationResponse of(Station station) {
+    public static StationResponse of(final long id, final String name) {
+        return new StationResponse(id, name);
+    }
+
+    public static StationResponse of(final Station station) {
         return new StationResponse(station.getId(), station.getName());
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 

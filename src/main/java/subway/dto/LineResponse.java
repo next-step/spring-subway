@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LineResponse {
-    private Long id;
+
+    private long id;
     private String name;
     private String color;
     private List<StationResponse> stations;
@@ -17,13 +18,13 @@ public class LineResponse {
     public LineResponse() {
     }
 
-    public LineResponse(Long id, String name, String color) {
+    public LineResponse(long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
     }
 
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
+    public LineResponse(long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -41,7 +42,7 @@ public class LineResponse {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 

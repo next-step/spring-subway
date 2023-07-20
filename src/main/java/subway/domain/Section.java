@@ -37,24 +37,12 @@ public class Section {
         }
     }
 
-    public Long getId() {
-        return id;
+    public Section downStationId(final Section newSection) {
+        return new Section(id, lineId, upStationId, newSection.upStationId, distance - newSection.distance);
     }
 
-    public Long getLineId() {
-        return lineId;
-    }
-
-    public Long getUpStationId() {
-        return upStationId;
-    }
-
-    public Long getDownStationId() {
-        return downStationId;
-    }
-
-    public Integer getDistance() {
-        return distance;
+    public Section upStationId(final Section newSection) {
+        return new Section(id, lineId, newSection.downStationId, downStationId, distance - newSection.distance);
     }
 
     public boolean containsStation(final long stationId) {
@@ -73,11 +61,23 @@ public class Section {
         return downStationId.equals(other.downStationId);
     }
 
-    public Section downStationId(final Section newSection) {
-        return new Section(id, lineId, upStationId, newSection.upStationId, distance - newSection.distance);
+    public Long getId() {
+        return id;
     }
 
-    public Section upStationId(final Section newSection) {
-        return new Section(id, lineId, newSection.downStationId, downStationId, distance - newSection.distance);
+    public Long getLineId() {
+        return lineId;
+    }
+
+    public Long getUpStationId() {
+        return upStationId;
+    }
+
+    public Long getDownStationId() {
+        return downStationId;
+    }
+
+    public Integer getDistance() {
+        return distance;
     }
 }

@@ -3,6 +3,7 @@ package subway.dto;
 import org.springframework.util.Assert;
 
 public class StationRequest {
+
     private String name;
 
     public StationRequest() {

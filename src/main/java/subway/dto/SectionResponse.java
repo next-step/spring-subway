@@ -4,17 +4,17 @@ import subway.domain.Section;
 
 public class SectionResponse {
 
-    private final Long id;
-    private final Long lineId;
-    private final Long upStationId;
-    private final Long downStationId;
-    private final Integer distance;
+    private final long id;
+    private final long lineId;
+    private final long upStationId;
+    private final long downStationId;
+    private final int distance;
 
-    public SectionResponse(final Long id,
-                           final Long lineId,
-                           final Long upStationId,
-                           final Long downStationId,
-                           final Integer distance) {
+    private SectionResponse(final long id,
+                            final long lineId,
+                            final long upStationId,
+                            final long downStationId,
+                            final int distance) {
         this.id = id;
         this.lineId = lineId;
         this.upStationId = upStationId;
@@ -32,23 +32,23 @@ public class SectionResponse {
         );
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public Long getLineId() {
+    public long getLineId() {
         return lineId;
     }
 
-    public Long getUpStationId() {
+    public long getUpStationId() {
         return upStationId;
     }
 
-    public Long getDownStationId() {
+    public long getDownStationId() {
         return downStationId;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 }
