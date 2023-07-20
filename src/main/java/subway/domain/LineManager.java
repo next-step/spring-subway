@@ -45,13 +45,14 @@ public class LineManager {
                 });
     }
 
-    public void connectSection(Section requestSection) {
+    public Section connectSection(Section requestSection) {
         validExistStations(requestSection.getUpStation(), requestSection.getDownStation());
         Section upSection = sections.get(0).findUpSection();
-        
+
         Section newSection = upSection.connectSection(requestSection);
 
         sections.add(newSection);
+        return newSection;
     }
 
     private void validExistStations(Station upStation, Station downStation) {

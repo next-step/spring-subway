@@ -79,9 +79,18 @@ public class LineService {
         Section newSection = getNewSection(line, Long.valueOf(sectionRequest.getUpStationId()),
                 Long.valueOf(sectionRequest.getDownStationId()),
                 sectionRequest.getDistance());
-        lineManager.connectSection(newSection);
+        newSection = lineManager.connectSection(newSection);
 
         sectionDao.insert(newSection);
+        updateSectionIfNotNull(newSection.getUpSection());
+        updateSectionIfNotNull(newSection.getDownSection());
+    }
+
+    public void updateSectionIfNotNull(Section section) {
+        if (section == null) {
+            return;
+        }
+        sectionDao.update(section);
     }
 
     @Transactional

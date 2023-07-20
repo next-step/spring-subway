@@ -79,4 +79,7 @@ public class SectionDao {
         String deleteSql = "delete from SECTIONS as S where S.line_id = ? AND S.down_station_id = ?";
         jdbcTemplate.update(deleteSql, lineId, stationId);
     }
+
+    public void update(Section section) {
+    }
 }
