@@ -34,7 +34,8 @@ public class LineService {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = getStationOrElseThrow(request.getUpStationId());
         Station downStation = getStationOrElseThrow(request.getDownStationId());
-        Section persistSection = sectionDao.save(new Section(persistLine, upStation, downStation, request.getDistance()));
+        Section persistSection = sectionDao.save(
+            new Section(persistLine, upStation, downStation, request.getDistance()));
 
         new LineSections(persistLine, persistSection);
 
@@ -56,8 +57,8 @@ public class LineService {
 
     @Transactional
     public LineResponse findLineResponseById(Long id) {
-        Line persistLine = getLineOrElseThrow(id);
-        return LineResponse.of(persistLine);
+        LineSections lineSections = sectionDao.findAllByLine(getLineOrElseThrow(id));
+        return LineResponse.of(lineSections);
     }
 
     private Station getStationOrElseThrow(Long id) {

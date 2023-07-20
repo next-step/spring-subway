@@ -1,6 +1,7 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -9,7 +10,6 @@ import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
-import subway.dto.SectionResponse;
 import subway.vo.SectionAdditionResult;
 
 @Service
@@ -25,17 +25,16 @@ public class SectionsService {
         this.sectionDao = sectionDao;
     }
 
-    public SectionResponse addSection(Long id, SectionAdditionRequest request) {
-        LineSections lineSections = sectionDao.findAllByLineId(id);
+    @Transactional
+    public void addSection(Long id, SectionAdditionRequest request) {
+        Line line = getLineOrElseThrow(id);
+        LineSections lineSections = sectionDao.findAllByLine(line);
         Section section = createNewSectionBy(request);
 
         SectionAdditionResult sectionAdditionResult = lineSections.add(section);
 
         sectionAdditionResult.getSectionToRemove().ifPresent(sectionDao::delete);
         sectionAdditionResult.getSectionsToAdd().forEach(sectionDao::save);
-
-        //TODO: front 스펙 보고 id null인 부분 처리하기
-        return SectionResponse.of(section);
     }
 
     private Section createNewSectionBy(SectionAdditionRequest request) {
@@ -44,13 +43,20 @@ public class SectionsService {
         return new Section(upStation, downStation, request.getDistance());
     }
 
+    @Transactional
     public void removeLast(Long lineId, Long stationId) {
-        LineSections lineSections = sectionDao.findAllByLineId(lineId);
+        Line line = getLineOrElseThrow(lineId);
+        LineSections lineSections = sectionDao.findAllByLine(line);
         Station station = getStationOrElseThrow(stationId);
 
         Section removedSection = lineSections.removeLast(station);
 
         sectionDao.deleteById(removedSection.getId());
+    }
+
+    private Line getLineOrElseThrow(Long id) {
+        return lineDao.findById(id)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 
     private Station getStationOrElseThrow(Long id) {

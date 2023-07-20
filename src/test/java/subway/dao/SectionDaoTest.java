@@ -50,6 +50,6 @@ class SectionDaoTest {
         Section section = sectionDao.save(new Section(lineA, stationA, stationB, 2));
         Section section2 = sectionDao.save(new Section(lineA, stationB, stationC, 2));
 
-        Assertions.assertThat(sectionDao.findAllByLineId(lineA.getId())).isEqualTo(new LineSections(lineA, new Sections(List.of(section, section2))));
+        Assertions.assertThat(sectionDao.findAllByLine(lineA)).isEqualTo(new LineSections(lineA, new Sections(List.of(section, section2))));
     }
 }

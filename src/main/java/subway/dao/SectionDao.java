@@ -58,6 +58,20 @@ public class SectionDao {
         return new LineSections(values.get(0).getLine(), new Sections(values));
     }
 
+    public LineSections findAllByLine(Line line){
+        String sql = "select s.id, line_id, up_station_id, down_station_id, distance, "
+            + "name, color "
+            + "from SECTION s join LINE l on s.line_id = l.id "
+            + "WHERE s.line_id = ?";
+
+        List<Section> values = jdbcTemplate.query(sql, rowToSectionRowMapper, line.getId()).stream()
+            .map(this::toSection)
+            .collect(Collectors.toUnmodifiableList());
+
+        return new LineSections(line, new Sections(values));
+    }
+
+
     private Section toSection(SectionRow sectionRow) {
         Station upStation = getStationOrElseThrow(sectionRow.getUpStationId());
         Station downStation = getStationOrElseThrow(sectionRow.getDownStationId());
