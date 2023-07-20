@@ -40,4 +40,8 @@ public class Sections {
     public List<Section> getSections() {
         return Collections.unmodifiableList(sections);
     }
+
+    public boolean checkInsertion(final Section section) {
+        return false;
+    }
 }

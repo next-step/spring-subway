@@ -3,8 +3,10 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.dto.SectionRequest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,18 +25,37 @@ class SectionsTest {
     @Test
     void createSectionsSortingTest() {
         // given
-        Section section1 = new Section(1L, 1L, 4L, 3L, 10);
-        Section section2 = new Section(1L, 1L, 3L, 1L, 10);
-        Section section3 = new Section(1L, 1L, 1L, 2L, 10);
-        Section section4 = new Section(1L, 1L, 2L, 5L, 10);
-
-        List<Section> sections = List.of(section2, section4, section1, section3);
-        List<Section> sortedSections = List.of(section1, section2, section3, section4);
+        List<Section> sortedSections = createSections();
+        List<Section> sections = new ArrayList<>(sortedSections);
+        Collections.shuffle(sections);
 
         // when
         List<Section> result = new Sections(sections).getSections();
 
         // then
         assertThat(result).isEqualTo(sortedSections);
+    }
+
+    @DisplayName("해당 구간이 추가 가능한 구간인지 검사한다.")
+    @Test
+    void validateSectionTest() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest("5", "6", 10);
+        Sections sections = new Sections(createSections());
+
+        // when
+        boolean result = sections.checkInsertion(sectionRequest.to(1L));
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    private List<Section> createSections() {
+        List<Section> sections = new ArrayList<>();
+        sections.add(new Section(1L, 1L, 4L, 3L, 10));
+        sections.add(new Section(1L, 1L, 3L, 1L, 10));
+        sections.add(new Section(1L, 1L, 1L, 2L, 10));
+        sections.add(new Section(1L, 1L, 2L, 5L, 10));
+        return sections;
     }
 }
