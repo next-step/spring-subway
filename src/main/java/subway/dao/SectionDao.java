@@ -3,7 +3,6 @@ package subway.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -25,15 +24,27 @@ public class SectionDao {
     private RowMapper<Line> rowToLineMapper = (rs, rowNum) ->
         new Line(
             rs.getLong("line_id"),
-            rs.getString("name"),
-            rs.getString("color")
+            rs.getString("line_name"),
+            rs.getString("line_color")
         );
 
-    private RowMapper<SectionRow> rowToSectionRowMapper = (rs, rowNum) -> new SectionRow(
-            rs.getLong("id"),
-            rowToLineMapper.mapRow(rs, rowNum),
+    private RowMapper<Station> rowToUpStationMapper = (rs, rowNum) ->
+        new Station(
             rs.getLong("up_station_id"),
+            rs.getString("up_station_name")
+        );
+
+    private RowMapper<Station> rowToDownStationMapper = (rs, rowNum) ->
+        new Station(
             rs.getLong("down_station_id"),
+            rs.getString("down_station_name")
+        );
+
+    private RowMapper<Section> rowToSectionMapper = (rs, rowNum) -> new Section(
+            rs.getLong("section_id"),
+            rowToLineMapper.mapRow(rs, rowNum),
+            rowToUpStationMapper.mapRow(rs, rowNum),
+            rowToDownStationMapper.mapRow(rs, rowNum),
             rs.getInt("distance")
         );
 
@@ -45,44 +56,19 @@ public class SectionDao {
         this.stationDao = stationDao;
     }
 
-    public LineSections findAllByLineId(Long id){
-        String sql = "select s.id, line_id, up_station_id, down_station_id, distance, "
-            + "name, color "
-            + "from SECTION s join LINE l on s.line_id = l.id "
-            + "WHERE s.line_id = ?";
-
-        List<Section> values = jdbcTemplate.query(sql, rowToSectionRowMapper, id).stream()
-            .map(this::toSection)
-            .collect(Collectors.toUnmodifiableList());
-
-        return new LineSections(values.get(0).getLine(), new Sections(values));
-    }
-
     public LineSections findAllByLine(Line line){
-        String sql = "select s.id, line_id, up_station_id, down_station_id, distance, "
-            + "name, color "
+        String sql = "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
+            + "l.name AS line_name, color AS line_color, "
+            + "us.name AS up_station_name, "
+            + "ds.name AS down_station_name "
             + "from SECTION s join LINE l on s.line_id = l.id "
+            + "join STATION us on up_station_id = us.id "
+            + "join STATION ds on down_station_id = ds.id "
             + "WHERE s.line_id = ?";
 
-        List<Section> values = jdbcTemplate.query(sql, rowToSectionRowMapper, line.getId()).stream()
-            .map(this::toSection)
-            .collect(Collectors.toUnmodifiableList());
+        List<Section> values = jdbcTemplate.query(sql, rowToSectionMapper, line.getId());
 
         return new LineSections(line, new Sections(values));
-    }
-
-
-    private Section toSection(SectionRow sectionRow) {
-        Station upStation = getStationOrElseThrow(sectionRow.getUpStationId());
-        Station downStation = getStationOrElseThrow(sectionRow.getDownStationId());
-        return new Section(sectionRow.getId(), sectionRow.getLine(), upStation,
-            downStation, sectionRow.getDistance());
-    }
-
-    private Station getStationOrElseThrow(Long id) {
-        return stationDao.findById(id)
-            .orElseThrow(
-                () -> new RuntimeException("존재하지 않는 station id입니다. id: \"" + id + "\""));
     }
 
     public Section save(Section section) {
