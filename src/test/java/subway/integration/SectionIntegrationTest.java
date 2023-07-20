@@ -3,7 +3,6 @@ package subway.integration;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,20 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
 
-    private SectionRequest sectionRequest;
-
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-
-        sectionRequest = new SectionRequest(12L, 13L, 777L);
-    }
-
     @Test
-    @DisplayName("지하철 구간을 생성한다.")
-    void createSection() {
+    @DisplayName("새로운 역을 상행 종점역으로 등록할 수 있다.")
+    void createFirstSection() {
         /* given */
         final Long lineId = 1L;
+        final SectionRequest sectionRequest = new SectionRequest(10L, 11L, 777L);
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
@@ -45,11 +36,11 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("새로운 구간의 상행역이 해당 노선에 등록되어 있는 하행 종점역이 아닌 경우 400 Bad Request로 응답한다.")
-    void badRequestWithNotRegisteredLastDownStation() {
+    @DisplayName("새로운 역을 하행 종점역으로 등록할 수 있다.")
+    void createSection() {
         /* given */
-        final SectionRequest sectionRequest = new SectionRequest(11L, 14L, 777L);
         final Long lineId = 1L;
+        final SectionRequest sectionRequest = new SectionRequest(12L, 13L, 777L);
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
@@ -61,9 +52,8 @@ class SectionIntegrationTest extends IntegrationTest {
                 .extract();
 
         /* then */
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().jsonPath().getString("message"))
-                .isEqualTo("새로운 구간의 상행역이 해당 노선에 등록되어 있는 하행 종점역이 아닙니다.");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.header("Location")).isNotBlank();
     }
 
     @Test

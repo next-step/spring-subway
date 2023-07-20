@@ -84,4 +84,22 @@ class SectionsTest {
         /* when & then */
         assertThat(sections.isEqualSizeToOne()).isTrue();
     }
+
+    @Test
+    @DisplayName("Sections의 종점인지 확인할 수 있다.")
+    void isEndStation() {
+        /* given */
+        final Sections sections = new Sections(List.of(
+                new Section(1L, 1L, 1L, 2L, 1L),
+                new Section(2L, 1L, 2L, 3L, 2L),
+                new Section(3L, 1L, 3L, 4L, 3L),
+                new Section(4L, 1L, 4L, 5L, 4L)
+        ));
+
+        /* when & then */
+        assertThat(sections.isEndStation(0L, 1L)).isTrue();
+        assertThat(sections.isEndStation(5L, 6L)).isTrue();
+        assertThat(sections.isEndStation(3L, 4L)).isFalse();
+        assertThat(sections.isEndStation(7L, 8L)).isFalse();
+    }
 }

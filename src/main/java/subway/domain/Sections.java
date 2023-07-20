@@ -13,27 +13,57 @@ public class Sections {
     }
 
     public boolean containsBoth(final Long upStationId, final Long downStationId) {
-        return containsStations(upStationId, downStationId) == 2;
+        return countByStationIds(upStationId, downStationId) == 2;
     }
 
     public boolean containsNeither(final Long upStationId, final Long downStationId) {
-        return containsStations(upStationId, downStationId) == 0;
+        return countByStationIds(upStationId, downStationId) == 0;
     }
 
     public Optional<Section> findLastSection() {
         final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
         final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
 
-        upStationIds.retainAll(downStationIds);
-        downStationIds.removeAll(upStationIds);
+        final Set<Long> intersectionIds = intersection(upStationIds, downStationIds);
+        downStationIds.removeAll(intersectionIds);
 
-        return values.stream()
-                .filter(section -> upStationIds.contains(section.getDownStationId()))
+        return values.stream().filter(section -> downStationIds.contains(section.getDownStationId()))
                 .findAny();
     }
 
     public boolean isEqualSizeToOne() {
         return this.values.size() == 1;
+    }
+
+    public boolean isEndStation(final Long upStationId, final Long downStationId) {
+        final Set<Long> upStationsIds = toSetWithMapper(Section::getUpStationId);
+        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
+
+        final Set<Long> differenceIds =
+                difference(union(upStationsIds, downStationIds), intersection(upStationsIds, downStationIds));
+
+        return differenceIds.contains(upStationId) || differenceIds.contains(downStationId);
+    }
+
+    private Set<Long> union(final Set<Long> upStationIds, final Set<Long> downStationIds) {
+        final Set<Long> unionIds = new HashSet<>(upStationIds);
+        unionIds.addAll(downStationIds);
+
+        return unionIds;
+    }
+
+    private Set<Long> intersection(final Set<Long> upStationIds, final Set<Long> downStationIds) {
+        final Set<Long> intersectionIds = new HashSet<>(upStationIds);
+        intersectionIds.retainAll(downStationIds);
+
+        return intersectionIds;
+    }
+
+    private Set<Long> difference(final Set<Long> upStationIds, final Set<Long> downStationIds) {
+        final Set<Long> differenceIds = new HashSet<>(upStationIds);
+        differenceIds.removeAll(downStationIds);
+
+        return differenceIds;
     }
 
     private Set<Long> toSetWithMapper(final Function<Section, Long> mapper) {
@@ -42,7 +72,7 @@ public class Sections {
                 .collect(Collectors.toSet());
     }
 
-    private int containsStations(final Long... targetIds) {
+    private int countByStationIds(final Long... targetIds) {
         final Set<Long> stationIds = new HashSet<>();
         for (Section section : values) {
             stationIds.add(section.getUpStationId());
