@@ -50,7 +50,13 @@ public class Section {
         return downSection.findDownSection();
     }
 
-
+    public Section findUpSection() {
+        if (upSection == null) {
+            return this;
+        }
+        return upSection.findUpSection();
+    }
+    
     public Long getId() {
         return id;
     }
@@ -115,10 +121,6 @@ public class Section {
         Assert.notNull(downSection, () -> "downSection이 null 일때, \"disconnectDownSection()\" 를 호출할 수 없습니다");
         downSection.upSection = null;
         downSection = null;
-    }
-
-    public Section findUpSection() {
-        return null;
     }
 
     public static class Builder {

@@ -35,7 +35,6 @@ public class LineManager {
     }
 
     public void connectSection(Section requestSection) {
-
     }
 
     public void disconnectDownSection(Station downStation) {
