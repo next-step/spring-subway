@@ -1,8 +1,10 @@
 package subway.domain;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,44 +44,35 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("추가할 구간의 상행역은 기존 구간들의 하행 종착역과 같아야 한다.")
-    void upStationOfNewSectionShouldEqualFinalDownStationOfSections() {
+    @DisplayName("순환된 구간으로 생성할 수 없다.")
+    void cannotCreateWithCircularSection() {
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
         Section section = new Section(lineA, stationA, stationB, 1);
-        Section unaddableSection = new Section(lineA, stationC, stationD, 1);
+        Section circularSection = new Section(lineA, stationB, stationA, 1);
 
-        Sections sections = new Sections(List.of(section));
-
-        assertThatThrownBy(() -> sections.add(unaddableSection))
+        assertThatThrownBy(() -> new Sections(List.of(section, circularSection)))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("추가할 구간의 하행역은 기존 구간들에 포함되면 안된다.")
-    void downStationOfNewSectionShouldNotBeContainedBySections() {
-        Station stationA = new Station(1L, "A");
-        Station stationB = new Station(2L, "B");
-        Section section = new Section(lineA, stationA, stationB, 1);
-        Section unaddableSection = new Section(lineA, stationB, stationA, 1);
+    @DisplayName("널이거나 비어 있는 구간 리스트로 생성할 수 없다.")
+    void cannotCreateWithNullOrEmptySectionList() {
 
-        Sections sections = new Sections(List.of(section));
-
-        assertThatThrownBy(() -> sections.add(unaddableSection))
+        assertThatThrownBy(() -> new Sections(null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Sections(emptyList()))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("구간 끝에 추가한다.")
-    void addLast() {
-        Station stationA = new Station(1L, "A");
-        Station stationB = new Station(2L, "B");
-        Station stationC = new Station(3L, "C");
-        Section section = new Section(lineA, stationA, stationB, 1);
-        Section addableSection = new Section(lineA, stationB, stationC, 1);
-        Sections sections = new Sections(List.of(section));
+    @DisplayName("끊어진 구간들로 생성할 수 없습니다.")
+    void cannotCreateWithSeperatedSections() {
+        Section sectionA = new Section(lineA, stationA, stationB, 3);
+        Section sectionB = new Section(lineA, stationC, stationD, 3);
 
-        sections.add(addableSection);
-
-        assertThat(sections.getLast()).isEqualTo(addableSection);
+        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -120,15 +113,5 @@ class SectionsTest {
         Sections expectedSections = new Sections(List.of(sectionA));
         assertThat(sections).isEqualTo(expectedSections);
         assertThat(removedSection).isEqualTo(sectionB);
-    }
-
-    @Test
-    @DisplayName("끊어진 구간들로 생성할 수 없습니다.")
-    void cannotCreateWithSeperatedSections() {
-        Section sectionA = new Section(lineA, stationA, stationB, 3);
-        Section sectionB = new Section(lineA, stationC, stationD, 3);
-
-        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
-            .isInstanceOf(IllegalArgumentException.class);
     }
 }

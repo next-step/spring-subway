@@ -15,9 +15,16 @@ public class Sections {
     private final List<Section> values;
 
     public Sections(List<Section> values) {
+        validateNullOrEmpty(values);
         this.values = sort(values);
 
         validateConnectedSections(values, this.values);
+    }
+
+    private void validateNullOrEmpty(List<Section> values) {
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("구간이 하나 이상 존재해야 합니다.");
+        }
     }
 
     private void validateConnectedSections(List<Section> values, List<Section> sortedValues) {
@@ -59,7 +66,7 @@ public class Sections {
         return values.stream()
             .filter(section -> !downStations.contains(section.getUpStation()))
             .findAny()
-            .orElseThrow();
+            .orElseThrow(() -> new IllegalArgumentException("노선은 순환할 수 없습니다."));
     }
 
     private Set<Station> extractDownStations(List<Section> values) {
@@ -109,8 +116,10 @@ public class Sections {
         Station upStation = section.getUpStation();
         Station downStation = section.getDownStation();
 
-        boolean upStationExists = this.values.stream().anyMatch(value -> value.containsStation(upStation));
-        boolean downStationExists = this.values.stream().anyMatch(value -> value.containsStation(downStation));
+        boolean upStationExists = this.values.stream()
+            .anyMatch(value -> value.containsStation(upStation));
+        boolean downStationExists = this.values.stream()
+            .anyMatch(value -> value.containsStation(downStation));
 
         if (upStationExists && downStationExists) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다.");
