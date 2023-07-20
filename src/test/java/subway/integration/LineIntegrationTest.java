@@ -226,6 +226,27 @@ class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("Line에 Station 두개가 이미 존재할 경우, 구간을 삽입할 수 없다.")
+    void cannotCreateSectionIfStationAlreadyExists() {
+        // given
+        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+
+        SectionRequest sectionRequest1 = new SectionRequest(stationRequest2, stationRequest3, 100);
+        registerSectionToLine(lineId, sectionRequest1);
+
+        SectionRequest sectionRequest2 = new SectionRequest(stationRequest3, stationRequest4, 100);
+        registerSectionToLine(lineId, sectionRequest2);
+
+        SectionRequest sectionRequest3 = new SectionRequest(stationRequest2, stationRequest4, 1);
+
+        // when
+        ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest3);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @Test
     @DisplayName("Line의 하행 Section을 제거한다")
     void deleteDownSectionOfLine() {
         // given

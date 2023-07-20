@@ -17,6 +17,7 @@ public class LineManager {
         initSectionConnection(this.sections);
     }
 
+
     private void initSectionConnection(List<Section> sections) {
         for (Section currentSection : sections) {
             Optional<Section> downSection = sections.stream()
@@ -52,14 +53,21 @@ public class LineManager {
         boolean isUpStationExists = false;
         boolean isDownStationExists = false;
         for (Section section : sections) {
-            isUpStationExists = section.getUpStation().equals(upStation) || section.getDownStation().equals(upStation);
-            isDownStationExists =
-                    section.getDownStation().equals(downStation) || section.getUpStation().equals(downStation);
+            isUpStationExists = isStationExists(upStation, isUpStationExists, section);
+            isDownStationExists = isStationExists(downStation, isDownStationExists, section);
         }
+
         boolean isAllExist = isDownStationExists && isUpStationExists;
         Assert.isTrue(!isAllExist,
                 () -> MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재합니다.", upStation,
                         downStation, sections));
+    }
+
+    private boolean isStationExists(Station upStation, boolean isUpStationExists, Section section) {
+        isUpStationExists = isUpStationExists
+                || section.getUpStation().equals(upStation)
+                || section.getDownStation().equals(upStation);
+        return isUpStationExists;
     }
 
     public void disconnectDownSection(Station downStation) {
