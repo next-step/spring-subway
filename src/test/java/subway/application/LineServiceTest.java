@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
 import subway.domain.Line;
-import subway.domain.SectionStation;
+import subway.domain.StationPair;
 import subway.domain.Station;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
@@ -40,10 +40,10 @@ class LineServiceTest {
         Station station4 = new Station(4L, "한대앞");
 
         given(lineDao.findById(lineId)).willReturn(new Line(1L, "1호선", "blue"));
-        given(lineDao.findAllSectionStation(lineId)).willReturn(List.of(
-                new SectionStation(station4, station1),
-                new SectionStation(station1, station3),
-                new SectionStation(station3, station2)
+        given(lineDao.findAllStationPair(lineId)).willReturn(List.of(
+                new StationPair(station4, station1),
+                new StationPair(station1, station3),
+                new StationPair(station3, station2)
         ));
 
         // when

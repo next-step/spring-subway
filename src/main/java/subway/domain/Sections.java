@@ -1,7 +1,5 @@
 package subway.domain;
 
-import subway.dto.StationResponse;
-
 import java.util.*;
 import java.util.stream.Collectors;
 

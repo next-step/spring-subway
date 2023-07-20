@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
-import subway.domain.SectionStation;
+import subway.domain.StationPair;
 import subway.domain.Station;
 
 import javax.sql.DataSource;
@@ -26,8 +26,8 @@ public class LineDao {
                     rs.getString("color")
             );
 
-    private RowMapper<SectionStation> sectionStationRowMapper = (rs, rowNum) ->
-            new SectionStation(
+    private RowMapper<StationPair> stationPairRowMapper = (rs, rowNum) ->
+            new StationPair(
                     new Station(
                             rs.getLong("s1_id"),
                             rs.getString("s1_name")
@@ -81,7 +81,7 @@ public class LineDao {
                 .findAny();
     }
 
-    public List<SectionStation> findAllSectionStation(final Long lineId) {
+    public List<StationPair> findAllStationPair(final Long lineId) {
         String sql = "select s1.id as s1_id, s1.name as s1_name, s2.id as s2_id, s2.name as s2_name " +
                 "from section " +
                 "join station as s1 " +
@@ -89,6 +89,6 @@ public class LineDao {
                 "join station as s2 " +
                 "on section.down_station_id = s2.id " +
                 "where line_id = ?";
-        return jdbcTemplate.query(sql, sectionStationRowMapper, lineId);
+        return jdbcTemplate.query(sql, stationPairRowMapper, lineId);
     }
 }
