@@ -3,13 +3,9 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.StationPair;
-import subway.domain.Station;
+import subway.domain.*;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.dto.StationResponse;
 import subway.exception.IllegalLineException;
 
 import java.util.*;
@@ -59,30 +55,10 @@ public class LineService {
     }
 
     public LineResponse findLineResponseById(Long id) {
-        Line persistLine = findLineById(id);
-        List<StationPair> stationPairs = lineDao.findAllStationPair(id);
-
-        final Map<Station, Station> stationMap = stationPairs.stream()
-                .collect(Collectors.toMap(StationPair::getUpStation, StationPair::getDownStation));
-
-        // dao 에서 가져온거
-        // 생성자로 받고
-        // sort() 하면 정렬된 거 방환
-
-        // 상행 종점 구하기
-        Set<Station> keySet = new HashSet<>(stationMap.keySet());
-        keySet.removeAll(stationMap.values());
-        Station lastUpStation = keySet.stream().findAny().orElseThrow();
-
-        List<StationResponse> stationResponses = new ArrayList<>();
-
-        Station curStation = lastUpStation;
-        while(curStation != null) {
-            stationResponses.add(StationResponse.of(curStation));
-            curStation = stationMap.get(curStation);
-        }
-
-        return LineResponse.of(persistLine, stationResponses);
+        final Line persistLine = findLineById(id);
+        final List<StationPair> stationPairs = lineDao.findAllStationPair(id);
+        final Stations stations = new Stations(stationPairs);
+        return LineResponse.of(persistLine, stations.getStations());
     }
 
     public Line findLineById(Long id) {

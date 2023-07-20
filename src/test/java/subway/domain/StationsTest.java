@@ -14,7 +14,7 @@ class StationsTest {
     @DisplayName("Stations 를 생성한다.")
     @Test
     void createStationsTest() {
-        assertDoesNotThrow(() -> new Stations(List.of()));
+        assertDoesNotThrow(() -> new Stations(List.of(new StationPair(new Station(1L, "범계"), new Station(2L, "장지")))));
     }
 
     @DisplayName("Stations 를 정렬한다.")

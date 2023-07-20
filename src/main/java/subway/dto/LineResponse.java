@@ -2,8 +2,10 @@ package subway.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import subway.domain.Line;
+import subway.domain.Station;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LineResponse {
@@ -32,8 +34,11 @@ public class LineResponse {
         return new LineResponse(line.getId(), line.getName(), line.getColor());
     }
 
-    public static LineResponse of(Line line, List<StationResponse> stations) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
+    public static LineResponse of(Line line, List<Station> stations) {
+        final List<StationResponse> stationResponses = stations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toUnmodifiableList());
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationResponses);
     }
 
     public Long getId() {
