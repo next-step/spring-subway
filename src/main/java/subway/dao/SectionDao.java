@@ -71,4 +71,13 @@ public class SectionDao {
         String sql = "select * from SECTION where line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
+
+    public void update(final Section newSection) {
+        String sql = "update SECTION set up_station_id = ?, down_station_id = ?, distance = ? where id = ?";
+        jdbcTemplate.update(sql, new Object[]{
+                newSection.getUpStationId(),
+                newSection.getDownStationId(),
+                newSection.getDistance(),
+                newSection.getId()});
+    }
 }

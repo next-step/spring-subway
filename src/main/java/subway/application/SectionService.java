@@ -19,7 +19,8 @@ public class SectionService {
 
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
         Sections sections = new Sections(sectionDao.findAll(lineId));
-        sections.checkInsertion(sectionRequest.to(lineId));
+        sections.updateForInsert(sectionRequest.to(lineId))
+                .ifPresent(sectionDao::update);
 
         final Section section = sectionDao.insert(sectionRequest.to(lineId));
         return SectionResponse.of(section);

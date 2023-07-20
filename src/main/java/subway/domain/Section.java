@@ -65,4 +65,12 @@ public class Section {
     public boolean compareDownStationId(final Section other) {
         return downStationId.equals(other.downStationId);
     }
+
+    public Section downStationId(final Section newSection) {
+        return new Section(id, lineId, upStationId, newSection.upStationId, distance - newSection.distance);
+    }
+
+    public Section upStationId(final Section newSection) {
+        return new Section(id, lineId, newSection.downStationId, downStationId, distance - newSection.distance);
+    }
 }
