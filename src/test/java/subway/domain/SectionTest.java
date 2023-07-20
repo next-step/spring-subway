@@ -1,12 +1,13 @@
 package subway.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Section 클래스 테스트")
 class SectionTest {
@@ -32,14 +33,17 @@ class SectionTest {
         Station upStation = new Station(1L, "A");
         Station downStation = new Station(2L, "B");
 
-        assertThatCode(() -> new Section(lineA, upStation, downStation, 1)).doesNotThrowAnyException();
-        assertThatThrownBy(() -> new Section(lineA, upStation, downStation, -1)).isInstanceOf(IllegalArgumentException.class);
+        assertThatCode(() -> new Section(lineA, upStation, downStation, 1))
+            .doesNotThrowAnyException();
+        assertThatThrownBy(() -> new Section(lineA, upStation, downStation, -1))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("상행역과 하행역은 같을 수 없다")
     void upStationAndDownStationShouldNotEqual() {
-        assertThatThrownBy(() -> new Section(lineA, stationA, stationA, 1)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Section(lineA, stationA, stationA, 1))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

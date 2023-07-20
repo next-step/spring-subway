@@ -31,7 +31,8 @@ public class Section {
     }
 
     public Section(Line line, Section section) {
-        this(section.getId(), line, section.getUpStation(), section.getDownStation(), section.getDistance());
+        this(section.getId(), line, section.getUpStation(), section.getDownStation(),
+            section.getDistance());
     }
 
     private void validatePositive(int distance) {
@@ -40,7 +41,8 @@ public class Section {
         }
     }
 
-    private void validateUpAndDownStationNotEqual(final Station upStation, final Station downStation) {
+    private void validateUpAndDownStationNotEqual(final Station upStation,
+        final Station downStation) {
         if (upStation.equals(downStation)) {
             throw new IllegalArgumentException(
                 "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
@@ -58,7 +60,8 @@ public class Section {
     }
 
     public boolean hasSameUpStationOrDownStation(Section section) {
-        return this.upStation.equals(section.upStation) || this.downStation.equals(section.downStation);
+        return this.upStation.equals(section.upStation) || this.downStation.equals(
+            section.downStation);
     }
 
     public List<Section> mergeSections(Section section) {
@@ -73,7 +76,8 @@ public class Section {
             return mergeDown(section);
         }
 
-        throw new IllegalArgumentException("추가할 구간의 상행역 하행역이 모두 같거나 모두 다를 수 없습니다. 기존 구간: " + this + " 추가할 구간: " + section);
+        throw new IllegalArgumentException(
+            "추가할 구간의 상행역 하행역이 모두 같거나 모두 다를 수 없습니다. 기존 구간: " + this + " 추가할 구간: " + section);
     }
 
     private boolean isOnlyUpStationMatch(Section section) {
@@ -97,7 +101,7 @@ public class Section {
     private List<Section> mergeDown(Section section) {
         List<Section> mergedSections = new ArrayList<>();
         mergedSections.add(new Section(
-            section.line, this.upStation,  section.upStation, this.distance - section.distance));
+            section.line, this.upStation, section.upStation, this.distance - section.distance));
         mergedSections.add(section);
         return mergedSections;
     }

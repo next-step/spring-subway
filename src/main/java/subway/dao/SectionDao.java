@@ -40,12 +40,12 @@ public class SectionDao {
         );
 
     private RowMapper<Section> rowToSectionMapper = (rs, rowNum) -> new Section(
-            rs.getLong("section_id"),
-            rowToLineMapper.mapRow(rs, rowNum),
-            rowToUpStationMapper.mapRow(rs, rowNum),
-            rowToDownStationMapper.mapRow(rs, rowNum),
-            rs.getInt("distance")
-        );
+        rs.getLong("section_id"),
+        rowToLineMapper.mapRow(rs, rowNum),
+        rowToUpStationMapper.mapRow(rs, rowNum),
+        rowToDownStationMapper.mapRow(rs, rowNum),
+        rs.getInt("distance")
+    );
 
     public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
@@ -54,15 +54,16 @@ public class SectionDao {
             .usingGeneratedKeyColumns("id");
     }
 
-    public LineSections findAllByLine(Line line){
-        String sql = "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
-            + "l.name AS line_name, color AS line_color, "
-            + "us.name AS up_station_name, "
-            + "ds.name AS down_station_name "
-            + "from SECTION s join LINE l on s.line_id = l.id "
-            + "join STATION us on up_station_id = us.id "
-            + "join STATION ds on down_station_id = ds.id "
-            + "WHERE s.line_id = ?";
+    public LineSections findAllByLine(Line line) {
+        String sql =
+            "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
+                + "l.name AS line_name, color AS line_color, "
+                + "us.name AS up_station_name, "
+                + "ds.name AS down_station_name "
+                + "from SECTION s join LINE l on s.line_id = l.id "
+                + "join STATION us on up_station_id = us.id "
+                + "join STATION ds on down_station_id = ds.id "
+                + "WHERE s.line_id = ?";
 
         List<Section> values = jdbcTemplate.query(sql, rowToSectionMapper, line.getId());
 
@@ -78,7 +79,8 @@ public class SectionDao {
         params.put("distance", section.getDistance());
 
         Long sectionId = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(sectionId, section.getLine(), section.getUpStation(), section.getDownStation(),
+        return new Section(sectionId, section.getLine(), section.getUpStation(),
+            section.getDownStation(),
             section.getDistance());
     }
 

@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import subway.domain.Station;
 
 public class StationResponse {
+
     private Long id;
     private String name;
 

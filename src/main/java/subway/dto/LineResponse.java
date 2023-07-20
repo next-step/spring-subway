@@ -6,6 +6,7 @@ import subway.domain.LineSections;
 import subway.domain.Station;
 
 public class LineResponse {
+
     private Long id;
     private String name;
     private String color;
@@ -35,7 +36,8 @@ public class LineResponse {
         Line line = lineSections.getLine();
         List<Station> stations = lineSections.getSections().getStations();
 
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), StationResponse.listOf(stations));
+        return new LineResponse(line.getId(), line.getName(), line.getColor(),
+            StationResponse.listOf(stations));
     }
 
     public Long getId() {
