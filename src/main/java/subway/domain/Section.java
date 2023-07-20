@@ -31,6 +31,32 @@ public class Section {
     public Section() {
     }
 
+    public Section cuttedSection(Section section) {
+        validateDistance(section);
+
+        if (this.upStation.equals(section.upStation)) {
+            return new Section(section.line,
+                    section.downStation,
+                    this.downStation,
+                    new Distance(this.getDistance() - section.getDistance()));
+        }
+
+        if (this.downStation.equals(section.downStation)) {
+            return new Section(section.line,
+                    this.upStation,
+                    section.upStation,
+                    new Distance(this.getDistance() - section.getDistance()));
+        }
+
+        throw new IllegalArgumentException("상행역과 하행역 중 하나는 같아야 합니다.");
+    }
+
+    private void validateDistance(Section section) {
+        if (this.getDistance() <= section.getDistance()) {
+            throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
+        }
+    }
+
     public Long getId() {
         return id;
     }
