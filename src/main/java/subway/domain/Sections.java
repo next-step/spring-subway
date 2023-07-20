@@ -15,6 +15,10 @@ public class Sections {
     }
 
     public boolean checkInsertion(final Section section) {
+        return checkOnlyOneStation(section) && checkDistance(section.getDistance());
+    }
+
+    private boolean checkOnlyOneStation(final Section section) {
         final boolean upCheck = checkStationExist(section.getUpStationId());
         final boolean downCheck = checkStationExist(section.getDownStationId());
         return upCheck ^ downCheck;
@@ -23,5 +27,9 @@ public class Sections {
     private boolean checkStationExist(final long stationId) {
         return sections.stream()
                 .anyMatch(section -> section.containsStation(stationId));
+    }
+
+    private boolean checkDistance(final int distance) {
+        return false;
     }
 }

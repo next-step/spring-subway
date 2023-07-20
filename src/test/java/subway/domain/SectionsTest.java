@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import subway.dto.SectionRequest;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,6 +51,20 @@ class SectionsTest {
     @DisplayName("두 역이 모두 노선에 존재하지 않는 경우 검증에 실패한다.")
     @Test
     void validateSectionFailNeitherContainTest() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest("1", "4", 10);
+        Sections sections = new Sections(createSections());
+
+        // when
+        boolean result = sections.checkInsertion(sectionRequest.to(1L));
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("역 사이에 새로운 역을 등록할 경우 기존 역 사이 길이보다 크거나 같으면 등록할 수 없다.")
+    @Test
+    void validateSectionDistanceTest() {
         // given
         SectionRequest sectionRequest = new SectionRequest("1", "4", 10);
         Sections sections = new Sections(createSections());
