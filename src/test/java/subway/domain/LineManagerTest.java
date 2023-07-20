@@ -163,4 +163,34 @@ class LineManagerTest {
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
     }
+
+    @Nested
+    @DisplayName("connectSection 메소드는")
+    class ConnectSection_Method {
+
+        @Test
+        @DisplayName("입력으로 들어온 Section의 하행 station과 line의 상행 종점 staiton이 일치하면, 연결을 성공한다")
+        void Connect_Success_When_Input_Down_Station_Equals_Line_Up_Station() {
+            // given
+            Line line = new Line(1L, "line", "red");
+
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section section = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(section)));
+
+            Section requestSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+
+            // when
+            Exception exception = catchException(() -> lineManager.connectSection(requestSection));
+
+            // then
+            assertThat(exception).isNull();
+            assertThat(requestSection.getDownSection()).isEqualTo(section);
+            assertThat(section.getUpSection()).isEqualTo(requestSection);
+        }
+    }
 }

@@ -34,6 +34,10 @@ public class LineManager {
                 });
     }
 
+    public void connectSection(Section requestSection) {
+
+    }
+
     public void disconnectDownSection(Station downStation) {
         Assert.isTrue(sections.size() > 1, () -> "line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.");
         Section downSection = sections.get(0).findDownSection();
@@ -47,4 +51,5 @@ public class LineManager {
         upSection.disconnectDownSection();
         sections.remove(downSection);
     }
+
 }
