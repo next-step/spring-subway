@@ -5,6 +5,7 @@ import java.util.Objects;
 public class Distance {
 
     private static final String DISTANCE_POSITIVE_EXCEPTION_MESSAGE = "거리는 양수여야 합니다.";
+
     private final int value;
 
     public Distance(final int value) {

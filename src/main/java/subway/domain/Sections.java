@@ -1,6 +1,11 @@
 package subway.domain;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Sections {
@@ -32,10 +37,13 @@ public class Sections {
         if (this.sections.size() <= 1) {
             throw new IllegalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
         }
+
         int lastIndex = this.sections.size() - 1;
+
         if (!lastSection().getDownStation().equals(lastStation)) {
             throw new IllegalArgumentException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
         }
+
         this.sections.remove(lastIndex);
     }
 
@@ -87,6 +95,7 @@ public class Sections {
 
     private Section lastSection() {
         validateEmpty();
+
         return this.sections.get(this.sections.size() - 1);
     }
 
@@ -99,6 +108,7 @@ public class Sections {
 
     public Section cut(final Section oldSection, final Section newSection) {
         validateDistance(oldSection, newSection);
+
         Distance reducedDistance = oldSection.distanceDifference(newSection);
 
         if (oldSection.isSameUpStation(newSection)) {
