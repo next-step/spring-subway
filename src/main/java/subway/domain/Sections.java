@@ -16,17 +16,6 @@ public class Sections {
         this.sections = sort(sections);
     }
 
-    public List<Station> toStations() {
-        if (sections.isEmpty()) {
-            return List.of();
-        }
-        List<Station> result = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toList());
-        result.add(sections.get(sections.size() - 1).getDownStation());
-        return result;
-    }
-
     private List<Section> sort(List<Section> sections) {
         if (sections.isEmpty()) {
             return List.of();
@@ -76,6 +65,17 @@ public class Sections {
             pivot = upStationMap.get(pivot.getDownStation());
             result.add(pivot);
         }
+        return result;
+    }
+
+    public List<Station> toStations() {
+        if (sections.isEmpty()) {
+            return List.of();
+        }
+        List<Station> result = sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toList());
+        result.add(sections.get(sections.size() - 1).getDownStation());
         return result;
     }
 

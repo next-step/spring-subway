@@ -60,12 +60,21 @@ public class SectionService {
 
         validateBothExistOrNot(isUpStationInLine, isDownStationInLine);
 
+        updateOriginalSectionIfExist(section, isUpStationInLine, isDownStationInLine);
+    }
+
+    private void updateOriginalSectionIfExist(
+            Section section,
+            boolean isUpStationInLine,
+            boolean isDownStationInLine) {
         if (isUpStationInLine) {
-            addSectionWithUpStation(section);
+            optionalSectionWithUpStation(section).ifPresent(
+                    originalSection -> updateOriginalSection(section, originalSection));
         }
 
         if (isDownStationInLine) {
-            addSectionWithDownStation(section);
+            optionalSectionWithDownStation(section).ifPresent(
+                    originalSection -> updateOriginalSection(section, originalSection));
         }
     }
 
@@ -79,39 +88,22 @@ public class SectionService {
         }
     }
 
-    private void addSectionWithUpStation(Section section) {
-        Optional<Section> optionalSection = sectionDao.findByLineIdAndUpStationId(
+    private Optional<Section> optionalSectionWithUpStation(Section section) {
+        return sectionDao.findByLineIdAndUpStationId(
                 section.getLineId(),
                 section.getUpStationId());
-        optionalSection.ifPresent(originalSection -> {
-            validateDistance(section, originalSection);
-            Section generatedSection = new Section(section.getLine(), section.getDownStation(),
-                    originalSection.getDownStation(),
-                    new Distance(originalSection.getDistance() - section.getDistance()));
-            sectionDao.deleteById(originalSection.getId());
-            sectionDao.insert(generatedSection);
-        });
     }
 
-    private void validateDistance(Section section, Section originalSection) {
-        if (section.getDistance() >= originalSection.getDistance()) {
-            throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
-        }
-    }
-
-    private void addSectionWithDownStation(Section section) {
-        Optional<Section> optionalSection = sectionDao.findByLineIdAndDownStationId(
+    private Optional<Section> optionalSectionWithDownStation(Section section) {
+        return sectionDao.findByLineIdAndDownStationId(
                 section.getLineId(),
                 section.getDownStationId());
-        optionalSection.ifPresent(originalSection -> {
-            validateDistance(section, originalSection);
-            Section generatedSection = new Section(section.getLine(),
-                    originalSection.getUpStation(),
-                    section.getUpStation(),
-                    new Distance(originalSection.getDistance() - section.getDistance()));
-            sectionDao.deleteById(originalSection.getId());
-            sectionDao.insert(generatedSection);
-        });
+    }
+
+    private void updateOriginalSection(Section section, Section originalSection) {
+        Section generatedSection = originalSection.cuttedSection(section);
+        sectionDao.deleteById(originalSection.getId());
+        sectionDao.insert(generatedSection);
     }
 
     @Transactional
