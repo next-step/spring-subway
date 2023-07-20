@@ -15,13 +15,29 @@ public class Sections {
     }
 
     public boolean checkInsertion(final Section section) {
-        return checkOnlyOneStation(section) && checkDistance(section.getDistance());
-    }
-
-    private boolean checkOnlyOneStation(final Section section) {
         final boolean upCheck = checkStationExist(section.getUpStationId());
         final boolean downCheck = checkStationExist(section.getDownStationId());
-        return upCheck ^ downCheck;
+        if(upCheck == downCheck) {
+            return false;
+        }
+
+        final Section existSection = findExistingSection(section, upCheck);
+
+        if(existSection != null) {
+            return checkDistance(existSection, section.getDistance());
+        }
+        return true;
+    }
+
+    private Section findExistingSection(final Section section, final boolean isUpStation) {
+        if(isUpStation) {
+            return sections.stream()
+                    .filter(section::compareUpStationId)
+                    .findAny().orElse(null);
+        }
+        return sections.stream()
+                    .filter(section::compareDownStationId)
+                    .findAny().orElse(null);
     }
 
     private boolean checkStationExist(final long stationId) {
@@ -29,7 +45,7 @@ public class Sections {
                 .anyMatch(section -> section.containsStation(stationId));
     }
 
-    private boolean checkDistance(final int distance) {
-        return false;
+    private boolean checkDistance(final Section original, final int distance) {
+        return original.isDistanceGreaterThan(distance);
     }
 }

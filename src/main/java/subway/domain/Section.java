@@ -53,4 +53,16 @@ public class Section {
     public boolean containsStation(final long stationId) {
         return upStationId == stationId || downStationId == stationId;
     }
+
+    public boolean isDistanceGreaterThan(final int other) {
+        return this.distance > other;
+    }
+
+    public boolean compareUpStationId(final Section other) {
+        return upStationId.equals(other.upStationId);
+    }
+
+    public boolean compareDownStationId(final Section other) {
+        return downStationId.equals(other.downStationId);
+    }
 }

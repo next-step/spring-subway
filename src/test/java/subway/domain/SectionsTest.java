@@ -64,9 +64,9 @@ class SectionsTest {
 
     @DisplayName("역 사이에 새로운 역을 등록할 경우 기존 역 사이 길이보다 크거나 같으면 등록할 수 없다.")
     @Test
-    void validateSectionDistanceTest() {
+    void validateSectionDistanceFailTest() {
         // given
-        SectionRequest sectionRequest = new SectionRequest("1", "4", 10);
+        SectionRequest sectionRequest = new SectionRequest("1", "6", 10);
         Sections sections = new Sections(createSections());
 
         // when
@@ -74,6 +74,20 @@ class SectionsTest {
 
         // then
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("역 사이에 새로운 역을 등록할 경우 기존 역 사이 길이보다 작아야 한다.")
+    @Test
+    void validateSectionDistanceTest() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest("1", "6", 3);
+        Sections sections = new Sections(createSections());
+
+        // when
+        boolean result = sections.checkInsertion(sectionRequest.to(1L));
+
+        // then
+        assertThat(result).isTrue();
     }
 
 
