@@ -144,6 +144,14 @@ public class Sections {
         }
     }
 
+    public List<Station> getStations() {
+        List<Station> stations = values.stream()
+            .map(Section::getUpStation)
+            .collect(Collectors.toList());
+        stations.add(getLast().getDownStation());
+        return stations;
+    }
+
     Section getFirst() {
         return this.values.get(0);
     }

@@ -35,6 +35,14 @@ public class LineSections {
         return sections.removeLast(station);
     }
 
+    public Line getLine() {
+        return line;
+    }
+
+    public Sections getSections() {
+        return sections;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
