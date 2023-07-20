@@ -3,6 +3,7 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.SectionDao;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.IllegalSectionException;
@@ -17,8 +18,8 @@ public class SectionService {
     }
 
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
-        validateLineAndLastStation(lineId, sectionRequest.getUpStationId());
-        validateDuplicateStationInLine(lineId, sectionRequest.getDownStationId());
+        Sections sections = new Sections(sectionDao.findAll(lineId));
+        sections.checkInsertion(sectionRequest.to(lineId));
 
         final Section section = sectionDao.insert(sectionRequest.to(lineId));
         return SectionResponse.of(section);
@@ -38,13 +39,6 @@ public class SectionService {
         if (!lastSection.getDownStationId().equals(stationId)) {
             throw new IllegalSectionException("해당 역은 노선의 하행 종점역이 아닙니다.");
         }
-    }
-
-    private void validateDuplicateStationInLine(final long lineId, final long stationId) {
-        sectionDao.findByLineIdAndStationId(lineId, stationId)
-                .ifPresent(section -> {
-                    throw new IllegalSectionException("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.");
-                });
     }
 
     private void validateSectionInLine(final long lineId) {

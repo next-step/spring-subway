@@ -78,13 +78,34 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("새로운 구간의 상행 역이 해당 노선의 하행 종점역이 아니어서 구간 생성 실패")
+    @DisplayName("상행역과 하행역이 이미 노선에 모두 등록되어 있어서 구간 생성 실패")
     @Test
-    void createSectionWithNotEndStation() {
+    void createSectionWithBothExistingStation() {
         // given
         createInitialLine();
 
-        SectionRequest request = new SectionRequest("1", "4", 10);
+        SectionRequest request = new SectionRequest("1", "2", 5);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("상행역과 하행역이 모두 노선에 등록되어 있지 않아서 구간 생성 실패")
+    @Test
+    void createSectionWithBothNotExistingStation() {
+        // given
+        createInitialLine();
+
+        SectionRequest request = new SectionRequest("5", "6", 5);
 
         // when
         ExtractableResponse<Response> response = RestAssured

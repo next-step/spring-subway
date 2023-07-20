@@ -11,8 +11,10 @@ import subway.dao.SectionDao;
 import subway.domain.Section;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -32,12 +34,11 @@ class SectionServiceTest {
     @Test
     void createSection() {
         // given
-        final Section lastSection = new Section(1L, 1L,  1L, 2L,10);
         final SectionRequest sectionRequest = new SectionRequest( "2", "3",10);
         final Section newSection = new Section(2L, 1L,  2L, 3L,10);
+        final Section oldSection = new Section(1L, 1L, 1L, 2L, 10);
 
-        given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
-        given(sectionDao.findByLineIdAndStationId(1L, 3L)).willReturn(Optional.empty());
+        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
         given(sectionDao.insert(any(Section.class))).willReturn(newSection);
 
         // when
@@ -58,43 +59,40 @@ class SectionServiceTest {
         final long lineId = 3L;
         final SectionRequest sectionRequest = new SectionRequest( "1", "2",10);
 
-        given(sectionDao.findLastSection(lineId)).willReturn(Optional.empty());
-
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
                 .hasMessage("해당 노선은 생성되지 않았습니다.")
-                .isInstanceOf(IllegalSectionException.class);
+                .isInstanceOf(IllegalLineException.class);
 
     }
 
-    @DisplayName("새로운 구간의 상행 역이 해당 노선의 하행 종점역이 아니어서 구간 생성 실패")
+    @DisplayName("새로운 구간의 상행 및 하행 역이 모두 해당 노선에 등록되어있는 역이어서 구간 생성 실패")
     @Test
-    void createSectionWithNotEndStation() {
+    void createSectionWithBothExistInLine() {
         // given
-        final Section lastSection = new Section(1L, 1L, 1L, 2L,  10);
-        final SectionRequest sectionRequest = new SectionRequest( "3", "1",10);
+        final Section oldSection = new Section(1L, 1L, 1L, 2L,  10);
+        final SectionRequest sectionRequest = new SectionRequest( "1", "2",10);
 
-        given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
+        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
-                .hasMessage("해당 역은 노선의 하행 종점역이 아닙니다.")
+                .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
 
-    @DisplayName("새로운 구간의 하행 역이 해당 노선에 등록되어있는 역이어서 구간 생성 실패")
+    @DisplayName("새로운 구간의 상행 및 하행 역이 모두 해당 노선에 등록되지 않아서 구간 생성 실패")
     @Test
-    void createSectionWithDuplicateStationInLine() {
+    void createSectionWithBothNotExistInLine() {
         // given
-        final Section lastSection = new Section(1L, 1L,  1L, 2L,10);
-        final SectionRequest sectionRequest = new SectionRequest( "2", "1",10);
+        final Section oldSection = new Section(1L, 1L, 1L, 2L,  10);
+        final SectionRequest sectionRequest = new SectionRequest( "3", "4",10);
 
-        given(sectionDao.findLastSection(1L)).willReturn(Optional.of(lastSection));
-        given(sectionDao.findByLineIdAndStationId(1L, 1L)).willReturn(Optional.of(lastSection));
+        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
-                .hasMessage("새로운 구간의 하행 역은 해당 노선에 등록되어있는 역일 수 없습니다.")
+                .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
 

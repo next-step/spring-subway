@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import subway.domain.Section;
 
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -64,5 +65,10 @@ public class SectionDao {
         String sql = "select * from section where line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId)
                 .size();
+    }
+
+    public List<Section> findAll(final long lineId) {
+        String sql = "select * from SECTION where line_id = ?";
+        return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 }
