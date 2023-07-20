@@ -21,7 +21,7 @@ public class SectionDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
-    private RowMapper<Section> rowMapper = (rs, rowNum) ->
+    private final RowMapper<Section> rowMapper = (rs, rowNum) ->
         new Section(
             rs.getLong("id"),
             new Station(
