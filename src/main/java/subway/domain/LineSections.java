@@ -9,9 +9,17 @@ public class LineSections {
     private final Sections sections;
 
     public LineSections(Line line, Sections sections) {
-        sections.validateSectionsBelongToLine(line);
         this.line = line;
         this.sections = sections;
+
+        validateAllSectionsBelongToThisLine();
+    }
+
+    private void validateAllSectionsBelongToThisLine() {
+        if (!this.sections.isSectionsAllBelongTo(this.line)) {
+            throw new IllegalArgumentException(
+                "현재 구간들은 해당 노선에 속하지 않습니다. current line: " + this.line);
+        }
     }
 
     public LineSections(Line line, Section section) {
@@ -19,6 +27,7 @@ public class LineSections {
     }
 
     public Section addLast(Section section) {
+        //여기없음
         return sections.addLast(section);
     }
 

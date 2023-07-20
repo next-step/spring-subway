@@ -18,7 +18,6 @@ public class Sections {
         this.values = sort(values);
 
         validateConnectedSections(values, this.values);
-        validateSectionsOfSameLine(values);
     }
 
     private void validateConnectedSections(List<Section> values, List<Section> sortedValues) {
@@ -27,15 +26,9 @@ public class Sections {
         }
     }
 
-    private void validateSectionsOfSameLine(List<Section> values) {
-        if (isAllBelongToSameLine(values)) {
-            throw new IllegalArgumentException("다른 노선의 구간을 입력했습니다");
-        }
-    }
-
-    private boolean isAllBelongToSameLine(List<Section> values) {
+    public boolean isSectionsAllBelongTo(Line line) {
         return values.stream()
-            .anyMatch(value -> !getLast().belongToSameLine(value));
+            .allMatch(section -> section.belongTo(line));
     }
 
     private List<Section> sort(List<Section> values) {
@@ -76,8 +69,6 @@ public class Sections {
     }
 
     public SectionAdditionResult add(Section section) {
-        //해당 섹션이 같인 라인인지 확인한다
-        this.validateSectionsBelongToLine(section.getLine());
         // 특정 스테이션이 이 섹션즈 안에 포함되는지
         validateOneInOneOut(section);
 
