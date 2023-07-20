@@ -6,8 +6,8 @@ import subway.domain.Section;
 
 public class SectionAdditionResult {
 
-    Optional<Section> sectionToRemove;
-    List<Section> sectionsToAdd;
+    private final Optional<Section> sectionToRemove;
+    private final List<Section> sectionsToAdd;
 
     public SectionAdditionResult(Optional<Section> sectionToRemove, List<Section> sectionsToAdd) {
         this.sectionToRemove = sectionToRemove;
