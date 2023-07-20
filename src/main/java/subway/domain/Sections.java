@@ -20,7 +20,7 @@ public class Sections {
 
     public void canDeleteStation(Long stationId) {
         if (sections.size() <= 1) {
-            throw new IllegalStateException("구간이 1개 이하이므로 해당역을 삭제할 수 없습니다.");
+            throw new IllegalArgumentException("구간이 1개 이하이므로 해당역을 삭제할 수 없습니다.");
         }
         Station endStation = findEndStation();
         if (endStation.getId() != stationId) {
