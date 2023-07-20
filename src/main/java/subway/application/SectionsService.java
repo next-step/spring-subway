@@ -10,6 +10,7 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
 import subway.dto.SectionResponse;
+import subway.vo.SectionAdditionResult;
 
 @Service
 public class SectionsService {
@@ -28,9 +29,11 @@ public class SectionsService {
         LineSections lineSections = sectionDao.findAllByLineId(id);
         Section section = createNewSectionBy(id, request);
 
-        Section addedSection = lineSections.addLast(section);
+        SectionAdditionResult sectionAdditionResult = lineSections.add(section);
 
-        return SectionResponse.of(sectionDao.save(addedSection));
+        sectionAdditionResult.getSectionToRemove().ifPresent(sectionDao::delete);
+        sectionAdditionResult.getSectionsToAdd().forEach(sectionDao::save);
+        return SectionResponse.of(section);
     }
 
     private Section createNewSectionBy(Long id, SectionAdditionRequest request) {

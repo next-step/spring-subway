@@ -2,6 +2,7 @@ package subway.domain;
 
 import java.util.List;
 import java.util.Objects;
+import subway.vo.SectionAdditionResult;
 
 public class LineSections {
 
@@ -26,9 +27,9 @@ public class LineSections {
         this(line, new Sections(List.of(section)));
     }
 
-    public Section addLast(Section section) {
+    public SectionAdditionResult add(Section section) {
         //여기없음
-        return sections.addLast(section);
+        return sections.add(section);
     }
 
     public Section removeLast(Station station) {

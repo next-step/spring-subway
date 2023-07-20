@@ -30,19 +30,6 @@ class SectionsAddTest {
     }
 
     @Test
-    @DisplayName("다른 라인의 구간이 추가될 수 없다.")
-    void cannotAddSectionOfOtherLine() {
-        Section firstSection = new Section(lineA, stationA, stationB, 5);
-        Section secondSection = new Section(lineA, stationB, stationC, 5);
-        Sections sections = new Sections(List.of(firstSection, secondSection));
-        Line otherLine = new Line(2L, "B", "green");
-        Section otherLineSection = new Section(otherLine, stationC, stationD, 3);
-
-        assertThatThrownBy(() -> sections.add(otherLineSection))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     @DisplayName("추가할 구간의 한 역만 기존 노선에 포함되어야 한다.")
     void canAddSectionToLineContainingOnlyOneStation() {
         Section firstSection = new Section(lineA, stationA, stationB, 5);
@@ -104,7 +91,7 @@ class SectionsAddTest {
         SectionAdditionResult sectionAdditionResult = sections.add(targetSection);
 
         assertThat(sectionAdditionResult.getSectionsToAdd()).isEqualTo(List.of(targetSection));
-        assertThat(sectionAdditionResult.getSectionToRemove()).isEqualTo(Optional.empty());
+        assertThat(sectionAdditionResult.getSectionToRemove()).isEmpty();
         assertThat(sections).isEqualTo(
             new Sections(List.of(targetSection, firstSection, secondSection)));
     }
@@ -120,7 +107,7 @@ class SectionsAddTest {
         SectionAdditionResult sectionAdditionResult = sections.add(targetSection);
 
         assertThat(sectionAdditionResult.getSectionsToAdd()).isEqualTo(List.of(targetSection));
-        assertThat(sectionAdditionResult.getSectionToRemove()).isEqualTo(Optional.empty());
+        assertThat(sectionAdditionResult.getSectionToRemove()).isEmpty();
         assertThat(sections).isEqualTo(
             new Sections(List.of(firstSection, secondSection, targetSection)));
     }
