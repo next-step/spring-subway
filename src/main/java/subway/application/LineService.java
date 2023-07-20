@@ -67,7 +67,13 @@ public class LineService {
         Section newSection = new Section(upStation, downStation, request.getDistance());
 
         Sections sections = sectionDao.findAllByLineId(lineId);
-        sections.insert(newSection);
+        sections.validateInsert(newSection);
+
+        if (sections.isInsertedMiddle(newSection)) {
+            Section oldSection = sections.oldSection(newSection);
+            sectionDao.deleteById(oldSection.getId());
+            sectionDao.insert(sections.cut(oldSection, newSection), lineId);
+        }
         sectionDao.insert(newSection, lineId);
 
         return findLineResponseById(lineId);

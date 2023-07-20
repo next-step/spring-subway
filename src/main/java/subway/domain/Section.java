@@ -33,12 +33,12 @@ public class Section {
         }
     }
 
-    public boolean isUpConnected(Section other) {
-        return upStation.equals(other.downStation);
+    public boolean isSameUpStation(Section other) {
+        return upStation.equals(other.upStation);
     }
 
-    public boolean isDownConnected(Section other) {
-        return downStation.equals(other.upStation);
+    public boolean isSameDownStation(Section other) {
+        return downStation.equals(other.downStation);
     }
 
     public Long getId() {

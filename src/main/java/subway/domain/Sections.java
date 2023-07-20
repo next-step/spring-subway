@@ -22,56 +22,6 @@ public class Sections {
         this.sections = sorted(sections);
     }
 
-    public void insert(final Section newSection) {
-        boolean existUpStation = existUpStation(newSection);
-        if (!existUpStation && newSection.isDownConnected(firstSection())) {
-            sections.add(0, newSection);
-            return;
-        }
-        if (!existUpStation) {
-            Station downStation = newSection.getDownStation();
-            Section oldSection = sections.stream()
-                    .filter(section -> section.getDownStation().equals(downStation))
-                    .findFirst()
-                    .orElseThrow();
-            Station upStation = oldSection.getUpStation();
-            validateDistance(newSection, oldSection);
-            int reducedDistance = oldSection.getDistance() - newSection.getDistance();
-            int insertIdx = sections.indexOf(oldSection);
-            sections.remove(oldSection);
-            Section preceedSection = new Section(upStation, newSection.getUpStation(), reducedDistance);
-            insertNewSections(preceedSection, newSection, insertIdx);
-            return;
-        }
-        if (newSection.isUpConnected(lastSection())) {
-            sections.add(newSection);
-            return;
-        }
-        Station upStation = newSection.getUpStation();
-        Section oldSection = sections.stream()
-                .filter(section -> section.getUpStation().equals(upStation))
-                .findFirst()
-                .orElseThrow();
-        Station downStation = oldSection.getDownStation();
-        validateDistance(newSection, oldSection);
-        int reducedDistance = oldSection.getDistance() - newSection.getDistance();
-        int insertIdx = sections.indexOf(oldSection);
-        sections.remove(insertIdx);
-        Section followSection = new Section(newSection.getDownStation(), downStation, reducedDistance);
-        insertNewSections(newSection, followSection, insertIdx);
-    }
-
-    private void insertNewSections(Section firstSection, Section secondSection, int insertIdx) {
-        sections.add(insertIdx, firstSection);
-        sections.add(insertIdx + 1, secondSection);
-    }
-
-    private void validateDistance(Section newSection, Section oldSection) {
-        if (newSection.getDistance() >= oldSection.getDistance()) {
-            throw new IllegalArgumentException("삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.");
-        }
-    }
-
     public void delete(Station lastStation) {
         if (this.sections.size() <= 1) {
             throw new IllegalStateException("구간은 0개가 될 수 없습니다.");
@@ -128,14 +78,56 @@ public class Sections {
                 .orElseThrow(() -> new IllegalStateException("상행 종점역을 찾을 수 없습니다."));
     }
 
-    private Section firstSection() {
-        validateEmpty();
-        return this.sections.get(0);
-    }
-
     private Section lastSection() {
         validateEmpty();
         return this.sections.get(this.sections.size() - 1);
+    }
+
+    public boolean isInsertedMiddle(final Section newSection) {
+        boolean containsUpStation = this.upStations.contains(newSection.getUpStation());
+        boolean containsDownStation = this.downStations.contains(newSection.getDownStation());
+
+        return containsUpStation || containsDownStation;
+    }
+
+    public Section cut(final Section oldSection, final Section newSection) {
+        validateDistance(oldSection, newSection);
+        int reducedDistance = oldSection.getDistance() - newSection.getDistance();
+
+        if (oldSection.isSameUpStation(newSection)) {
+            return new Section(newSection.getDownStation(), oldSection.getDownStation(), reducedDistance);
+        }
+
+        return new Section(oldSection.getUpStation(), newSection.getUpStation(), reducedDistance);
+
+    }
+
+    public Section oldSection(Section newSection) {
+        return sections.stream()
+                .filter(section -> section.isSameUpStation(newSection) || section.isSameDownStation(newSection))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public void validateInsert(final Section newSection) {
+        Set<Station> allStations = new HashSet<>(upStations);
+        allStations.addAll(downStations);
+
+        // TODO: 라인 생성 시 구간 삽입하는 기능 만들면 삭제하기
+        if (allStations.isEmpty()) {
+            return;
+        }
+
+        boolean hasUpStation = allStations.contains(newSection.getUpStation());
+        boolean hasDownStation = allStations.contains(newSection.getDownStation());
+
+        validateExistOnlyOne(hasUpStation, hasDownStation);
+    }
+
+    private void validateDistance(final Section oldSection, final Section newSection) {
+        if (oldSection.getDistance() <= newSection.getDistance()) {
+            throw new IllegalArgumentException("삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.");
+        }
     }
 
     private void validateEmpty() {
@@ -144,19 +136,7 @@ public class Sections {
         }
     }
 
-    private boolean existUpStation(final Section newSection) {
-        Set<Station> allStations = new HashSet<>(upStations);
-        allStations.addAll(downStations);
-
-        boolean hasUpStation = allStations.contains(newSection.getUpStation());
-        boolean hasDownStation = allStations.contains(newSection.getDownStation());
-
-        validateExistOnlyOne(hasUpStation, hasDownStation);
-
-        return hasUpStation;
-    }
-
-    private void validateExistOnlyOne(boolean hasUpStation, boolean hasDownStation) {
+    private void validateExistOnlyOne(final boolean hasUpStation, final boolean hasDownStation) {
         if (hasUpStation == hasDownStation) {
             throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
         }

@@ -36,7 +36,7 @@ public class SectionDao {
                 );
     }
 
-    public Section insert(Section section, Long lineId) {
+    public void insert(Section section, Long lineId) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
         params.put("up_station_id", section.getUpStation().getId());
@@ -44,8 +44,7 @@ public class SectionDao {
         params.put("line_id", lineId);
         params.put("distance", section.getDistance());
 
-        Long sectionId = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(sectionId, section.getUpStation(), section.getDownStation(), section.getDistance());
+        insertAction.executeAndReturnKey(params);
     }
 
     public Sections findAllByLineId(Long lineId) {
@@ -56,5 +55,10 @@ public class SectionDao {
     public void deleteByStation(Station station, Long lineId) {
         jdbcTemplate.update("delete from SECTION where down_station_id = ? and line_id = ?",
                 station.getId(), lineId);
+    }
+
+    public void deleteById(Long id) {
+        String sql = "delete from SECTION where id = ?";
+        jdbcTemplate.update(sql, id);
     }
 }
