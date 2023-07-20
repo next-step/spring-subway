@@ -81,5 +81,8 @@ public class SectionDao {
     }
 
     public void update(Section section) {
+        String sql = "update SECTIONS set (up_station_id, down_station_id, distance) = (?, ?, ?) where id = ?";
+        jdbcTemplate.update(sql, section.getUpStation().getId(), section.getDownStation().getId(),
+                section.getDistance(), section.getId());
     }
 }
