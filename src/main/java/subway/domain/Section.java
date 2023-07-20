@@ -2,6 +2,7 @@ package subway.domain;
 
 import java.text.MessageFormat;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.util.Assert;
 
 public class Section {
@@ -33,36 +34,39 @@ public class Section {
         return new Builder();
     }
 
-    public void connectDownSection(Section requestSection) {
-        Assert.notNull(requestSection, () -> "requestSection null이 될 수 없습니다.");
-        Assert.isTrue(requestSection.upStation.equals(downStation), () -> MessageFormat.format(
-                "추가되는 requestSection.upStation은 현재의 section.downStation과 동일해야합니다. requestSection.upStation \"{0}\" current.downStation \"{1}\"",
-                requestSection.upStation, downStation));
-
-        this.downSection = requestSection;
-        requestSection.upSection = this;
-    }
-
-    void connectSection(Section requestSection) {
+    Section connectSection(Section requestSection) {
         Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다");
-        SectionConnector.findSectionConnector(this, requestSection)
-                .ifPresentOrElse(sectionConnector1 -> sectionConnector1.connectSection(this, requestSection),
-                        () -> connectSectionIfDownSectionPresent(requestSection));
+        Optional<SectionConnector> sectionConnectorOptional = SectionConnector
+                .findSectionConnector(this, requestSection);
+
+        if (sectionConnectorOptional.isEmpty()) {
+            return connectSectionIfDownSectionPresent(requestSection);
+        }
+
+        return sectionConnectorOptional.get().connectSection(this, requestSection);
     }
 
-    private void connectSectionIfDownSectionPresent(Section requestSection) {
+
+    private Section connectSectionIfDownSectionPresent(Section requestSection) {
         Assert.notNull(downSection,
                 () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection));
 
-        downSection.connectSection(requestSection);
+        return downSection.connectSection(requestSection);
     }
 
-    void connectUpSection(Section requestSection) {
+    public Section connectDownSection(Section requestSection) {
+        this.downSection = requestSection;
+        requestSection.upSection = this;
+        return downSection;
+    }
+
+    Section connectUpSection(Section requestSection) {
         this.upSection = requestSection;
         requestSection.downSection = this;
+        return requestSection;
     }
 
-    void connectMiddleUpSection(Section requestSection) {
+    Section connectMiddleUpSection(Section requestSection) {
         Section newDownSection = Section.builder()
                 .id(requestSection.getId())
                 .line(line)
@@ -79,9 +83,10 @@ public class Section {
         }
         this.downSection = newDownSection;
         this.distance = requestSection.getDistance();
+        return newDownSection;
     }
 
-    void connectMiddleDownSection(Section requestSection) {
+    Section connectMiddleDownSection(Section requestSection) {
         Section newUpSection = Section.builder()
                 .id(requestSection.getId())
                 .line(line)
@@ -98,6 +103,7 @@ public class Section {
         }
         this.upSection = newUpSection;
         this.distance = requestSection.getDistance();
+        return newUpSection;
     }
 
     public Section findDownSection() {

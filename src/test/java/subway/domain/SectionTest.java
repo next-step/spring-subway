@@ -115,7 +115,7 @@ class SectionTest {
             Section downSection = DomainFixture.Section.buildWithStations(differentMiddleStation, downStation);
 
             // when
-            Exception exception = catchException(() -> section.connectDownSection(downSection));
+            Exception exception = catchException(() -> section.connectSection(downSection));
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
@@ -133,7 +133,7 @@ class SectionTest {
             Section downSection = null;
 
             // when
-            Exception exception = catchException(() -> section.connectDownSection(downSection));
+            Exception exception = catchException(() -> section.connectSection(downSection));
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);

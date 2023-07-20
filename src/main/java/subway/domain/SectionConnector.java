@@ -8,27 +8,27 @@ enum SectionConnector {
     UP((baseSection, requestSection) -> baseSection.getUpSection() == null && baseSection.getUpStation()
             .equals(requestSection.getDownStation())) {
         @Override
-        public void connectSection(Section baseSection, Section requestSection) {
-            baseSection.connectUpSection(requestSection);
+        public Section connectSection(Section baseSection, Section requestSection) {
+            return baseSection.connectUpSection(requestSection);
         }
     },
     MIDDLE_UP((baseSection, requestSection) -> baseSection.getUpStation().equals(requestSection.getUpStation())) {
         @Override
-        public void connectSection(Section baseSection, Section requestSection) {
-            baseSection.connectMiddleUpSection(requestSection);
+        public Section connectSection(Section baseSection, Section requestSection) {
+            return baseSection.connectMiddleUpSection(requestSection);
         }
     },
     MIDDLE_DOWN((baseSection, requestSection) -> baseSection.getDownStation().equals(requestSection.getDownStation())) {
         @Override
-        public void connectSection(Section baseSection, Section requestSection) {
-            baseSection.connectMiddleDownSection(requestSection);
+        public Section connectSection(Section baseSection, Section requestSection) {
+            return baseSection.connectMiddleDownSection(requestSection);
         }
     },
     DOWN((baseSection, requestSection) -> baseSection.getDownSection() == null
             && baseSection.getDownStation().equals(requestSection.getUpStation())) {
         @Override
-        public void connectSection(Section baseSection, Section requestSection) {
-            baseSection.connectDownSection(requestSection);
+        public Section connectSection(Section baseSection, Section requestSection) {
+            return baseSection.connectDownSection(requestSection);
         }
     },
     ;
@@ -45,5 +45,5 @@ enum SectionConnector {
                 .findFirst();
     }
 
-    abstract void connectSection(Section baseSection, Section requestSection);
+    abstract Section connectSection(Section baseSection, Section requestSection);
 }

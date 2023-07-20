@@ -76,12 +76,12 @@ public class LineService {
 
         LineManager lineManager = new LineManager(line, sections);
 
-        Section downSection = getDownSection(line, Long.valueOf(sectionRequest.getUpStationId()),
+        Section newSection = getNewSection(line, Long.valueOf(sectionRequest.getUpStationId()),
                 Long.valueOf(sectionRequest.getDownStationId()),
                 sectionRequest.getDistance());
-        lineManager.connectDownSection(downSection);
+        lineManager.connectSection(newSection);
 
-        sectionDao.insert(downSection);
+        sectionDao.insert(newSection);
     }
 
     @Transactional
@@ -112,7 +112,7 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
-    private Section getDownSection(Line line, Long upStationId, Long downStationId, Integer distance) {
+    private Section getNewSection(Line line, Long upStationId, Long downStationId, Integer distance) {
         Station upStation = getStation(upStationId);
         Station downStation = getStation(downStationId);
 

@@ -48,7 +48,10 @@ public class LineManager {
     public void connectSection(Section requestSection) {
         validExistStations(requestSection.getUpStation(), requestSection.getDownStation());
         Section upSection = sections.get(0).findUpSection();
-        upSection.connectSection(requestSection);
+        
+        Section newSection = upSection.connectSection(requestSection);
+
+        sections.add(newSection);
     }
 
     private void validExistStations(Station upStation, Station downStation) {

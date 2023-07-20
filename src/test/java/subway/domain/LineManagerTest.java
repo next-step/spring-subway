@@ -34,7 +34,7 @@ class LineManagerTest {
             LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(upSection)));
 
             // when
-            lineManager.connectDownSection(downSection);
+            lineManager.connectSection(downSection);
 
             // then
             assertThat(upSection.getDownSection()).isEqualTo(downSection);
@@ -56,7 +56,7 @@ class LineManagerTest {
             LineManager lineManager = new LineManager(line, Arrays.asList(upSection));
 
             // when
-            Exception exception = catchException(() -> lineManager.connectDownSection(existSection));
+            Exception exception = catchException(() -> lineManager.connectSection(existSection));
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
@@ -82,7 +82,7 @@ class LineManagerTest {
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
             LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(upSection)));
-            lineManager.connectDownSection(downSection);
+            lineManager.connectSection(downSection);
 
             // when
             lineManager.disconnectDownSection(downStation);
@@ -106,7 +106,7 @@ class LineManagerTest {
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
             LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(upSection)));
-            lineManager.connectDownSection(downSection);
+            lineManager.connectSection(downSection);
 
             // when
             Exception exception = catchException(() -> lineManager.disconnectDownSection(upStation));
@@ -150,8 +150,8 @@ class LineManagerTest {
             Section middleUpSection = DomainFixture.Section.buildWithStations(middleUpStation, middleDownStation);
             Section middleDownSection = DomainFixture.Section.buildWithStations(middleDownStation, downStation);
 
-            upSection.connectDownSection(middleUpSection);
-            middleUpSection.connectDownSection(middleDownSection);
+            upSection.connectSection(middleUpSection);
+            middleUpSection.connectSection(middleDownSection);
 
             LineManager lineManager = new LineManager(line,
                     Arrays.asList(upSection, middleUpSection, middleDownSection));
