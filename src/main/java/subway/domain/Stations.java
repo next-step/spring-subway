@@ -4,7 +4,9 @@ import java.util.List;
 
 public class Stations {
 
+    private final List<Station> stations;
+
     public Stations(final List<StationPair> stationPairs) {
-        throw new UnsupportedOperationException();
+        this.stations = null;
     }
 }
