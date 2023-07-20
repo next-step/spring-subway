@@ -2,7 +2,12 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
+import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Sections;
+import subway.domain.Station;
 import subway.dto.request.LineRequest;
 import subway.dto.response.LineResponse;
 
@@ -12,13 +17,26 @@ import java.util.stream.Collectors;
 @Service
 public class LineService {
     private final LineDao lineDao;
+    private final SectionDao sectionDao;
+    private final StationDao stationDao;
 
-    public LineService(LineDao lineDao) {
+    public LineService(LineDao lineDao, SectionDao sectionDao, StationDao stationDao) {
         this.lineDao = lineDao;
+        this.sectionDao = sectionDao;
+        this.stationDao = stationDao;
     }
 
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        Station upStation = stationDao.findById(request.getUpStationId());
+        Station downStation = stationDao.findById(request.getDownStationId());
+        Section section = new Section(
+            upStation,
+            downStation,
+            persistLine,
+            request.getDistance()
+        );
+        sectionDao.insert(section);
         return LineResponse.of(persistLine);
     }
 
@@ -35,7 +53,9 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
+        Sections sections = sectionDao.findAllByLineId(id);
+        List<Station> sortedStations = sections.sortStations();
+        return LineResponse.of(persistLine, sortedStations);
     }
 
     public Line findLineById(Long id) {
