@@ -74,6 +74,24 @@ class SectionTest {
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
+
+        @Test
+        @DisplayName("upStation과 downStation이 일치하면 IllegalArgumentException을 던진다.")
+        void Throw_IllegalArgumentException_When_Input_Same_Station() {
+            // given
+            Station sameStation = new Station(1L, "sameStation");
+            Integer distance = 10;
+
+            // when
+            Exception exception = catchException(() -> Section.builder()
+                    .upStation(sameStation)
+                    .downStation(sameStation)
+                    .distance(distance)
+                    .build());
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Nested

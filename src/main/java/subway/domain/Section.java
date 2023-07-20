@@ -20,6 +20,8 @@ public class Section {
         Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.");
         Assert.isTrue(builder.distance > 0,
                 () -> MessageFormat.format("distance \"{0}\"는 0 이하가 될 수 없습니다.", builder.distance));
+        Assert.isTrue(!builder.upStation.equals(builder.downStation),
+                () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation));
 
         this.upStation = builder.upStation;
         this.downStation = builder.downStation;
