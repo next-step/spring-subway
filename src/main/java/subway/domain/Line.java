@@ -27,10 +27,6 @@ public class Line {
         this.sections = sections;
     }
 
-    public Line addSections(final Sections sections) {
-        return new Line(this.id, this.name, this.color, this.sections.union(sections));
-    }
-
     public Line addSection(final Section section) {
         return new Line(name, color, sections.addSection(section));
     }

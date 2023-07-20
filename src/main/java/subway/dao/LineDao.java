@@ -30,12 +30,13 @@ public class LineDao {
 
     private final ResultSetExtractor<Line> extractor = rs -> {
         List<Section> sections = new ArrayList<>();
-        Line line = null;
-        while (rs.next()) {
-            if (line == null) {
-                line = new Line(rs.getLong("line_id"), rs.getString("line_name"), rs.getString("line_color"));
-            }
+        boolean isNext = rs.next();
 
+        Long id = rs.getLong("line_id");
+        String name = rs.getString("line_name");
+        String color = rs.getString("line_color");
+
+        while (isNext) {
             sections.add(
                     new Section(
                             rs.getLong("section_id"),
@@ -44,8 +45,11 @@ public class LineDao {
                             rs.getInt("section_distance")
                     )
             );
+            isNext = rs.next();
         }
-        return line.addSections(new Sections(sections));
+
+        return new Line(id, name, color, new Sections(sections)
+        );
     };
 
     public LineDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
@@ -67,10 +71,11 @@ public class LineDao {
 
     public List<Line> findAll() {
         String sql = "select id, name, color from LINE";
+
         return jdbcTemplate.query(sql, lineRowMapper);
     }
 
-    public Line findById(final Long lineId) {
+    public Line findById(final Long id) {
         String sql = "select section.id as section_id, " +
                 "up_station.id as up_station_id, " +
                 "up_station.name as up_station_name, " +
@@ -86,7 +91,8 @@ public class LineDao {
                 "left join STATION down_station on section.down_station_id = down_station.id " +
                 "where section.line_id = ?";
 
-        Line line = jdbcTemplate.query(sql, extractor, lineId);
+        Line line = jdbcTemplate.query(sql, extractor, id);
+
         return line;
     }
 

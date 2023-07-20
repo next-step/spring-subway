@@ -1,7 +1,6 @@
 package subway.domain;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,14 +41,6 @@ public class Sections {
                 .distinct()
                 .collect(Collectors.toList())
                 .contains(station);
-    }
-
-    public Sections union(final Sections other) {
-        return new Sections(
-                Stream.of(this.sections, other.sections)
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toList())
-        );
     }
 
     public Sections remove(final Station station) {

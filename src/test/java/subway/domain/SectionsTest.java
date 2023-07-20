@@ -102,31 +102,6 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("두 Sections를 합치는 테스트")
-    void unionSectionsTest() {
-        // given
-        Section section1 = new Section(
-                new Station("서울대입구역"),
-                new Station("신대방역"),
-                10
-        );
-        Sections sections1 = new Sections(List.of(section1));
-
-        Section section2 = new Section(
-                new Station("잠실역"),
-                new Station("상도역"),
-                5
-        );
-        Sections sections2 = new Sections(List.of(section2));
-
-        // when
-        Sections unionSections = sections1.union(sections2);
-
-        // then
-        assertThat(unionSections.getSections()).containsAll(List.of(section1, section2));
-    }
-
-    @Test
     @DisplayName("한개 구간 삭제 테스트")
     void removeSectionTest() {
         // given
