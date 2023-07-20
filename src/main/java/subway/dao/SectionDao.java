@@ -3,7 +3,6 @@ package subway.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -61,18 +60,7 @@ public class SectionDao {
     }
 
     public List<Section> findAllByLineId(Long lineId) {
-        List<Section> sections = jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId);
-        connectSection(sections);
-        return sections;
-    }
-
-    private void connectSection(List<Section> sections) {
-        for (Section currentSection : sections) {
-            Optional<Section> downSection = sections.stream()
-                    .filter(section -> currentSection.getDownStation().equals(section.getUpStation())).findFirst();
-
-            downSection.ifPresent(section -> currentSection.connectDownSection(downSection.get()));
-        }
+        return jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId);
     }
 
     private Section buildSection(Long sectionId, Section section) {

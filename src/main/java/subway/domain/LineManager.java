@@ -2,6 +2,7 @@ package subway.domain;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.util.Assert;
 
 public class LineManager {
@@ -12,6 +13,16 @@ public class LineManager {
     public LineManager(Line line, List<Section> sections) {
         this.line = line;
         this.sections = sections;
+        connectSection(this.sections);
+    }
+
+    private void connectSection(List<Section> sections) {
+        for (Section currentSection : sections) {
+            Optional<Section> downSection = sections.stream()
+                    .filter(section -> currentSection.getDownStation().equals(section.getUpStation())).findFirst();
+
+            downSection.ifPresent(section -> currentSection.connectDownSection(downSection.get()));
+        }
     }
 
     public void connectDownSection(Section downSection) {

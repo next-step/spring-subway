@@ -169,7 +169,7 @@ class LineManagerTest {
     class ConnectSection_Method {
 
         @Test
-        @DisplayName("입력으로 들어온 Section의 하행 station과 line의 상행 종점 staiton이 일치하면, 연결을 성공한다")
+        @DisplayName("입력으로 들어온 Section의 하행 station과 line의 상행 종점 station이 일치하면, 연결을 성공한다")
         void Connect_Success_When_Input_Down_Station_Equals_Line_Up_Station() {
             // given
             Line line = new Line(1L, "line", "red");
