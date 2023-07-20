@@ -52,7 +52,7 @@ class SectionIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
+                .body(new SectionRequest("1", "3", 5))
                 .when().post("/lines/1/sections")
                 .then().log().all()
                 .extract();
@@ -60,6 +60,15 @@ class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+
+        ExtractableResponse<Response> responseForCheck = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/1")
+                .then().log().all()
+                .extract();
+
+        assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("존재하지 않는 노선으로 인한 구간 생성 실패")
