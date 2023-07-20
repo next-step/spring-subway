@@ -3,7 +3,10 @@ package subway.domain;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -110,5 +113,28 @@ public class Sections {
         if (contains(section.getUpStation()) && contains(section.getDownStation())) {
             throw new IllegalArgumentException("두 역 모두 기존 노선에 포함될 수 없습니다.");
         }
+    }
+
+    public List<Station> getSortedStations() {
+        Map<Station, Station> stationMap = new HashMap<>();
+
+        sections.forEach(section -> stationMap.put(section.getUpStation(), section.getDownStation()));
+
+        Set<Station> downStations = new HashSet<>(stationMap.values());
+
+        Station start = sections.stream()
+                .map(Section::getUpStation)
+                .filter(downStation -> !downStations.contains(downStation))
+                .findAny()
+                .orElse(null);
+
+        List<Station> sortedStations = new ArrayList<>();
+
+        while (start != null) {
+            sortedStations.add(start);
+            start = stationMap.get(start);
+        }
+
+        return sortedStations;
     }
 }

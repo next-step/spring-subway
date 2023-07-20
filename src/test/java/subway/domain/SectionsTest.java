@@ -352,4 +352,26 @@ class SectionsTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
     }
+
+    @Test
+    @DisplayName("노선 역을 정렬하여 반환하는 기능")
+    void getSortedStationsTest() {
+        // given
+        Section section1 = new Section(new Station("서울역"), new Station("잠실역"), 1);
+        Section section2 = new Section(new Station("신대방역"), new Station("상도역"), 1);
+        Section section3 = new Section(new Station("상도역"), new Station("서울역"), 1);
+
+        Sections sections = new Sections(List.of(section1, section2, section3));
+
+        // when
+        List<Station> sortedStations = sections.getSortedStations();
+
+        // then
+        assertThat(sortedStations).containsExactly(
+                new Station("신대방역"),
+                new Station("상도역"),
+                new Station("서울역"),
+                new Station("잠실역")
+        );
+    }
 }
