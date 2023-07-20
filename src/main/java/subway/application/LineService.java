@@ -59,9 +59,10 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         Line persistLine = getLineById(id);
-        List<Station> stations = stationDao.findAllByLineId(persistLine.getId());
+        List<Section> sections = sectionDao.findAllByLineId(persistLine.getId());
+        LineManager lineManager = new LineManager(persistLine, sections);
 
-        return LineResponse.from(persistLine, stationsToStationResponses(stations));
+        return LineResponse.from(persistLine, stationsToStationResponses(lineManager.getSortedStations()));
     }
 
     private List<StationResponse> stationsToStationResponses(List<Station> stations) {

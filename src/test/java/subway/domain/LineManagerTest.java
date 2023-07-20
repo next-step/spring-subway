@@ -215,4 +215,31 @@ class LineManagerTest {
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
     }
+
+    @Nested
+    @DisplayName("getSortedStations 메소드는")
+    class GetSortedStations_Method {
+
+        @Test
+        @DisplayName("정렬된 line의 상행 종점을 기준으로 정렬된 stations을 반환한다.")
+        void Return_Sorted_Stations_Orders_By_Line_UpStations() {
+            // given
+            Line line = new Line(1L, "line", "red");
+
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section section = DomainFixture.Section.buildWithStations(middleStation, downStation);
+            Section requestSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+
+            LineManager lineManager = new LineManager(line, new ArrayList<>(List.of(requestSection, section)));
+
+            // when
+            List<Station> result = lineManager.getSortedStations();
+
+            // then
+            assertThat(result).containsExactly(upStation, middleStation, downStation);
+        }
+    }
 }

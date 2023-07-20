@@ -1,6 +1,7 @@
 package subway.domain;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.util.Assert;
@@ -25,24 +26,16 @@ public class LineManager {
         }
     }
 
-    public void connectDownSection(Section downSection) {
-        validNotDuplicatedDownStation(downSection.getDownStation());
-
-        Section lineDownSection = sections.get(0).findDownSection();
-        lineDownSection.connectDownSection(downSection);
-
-        sections.add(downSection);
-    }
-
-    private void validNotDuplicatedDownStation(Station downStation) {
-        sections.stream()
-                .filter(section -> section.getUpStation().equals(downStation)
-                        || section.getDownStation().equals(downStation))
-                .findAny()
-                .ifPresent(section -> {
-                    throw new IllegalArgumentException(
-                            MessageFormat.format("line에 이미 존재하는 station 입니다. \"{0}\"", downStation));
-                });
+    public List<Station> getSortedStations() {
+        Section section = sections.get(0).findUpSection();
+        List<Station> sortedStations = new ArrayList<>();
+        while (section.getDownSection() != null) {
+            sortedStations.add(section.getUpStation());
+            section = section.getDownSection();
+        }
+        sortedStations.add(section.getUpStation());
+        sortedStations.add(section.getDownStation());
+        return sortedStations;
     }
 
     public Section connectSection(Section requestSection) {
