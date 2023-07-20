@@ -157,6 +157,75 @@ class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("Line의 상행 종점에 구간을 등록한다.")
+    void createSectionOnLineUpStation() {
+        // given
+        String lineId = createLineByLineRequest(lineRequest2).body().as(LineResponse.class).getId();
+
+        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest3, 100);
+
+        // when
+        ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    @DisplayName("Line의 중간에 삽입될 Section의 상행역을 기준으로 구간을 등록할 수 있다.")
+    void createSectionOnLineMiddleStationByUpStation() {
+        // given
+        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+
+        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 10);
+        registerSectionToLine(lineId, sectionRequest);
+
+        SectionRequest middleSectionRequest = new SectionRequest(stationRequest2, stationRequest3, 2);
+
+        // when
+        ExtractableResponse<Response> response = registerSectionToLine(lineId, middleSectionRequest);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    @DisplayName("Line의 중간에 삽입될 Section의 상행역을 기준으로 구간을 등록할 수 있다.")
+    void createSectionOnLineMiddleStationByDownStation() {
+        // given
+        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+
+        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 10);
+        registerSectionToLine(lineId, sectionRequest);
+
+        SectionRequest middleSectionRequest = new SectionRequest(stationRequest3, stationRequest4, 2);
+
+        // when
+        ExtractableResponse<Response> response = registerSectionToLine(lineId, middleSectionRequest);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    @DisplayName("Line의 중간에 Line의 역 사이 길이보다 삽입될 Section의 길이가 더 크거나 같으면 삽입할 수 없다.")
+    void cannotCreateSectionWhenSectionIsLongerThanSavedSectionDistance() {
+        // given
+        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+
+        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 5);
+        registerSectionToLine(lineId, sectionRequest);
+
+        SectionRequest middleSectionRequest = new SectionRequest(stationRequest3, stationRequest4, 5);
+
+        // when
+        ExtractableResponse<Response> response = registerSectionToLine(lineId, middleSectionRequest);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @Test
     @DisplayName("Line의 하행 Section을 제거한다")
     void deleteDownSectionOfLine() {
         // given

@@ -64,6 +64,10 @@ lineId, upStationId, downStationId;
 - [x] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 같으면 등록 가능 하다.
 - [x] 새로운 Section의 시작Station은 기존 Section의 끝 Station과 다르면 예외를 던진다.
 - [x] 새로운 Section의 끝Station은 기존 Section에 등록되어 있으면 예외를 던진다.
+- [ ] 새로운 Section의 상행, 하행이 Line의 하행 혹은 상행과 일치한다면 삽입될수있다
+  - [ ] 중간에 삽입하는 Section의 길이가,기존 역 사이의 길이보다 크거나 같으면, 삽입할 수 없음
+  - [ ] 상행과, 하행이 모두 Section에 있다면, 추가할 수 없음
+  - [ ] 상행과 하행이 둘 다 포함되지 않다면, 추가할 수 없음
 
 ### Section 제거 기능
 
