@@ -64,12 +64,12 @@ public class LineService {
     private Station getStationOrElseThrow(Long id) {
         return stationDao.findById(id)
             .orElseThrow(
-                () -> new RuntimeException("존재하지 않는 station id입니다. id: \"" + id + "\""));
+                () -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\""));
     }
 
     private Line getLineOrElseThrow(Long id) {
         return lineDao.findById(id)
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 line id입니다. id: \"" + id + "\""));
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 
     @Transactional
