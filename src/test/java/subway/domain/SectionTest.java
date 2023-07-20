@@ -357,6 +357,24 @@ class SectionTest {
             assertSectionConnectedStatus(upSection, List.of(upStation, middleStation1, middleStation2, downStation));
         }
 
+        @Test
+        @DisplayName("Null값이 들어오면, IllegalArgumentException을 던진다")
+        void Throw_IllegalArgumentException_When_Input_Null_Section() {
+            // given
+            Station upStation = new Station("upStation");
+            Station downStation = new Station("middleStation1");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, downStation);
+
+            Section nullSection = null;
+
+            // when
+            Exception exception = catchException(() -> upSection.connectSection(nullSection));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
+
         private void assertSectionConnectedStatus(Section section, List<Station> stations) {
             for (int stationIdx = 0; stationIdx < stations.size() - 1; stationIdx++) {
                 assertThat(section.getUpStation()).isEqualTo(stations.get(stationIdx));
