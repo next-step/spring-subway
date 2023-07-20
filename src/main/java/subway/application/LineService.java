@@ -1,6 +1,7 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.domain.*;
@@ -22,6 +23,7 @@ public class LineService {
         this.sectionDao = sectionDao;
     }
 
+    @Transactional
     public LineResponse saveLine(LineRequest request) {
         validateDuplicateName(request.getName());
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
