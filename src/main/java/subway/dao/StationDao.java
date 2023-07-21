@@ -3,6 +3,7 @@ package subway.dao;
 import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -38,7 +39,11 @@ public class StationDao {
 
     public Optional<Station> findById(Long id) {
         String sql = "SELECT * FROM STATION WHERE id = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            return Optional.empty();
+        }
     }
 
     public void update(Station newStation) {
@@ -56,5 +61,14 @@ public class StationDao {
                 + "JOIN SECTIONS AS SE ON SE.line_id = ? AND (SE.up_station_id = S.id OR SE.down_station_id = S.id)";
 
         return jdbcTemplate.query(sql, rowMapper, lineId);
+    }
+
+    public Optional<Station> findByName(String name) {
+        String sql = "SELECT * FROM STATION WHERE name = ?";
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, name));
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            return Optional.empty();
+        }
     }
 }

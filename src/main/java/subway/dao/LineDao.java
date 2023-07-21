@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.sql.DataSource;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -52,12 +53,13 @@ public class LineDao {
 
     public Optional<Line> findById(Long id) {
         String sql = "SELECT * FROM LINE AS L WHERE L.id = ?";
-        Line line = jdbcTemplate.queryForObject(sql, lineRowMapper, id);
-        if (line == null) {
+        try {
+            Line line = jdbcTemplate.queryForObject(sql, lineRowMapper, id);
+            return Optional.of(
+                    new Line(line.getId(), line.getName(), line.getColor(), sectionDao.findAllByLineId(line.getId())));
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
             return Optional.empty();
         }
-        return Optional.of(
-                new Line(line.getId(), line.getName(), line.getColor(), sectionDao.findAllByLineId(line.getId())));
     }
 
     public void update(Line newLine) {
@@ -67,5 +69,16 @@ public class LineDao {
 
     public void deleteById(Long id) {
         jdbcTemplate.update("DELETE FROM LINE WHERE id = ?", id);
+    }
+
+    public Optional<Line> findByName(String name) {
+        String sql = "SELECT * FROM LINE WHERE name = ?";
+        try {
+            Line line = jdbcTemplate.queryForObject(sql, lineRowMapper, name);
+            return Optional.of(
+                    new Line(line.getId(), line.getName(), line.getColor(), sectionDao.findAllByLineId(line.getId())));
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            return Optional.empty();
+        }
     }
 }

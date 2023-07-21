@@ -19,6 +19,7 @@ import subway.application.LineService;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
+import subway.util.ErrorTemplate;
 
 @RestController
 @RequestMapping("/lines")
@@ -75,7 +76,7 @@ public class LineController {
     }
 
     @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<ErrorTemplate> handleSQLException(SQLException sqlException) {
+        return new ResponseEntity<>(ErrorTemplate.of("SQL fail"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -28,6 +28,7 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
+        validLineRequest(request);
         Station upStation = getStation(Long.valueOf(request.getUpStationId()));
         Station downStation = getStation(Long.valueOf(request.getDownStationId()));
 
@@ -41,6 +42,15 @@ public class LineService {
 
         sectionDao.insert(line.getId(), section);
         return LineResponse.from(line, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
+    }
+
+    private void validLineRequest(LineRequest lineRequest) {
+        lineDao.findByName(lineRequest.getName()).ifPresent(
+                line -> {
+                    throw new IllegalArgumentException(
+                            MessageFormat.format("{0} 와 일치하는 line 의 이름이 이미 존재합니다.", lineRequest.getName()));
+                }
+        );
     }
 
     public List<LineResponse> findLineResponses() {
