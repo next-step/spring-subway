@@ -1,34 +1,35 @@
 package subway.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.LineWithStationsResponse;
+import subway.dto.request.CreateLineRequest;
+import subway.dto.response.LineResponse;
+import subway.dto.response.LineWithStationsResponse;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineIntegrationTest extends IntegrationTest {
 
-    private LineRequest lineRequest1;
-    private LineRequest lineRequest2;
+    private CreateLineRequest lineRequest1;
+    private CreateLineRequest lineRequest2;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-        lineRequest2 = new LineRequest("구신분당선", "bg-red-600", 1L, 2L, 10L);
+        lineRequest1 = new CreateLineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
+        lineRequest2 = new CreateLineRequest("구신분당선", "bg-red-600", 1L, 2L, 10L);
     }
 
     @DisplayName("지하철 노선을 생성하면서 첫 구간도 함께 생성한다.")

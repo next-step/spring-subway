@@ -1,9 +1,10 @@
-package subway.dto;
+package subway.dto.response;
+
+import subway.domain.Line;
+import subway.domain.Station;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import subway.domain.Line;
-import subway.domain.Station;
 
 public class LineWithStationsResponse {
 

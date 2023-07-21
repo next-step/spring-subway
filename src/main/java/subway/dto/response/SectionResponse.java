@@ -1,7 +1,8 @@
-package subway.dto;
+package subway.dto.response;
+
+import subway.domain.Section;
 
 import java.util.Objects;
-import subway.domain.Section;
 
 public class SectionResponse {
 
@@ -12,12 +13,15 @@ public class SectionResponse {
     private Long distance;
 
     public SectionResponse(Long id, Long lineId, Long upStationId, Long downStationId,
-            Long distance) {
+                           Long distance) {
         this.id = id;
         this.lineId = lineId;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
+    }
+
+    public SectionResponse() {
     }
 
     public static SectionResponse from(Section section) {
@@ -27,10 +31,6 @@ public class SectionResponse {
                 section.getUpStationId(),
                 section.getDownStationId(),
                 section.getDistance());
-    }
-
-
-    public SectionResponse() {
     }
 
     public Long getId() {

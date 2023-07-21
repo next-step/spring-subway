@@ -1,7 +1,8 @@
 package subway.domain;
 
-import java.util.Objects;
 import org.springframework.util.Assert;
+
+import java.util.Objects;
 
 public class Section {
 

@@ -1,4 +1,4 @@
-package subway.dto;
+package subway.dto.request;
 
 import java.util.Objects;
 
@@ -13,7 +13,6 @@ public class SectionRequest {
         this.downStationId = downStationId;
         this.distance = distance;
     }
-
 
     public SectionRequest() {
     }
