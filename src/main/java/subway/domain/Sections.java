@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -174,7 +175,7 @@ public class Sections {
     }
 
     public List<Section> getValues() {
-        return values;
+        return Collections.unmodifiableList(values);
     }
 
     @Override
