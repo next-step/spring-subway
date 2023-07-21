@@ -1,19 +1,16 @@
 package subway.application;
 
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.Distance;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Sections;
-import subway.domain.Station;
-import subway.dto.SectionRequest;
-import subway.dto.SectionResponse;
+import subway.domain.*;
+import subway.dto.request.SectionRequest;
+import subway.dto.response.SectionResponse;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SectionService {
@@ -30,22 +27,36 @@ public class SectionService {
         this.stationDao = stationDao;
     }
 
+    private static void validateIsNotLast(Long stationId, Section lastSection) {
+        if (!lastSection.getDownStationId().equals(stationId)) {
+            throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
+        }
+    }
+
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
-        Line line = lineDao.findById(lineId);
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
-        Distance distance = new Distance(request.getDistance());
-        Section section = new Section(
-                line,
-                upStation,
-                downStation,
-                distance);
+        Section section = createSection(
+                lineId,
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDistance());
 
         preprocessSaveSection(section);
 
         Section result = sectionDao.insert(section);
         return SectionResponse.from(result);
+    }
+
+    @Transactional
+    public void saveSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
+        createSection(lineId, upStationId, downStationId, distance);
+    }
+
+    private Section createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
+        Line line = lineDao.findById(lineId);
+        Station upStation = stationDao.findById(upStationId);
+        Station downStation = stationDao.findById(downStationId);
+        return new Section(line, upStation, downStation, new Distance(distance));
     }
 
     private void preprocessSaveSection(Section section) {
@@ -113,11 +124,5 @@ public class SectionService {
         Section lastSection = sections.findLastSection();
         validateIsNotLast(stationId, lastSection);
         sectionDao.deleteById(lastSection.getId());
-    }
-
-    private static void validateIsNotLast(Long stationId, Section lastSection) {
-        if (!lastSection.getDownStationId().equals(stationId)) {
-            throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
-        }
     }
 }

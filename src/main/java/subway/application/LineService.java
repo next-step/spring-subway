@@ -1,16 +1,17 @@
 package subway.application;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.domain.Line;
 import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.LineWithStationsResponse;
-import subway.dto.SectionRequest;
+import subway.dto.request.CreateLineRequest;
+import subway.dto.request.LineRequest;
+import subway.dto.response.LineResponse;
+import subway.dto.response.LineWithStationsResponse;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LineService {
@@ -22,18 +23,22 @@ public class LineService {
     private final SectionService sectionService;
 
     public LineService(LineDao lineDao, StationService stationService,
-            SectionService sectionService) {
+                       SectionService sectionService) {
         this.lineDao = lineDao;
         this.stationService = stationService;
         this.sectionService = sectionService;
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(CreateLineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        sectionService.saveSection(persistLine.getId(),
-                new SectionRequest(request.getUpStationId(), request.getDownStationId(),
-                        request.getDistance()));
+
+        sectionService.saveSection(
+                persistLine.getId(),
+                request.getUpStationId(),
+                request.getDownStationId(),
+                request.getDistance());
+
         return LineResponse.of(persistLine);
     }
 
@@ -67,3 +72,4 @@ public class LineService {
     }
 
 }
+
