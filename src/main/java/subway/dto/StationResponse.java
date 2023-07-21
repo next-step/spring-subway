@@ -4,8 +4,8 @@ import java.util.Objects;
 import subway.domain.Station;
 
 public class StationResponse {
-    private String id;
-    private String name;
+    private final String id;
+    private final String name;
 
     public StationResponse(String id, String name) {
         this.id = id;
