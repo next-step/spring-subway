@@ -56,13 +56,6 @@ public class StationDao {
         jdbcTemplate.update(sql, id);
     }
 
-    public List<Station> findAllByLineId(Long lineId) {
-        String sql = "SELECT DISTINCT S.* FROM STATION AS S "
-                + "JOIN SECTIONS AS SE ON SE.line_id = ? AND (SE.up_station_id = S.id OR SE.down_station_id = S.id)";
-
-        return jdbcTemplate.query(sql, rowMapper, lineId);
-    }
-
     public Optional<Station> findByName(String name) {
         String sql = "SELECT * FROM STATION WHERE name = ?";
         try {

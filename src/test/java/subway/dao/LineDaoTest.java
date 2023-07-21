@@ -4,11 +4,13 @@ package subway.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import subway.dao.mapper.LineRowMapper;
 import subway.dao.mapper.SectionRowMapper;
@@ -20,6 +22,7 @@ import subway.domain.Station;
 
 @DisplayName("LineDao 클래스")
 @JdbcTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ContextConfiguration(classes = {SectionDao.class, StationDao.class, LineDao.class, LineRowMapper.class,
         SectionRowMapper.class, StationRowMapper.class})
 class LineDaoTest {
@@ -61,6 +64,19 @@ class LineDaoTest {
             assertThat(result.getSections()).containsAll(List.of(upSection, downSection));
         }
 
+        @Test
+        @DisplayName("어떠한 값도 찾을 수 없다면, Optional.empty를 반환한다.")
+        void Return_Empty_If_Cannot_Find_Any_Value() {
+            // given
+            long nonPersistId = 1000L;
+
+            // when
+            Optional<Line> result = lineDao.findById(nonPersistId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
     }
 
     @Nested
@@ -94,6 +110,95 @@ class LineDaoTest {
             assertThat(result.get(1).getSections()).containsExactly(section2);
         }
 
+        @Test
+        @DisplayName("어떠한 값도 찾을 수 없으면 empty list 를 반환한다.")
+        void Return_Empty_List_If_Cannot_Find_Any_Lines() {
+            // when
+            List<Line> result = lineDao.findAll();
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+    }
+
+    @Nested
+    @DisplayName("update 메소드는")
+    class Update_Method {
+
+        @Test
+        @DisplayName("Line의 name과 color를 변경한다.")
+        void Update_Line_Color_Name() {
+            // given
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
+
+            Station upStation = stationDao.insert(new Station("upStationName"));
+            Station downStation = stationDao.insert(new Station("downStationName"));
+
+            Section section = DomainFixture.Section.buildWithStations(upStation, downStation);
+
+            section = sectionDao.insert(line.getId(), section);
+
+            Line newLine = new Line(line.getId(), "updatedLine", "updatedColor", List.of(section));
+
+            // when
+            lineDao.update(newLine);
+            Optional<Line> result = lineDao.findById(line.getId());
+
+            // then
+            assertThat(result).isNotEmpty().contains(newLine);
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteById 메소드는")
+    class DeleteById_Method {
+
+        @Test
+        @DisplayName("lineId와 일치하는 Line을 삭제한다.")
+        void Delete_Line_Matched_LineId() {
+            // given
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
+
+            // when
+            lineDao.deleteById(line.getId());
+            Optional<Line> result = lineDao.findById(line.getId());
+
+            // then
+            assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("findByName 메소드는")
+    class FindByName_Method {
+
+        @Test
+        @DisplayName("name과 일치하는 line을 반환한다.")
+        void Return_Line_Matched_Name() {
+            // given
+            String name = "line";
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
+
+            // when
+            Optional<Line> result = lineDao.findByName(name);
+
+            // then
+            assertThat(result).isNotEmpty().contains(line);
+        }
+
+        @Test
+        @DisplayName("name과 일치하는 line을 찾을 수 없다면, Optional.empty()를 반환한다.")
+        void Return_Empty_Optional_Cannot_Find_Matched_Name_Line() {
+            // given
+            String name = "line";
+
+            // when
+            Optional<Line> result = lineDao.findByName(name);
+
+            // then
+            assertThat(result).isEmpty();
+        }
     }
 
 }

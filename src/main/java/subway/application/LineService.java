@@ -58,7 +58,7 @@ public class LineService {
 
         return persistLines.stream()
                 .map(line -> LineResponse.from(line,
-                        stationsToStationResponses(stationDao.findAllByLineId(line.getId()))))
+                        stationsToStationResponses(line.getSortedStations())))
                 .collect(Collectors.toList());
     }
 

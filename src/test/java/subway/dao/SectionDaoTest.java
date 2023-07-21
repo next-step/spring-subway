@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import subway.dao.mapper.LineRowMapper;
 import subway.dao.mapper.SectionRowMapper;
@@ -19,6 +20,7 @@ import subway.domain.Station;
 
 @DisplayName("SectionDao 클래스")
 @JdbcTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ContextConfiguration(classes = {SectionDao.class, StationDao.class, LineDao.class, LineRowMapper.class,
         SectionRowMapper.class, StationRowMapper.class})
 class SectionDaoTest {
@@ -79,6 +81,19 @@ class SectionDaoTest {
 
             // then
             assertThat(result).containsAll(List.of(upSection, downSection));
+        }
+
+        @Test
+        @DisplayName("어떠한 값도 찾을 수 없다면, Empty List를 반환한다.")
+        void Return_Empty_List_Cannot_Find_Any_Sections() {
+            // given
+            Long lineId = 1L;
+
+            // when
+            List<Section> result = sectionDao.findAllByLineId(lineId);
+
+            // then
+            assertThat(result).isEmpty();
         }
     }
 
