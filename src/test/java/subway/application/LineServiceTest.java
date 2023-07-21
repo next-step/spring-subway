@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,6 +23,7 @@ import subway.domain.DomainFixture;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
 
 @ExtendWith(SpringExtension.class)
@@ -44,6 +46,22 @@ class LineServiceTest {
     @Nested
     @DisplayName("connectSectionByStationId 메소드는")
     class ConnectSectionByStationId_Method {
+
+        @Test
+        @DisplayName("lineId에 해당하는 line을 찾을 수 없으면, IllegalArgumentException 던진다")
+        void Throw_IllegalArgumentException_If_CannotFind_Line() {
+            // given
+            Long lineId = 1L;
+            SectionRequest sectionRequest = new SectionRequest("2", "3", 10);
+
+            when(lineDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+            // when
+            Exception exception = catchException(() -> lineService.connectSectionByStationId(lineId, sectionRequest));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
 
         @Test
         @DisplayName("line의 하행과 새로운 section의 상행이 일치하는 section이 들어오면, section이 추가된다")
@@ -87,7 +105,6 @@ class LineServiceTest {
         @DisplayName("stationId와 line의 하행이 일치하면, 연결을 해제하고 삭제한다")
         void Disconnect_And_Delete_When_StationId_Equals_Line_DownStationId() {
             // given
-
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
@@ -112,5 +129,73 @@ class LineServiceTest {
             assertThat(exception).isNull();
         }
 
+        @Test
+        @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
+        void Throw_IllegalArgumentException_Cannot_Find_StationId() {
+            // given
+            Long lineId = 1L;
+            Long stationId = 2L;
+
+            when(stationDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+            // when
+            Exception exception = catchException(() -> lineService.disconnectSectionByStationId(lineId, stationId));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("lineId에 해당하는 line을 찾을 수 없ㅇ면, IllegalArgumentException을 던진다.")
+        void Throw_IllegalArgumentException_Cannot_Find_Any_Line_By_LineId() {
+            // given
+            Long lineId = 1L;
+            Long stationId = 2L;
+
+            when(lineDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+            // when
+            Exception exception = catchException(
+                    () -> lineService.disconnectSectionByStationId(lineId, stationId));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("saveLine 메소드는")
+    class SaveLine_Method {
+
+        @Test
+        @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
+        void Throw_IllegalArgumentException_Cannot_Find_StationId() {
+            // given
+            LineRequest lineRequest = new LineRequest("line", "red", "1", "2", 10);
+
+            when(stationDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+            // when
+            Exception exception = catchException(() -> lineService.saveLine(lineRequest));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("이름이 일치하는 line이 존재한다면, IllegalArgumentException을 던진다.")
+        void Throw_IllegalArgumentException_If_Exist_Duplicated_Named_Line() {
+            // given
+            Line line = new Line(1L, "line", "red");
+            LineRequest lineRequest = new LineRequest(line.getName(), "red", "1", "2", 10);
+
+            when(lineDao.findByName(Mockito.anyString())).thenReturn(Optional.of(line));
+
+            // when
+            Exception exception = catchException(() -> lineService.saveLine(lineRequest));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 }

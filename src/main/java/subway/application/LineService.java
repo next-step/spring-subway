@@ -89,7 +89,7 @@ public class LineService {
         updateSectionIfNotNull(newSection.getDownSection());
     }
 
-    public void updateSectionIfNotNull(Section section) {
+    private void updateSectionIfNotNull(Section section) {
         if (section == null) {
             return;
         }
@@ -107,7 +107,7 @@ public class LineService {
 
     private Line getLineById(Long id) {
         return lineDao.findById(id)
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new IllegalArgumentException(
                         MessageFormat.format("lineId \"{0}\"에 해당하는 line이 존재하지 않습니다", id)
                 ));
     }
@@ -132,7 +132,7 @@ public class LineService {
     }
 
     private Station getStation(Long stationId) {
-        return stationDao.findById(stationId).orElseThrow(() -> new IllegalStateException(
+        return stationDao.findById(stationId).orElseThrow(() -> new IllegalArgumentException(
                         MessageFormat.format("stationId \"{0}\"에 해당하는 station이 존재하지 않습니다", stationId)
                 )
         );

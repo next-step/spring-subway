@@ -29,7 +29,7 @@ public class StationService {
     }
 
     public StationResponse findStationResponseById(Long id) {
-        Station station = stationDao.findById(id).orElseThrow(() -> new IllegalStateException(
+        Station station = stationDao.findById(id).orElseThrow(() -> new IllegalArgumentException(
                 MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id)));
 
         return StationResponse.of(station);
