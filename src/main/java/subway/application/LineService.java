@@ -26,7 +26,9 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest request) {
         validateDuplicateName(request.getName());
-        final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        final Line persistLine = lineDao.insert(
+            new Line(request.getName(), request.getColor())
+        );
 
         sectionDao.insert(new Section(
                 persistLine.getId(),
@@ -36,13 +38,6 @@ public class LineService {
         );
 
         return LineResponse.of(persistLine);
-    }
-
-    private void validateDuplicateName(final String name) {
-        lineDao.findByName(name)
-                .ifPresent(line -> {
-                    throw new IllegalLineException("노선 이름은 중복될 수 없습니다.");
-                });
     }
 
     public List<LineResponse> findLineResponses() {
@@ -73,6 +68,13 @@ public class LineService {
 
     public void deleteLineById(Long id) {
         lineDao.deleteById(id);
+    }
+
+    private void validateDuplicateName(final String name) {
+        lineDao.findByName(name)
+            .ifPresent(line -> {
+                throw new IllegalLineException("노선 이름은 중복될 수 없습니다.");
+            });
     }
 
 }

@@ -29,7 +29,7 @@ class SectionsTest {
 
         // when & then
         assertThatNoException()
-                .isThrownBy(() -> sections.updateBeforeInsert(sectionRequest.to(1L)));
+                .isThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)));
     }
 
     @DisplayName("두 역이 모두 노선에 존재하는 경우 검증에 실패한다.")
@@ -40,7 +40,7 @@ class SectionsTest {
         Sections sections = new Sections(createSections());
 
         // when & then
-        assertThatThrownBy(() -> sections.updateBeforeInsert(sectionRequest.to(1L)))
+        assertThatThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
@@ -53,7 +53,7 @@ class SectionsTest {
         Sections sections = new Sections(createSections());
 
         // when & then
-        assertThatThrownBy(() -> sections.updateBeforeInsert(sectionRequest.to(1L)))
+        assertThatThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
@@ -66,7 +66,7 @@ class SectionsTest {
         Sections sections = new Sections(createSections());
 
         // when & then
-        assertThatThrownBy(() -> sections.updateBeforeInsert(sectionRequest.to(1L)))
+        assertThatThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
     }
@@ -80,7 +80,7 @@ class SectionsTest {
 
         // when & then
         assertThatNoException()
-                .isThrownBy(() -> sections.updateBeforeInsert(sectionRequest.to(1L)));
+                .isThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)));
     }
 
 
