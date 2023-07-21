@@ -33,15 +33,15 @@ enum SectionConnector {
     },
     ;
 
-    private final BiPredicate<Section, Section> biPredicate;
+    private final BiPredicate<Section, Section> sectionConnectorMatcher;
 
-    SectionConnector(BiPredicate<Section, Section> biPredicate) {
-        this.biPredicate = biPredicate;
+    SectionConnector(BiPredicate<Section, Section> sectionConnectorMatcher) {
+        this.sectionConnectorMatcher = sectionConnectorMatcher;
     }
 
     static Optional<SectionConnector> findSectionConnector(Section baseSection, Section requestSection) {
         return Arrays.stream(SectionConnector.values())
-                .filter(sectionConnector -> sectionConnector.biPredicate.test(baseSection, requestSection))
+                .filter(sectionConnector -> sectionConnector.sectionConnectorMatcher.test(baseSection, requestSection))
                 .findFirst();
     }
 
