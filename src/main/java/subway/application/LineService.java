@@ -55,7 +55,7 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public LineResponse findLineResponseById(Long id) {
         LineSections lineSections = sectionDao.findAllByLine(getLineOrElseThrow(id));
         return LineResponse.of(lineSections);
