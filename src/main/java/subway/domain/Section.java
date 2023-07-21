@@ -10,7 +10,7 @@ public class Section {
     private static final int MIN_DISTANCE_SIZE = 0;
 
     private final Long id;
-    private Integer distance;
+    private int distance;
     private Station upStation;
     private Station downStation;
     private Section upSection;
@@ -150,7 +150,7 @@ public class Section {
         return downStation;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 
@@ -187,12 +187,12 @@ public class Section {
 
     public static class Builder {
 
-        protected Long id;
-        protected Station upStation;
-        protected Station downStation;
-        protected Section upSection;
-        protected Section downSection;
-        protected Integer distance;
+        private Long id;
+        private Station upStation;
+        private Station downStation;
+        private Section upSection;
+        private Section downSection;
+        private int distance;
 
         private Builder() {
         }
@@ -222,7 +222,7 @@ public class Section {
             return this;
         }
 
-        public Builder distance(Integer distance) {
+        public Builder distance(int distance) {
             this.distance = distance;
             return this;
         }
