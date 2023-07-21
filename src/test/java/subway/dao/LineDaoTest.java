@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.context.ContextConfiguration;
-import subway.DomainFixture;
 import subway.dao.mapper.LineRowMapper;
 import subway.dao.mapper.SectionRowMapper;
 import subway.dao.mapper.StationRowMapper;
+import subway.domain.DomainFixture;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
@@ -87,7 +87,7 @@ class LineDaoTest {
 
             // when
             List<Line> result = lineDao.findAll();
-            
+
             // then
             assertThat(result).containsAll(List.of(line1, line2));
             assertThat(result.get(0).getSections()).containsExactly(section1);

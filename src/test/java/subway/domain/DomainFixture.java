@@ -1,6 +1,4 @@
-package subway;
-
-import subway.domain.Station;
+package subway.domain;
 
 public class DomainFixture {
 
