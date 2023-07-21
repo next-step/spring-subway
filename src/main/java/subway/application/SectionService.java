@@ -21,16 +21,12 @@ public class SectionService {
     @Transactional
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
         final Sections sections = new Sections(sectionDao.findAll(lineId));
-        final Section searchTarget = sectionRequest.to(lineId);
+        final Section searchParams = sectionRequest.to(lineId);
 
-        sections.findConnectedSection(searchTarget)
+        sections.findConnectedSection(searchParams)
             .ifPresent(sectionDao::update);
 
-        return SectionResponse.of(insert(searchTarget));
-    }
-
-    private Section insert(final Section section) {
-        return sectionDao.insert(section);
+        return SectionResponse.of(sectionDao.insert(searchParams));
     }
 
     public void deleteSection(final long lineId, final long stationId) {
