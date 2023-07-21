@@ -8,7 +8,6 @@ import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
-import subway.domain.LineManager;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineRequest;
@@ -29,18 +28,19 @@ public class LineService {
     }
 
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = getStation(Long.valueOf(request.getUpStationId()));
         Station downStation = getStation(Long.valueOf(request.getDownStationId()));
+
         Section section = Section.builder()
-                .line(persistLine)
                 .distance(request.getDistance())
                 .upStation(upStation)
                 .downStation(downStation)
                 .build();
 
-        sectionDao.insert(section);
-        return LineResponse.from(persistLine, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
+        Line line = lineDao.insert(new Line(request.getName(), request.getColor(), List.of(section)));
+
+        sectionDao.insert(line.getId(), section);
+        return LineResponse.from(line, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
     }
 
     public List<LineResponse> findLineResponses() {
@@ -57,11 +57,9 @@ public class LineService {
     }
 
     public LineResponse findLineResponseById(Long id) {
-        Line persistLine = getLineById(id);
-        List<Section> sections = sectionDao.findAllByLineId(persistLine.getId());
-        LineManager lineManager = new LineManager(persistLine, sections);
+        Line line = getLineById(id);
 
-        return LineResponse.from(persistLine, stationsToStationResponses(lineManager.getSortedStations()));
+        return LineResponse.from(line, stationsToStationResponses(line.getSortedStations()));
     }
 
     private List<StationResponse> stationsToStationResponses(List<Station> stations) {
@@ -72,14 +70,11 @@ public class LineService {
 
     public void connectSectionByStationId(Long lineId, SectionRequest sectionRequest) {
         Line line = getLineById(lineId);
-        LineManager lineManager = new LineManager(line, sectionDao.findAllByLineId(lineId));
 
-        Section newSection = getNewSection(line, Long.valueOf(sectionRequest.getUpStationId()),
-                Long.valueOf(sectionRequest.getDownStationId()),
-                sectionRequest.getDistance());
-        newSection = lineManager.connectSection(newSection);
+        Section newSection = getNewSection(sectionRequest);
+        newSection = line.connectSection(newSection);
 
-        sectionDao.insert(newSection);
+        sectionDao.insert(line.getId(), newSection);
         updateSectionIfNotNull(newSection.getUpSection());
         updateSectionIfNotNull(newSection.getDownSection());
     }
@@ -92,13 +87,10 @@ public class LineService {
     }
 
     public void disconnectSectionByStationId(Long lineId, Long stationId) {
-        Line line = getLineById(lineId);
-        List<Section> sections = sectionDao.findAllByLineId(lineId);
         Station station = getStation(stationId);
 
-        LineManager lineManager = new LineManager(line, sections);
-
-        lineManager.disconnectDownSection(station);
+        Line line = getLineById(lineId);
+        line.disconnectDownSection(station);
 
         sectionDao.deleteByLineIdAndDownStationId(lineId, stationId);
     }
@@ -118,15 +110,14 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
-    private Section getNewSection(Line line, Long upStationId, Long downStationId, Integer distance) {
-        Station upStation = getStation(upStationId);
-        Station downStation = getStation(downStationId);
+    private Section getNewSection(SectionRequest sectionRequest) {
+        Station upStation = getStation(Long.valueOf(sectionRequest.getUpStationId()));
+        Station downStation = getStation(Long.valueOf(sectionRequest.getDownStationId()));
 
         return Section.builder()
-                .line(line)
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(distance)
+                .distance(sectionRequest.getDistance())
                 .build();
     }
 

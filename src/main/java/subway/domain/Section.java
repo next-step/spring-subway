@@ -10,7 +10,6 @@ public class Section {
     private static final int MIN_DISTANCE_SIZE = 0;
 
     private final Long id;
-    private final Line line;
     private Integer distance;
     private Station upStation;
     private Station downStation;
@@ -23,7 +22,6 @@ public class Section {
         this.upStation = builder.upStation;
         this.downStation = builder.downStation;
         this.distance = builder.distance;
-        this.line = builder.line;
         this.id = builder.id;
         this.upSection = builder.upSection;
         this.downSection = builder.downSection;
@@ -77,7 +75,6 @@ public class Section {
     Section connectMiddleUpSection(Section requestSection) {
         Section newDownSection = Section.builder()
                 .id(requestSection.getId())
-                .line(line)
                 .upSection(this)
                 .downSection(this.downSection)
                 .upStation(requestSection.downStation)
@@ -97,7 +94,6 @@ public class Section {
     Section connectMiddleDownSection(Section requestSection) {
         Section newUpSection = Section.builder()
                 .id(requestSection.getId())
-                .line(line)
                 .upSection(this.upSection)
                 .downSection(this)
                 .upStation(this.upStation)
@@ -138,10 +134,6 @@ public class Section {
         return id;
     }
 
-    public Line getLine() {
-        return line;
-    }
-
     public Section getDownSection() {
         return downSection;
     }
@@ -173,13 +165,13 @@ public class Section {
         Section section = (Section) o;
         return Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation)
                 && Objects.equals(downStation, section.downStation) && Objects.equals(distance,
-                section.distance) && Objects.equals(line, section.line) && Objects.equals(downSection,
+                section.distance) && Objects.equals(downSection,
                 section.downSection);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, upStation, downStation, distance, line, downSection);
+        return Objects.hash(id, upStation, downStation, distance, downSection);
     }
 
     @Override
@@ -189,7 +181,6 @@ public class Section {
                 ", upStation=" + upStation +
                 ", downStation=" + downStation +
                 ", distance=" + distance +
-                ", line=" + line +
                 ", downSection=" + downSection +
                 '}';
     }
@@ -197,7 +188,6 @@ public class Section {
     public static class Builder {
 
         protected Long id;
-        protected Line line;
         protected Station upStation;
         protected Station downStation;
         protected Section upSection;
@@ -209,11 +199,6 @@ public class Section {
 
         public Builder id(Long id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder line(Line line) {
-            this.line = line;
             return this;
         }
 

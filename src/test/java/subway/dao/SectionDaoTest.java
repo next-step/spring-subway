@@ -40,15 +40,14 @@ class SectionDaoTest {
         @DisplayName("Section을 받아 아이디를 생성하고 저장한다.")
         void Insert_Section_And_Return_Section() {
             // given
-            Line line = lineDao.insert(new Line("line", "red"));
-
             Station upStation = stationDao.insert(new Station("upStationName"));
             Station downStation = stationDao.insert(new Station("downStationName"));
 
-            Section section = DomainFixture.Section.buildWithStations(line, upStation, downStation);
+            Section section = DomainFixture.Section.buildWithStations(upStation, downStation);
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
 
             // when
-            Section result = sectionDao.insert(section);
+            Section result = sectionDao.insert(line.getId(), section);
 
             // then
             assertThat(result.getId()).isNotNull();
@@ -63,17 +62,17 @@ class SectionDaoTest {
         @DisplayName("lineId에 연결된 모든 Section들을 반환한다.")
         void Return_All_Section_Connected_With_Line_Id() {
             // given
-            Line line = lineDao.insert(new Line("line", "red"));
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
 
             Station upStation = stationDao.insert(new Station("upStationName"));
             Station middleStation = stationDao.insert(new Station("middleStationName"));
             Station downStation = stationDao.insert(new Station("downStationName"));
 
-            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection = sectionDao.insert(upSection);
-            downSection = sectionDao.insert(downSection);
+            upSection = sectionDao.insert(line.getId(), upSection);
+            downSection = sectionDao.insert(line.getId(), downSection);
 
             // when
             List<Section> result = sectionDao.findAllByLineId(line.getId());
@@ -91,17 +90,17 @@ class SectionDaoTest {
         @DisplayName("lineId와 stationId에 일치하는 Section을 삭제한다")
         void Delete_Section_Equals_LineId_And_StationId() {
             // given
-            Line line = lineDao.insert(new Line("line", "red"));
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
 
             Station upStation = stationDao.insert(new Station("upStationName"));
             Station middleStation = stationDao.insert(new Station("middleStationName"));
             Station downStation = stationDao.insert(new Station("downStationName"));
 
-            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection = sectionDao.insert(upSection);
-            downSection = sectionDao.insert(downSection);
+            upSection = sectionDao.insert(line.getId(), upSection);
+            downSection = sectionDao.insert(line.getId(), downSection);
 
             upSection.connectDownSection(downSection);
 
@@ -123,14 +122,14 @@ class SectionDaoTest {
         @DisplayName("SECTIONS.id에 해당하는 Section을 업데이트 한다")
         void Update_Section_Equals_Sections_Id() {
             // given
-            Line line = lineDao.insert(new Line("line", "red"));
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
 
             Station upStation = stationDao.insert(new Station("upStationName"));
             Station downStation = stationDao.insert(new Station("downStationName"));
             Station updateStation = stationDao.insert(new Station("updateStationName"));
 
-            Section section = DomainFixture.Section.buildWithStations(line, upStation, downStation);
-            section = sectionDao.insert(section);
+            Section section = DomainFixture.Section.buildWithStations(upStation, downStation);
+            section = sectionDao.insert(line.getId(), section);
 
             Section updatedSection = DomainFixture.Section.buildWithSectionAndStation(section, updateStation);
 

@@ -14,10 +14,9 @@ import subway.domain.Section;
 public class SectionDao {
 
     private static final String FIND_ALL_BY_LINE_ID_SQL =
-            "select S.*, L.*, US.id as US_ID, US.name as US_NAME, DS.id as DS_ID, DS.name as DS_NAME from SECTIONS as S "
-                    + "JOIN LINE as L ON S.line_id = ? AND S.line_id = L.id "
-                    + "JOIN STATION as US ON S.up_station_id = US.id "
-                    + "JOIN STATION as DS ON S.down_station_id = DS.id";
+            "select S.*, US.id as US_ID, US.name as US_NAME, DS.id as DS_ID, DS.name as DS_NAME from SECTIONS as S "
+                    + "JOIN STATION as US ON S.line_id = ? AND S.up_station_id = US.id "
+                    + "JOIN STATION as DS ON S.line_id = ? AND S.down_station_id = DS.id";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
@@ -31,10 +30,10 @@ public class SectionDao {
         this.sectionRowMapper = sectionRowMapper;
     }
 
-    public Section insert(Section section) {
+    public Section insert(Long lineId, Section section) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
-        params.put("line_id", section.getLine().getId());
+        params.put("line_id", lineId);
         params.put("up_section_id", extractUpSectionId(section));
         params.put("down_section_id", extractDownSectionId(section));
         params.put("up_station_id", section.getUpStation().getId());
@@ -59,14 +58,13 @@ public class SectionDao {
         return null;
     }
 
-    public List<Section> findAllByLineId(Long lineId) {
-        return jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId);
+    List<Section> findAllByLineId(Long lineId) {
+        return jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId, lineId);
     }
 
     private Section buildSection(Long sectionId, Section section) {
         return Section.builder()
                 .id(sectionId)
-                .line(section.getLine())
                 .upStation(section.getUpStation())
                 .downStation(section.getDownStation())
                 .upSection(section.getUpSection())

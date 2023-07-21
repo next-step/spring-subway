@@ -49,14 +49,14 @@ class LineServiceTest {
         @DisplayName("line의 하행과 새로운 section의 상행이 일치하는 section이 들어오면, section이 추가된다")
         void Connect_Section_When_Valid_Section_Input() {
             // given
-            Line line = new Line(1L, "line", "red");
-
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(upSection)));
 
             SectionRequest sectionRequest = new SectionRequest(String.valueOf(middleStation.getId()),
                     String.valueOf(downStation.getId()),
@@ -64,8 +64,7 @@ class LineServiceTest {
 
             when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
 
-            when(sectionDao.findAllByLineId(line.getId())).thenReturn(new ArrayList<>(List.of(upSection)));
-            when(sectionDao.insert(downSection)).thenReturn(downSection);
+            when(sectionDao.insert(line.getId(), downSection)).thenReturn(downSection);
 
             when(stationDao.findById(middleStation.getId())).thenReturn(Optional.of(middleStation));
             when(stationDao.findById(downStation.getId())).thenReturn(Optional.of(downStation));
@@ -88,19 +87,18 @@ class LineServiceTest {
         @DisplayName("stationId와 line의 하행이 일치하면, 연결을 해제하고 삭제한다")
         void Disconnect_And_Delete_When_StationId_Equals_Line_DownStationId() {
             // given
-            Line line = new Line(1L, "line", "red");
 
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(3L, "downStation");
 
-            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
             upSection.connectDownSection(downSection);
 
-            when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
+            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(upSection, downSection)));
 
-            when(sectionDao.findAllByLineId(line.getId())).thenReturn(new ArrayList<>(List.of(upSection, downSection)));
+            when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
 
             when(stationDao.findById(upStation.getId())).thenReturn(Optional.of(upStation));
             when(stationDao.findById(middleStation.getId())).thenReturn(Optional.of(middleStation));

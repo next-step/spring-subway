@@ -1,5 +1,6 @@
 package subway.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,14 +16,17 @@ import subway.domain.Line;
 public class LineDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-    private final RowMapper<Line> rowMapper;
+    private final RowMapper<Line> lineRowMapper;
+    private final SectionDao sectionDao;
 
-    public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource, RowMapper<Line> rowMapper) {
+    public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource, RowMapper<Line> lineRowMapper,
+            SectionDao sectionDao) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("line")
                 .usingGeneratedKeyColumns("id");
-        this.rowMapper = rowMapper;
+        this.lineRowMapper = lineRowMapper;
+        this.sectionDao = sectionDao;
     }
 
     public Line insert(Line line) {
@@ -36,13 +40,24 @@ public class LineDao {
     }
 
     public List<Line> findAll() {
-        String sql = "select id, name, color from LINE";
-        return jdbcTemplate.query(sql, rowMapper);
+        String sql = "SELECT * FROM LINE";
+        List<Line> linesWithOutSections = jdbcTemplate.query(sql, lineRowMapper);
+        List<Line> linesWithSections = new ArrayList<>();
+        for (Line line : linesWithOutSections) {
+            linesWithSections.add(
+                    new Line(line.getId(), line.getName(), line.getColor(), sectionDao.findAllByLineId(line.getId())));
+        }
+        return linesWithSections;
     }
 
     public Optional<Line> findById(Long id) {
-        String sql = "select id, name, color from LINE WHERE id = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        String sql = "SELECT * FROM LINE AS L WHERE L.id = ?";
+        Line line = jdbcTemplate.queryForObject(sql, lineRowMapper, id);
+        if (line == null) {
+            return Optional.empty();
+        }
+        return Optional.of(
+                new Line(line.getId(), line.getName(), line.getColor(), sectionDao.findAllByLineId(line.getId())));
     }
 
     public void update(Line newLine) {
