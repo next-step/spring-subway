@@ -5,6 +5,10 @@ import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineStationsResponse;
+import subway.dto.SectionRequest;
+import subway.exception.IncorrectRequestException;
+import subway.exception.InternalStateException;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -32,7 +36,7 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+    public ResponseEntity<LineStationsResponse> findLineById(@PathVariable Long id) {
         return ResponseEntity.ok(lineService.findLineResponseById(id));
     }
 
@@ -48,8 +52,30 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
+        lineService.saveSection(sectionRequest, id);
+        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam String stationId) {
+        lineService.deleteSectionByStationId(id, stationId);
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<Void> handleSQLException() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(IncorrectRequestException.class)
+    public ResponseEntity<Void> handleIncorrectRequestException() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(InternalStateException.class)
+    public ResponseEntity<Void> handleInternalStateException() {
         return ResponseEntity.badRequest().build();
     }
 }

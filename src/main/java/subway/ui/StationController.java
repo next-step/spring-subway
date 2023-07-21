@@ -2,9 +2,9 @@ package subway.ui;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import subway.application.StationService;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-import subway.application.StationService;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/stations")
 public class StationController {
+
     private final StationService stationService;
 
     public StationController(StationService stationService) {
