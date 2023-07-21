@@ -20,7 +20,7 @@ public class StationDao {
     public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource, RowMapper<Station> rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("station")
+                .withTableName("STATION")
                 .usingGeneratedKeyColumns("id");
         this.rowMapper = rowMapper;
     }
@@ -32,28 +32,28 @@ public class StationDao {
     }
 
     public List<Station> findAll() {
-        String sql = "select * from STATION";
+        String sql = "SELECT * FROM STATION";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     public Optional<Station> findById(Long id) {
-        String sql = "select * from STATION where id = ?";
+        String sql = "SELECT * FROM STATION WHERE id = ?";
         return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
     }
 
     public void update(Station newStation) {
-        String sql = "update STATION set name = ? where id = ?";
+        String sql = "UPDATE STATION SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
     }
 
     public void deleteById(Long id) {
-        String sql = "delete from STATION where id = ?";
+        String sql = "DELETE FROM STATION WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
 
     public List<Station> findAllByLineId(Long lineId) {
-        String sql = "SELECT DISTINCT S.* FROM STATION as S "
-                + "JOIN SECTIONS as SE ON SE.line_id = ? AND (SE.up_station_id = S.id OR SE.down_station_id = S.id)";
+        String sql = "SELECT DISTINCT S.* FROM STATION AS S "
+                + "JOIN SECTIONS AS SE ON SE.line_id = ? AND (SE.up_station_id = S.id OR SE.down_station_id = S.id)";
 
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }

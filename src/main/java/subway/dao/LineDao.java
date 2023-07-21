@@ -23,7 +23,7 @@ public class LineDao {
             SectionDao sectionDao) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("line")
+                .withTableName("LINE")
                 .usingGeneratedKeyColumns("id");
         this.lineRowMapper = lineRowMapper;
         this.sectionDao = sectionDao;
@@ -61,11 +61,11 @@ public class LineDao {
     }
 
     public void update(Line newLine) {
-        String sql = "update LINE set name = ?, color = ? where id = ?";
+        String sql = "UPDATE LINE SET name = ?, color = ? WHERE id = ?";
         jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
     public void deleteById(Long id) {
-        jdbcTemplate.update("delete from Line where id = ?", id);
+        jdbcTemplate.update("DELETE FROM LINE WHERE id = ?", id);
     }
 }

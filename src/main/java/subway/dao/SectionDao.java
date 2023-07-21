@@ -14,9 +14,9 @@ import subway.domain.Section;
 public class SectionDao {
 
     private static final String FIND_ALL_BY_LINE_ID_SQL =
-            "select S.*, US.id as US_ID, US.name as US_NAME, DS.id as DS_ID, DS.name as DS_NAME from SECTIONS as S "
-                    + "JOIN STATION as US ON S.line_id = ? AND S.up_station_id = US.id "
-                    + "JOIN STATION as DS ON S.line_id = ? AND S.down_station_id = DS.id";
+            "SELECT S.*, US.id AS US_ID, US.name AS US_NAME, DS.id AS DS_ID, DS.name AS DS_NAME FROM SECTIONS AS S "
+                    + "JOIN STATION AS US ON S.line_id = ? AND S.up_station_id = US.id "
+                    + "JOIN STATION AS DS ON S.line_id = ? AND S.down_station_id = DS.id";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
@@ -25,7 +25,7 @@ public class SectionDao {
     SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource, RowMapper<Section> sectionRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("sections")
+                .withTableName("SECTIONS")
                 .usingGeneratedKeyColumns("id");
         this.sectionRowMapper = sectionRowMapper;
     }
@@ -74,12 +74,12 @@ public class SectionDao {
     }
 
     public void deleteByLineIdAndDownStationId(Long lineId, Long stationId) {
-        String deleteSql = "delete from SECTIONS as S where S.line_id = ? AND S.down_station_id = ?";
+        String deleteSql = "DELETE FROM SECTIONS AS S WHERE S.line_id = ? AND S.down_station_id = ?";
         jdbcTemplate.update(deleteSql, lineId, stationId);
     }
 
     public void update(Section section) {
-        String sql = "update SECTIONS set (up_station_id, down_station_id, distance) = (?, ?, ?) where id = ?";
+        String sql = "UPDATE SECTIONS SET (up_station_id, down_station_id, distance) = (?, ?, ?) WHERE id = ?";
         jdbcTemplate.update(sql, section.getUpStation().getId(), section.getDownStation().getId(),
                 section.getDistance(), section.getId());
     }
