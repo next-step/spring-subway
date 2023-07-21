@@ -5,14 +5,14 @@ import java.util.Objects;
 public class LineRequest {
     private String name;
     private String color;
-    private String upStationId;
-    private String downStationId;
+    private Long upStationId;
+    private Long downStationId;
     private Integer distance;
 
     public LineRequest() {
     }
 
-    public LineRequest(String name, String color, String upStationId, String downStationId, Integer distance) {
+    public LineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -28,11 +28,11 @@ public class LineRequest {
         return color;
     }
 
-    public String getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public String getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 

@@ -27,7 +27,7 @@ class StationIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> getStationByStationId(String stationId) {
+    static ExtractableResponse<Response> getStationByStationId(Long stationId) {
         return given().log().all()
                 .when()
                 .get("/stations/{stationId}", stationId)

@@ -29,8 +29,8 @@ public class LineService {
 
     public LineResponse saveLine(LineRequest request) {
         validLineRequest(request);
-        Station upStation = getStation(Long.valueOf(request.getUpStationId()));
-        Station downStation = getStation(Long.valueOf(request.getDownStationId()));
+        Station upStation = getStation(request.getUpStationId());
+        Station downStation = getStation(request.getDownStationId());
 
         Section section = Section.builder()
                 .distance(request.getDistance())
@@ -121,8 +121,8 @@ public class LineService {
     }
 
     private Section getNewSection(SectionRequest sectionRequest) {
-        Station upStation = getStation(Long.valueOf(sectionRequest.getUpStationId()));
-        Station downStation = getStation(Long.valueOf(sectionRequest.getDownStationId()));
+        Station upStation = getStation(sectionRequest.getUpStationId());
+        Station downStation = getStation(sectionRequest.getDownStationId());
 
         return Section.builder()
                 .upStation(upStation)

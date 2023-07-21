@@ -22,7 +22,7 @@ class SectionTest {
             // given
             Station upStation = new Station(1L, "upStation");
             Station downStation = new Station(2L, "downStation");
-            Integer distance = 10;
+            int distance = 10;
 
             // when
             Throwable throwable = Assertions.catchThrowable(() -> Section.builder()
@@ -41,7 +41,7 @@ class SectionTest {
             // given
             Station upStation = new Station(1L, "upStation");
             Station nullStation = null;
-            Integer distance = 10;
+            int distance = 10;
 
             // when
             Exception exception = catchException(
@@ -61,7 +61,7 @@ class SectionTest {
             // given
             Station upStation = new Station(1L, "upStation");
             Station downStation = new Station(2L, "downStation");
-            Integer zeroDistance = 0;
+            int zeroDistance = 0;
 
             // when
             Exception exception = catchException(() -> Section.builder()
@@ -79,7 +79,7 @@ class SectionTest {
         void Throw_IllegalArgumentException_When_Input_Same_Station() {
             // given
             Station sameStation = new Station(1L, "sameStation");
-            Integer distance = 10;
+            int distance = 10;
 
             // when
             Exception exception = catchException(() -> Section.builder()

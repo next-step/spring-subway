@@ -52,7 +52,7 @@ class LineServiceTest {
         void Throw_IllegalArgumentException_If_CannotFind_Line() {
             // given
             Long lineId = 1L;
-            SectionRequest sectionRequest = new SectionRequest("2", "3", 10);
+            SectionRequest sectionRequest = new SectionRequest(2L, 3L, 10);
 
             when(lineDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
@@ -76,8 +76,7 @@ class LineServiceTest {
 
             Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(upSection)));
 
-            SectionRequest sectionRequest = new SectionRequest(String.valueOf(middleStation.getId()),
-                    String.valueOf(downStation.getId()),
+            SectionRequest sectionRequest = new SectionRequest(middleStation.getId(), downStation.getId(),
                     downSection.getDistance());
 
             when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
@@ -171,7 +170,7 @@ class LineServiceTest {
         @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
         void Throw_IllegalArgumentException_Cannot_Find_StationId() {
             // given
-            LineRequest lineRequest = new LineRequest("line", "red", "1", "2", 10);
+            LineRequest lineRequest = new LineRequest("line", "red", 1L, 2L, 10);
 
             when(stationDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
@@ -187,7 +186,7 @@ class LineServiceTest {
         void Throw_IllegalArgumentException_If_Exist_Duplicated_Named_Line() {
             // given
             Line line = new Line(1L, "line", "red");
-            LineRequest lineRequest = new LineRequest(line.getName(), "red", "1", "2", 10);
+            LineRequest lineRequest = new LineRequest(line.getName(), "red", 1L, 2L, 10);
 
             when(lineDao.findByName(Mockito.anyString())).thenReturn(Optional.of(line));
 

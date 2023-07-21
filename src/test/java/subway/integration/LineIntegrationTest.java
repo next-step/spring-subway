@@ -28,10 +28,10 @@ import subway.dto.StationResponse;
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
 
-    private String stationRequest1;
-    private String stationRequest2;
-    private String stationRequest3;
-    private String stationRequest4;
+    private Long stationRequest1;
+    private Long stationRequest2;
+    private Long stationRequest3;
+    private Long stationRequest4;
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
 
@@ -84,10 +84,10 @@ class LineIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = findAllLines();
 
-        List<String> expectedLineIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> it.header("Location").split("/")[2])
+        List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
+                .map(it -> Long.valueOf(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
-        List<String> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
+        List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
                 .map(LineResponse::getId)
                 .collect(Collectors.toList());
 
@@ -102,7 +102,7 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         ExtractableResponse<Response> createResponse = createLineByLineRequest(lineRequest1);
 
-        String lineId = createResponse.header("Location").split("/")[2];
+        Long lineId = Long.valueOf(createResponse.header("Location").split("/")[2]);
 
         // when
         ExtractableResponse<Response> response = getLineByLineId(lineId);
@@ -118,7 +118,7 @@ class LineIntegrationTest extends IntegrationTest {
     void updateLine() {
         // given
         ExtractableResponse<Response> createResponse = createLineByLineRequest(lineRequest1);
-        String lineId = createResponse.header("Location").split("/")[2];
+        Long lineId = Long.valueOf(createResponse.header("Location").split("/")[2]);
 
         // when
         ExtractableResponse<Response> response = updateLineByLineId(lineId, lineRequest2);
@@ -132,7 +132,7 @@ class LineIntegrationTest extends IntegrationTest {
     void deleteLine() {
         // given
         ExtractableResponse<Response> createResponse = createLineByLineRequest(lineRequest1);
-        String lineId = createResponse.header("Location").split("/")[2];
+        Long lineId = Long.valueOf(createResponse.header("Location").split("/")[2]);
 
         // when
         ExtractableResponse<Response> response = deleteLineByLineId(lineId);
@@ -145,7 +145,7 @@ class LineIntegrationTest extends IntegrationTest {
     @DisplayName("Line에 구간을 등록한다.")
     void createSection() {
         // given
-        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
         SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest3, 5);
 
@@ -160,7 +160,7 @@ class LineIntegrationTest extends IntegrationTest {
     @DisplayName("Line의 상행 종점에 구간을 등록한다.")
     void createSectionOnLineUpStation() {
         // given
-        String lineId = createLineByLineRequest(lineRequest2).body().as(LineResponse.class).getId();
+        Long lineId = createLineByLineRequest(lineRequest2).body().as(LineResponse.class).getId();
 
         SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest3, 100);
 
@@ -175,7 +175,7 @@ class LineIntegrationTest extends IntegrationTest {
     @DisplayName("Line의 중간에 삽입될 Section의 상행역을 기준으로 구간을 등록할 수 있다.")
     void createSectionOnLineMiddleStationByUpStation() {
         // given
-        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
         SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 10);
         registerSectionToLine(lineId, sectionRequest);
@@ -193,7 +193,7 @@ class LineIntegrationTest extends IntegrationTest {
     @DisplayName("Line의 중간에 삽입될 Section의 상행역을 기준으로 구간을 등록할 수 있다.")
     void createSectionOnLineMiddleStationByDownStation() {
         // given
-        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
         SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 10);
         registerSectionToLine(lineId, sectionRequest);
@@ -211,7 +211,7 @@ class LineIntegrationTest extends IntegrationTest {
     @DisplayName("Line의 중간에 Line의 역 사이 길이보다 삽입될 Section의 길이가 더 크거나 같으면 삽입할 수 없다.")
     void cannotCreateSectionWhenSectionIsLongerThanSavedSectionDistance() {
         // given
-        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
         SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 5);
         registerSectionToLine(lineId, sectionRequest);
@@ -229,7 +229,7 @@ class LineIntegrationTest extends IntegrationTest {
     @DisplayName("Line에 Station 두개가 이미 존재할 경우, 구간을 삽입할 수 없다.")
     void cannotCreateSectionIfStationAlreadyExists() {
         // given
-        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
         SectionRequest sectionRequest1 = new SectionRequest(stationRequest2, stationRequest3, 100);
         registerSectionToLine(lineId, sectionRequest1);
@@ -250,7 +250,7 @@ class LineIntegrationTest extends IntegrationTest {
     @DisplayName("Line의 하행 Section을 제거한다")
     void deleteDownSectionOfLine() {
         // given
-        String lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
         SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest3, 5);
 

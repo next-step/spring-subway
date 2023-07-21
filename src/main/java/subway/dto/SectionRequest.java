@@ -4,25 +4,25 @@ import java.util.Objects;
 
 public class SectionRequest {
 
-    private final String upStationId;
-    private final String downStationId;
-    private final Integer distance;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final int distance;
 
-    public SectionRequest(String upStationId, String downStationId, Integer distance) {
+    public SectionRequest(Long upStationId, Long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public String getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public String getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 
