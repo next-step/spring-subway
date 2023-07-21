@@ -48,8 +48,8 @@ class SectionTest {
         Section section = new Section(lineA, stationA, stationB, 1);
         Section otherSection = new Section(lineA, stationB, stationC, 1);
 
-        assertThat(section.cannotPrecede(otherSection)).isFalse();
-        assertThat(otherSection.cannotPrecede(section)).isTrue();
+        assertThat(section.canPrecede(otherSection)).isTrue();
+        assertThat(otherSection.canPrecede(section)).isFalse();
     }
 
     @Test

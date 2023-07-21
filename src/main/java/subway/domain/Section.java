@@ -49,10 +49,6 @@ public class Section {
         }
     }
 
-    public boolean cannotPrecede(Section other) {
-        return !downStation.equals(other.upStation);
-    }
-
     public boolean canPrecede(Section other) {
         return downStation.equals(other.upStation);
     }
