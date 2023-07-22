@@ -2,6 +2,9 @@ package subway.domain;
 
 import java.util.Objects;
 
+/**
+ * 노선
+ */
 public class Line {
     private Long id;
     private String name;
@@ -44,5 +47,14 @@ public class Line {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, color);
+    }
+
+    @Override
+    public String toString() {
+        return "Line{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", color='" + color + '\'' +
+            '}';
     }
 }

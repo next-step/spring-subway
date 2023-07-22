@@ -1,28 +1,33 @@
 package subway.ui;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.application.SectionsService;
+import subway.dto.request.LineCreationRequest;
+import subway.dto.request.LineUpdateRequest;
+import subway.dto.response.LineResponse;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
+import subway.dto.request.SectionAdditionRequest;
 
 @RestController
 @RequestMapping("/lines")
 public class LineController {
 
     private final LineService lineService;
+    private final SectionsService sectionsService;
 
-    public LineController(LineService lineService) {
+    public LineController(LineService lineService, SectionsService sectionsService) {
         this.lineService = lineService;
+        this.sectionsService = sectionsService;
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreationRequest lineCreationRequest) {
+        LineResponse line = lineService.saveLine(lineCreationRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -37,7 +42,7 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
@@ -48,8 +53,15 @@ public class LineController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
+    @PostMapping("/{id}/sections")
+    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionAdditionRequest sectionRequest) {
+        sectionsService.addSection(id, sectionRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{id}/sections")
+    public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
+        sectionsService.removeLast(id, stationId);
+        return ResponseEntity.noContent().build();
     }
 }
