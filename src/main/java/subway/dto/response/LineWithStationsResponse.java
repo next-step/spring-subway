@@ -22,6 +22,9 @@ public class LineWithStationsResponse {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public LineWithStationsResponse() {
+    }
+
     public static LineWithStationsResponse of(Line line, List<Station> stations) {
         return new LineWithStationsResponse(line.getId(), line.getName(), line.getColor(),
                 stations);

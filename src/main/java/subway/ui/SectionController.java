@@ -36,22 +36,14 @@ public class SectionController {
     @DeleteMapping("/lines/{lineId}/sections")
     public ResponseEntity<Void> deleteSection(
             @PathVariable Long lineId,
-            @RequestParam Long stationId
-    ) {
+            @RequestParam Long stationId) {
         sectionService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException(SQLException sqlException) {
-        sqlException.printStackTrace();
+    @ExceptionHandler({SQLException.class, IllegalArgumentException.class, IllegalStateException.class})
+    public ResponseEntity<Void> handleSQLException() {
         return ResponseEntity.badRequest().build();
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Void> handleIllegalArgumentException(
-            IllegalArgumentException sqlException) {
-        sqlException.printStackTrace();
-        return ResponseEntity.badRequest().build();
-    }
 }

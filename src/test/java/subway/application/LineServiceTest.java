@@ -1,5 +1,6 @@
 package subway.application;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.request.CreateLineRequest;
 import subway.dto.response.LineResponse;
+import subway.fixture.StationFixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,18 +28,26 @@ class LineServiceTest {
     private LineDao lineDao;
 
     @Autowired
-    private SectionDao sectionDao;
+    private StationDao stationDao;
 
     @Autowired
-    private StationDao stationDao;
+    private SectionDao sectionDao;
+
+    private StationFixture stationFixture;
+
+    @BeforeEach
+    void setUp() {
+        stationFixture = new StationFixture();
+        stationFixture.init(stationDao);
+    }
 
     @DisplayName("지하철 노선을 생성하면서 첫 구간도 함께 생성한다.")
     @Test
     void saveLineAndSaveFirstSection() {
         // given
-        Line line = lineDao.insert(new Line("5호선", "green"));
-        Station upStation = stationDao.insert(new Station("1호선"));
-        Station downStation = stationDao.insert(new Station("2호선"));
+        Line line = new Line("1호선", "그린");
+        Station upStation = stationFixture.getStationA();
+        Station downStation = stationFixture.getStationB();
         CreateLineRequest createLineRequest = new CreateLineRequest(
                 line.getName(),
                 line.getColor(),
@@ -51,7 +61,7 @@ class LineServiceTest {
         // then
         assertThat(lineDao.findById(lineResponse.getId()))
                 .extracting(Line::getName, Line::getColor)
-                .contains("5호선", "green");
-
+                .contains(line.getName(), line.getColor());
+        assertThat(sectionDao.findAllByLineId(lineResponse.getId())).hasSize(1);
     }
 }

@@ -8,7 +8,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.domain.Line;
+import subway.domain.Station;
+import subway.dto.request.CreateLineRequest;
 import subway.dto.request.SectionRequest;
+import subway.integration.fixture.LineIntegrationFixture;
+import subway.integration.fixture.SectionIntegrationFixture;
+import subway.integration.fixture.StationIntegrationFixture;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,26 +24,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SectionIntegrationTest extends IntegrationTest {
 
     private Long lineId;
-    private SectionRequest sectionRequest1;
-    private SectionRequest sectionRequest2;
+    private SectionRequest sectionRequestA;
+    private SectionRequest sectionRequestB;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        lineId = 1L;
-        sectionRequest1 = new SectionRequest(1L, 2L, 10L);
-        sectionRequest2 = new SectionRequest(2L, 3L, 10L);
+        Station upStation = StationIntegrationFixture.createStation(Map.of("name", "낙성대"));
+        Station downStation = StationIntegrationFixture.createStation(Map.of("name", "사당"));
+        Station newStationA = StationIntegrationFixture.createStation(Map.of("name", "방배"));
+        Station newStationB = StationIntegrationFixture.createStation(Map.of("name", "서초"));
+
+        final Line line = LineIntegrationFixture.createLine(new CreateLineRequest("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10L));
+
+        lineId = line.getId();
+        sectionRequestA = new SectionRequest(downStation.getId(), newStationA.getId(), 10L);
+        sectionRequestB = new SectionRequest(newStationA.getId(), newStationB.getId(), 10L);
     }
 
     @DisplayName("지하철 구간을 생성한다.")
     @Test
-    void createLine() {
+    void createSection() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest1)
+                .body(sectionRequestA)
                 .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all().
                 extract();
@@ -49,26 +64,13 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest1)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
-        ExtractableResponse<Response> createResposne2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest2)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
+        SectionIntegrationFixture.createSection(lineId, sectionRequestA);
+        SectionIntegrationFixture.createSection(lineId, sectionRequestB);
 
         // when
-
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .queryParam("stationId", sectionRequest2.getDownStationId())
+                .queryParam("stationId", sectionRequestB.getDownStationId())
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
@@ -76,6 +78,5 @@ class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
-
 
 }

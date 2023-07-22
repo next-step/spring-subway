@@ -1,0 +1,21 @@
+package subway.integration.fixture;
+
+import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.springframework.http.MediaType;
+import subway.dto.request.SectionRequest;
+
+public class SectionIntegrationFixture {
+
+    public static ExtractableResponse<Response> createSection(Long lineId, SectionRequest sectionRequest) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all().
+                extract();
+    }
+
+}
