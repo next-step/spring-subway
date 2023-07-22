@@ -16,8 +16,8 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.SectionAdditionRequest;
+import subway.dto.request.LineRequest;
+import subway.dto.request.SectionAdditionRequest;
 
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {

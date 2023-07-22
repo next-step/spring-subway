@@ -9,7 +9,7 @@ import subway.domain.Line;
 import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.SectionAdditionRequest;
+import subway.dto.request.SectionAdditionRequest;
 import subway.vo.SectionAdditionResult;
 
 @Service

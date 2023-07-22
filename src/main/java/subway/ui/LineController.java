@@ -5,13 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.application.SectionsService;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.dto.request.LineRequest;
+import subway.dto.request.LineUpdateRequest;
+import subway.dto.response.LineResponse;
 
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
-import subway.dto.SectionAdditionRequest;
+import subway.dto.request.SectionAdditionRequest;
 
 @RestController
 @RequestMapping("/lines")
@@ -42,7 +43,7 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }

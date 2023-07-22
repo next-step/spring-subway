@@ -9,8 +9,9 @@ import subway.domain.Line;
 import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.dto.request.LineRequest;
+import subway.dto.request.LineUpdateRequest;
+import subway.dto.response.LineResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,7 +74,7 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest lineUpdateRequest) {
+    public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
