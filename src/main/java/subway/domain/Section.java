@@ -6,15 +6,11 @@ import java.util.Objects;
 
 public class Section {
 
-    private Long id;
-    private Long lineId;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
-
-    private Section() {
-        /* no-op */
-    }
+    private final Long id;
+    private final Long lineId;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final Long distance;
 
     public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
         this(null, lineId, upStationId, downStationId, distance);
