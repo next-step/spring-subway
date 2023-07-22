@@ -21,10 +21,6 @@ public class SectionChange {
         sectionsToAdd.add(section);
     }
 
-    public void appendSectionsToRemove(List<Section> sections) {
-        sectionsToRemove.addAll(sections);
-    }
-
     public void appendSectionsToAdd(List<Section> sections) {
         sectionsToAdd.addAll(sections);
     }

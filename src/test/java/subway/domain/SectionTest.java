@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ class SectionTest {
     @DisplayName("구간은 주어진 라인의 소속이다")
     void sectionBelongToLine() {
         Section section = new Section(lineA, stationA, stationB, 1);
-        
+
         assertThat(section.belongTo(lineA)).isTrue();
     }
 
@@ -104,7 +105,8 @@ class SectionTest {
         List<Section> mergedSections = section.mergeSections(targetSection);
 
         Section createdSection = new Section(lineA, stationB, stationC, 1);
-        assertThat(mergedSections).isEqualTo(List.of(targetSection, createdSection));
+        assertThat(doSectionsHaveSameFields(mergedSections.get(0), targetSection)).isTrue();
+        assertThat(doSectionsHaveSameFields(mergedSections.get(1), createdSection)).isTrue();
     }
 
     @Test
@@ -116,7 +118,8 @@ class SectionTest {
         List<Section> mergedSections = section.mergeSections(targetSection);
 
         Section createdSection = new Section(lineA, stationA, stationB, 1);
-        assertThat(mergedSections).isEqualTo(List.of(createdSection, targetSection));
+        assertThat(doSectionsHaveSameFields(mergedSections.get(0), createdSection)).isTrue();
+        assertThat(doSectionsHaveSameFields(mergedSections.get(1), targetSection)).isTrue();
     }
 
     @Test
@@ -132,4 +135,10 @@ class SectionTest {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
+    private boolean doSectionsHaveSameFields(Section section, Section other) {
+        return Objects.equals(section.getLine(), other.getLine())
+            && Objects.equals(section.getUpStation(), other.getUpStation())
+            && Objects.equals(section.getDownStation(), other.getDownStation())
+            && section.getDistance() == other.getDistance();
+    }
 }

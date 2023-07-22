@@ -132,40 +132,39 @@ public class Section {
         return downStation;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Section)) {
-            return false;
-        }
-        Section section = (Section) o;
-        return distance == section.distance && Objects.equals(id, section.id)
-            && Objects.equals(line, section.line) && Objects.equals(upStation,
-            section.upStation) && Objects.equals(downStation, section.downStation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, line, upStation, downStation, distance);
-    }
-
-    @Override
-    public String toString() {
-        return "Section{" +
-            "lineId=" + this.line.getId() +
-            "upStation=" + upStation +
-            ", downStation=" + downStation +
-            ", distance=" + distance +
-            '}';
-    }
-
     public boolean hasDownStationSameAs(Station station) {
         return station.equals(this.downStation);
     }
 
     public boolean belongTo(Line line) {
         return this.line.equals(line);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Section section = (Section) o;
+        return Objects.equals(id, section.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Section{" +
+            "id=" + id +
+            ", line=" + line +
+            ", upStation=" + upStation +
+            ", downStation=" + downStation +
+            ", distance=" + distance +
+            '}';
     }
 }

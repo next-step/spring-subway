@@ -30,9 +30,9 @@ class SectionsTest {
     @DisplayName("정렬된 구간들을 생성한다.")
     void createSortedSections() {
 
-        Section firstSection = new Section(lineA, stationA, stationB, 1);
-        Section secondSection = new Section(lineA, stationB, stationC, 1);
-        Section thirdSection = new Section(lineA, stationC, stationD, 1);
+        Section firstSection = new Section(1L, lineA, stationA, stationB, 1);
+        Section secondSection = new Section(2L, lineA, stationB, stationC, 1);
+        Section thirdSection = new Section(3L, lineA, stationC, stationD, 1);
 
         Sections sections = new Sections(List.of(thirdSection, secondSection, firstSection));
 
@@ -47,8 +47,8 @@ class SectionsTest {
     void cannotCreateWithCircularSection() {
         Station stationA = new Station(1L, "A");
         Station stationB = new Station(2L, "B");
-        Section section = new Section(lineA, stationA, stationB, 1);
-        Section circularSection = new Section(lineA, stationB, stationA, 1);
+        Section section = new Section(1L, lineA, stationA, stationB, 1);
+        Section circularSection = new Section(2L, lineA, stationB, stationA, 1);
 
         assertThatThrownBy(() -> new Sections(List.of(section, circularSection)))
             .isInstanceOf(IllegalArgumentException.class);
@@ -67,8 +67,8 @@ class SectionsTest {
     @Test
     @DisplayName("끊어진 구간들로 생성할 수 없습니다.")
     void cannotCreateWithSeperatedSections() {
-        Section sectionA = new Section(lineA, stationA, stationB, 3);
-        Section sectionB = new Section(lineA, stationC, stationD, 3);
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
+        Section sectionB = new Section(2L, lineA, stationC, stationD, 3);
 
         assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
             .isInstanceOf(IllegalArgumentException.class);
@@ -79,7 +79,7 @@ class SectionsTest {
     void cannotRemoveOneSizeSections() {
         Station stationA = new Station(1L, "A");
         Station stationB = new Station(2L, "B");
-        Section section = new Section(lineA, stationA, stationB, 1);
+        Section section = new Section(1L, lineA, stationA, stationB, 1);
         Sections sections = new Sections(List.of(section));
 
         assertThatThrownBy(() -> sections.removeLast(stationB))
@@ -89,8 +89,8 @@ class SectionsTest {
     @Test
     @DisplayName("주어진 역이 노선의 하행 종점역이 아니면 구간을 삭제할 수 없다")
     void cannotRemoveSectionIfNotFinalDownStation() {
-        Section sectionA = new Section(lineA, stationA, stationB, 1);
-        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 1);
+        Section sectionB = new Section(2L, lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
         assertThatThrownBy(() -> sections.removeLast(stationA))
@@ -103,8 +103,8 @@ class SectionsTest {
         Station stationA = new Station(1L, "A");
         Station stationB = new Station(2L, "B");
         Station stationC = new Station(3L, "C");
-        Section sectionA = new Section(lineA, stationA, stationB, 1);
-        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 1);
+        Section sectionB = new Section(2L, lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
         Section removedSection = sections.removeLast(stationC);
@@ -118,8 +118,8 @@ class SectionsTest {
     @DisplayName("다른 노선에 속한 구간들로 생성할 수 없습니다.")
     void cannotCreateWithSectionsOfOtherLines() {
         Line otherLine = new Line(2L, "lineB", "red");
-        Section sectionA = new Section(lineA, stationA, stationB, 3);
-        Section sectionB = new Section(otherLine, stationB, stationC, 3);
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
+        Section sectionB = new Section(2L, otherLine, stationB, stationC, 3);
 
         assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
             .isInstanceOf(IllegalArgumentException.class);
