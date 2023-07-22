@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -81,12 +80,12 @@ public class Sections {
 
         if (section.canPrecede(getFirst())) {
             addFirst(section);
-            return new SectionAdditionResult(Optional.empty(), List.of(getFirst()));
+            return new SectionAdditionResult(Collections.emptyList(), List.of(getFirst()));
         }
 
         if (getLast().canPrecede(section)) {
             addLast(section);
-            return new SectionAdditionResult(Optional.empty(), List.of(getLast()));
+            return new SectionAdditionResult(Collections.emptyList(), List.of(getLast()));
         }
 
         return addSectionInMiddle(section);
@@ -103,7 +102,7 @@ public class Sections {
         this.values.addAll(this.values.indexOf(foundSection), sectionsToAdd);
         this.values.remove(foundSection);
 
-        return new SectionAdditionResult(Optional.of(foundSection), sectionsToAdd);
+        return new SectionAdditionResult(List.of(foundSection), sectionsToAdd);
     }
 
     private Section findMatchedSection(Section section) {

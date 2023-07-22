@@ -33,7 +33,7 @@ public class SectionsService {
 
         SectionAdditionResult sectionAdditionResult = lineSections.add(section);
 
-        sectionAdditionResult.getSectionToRemove().ifPresent(sectionDao::delete);
+        sectionAdditionResult.getSectionToRemove().forEach(sectionDao::delete);
         sectionAdditionResult.getSectionsToAdd().forEach(sectionDao::save);
     }
 
@@ -51,7 +51,7 @@ public class SectionsService {
 
         Section removedSection = lineSections.removeLast(station);
 
-        sectionDao.deleteById(removedSection.getId());
+        sectionDao.delete(removedSection);
     }
 
     private Line getLineOrElseThrow(Long id) {
