@@ -48,7 +48,8 @@ public class LineDao {
 
     public Optional<Line> findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        return jdbcTemplate.queryForStream(sql, rowMapper, id)
+            .findAny();
     }
 
     public void update(Line newLine) {
