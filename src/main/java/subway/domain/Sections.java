@@ -109,7 +109,7 @@ public class Sections {
         return this.values.stream()
             .filter(value -> value.hasSameUpStationOrDownStation(section))
             .findAny()
-            .orElseThrow(() -> new IllegalStateException("여기 오면 안되는데?"));
+            .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다."));
     }
 
     private void validateOneInOneOut(Section section) {

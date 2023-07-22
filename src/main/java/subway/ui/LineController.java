@@ -10,7 +10,6 @@ import subway.dto.request.LineUpdateRequest;
 import subway.dto.response.LineResponse;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 import subway.dto.request.SectionAdditionRequest;
 
@@ -64,10 +63,5 @@ public class LineController {
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
         sectionsService.removeLast(id, stationId);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
     }
 }
