@@ -15,6 +15,22 @@ public class Sections {
         this.sections = sort(sections);
     }
 
+    private List<Section> sort(List<Section> sections) {
+        if (sections.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Station, Section> upStationMap = initializeUpStationMap(
+                sections);
+
+        Map<Station, Section> downStationMap = initializeDownStationMap(
+                sections);
+
+        Section firstSection = findFirstSection(sections, downStationMap);
+
+        return sortedSections(upStationMap, firstSection);
+    }
+
     private Map<Station, Section> initializeUpStationMap(List<Section> sections) {
         Map<Station, Section> upStationMap = new HashMap<>();
         for (Section section : sections) {
@@ -51,22 +67,6 @@ public class Sections {
         return result;
     }
 
-    private List<Section> sort(List<Section> sections) {
-        if (sections.isEmpty()) {
-            return List.of();
-        }
-
-        Map<Station, Section> upStationMap = initializeUpStationMap(
-                sections);
-
-        Map<Station, Section> downStationMap = initializeDownStationMap(
-                sections);
-
-        Section firstSection = findFirstSection(sections, downStationMap);
-
-        return sortedSections(upStationMap, firstSection);
-    }
-
     public List<Station> toStations() {
         if (sections.isEmpty()) {
             return List.of();
@@ -76,10 +76,6 @@ public class Sections {
                 .collect(Collectors.toList());
         result.add(sections.get(sections.size() - 1).getDownStation());
         return result;
-    }
-
-    public Section findLastSection() {
-        return sections.get(sectionLength() - 1);
     }
 
     public int sectionLength() {
@@ -97,6 +93,10 @@ public class Sections {
 
     public boolean isLastDownStation(Station station) {
         return findLastSection().getDownStation().equals(station);
+    }
+
+    private Section findLastSection() {
+        return sections.get(sectionLength() - 1);
     }
 
     @Override
