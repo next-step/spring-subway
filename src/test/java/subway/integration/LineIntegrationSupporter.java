@@ -27,7 +27,7 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> getLineByLineId(String lineId) {
+    static ExtractableResponse<Response> getLineByLineId(Long lineId) {
         return given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/{lineId}", lineId)
@@ -35,7 +35,7 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> updateLineByLineId(String lineId, LineRequest lineRequest) {
+    static ExtractableResponse<Response> updateLineByLineId(Long lineId, LineRequest lineRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest)
@@ -44,14 +44,14 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> deleteLineByLineId(String lineId) {
+    static ExtractableResponse<Response> deleteLineByLineId(Long lineId) {
         return given().log().all()
                 .when().delete("/lines/{lineId}", lineId)
                 .then().log().all()
                 .extract();
     }
 
-    static ExtractableResponse<Response> registerSectionToLine(String lineId, SectionRequest sectionRequest) {
+    static ExtractableResponse<Response> registerSectionToLine(Long lineId, SectionRequest sectionRequest) {
         return given().log().all()
                 .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -60,7 +60,7 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> deleteSectionByLineIdAndStationId(String lineId, String stationId) {
+    static ExtractableResponse<Response> deleteSectionByLineIdAndStationId(Long lineId, Long stationId) {
         return given().log().all()
                 .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
                 .then().log().all()

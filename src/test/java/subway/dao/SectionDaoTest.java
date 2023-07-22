@@ -3,6 +3,8 @@ package subway.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,17 @@ class SectionDaoTest {
     @Autowired
     private LineDao lineDao;
 
+    private Station station1;
+    private Station station2;
+    private Station station3;
+
+    @BeforeEach
+    void beforeEach() {
+        station1 = new Station(1L, "station1");
+        station2 = new Station(2L, "station2");
+        station3 = new Station(3L, "station3");
+    }
+
     @Nested
     @DisplayName("insert 메소드는")
     class Insert_Section {
@@ -42,13 +55,10 @@ class SectionDaoTest {
             // given
             Line line = lineDao.insert(new Line("line", "red"));
 
-            Station upStation = stationDao.insert(new Station("upStationName"));
-            Station downStation = stationDao.insert(new Station("downStationName"));
-
-            Section section = DomainFixture.Section.buildWithStations(line, upStation, downStation);
+            Section section = DomainFixture.Section.buildWithStations(station1, station2);
 
             // when
-            Section result = sectionDao.insert(section);
+            Section result = sectionDao.insert(section, line.getId());
 
             // then
             assertThat(result.getId()).isNotNull();
@@ -65,21 +75,21 @@ class SectionDaoTest {
             // given
             Line line = lineDao.insert(new Line("line", "red"));
 
-            Station upStation = stationDao.insert(new Station("upStationName"));
-            Station middleStation = stationDao.insert(new Station("middleStationName"));
-            Station downStation = stationDao.insert(new Station("downStationName"));
+            stationDao.insert(station1);
+            stationDao.insert(station2);
+            stationDao.insert(station3);
 
-            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
+            Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
+            Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
 
-            upSection = sectionDao.insert(upSection);
-            downSection = sectionDao.insert(downSection);
+            section1 = sectionDao.insert(section1, line.getId());
+            section2 = sectionDao.insert(section2, line.getId());
 
             // when
             List<Section> result = sectionDao.findAllByLineId(line.getId());
 
             // then
-            assertThat(result).containsAll(List.of(upSection, downSection));
+            assertThat(result).containsAll(List.of(section1, section2));
         }
     }
 
@@ -97,11 +107,11 @@ class SectionDaoTest {
             Station middleStation = stationDao.insert(new Station("middleStationName"));
             Station downStation = stationDao.insert(new Station("downStationName"));
 
-            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection = sectionDao.insert(upSection);
-            downSection = sectionDao.insert(downSection);
+            upSection = sectionDao.insert(upSection, line.getId());
+            downSection = sectionDao.insert(downSection, line.getId());
 
             upSection.connectDownSection(downSection);
 
@@ -129,8 +139,8 @@ class SectionDaoTest {
             Station downStation = stationDao.insert(new Station("downStationName"));
             Station updateStation = stationDao.insert(new Station("updateStationName"));
 
-            Section section = DomainFixture.Section.buildWithStations(line, upStation, downStation);
-            section = sectionDao.insert(section);
+            Section section = DomainFixture.Section.buildWithStations(upStation, downStation);
+            section = sectionDao.insert(section, line.getId());
 
             Section updatedSection = DomainFixture.Section.buildWithSectionAndStation(section, updateStation);
 

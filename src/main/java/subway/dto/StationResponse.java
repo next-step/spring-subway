@@ -4,41 +4,24 @@ import java.util.Objects;
 import subway.domain.Station;
 
 public class StationResponse {
-    private String id;
+    private Long id;
     private String name;
 
-    public StationResponse(String id, String name) {
+    public StationResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
     public static StationResponse of(Station station) {
-        return new StationResponse(String.valueOf(station.getId()), station.getName());
+        return new StationResponse(station.getId(), station.getName());
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
     public String getName() {
         return name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof StationResponse)) {
-            return false;
-        }
-        StationResponse that = (StationResponse) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
     }
 
     @Override

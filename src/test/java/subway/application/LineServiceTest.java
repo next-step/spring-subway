@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,18 @@ class LineServiceTest {
     @MockBean
     private StationDao stationDao;
 
+    private Station station1;
+    private Station station2;
+    private Station station3;
+
+    @BeforeEach
+    void beforeEach() {
+        station1 = new Station(1L, "station1");
+        station2 = new Station(2L, "station2");
+        station3 = new Station(3L, "station3");
+    }
+
+
     @Nested
     @DisplayName("connectSectionByStationId 메소드는")
     class ConnectSectionByStationId_Method {
@@ -51,24 +65,20 @@ class LineServiceTest {
             // given
             Line line = new Line(1L, "line", "red");
 
-            Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(2L, "middleStation");
-            Station downStation = new Station(3L, "downStation");
+            Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
+            Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
 
-            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
-
-            SectionRequest sectionRequest = new SectionRequest(String.valueOf(middleStation.getId()),
-                    String.valueOf(downStation.getId()),
-                    downSection.getDistance());
+            SectionRequest sectionRequest = new SectionRequest(station2.getId(),
+                    station3.getId(),
+                    section2.getDistance());
 
             when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
 
-            when(sectionDao.findAllByLineId(line.getId())).thenReturn(new ArrayList<>(List.of(upSection)));
-            when(sectionDao.insert(downSection)).thenReturn(downSection);
+            when(sectionDao.findAllByLineId(line.getId())).thenReturn(new ArrayList<>(List.of(section1)));
+            when(sectionDao.insert(section2, line.getId())).thenReturn(section2);
 
-            when(stationDao.findById(middleStation.getId())).thenReturn(Optional.of(middleStation));
-            when(stationDao.findById(downStation.getId())).thenReturn(Optional.of(downStation));
+            when(stationDao.findById(station2.getId())).thenReturn(Optional.of(station2));
+            when(stationDao.findById(station3.getId())).thenReturn(Optional.of(station3));
 
             // when
             Exception exception = catchException(
@@ -76,7 +86,7 @@ class LineServiceTest {
 
             // then
             assertThat(exception).isNull();
-            assertThat(upSection.getDownSection()).isNotNull();
+            assertThat(section1.getDownSection()).isEqualTo(section2);
         }
     }
 
@@ -90,25 +100,21 @@ class LineServiceTest {
             // given
             Line line = new Line(1L, "line", "red");
 
-            Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(2L, "middleStation");
-            Station downStation = new Station(3L, "downStation");
-
-            Section upSection = DomainFixture.Section.buildWithStations(line, upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(line, middleStation, downStation);
-            upSection.connectDownSection(downSection);
+            Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
+            Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
+            section1.connectDownSection(section2);
 
             when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
 
-            when(sectionDao.findAllByLineId(line.getId())).thenReturn(new ArrayList<>(List.of(upSection, downSection)));
+            when(sectionDao.findAllByLineId(line.getId())).thenReturn(new ArrayList<>(List.of(section1, section2)));
 
-            when(stationDao.findById(upStation.getId())).thenReturn(Optional.of(upStation));
-            when(stationDao.findById(middleStation.getId())).thenReturn(Optional.of(middleStation));
-            when(stationDao.findById(downStation.getId())).thenReturn(Optional.of(downStation));
+            when(stationDao.findById(station1.getId())).thenReturn(Optional.of(station1));
+            when(stationDao.findById(station2.getId())).thenReturn(Optional.of(station2));
+            when(stationDao.findById(station3.getId())).thenReturn(Optional.of(station3));
 
             // when
             Exception exception = catchException(
-                    () -> lineService.disconnectSectionByStationId(line.getId(), downStation.getId()));
+                    () -> lineService.disconnectSectionByStationId(line.getId(), station3.getId()));
 
             // then
             assertThat(exception).isNull();

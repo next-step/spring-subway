@@ -60,10 +60,10 @@ class StationIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.findAllStation();
 
-        List<String> expectedStationIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> it.header("Location").split("/")[2])
+        List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
+                .map(it -> Long.valueOf(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
-        List<String> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
+        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
                 .map(StationResponse::getId)
                 .collect(Collectors.toList());
         
@@ -80,7 +80,7 @@ class StationIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(
                 new StationRequest(stationName));
 
-        String stationId = createResponse.header("Location").split("/")[2];
+        Long stationId = Long.valueOf(createResponse.header("Location").split("/")[2]);
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.getStationByStationId(stationId);
