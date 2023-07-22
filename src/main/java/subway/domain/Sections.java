@@ -82,33 +82,39 @@ public class Sections {
     }
 
     public SectionChange add(Section section) {
-        validateSectionBelongToLine(section);
+        validateSectionInLine(section);
+        validateOnlyOneStationInLine(section);
 
-        validateOneInOneOut(section);
-
-        if (section.canPrecede(getFirst())) {
-            SectionChange sectionChange = new SectionChange();
-            addFirst(section);
-            sectionChange.appendSectionToAdd(section);
-            return sectionChange;
+        if (section.isUpperSectionOf(getFirst())) {
+            return addFirst(section);
         }
 
-        if (getLast().canPrecede(section)) {
-            SectionChange sectionChange = new SectionChange();
-            addLast(section);
-            sectionChange.appendSectionToAdd(section);
-            return sectionChange;
+        if (getLast().isUpperSectionOf(section)) {
+            return addLast(section);
         }
 
         return addSectionInMiddle(section);
     }
 
-    private void validateSectionBelongToLine(final Section section) {
+    private SectionChange addFirst(final Section section) {
+        this.values.add(0, section);
+        SectionChange sectionChange = new SectionChange();
+        sectionChange.appendSectionToAdd(section);
+        return sectionChange;
+    }
+
+    private SectionChange addLast(final Section section) {
+        this.values.add(section);
+        SectionChange sectionChange = new SectionChange();
+        sectionChange.appendSectionToAdd(section);
+        return sectionChange;
+    }
+
+    private void validateSectionInLine(final Section section) {
         if (!section.belongTo(getFirst().getLine())) {
             throw new IllegalArgumentException("추가할 구간은 기존 노선에 포함되어야 합니다.");
         }
     }
-
 
     private SectionChange addSectionInMiddle(Section section) {
         Section foundSection = findMatchedSection(section);
@@ -131,7 +137,7 @@ public class Sections {
             .orElseThrow(() -> new IllegalStateException("여기 오면 안되는데?"));
     }
 
-    private void validateOneInOneOut(Section section) {
+    private void validateOnlyOneStationInLine(Section section) {
         Station upStation = section.getUpStation();
         Station downStation = section.getDownStation();
 
@@ -140,20 +146,20 @@ public class Sections {
         boolean downStationExists = this.values.stream()
             .anyMatch(value -> value.containsStation(downStation));
 
+        validateBothStationsInLine(upStationExists, downStationExists);
+        validateBothStationsNotInLine(upStationExists, downStationExists);
+    }
+
+    private static void validateBothStationsInLine(final boolean upStationExists, final boolean downStationExists) {
         if (upStationExists && downStationExists) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다.");
         }
+    }
+
+    private static void validateBothStationsNotInLine(final boolean upStationExists, final boolean downStationExists) {
         if (!upStationExists && !downStationExists) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다.");
         }
-    }
-
-    private void addFirst(Section section) {
-        this.values.add(0, section);
-    }
-
-    private void addLast(Section section) {
-        this.values.add(section);
     }
 
     public Section removeLast(Station station) {

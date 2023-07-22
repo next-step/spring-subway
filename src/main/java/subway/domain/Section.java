@@ -50,7 +50,7 @@ public class Section {
         }
     }
 
-    public boolean canPrecede(Section other) {
+    public boolean isUpperSectionOf(Section other) {
         return downStation.equals(other.upStation);
     }
 

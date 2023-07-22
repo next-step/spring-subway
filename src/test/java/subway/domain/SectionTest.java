@@ -52,8 +52,8 @@ class SectionTest {
         Section section = new Section(lineA, stationA, stationB, 1);
         Section otherSection = new Section(lineA, stationB, stationC, 1);
 
-        assertThat(section.canPrecede(otherSection)).isTrue();
-        assertThat(otherSection.canPrecede(section)).isFalse();
+        assertThat(section.isUpperSectionOf(otherSection)).isTrue();
+        assertThat(otherSection.isUpperSectionOf(section)).isFalse();
     }
 
     @Test
