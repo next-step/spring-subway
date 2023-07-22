@@ -24,7 +24,7 @@ public class SectionController {
     ) {
         SectionResponse sectionResponse = sectionService.createSection(lineId, sectionRequest);
 
-        return ResponseEntity.created(URI.create("/sections/" + sectionResponse.getId())).body(sectionResponse);
+        return ResponseEntity.created(URI.create("/lines/" + lineId + "/sections")).body(sectionResponse);
     }
 
     @DeleteMapping("/lines/{lineId}/sections")
