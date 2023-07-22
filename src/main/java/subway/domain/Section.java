@@ -26,15 +26,6 @@ public class Section {
         this(null, line, upStation, downStation, distance);
     }
 
-    public Section(Station upStation, Station downStation, int distance) {
-        this(null, null, upStation, downStation, distance);
-    }
-
-    public Section(Line line, Section section) {
-        this(section.getId(), line, section.getUpStation(), section.getDownStation(),
-            section.getDistance());
-    }
-
     private void validatePositive(int distance) {
         if (distance <= 0) {
             throw new IllegalArgumentException("구간 길이는 양수여야합니다 distance: \"" + distance + "\"");
