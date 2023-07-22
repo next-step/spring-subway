@@ -134,7 +134,7 @@ public class Sections {
         return this.values.stream()
             .filter(value -> value.hasSameUpStationOrDownStation(section))
             .findAny()
-            .orElseThrow(() -> new IllegalStateException("여기 오면 안되는데?"));
+            .orElseThrow(() -> new IllegalStateException("구간 추가 도중 문제가 발생했습니다."));
     }
 
     private void validateOnlyOneStationInLine(Section section) {
@@ -150,13 +150,13 @@ public class Sections {
         validateBothStationsNotInLine(upStationExists, downStationExists);
     }
 
-    private static void validateBothStationsInLine(final boolean upStationExists, final boolean downStationExists) {
+    private void validateBothStationsInLine(final boolean upStationExists, final boolean downStationExists) {
         if (upStationExists && downStationExists) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다.");
         }
     }
 
-    private static void validateBothStationsNotInLine(final boolean upStationExists, final boolean downStationExists) {
+    private void validateBothStationsNotInLine(final boolean upStationExists, final boolean downStationExists) {
         if (!upStationExists && !downStationExists) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다.");
         }

@@ -135,6 +135,18 @@ class SectionTest {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    @DisplayName("구간과 상행역 또는 하행역이 겹치는지 여부를 반환한다.")
+    void hasSameUpStationOrDownStation() {
+        Section section = new Section(lineA, stationA, stationB, 3);
+        Section upStationSameSection = new Section(lineA, stationA, stationC, 2);
+        Section nothingSameSection = new Section(lineA, stationC, stationD, 2);
+
+        assertThat(section.hasSameUpStationOrDownStation(upStationSameSection)).isTrue();
+        assertThat(section.hasSameUpStationOrDownStation(nothingSameSection)).isFalse();
+    }
+
+
     private boolean doSectionsHaveSameFields(Section section, Section other) {
         return Objects.equals(section.getLine(), other.getLine())
             && Objects.equals(section.getUpStation(), other.getUpStation())

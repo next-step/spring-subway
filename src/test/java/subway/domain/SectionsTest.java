@@ -16,6 +16,7 @@ class SectionsTest {
     Station stationB;
     Station stationC;
     Station stationD;
+    Station stationE;
 
     @BeforeEach
     void setUp() {
@@ -24,6 +25,7 @@ class SectionsTest {
         stationB = new Station(2L, "B");
         stationC = new Station(3L, "C");
         stationD = new Station(4L, "D");
+        stationE = new Station(5L, "E");
     }
 
     @Test
@@ -65,10 +67,21 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("끊어진 구간들로 생성할 수 없습니다.")
+    @DisplayName("끊어진 구간들로 생성할 수 없다.")
     void cannotCreateWithSeperatedSections() {
         Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
         Section sectionB = new Section(2L, lineA, stationC, stationD, 3);
+
+        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("다른 노선에 속한 구간들로 생성할 수 없다.")
+    void cannotCreateWithSectionsOfOtherLines() {
+        Line otherLine = new Line(2L, "lineB", "red");
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
+        Section sectionB = new Section(2L, otherLine, stationB, stationC, 3);
 
         assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
             .isInstanceOf(IllegalArgumentException.class);
@@ -115,13 +128,89 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("다른 노선에 속한 구간들로 생성할 수 없습니다.")
-    void cannotCreateWithSectionsOfOtherLines() {
-        Line otherLine = new Line(2L, "lineB", "red");
-        Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
-        Section sectionB = new Section(2L, otherLine, stationB, stationC, 3);
+    @DisplayName("추가할 구간의 한 역만 기존 노선에 포함되어야 한다.")
+    void canAddSectionToLineContainingOnlyOneStation() {
+        Section firstSection = new Section(lineA, stationA, stationB, 5);
+        Section secondSection = new Section(lineA, stationB, stationC, 5);
+        Sections sections = new Sections(List.of(firstSection, secondSection));
+        Section bothContainedSection = new Section(lineA, stationA, stationC, 3);
+        Section bothNotContainedSection = new Section(lineA, stationD, stationE, 3);
 
-        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
+        assertThatThrownBy(() -> sections.add(bothContainedSection))
             .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sections.add(bothNotContainedSection))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("노선의 특정 구간과 상행역만 같은 경우 노선에 추가한다.")
+    void addSectionOfSameUpStationAsLinesSection() {
+        Section firstSection = new Section(lineA, stationA, stationB, 5);
+        Section secondSection = new Section(lineA, stationB, stationD, 5);
+        Sections sections = new Sections(List.of(firstSection, secondSection));
+        Section targetSection = new Section(lineA, stationB, stationC, 3);
+
+        SectionChange sectionChange = sections.add(targetSection);
+
+        Section createdSection = new Section(lineA, stationC, stationD, 2);
+        assertThat(sectionChange.getSectionsToAdd())
+            .isEqualTo(List.of(targetSection, createdSection));
+        assertThat(sectionChange.getSectionsToRemove())
+            .isEqualTo(List.of(secondSection));
+        assertThat(sections)
+            .isEqualTo(new Sections(List.of(firstSection, targetSection, createdSection)));
+    }
+
+    @Test
+    @DisplayName("노선의 특정 구간과 하행역만 같은 경우 노선에 추가한다.")
+    void addSectionOfSameDownStationAsLinesSection() {
+        Section firstSection = new Section(lineA, stationA, stationB, 5);
+        Section secondSection = new Section(lineA, stationB, stationD, 5);
+        Sections sections = new Sections(List.of(firstSection, secondSection));
+        Section targetSection = new Section(lineA, stationC, stationD, 3);
+
+        SectionChange sectionChange = sections.add(targetSection);
+
+        Section createdSection = new Section(lineA, stationB, stationC, 2);
+        assertThat(sectionChange.getSectionsToAdd())
+            .isEqualTo(List.of(createdSection, targetSection));
+        assertThat(sectionChange.getSectionsToRemove())
+            .isEqualTo(List.of(secondSection));
+        assertThat(sections)
+            .isEqualTo(new Sections(List.of(firstSection, createdSection, targetSection)));
+    }
+
+    @Test
+    @DisplayName("추가할 구간의 하행역이 기존 노선의 상행 종점역과 같은 경우 노선의 맨 앞에 추가한다.")
+    void addFirst() {
+        Section firstSection = new Section(lineA, stationB, stationC, 5);
+        Section secondSection = new Section(lineA, stationC, stationD, 5);
+        Sections sections = new Sections(List.of(firstSection, secondSection));
+        Section targetSection = new Section(lineA, stationA, stationB, 3);
+
+        SectionChange sectionChange = sections.add(targetSection);
+
+        assertThat(sectionChange.getSectionsToAdd())
+            .isEqualTo(List.of(targetSection));
+        assertThat(sectionChange.getSectionsToRemove()).isEmpty();
+        assertThat(sections)
+            .isEqualTo(new Sections(List.of(targetSection, firstSection, secondSection)));
+    }
+
+    @Test
+    @DisplayName("추가할 구간의 상행역이 기존 노선의 하행 종점역과 같은 경우 노선의 맨 뒤에 추가한다.")
+    void addLast() {
+        Section firstSection = new Section(lineA, stationA, stationB, 5);
+        Section secondSection = new Section(lineA, stationB, stationC, 5);
+        Sections sections = new Sections(List.of(firstSection, secondSection));
+        Section targetSection = new Section(lineA, stationC, stationD, 3);
+
+        SectionChange sectionChange = sections.add(targetSection);
+
+        assertThat(sectionChange.getSectionsToAdd())
+            .isEqualTo(List.of(targetSection));
+        assertThat(sectionChange.getSectionsToRemove()).isEmpty();
+        assertThat(sections)
+            .isEqualTo(new Sections(List.of(firstSection, secondSection, targetSection)));
     }
 }
