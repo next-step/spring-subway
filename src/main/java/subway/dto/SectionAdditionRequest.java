@@ -1,8 +1,13 @@
 package subway.dto;
 
+import javax.validation.constraints.NotNull;
+
 public class SectionAdditionRequest {
+    @NotNull
     private Long upStationId;
+    @NotNull
     private Long downStationId;
+    @NotNull
     private int distance;
 
     private SectionAdditionRequest() {
