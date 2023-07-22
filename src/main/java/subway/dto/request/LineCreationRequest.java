@@ -1,6 +1,6 @@
 package subway.dto.request;
 
-public class LineRequest {
+public class LineCreationRequest {
 
     private String name;
     private Long upStationId;
@@ -8,15 +8,15 @@ public class LineRequest {
     private Integer distance;
     private String color;
 
-    public LineRequest() {
+    public LineCreationRequest() {
     }
 
-    public LineRequest(String name, String color) {
+    public LineCreationRequest(String name, String color) {
         this.name = name;
         this.color = color;
     }
 
-    public LineRequest(String name, Long upStationId, Long downStationId, Integer distance,
+    public LineCreationRequest(String name, Long upStationId, Long downStationId, Integer distance,
         String color) {
         this.name = name;
         this.upStationId = upStationId;

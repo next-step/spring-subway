@@ -9,7 +9,7 @@ import subway.domain.Line;
 import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.request.LineRequest;
+import subway.dto.request.LineCreationRequest;
 import subway.dto.request.LineUpdateRequest;
 import subway.dto.response.LineResponse;
 
@@ -30,13 +30,13 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(LineCreationRequest lineCreationRequest) {
 
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = getStationOrElseThrow(request.getUpStationId());
-        Station downStation = getStationOrElseThrow(request.getDownStationId());
+        Line persistLine = lineDao.insert(new Line(lineCreationRequest.getName(), lineCreationRequest.getColor()));
+        Station upStation = getStationOrElseThrow(lineCreationRequest.getUpStationId());
+        Station downStation = getStationOrElseThrow(lineCreationRequest.getDownStationId());
         Section persistSection = sectionDao.save(
-            new Section(persistLine, upStation, downStation, request.getDistance()));
+            new Section(persistLine, upStation, downStation, lineCreationRequest.getDistance()));
 
         new LineSections(persistLine, persistSection);
 

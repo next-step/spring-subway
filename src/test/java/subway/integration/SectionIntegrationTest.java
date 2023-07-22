@@ -16,7 +16,7 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Station;
-import subway.dto.request.LineRequest;
+import subway.dto.request.LineCreationRequest;
 import subway.dto.request.SectionAdditionRequest;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -52,8 +52,8 @@ class SectionIntegrationTest extends IntegrationTest {
     void addSectionToLine() {
         // given
         StationIntegrationTest.createInitialStations();
-        LineRequest lineRequest = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
-        LineIntegrationTest.createLine(lineRequest);
+        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        LineIntegrationTest.createLine(lineCreationRequest);
         SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
             stationC.getId(), 3);
 
@@ -82,8 +82,8 @@ class SectionIntegrationTest extends IntegrationTest {
     void removeSectionOfLine() {
         // given
         StationIntegrationTest.createInitialStations();
-        LineRequest lineRequest = new LineRequest("신분당선", 1L, 2L, 3, "bg-red-600");
-        LineIntegrationTest.createLine(lineRequest);
+        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        LineIntegrationTest.createLine(lineCreationRequest);
         SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
             stationC.getId(), 3);
         addSectionToLine(sectionAdditionRequest);
