@@ -41,6 +41,27 @@ public class StationDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
+    public List<Station> findAllByLineId(final Long lineId) {
+        final String upStationSql = "SELECT up_station.id AS id, " +
+                "up_station.name AS name " +
+                "FROM SECTION section " +
+                "LEFT JOIN Line line ON section.LINE_ID = line.ID " +
+                "LEFT JOIN STATION up_station ON section.up_station_id = up_station.id " +
+                "WHERE line.id = ?";
+
+        final String downStationSql = "SELECT down_station.id AS id, " +
+                "down_station.name AS name " +
+                "FROM SECTION section " +
+                "LEFT JOIN Line line ON section.LINE_ID = line.ID " +
+                "LEFT JOIN STATION down_station ON section.down_station_id = down_station.id " +
+                "WHERE line.id = ?";
+
+        final String sql = "SELECT id, name " +
+                "FROM (" + upStationSql + "UNION " + downStationSql + ")";
+
+        return jdbcTemplate.query(sql, rowMapper, lineId, lineId);
+    }
+
     public Station findById(Long id) {
         String sql = "select * from STATION where id = ?";
         return jdbcTemplate.queryForObject(sql, rowMapper, id);

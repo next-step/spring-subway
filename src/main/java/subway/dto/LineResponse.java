@@ -1,11 +1,13 @@
 package subway.dto;
 
 import subway.domain.Line;
+import subway.domain.Station;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LineResponse {
+
     private Long id;
     private String name;
     private String color;
@@ -15,27 +17,32 @@ public class LineResponse {
         /* no-op */
     }
 
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
+    public LineResponse(final Long id, final String name, final String color, final List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.stations = stations;
     }
 
-    public static LineResponse of(Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), Collections.emptyList());
+    public static LineResponse of(final Line line, final List<Station> stations) {
+        return new LineResponse(
+                line.getId(), line.getName(), line.getColor(),
+                stations.stream()
+                        .map(StationResponse::of)
+                        .collect(Collectors.toList())
+        );
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public String getColor() {
-        return color;
+        return this.color;
     }
 
     public List<StationResponse> getStations() {

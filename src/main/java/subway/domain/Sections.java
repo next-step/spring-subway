@@ -21,24 +21,6 @@ public class Sections {
         return countByStationIds(upStationId, downStationId) == 0;
     }
 
-    public Optional<Section> findLastSection() {
-        final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
-        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
-
-        downStationIds.removeAll(intersection(upStationIds, downStationIds));
-
-        return find(section -> downStationIds.contains(section.getDownStationId()));
-    }
-
-    public Optional<Section> findFirstSection() {
-        final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
-        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
-
-        upStationIds.removeAll(intersection(upStationIds, downStationIds));
-
-        return find(section -> upStationIds.contains(section.getUpStationId()));
-    }
-
     public List<Long> getSortedStationIds() {
         final Map<Long, Section> upStationKeyMap = values.stream()
                 .collect(Collectors.toMap(Section::getUpStationId, section -> section));
@@ -75,6 +57,24 @@ public class Sections {
         return find(section -> section.containsStations(upStationId, downStationId));
     }
 
+    public Optional<Section> findFirstSection() {
+        final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
+        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
+
+        upStationIds.removeAll(intersection(upStationIds, downStationIds));
+
+        return find(section -> upStationIds.contains(section.getUpStationId()));
+    }
+
+    public Optional<Section> findLastSection() {
+        final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
+        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
+
+        downStationIds.removeAll(intersection(upStationIds, downStationIds));
+
+        return find(section -> downStationIds.contains(section.getDownStationId()));
+    }
+
     private Optional<Section> find(final Predicate<Section> predicate) {
         return values.stream()
                 .filter(predicate)
@@ -108,13 +108,13 @@ public class Sections {
                 .collect(Collectors.toSet());
     }
 
-    private int countByStationIds(final Long... targetIds) {
+    private int countByStationIds(final Long... targetStationIds) {
         final Set<Long> stationIds = new HashSet<>();
         for (Section section : values) {
             stationIds.add(section.getUpStationId());
             stationIds.add(section.getDownStationId());
         }
-        stationIds.retainAll(Arrays.asList(targetIds));
+        stationIds.retainAll(Arrays.asList(targetStationIds));
 
         return stationIds.size();
     }

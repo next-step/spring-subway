@@ -3,17 +3,14 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import subway.dto.LineWithStations;
-import subway.dto.StationResponse;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,50 +19,47 @@ import java.util.stream.Collectors;
 public class LineService {
     private final LineDao lineDao;
     private final SectionDao sectionDao;
+    private final StationDao stationDao;
 
-    public LineService(LineDao lineDao, SectionDao sectionDao) {
+    public LineService(final LineDao lineDao, final SectionDao sectionDao, final StationDao stationDao) {
         this.lineDao = lineDao;
         this.sectionDao = sectionDao;
+        this.stationDao = stationDao;
     }
 
-    public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+    public Line saveLine(final LineRequest request) {
+        final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         sectionDao.insert(
-                new Section(persistLine.getId(), request.getUpStationId(), request.getDownStationId(), request.getDistance()));
-        return LineResponse.of(persistLine);
+                new Section(
+                        persistLine.getId(),
+                        request.getUpStationId(),
+                        request.getDownStationId(),
+                        request.getDistance()
+                )
+        );
+
+        return persistLine;
     }
 
     public List<LineResponse> findLineResponses() {
-        List<Line> persistLines = findLines();
+        final List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(LineResponse::of)
+                .map(line -> findLineResponse(line.getId()))
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLineAndStationsById(Long id) {
-        final List<LineWithStations> lineWithStations = findAllById(id);
-        final Sections sections = new Sections(sectionDao.findAllByLineId(id));
+    public LineResponse findLineResponse(final Long lineId) {
+        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
+        final List<Station> stations = stationDao.findAllByLineId(lineId);
+        final Map<Long, Station> stationMap = stations.stream()
+                .collect(Collectors.toMap(Station::getId, station -> station));
 
-        final Map<Long, Station> stations = new HashMap<>();
-        for (LineWithStations lineWithStation : lineWithStations) {
-            final Station upStation = lineWithStation.getUpStation();
-            final Station downStation = lineWithStation.getDownStation();
-            stations.put(upStation.getId(), upStation);
-            stations.put(downStation.getId(), downStation);
-        }
+        final List<Station> stationList = sections.getSortedStationIds().stream()
+                .map(stationMap::get)
+                .collect(Collectors.toList());
 
-        final List<StationResponse> stationList = new ArrayList<>();
-        final List<Long> sortedStationIds = sections.getSortedStationIds();
-        for (Long stationId : sortedStationIds) {
-            stationList.add(StationResponse.of(stations.get(stationId)));
-        }
-
-        final Line line = lineWithStations.get(0).getLine();
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), stationList);
-    }
-
-    public List<LineWithStations> findAllById(Long id) {
-        return lineDao.findAllById(id);
+        final Line line = lineDao.findById(lineId);
+        return LineResponse.of(line, stationList);
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
