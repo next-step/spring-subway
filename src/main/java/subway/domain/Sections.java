@@ -34,13 +34,13 @@ public class Sections {
 
     private Optional<Section> findConnectedUpStation(Section base) {
         Section conectedSection = upStationMap.get(base.getUpStationId());
-        validateDistance(conectedSection, base.getDistance());
+        validateDistance(conectedSection, base);
         return Optional.of(conectedSection.upStationId(base));
     }
 
     private Optional<Section> findConnectedDownStation(Section base) {
         Section connectedSection = downStationMap.get(base.getDownStationId());
-        validateDistance(connectedSection, base.getDistance());
+        validateDistance(connectedSection, base);
         return Optional.of(connectedSection.downStationId(base));
     }
 
@@ -62,8 +62,8 @@ public class Sections {
         }
     }
 
-    private void validateDistance(final Section existSection, final int distance) {
-        if (!existSection.isDistanceGreaterThan(distance)) {
+    private void validateDistance(final Section existSection, final Section other) {
+        if (existSection.isDistanceLessThanOrEqualTo(other)) {
             throw new IllegalSectionException("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
         }
     }

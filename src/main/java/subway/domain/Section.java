@@ -45,20 +45,12 @@ public class Section {
         return new Section(id, lineId, newSection.downStationId, downStationId, distance - newSection.distance);
     }
 
-    public boolean containsStation(final long stationId) {
-        return upStationId == stationId || downStationId == stationId;
+    public boolean isDistanceLessThanOrEqualTo(final Section other) {
+        return this.distance <= other.distance;
     }
 
-    public boolean isDistanceGreaterThan(final int other) {
-        return this.distance > other;
-    }
-
-    public boolean compareUpStationId(final Section other) {
-        return upStationId.equals(other.upStationId);
-    }
-
-    public boolean compareDownStationId(final Section other) {
-        return downStationId.equals(other.downStationId);
+    public boolean matchDownStationId(final long other) {
+        return downStationId == other;
     }
 
     public Long getId() {
