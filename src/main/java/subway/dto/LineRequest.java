@@ -1,14 +1,25 @@
 package subway.dto;
 
-public class LineRequest {
-    private String name;
-    private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Integer distance;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 
-    public LineRequest() {
-    }
+public class LineRequest {
+
+    @NotBlank
+    private String name;
+
+    @NotBlank
+    private String color;
+
+    @NotBlank
+    private Long upStationId;
+
+    @NotBlank
+    private Long downStationId;
+
+    @NotBlank
+    @Positive
+    private Integer distance;
 
     public LineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;

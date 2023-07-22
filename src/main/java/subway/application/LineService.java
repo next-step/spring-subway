@@ -1,8 +1,5 @@
 package subway.application;
 
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
@@ -14,6 +11,10 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
 import subway.dto.StationResponse;
+
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LineService {
@@ -41,7 +42,7 @@ public class LineService {
         return LineResponse.from(persistLine, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
     }
 
-    public List<LineResponse> findLineResponses() {
+    public List<LineResponse> findAllLines() {
         List<Line> persistLines = findLines();
 
         return persistLines.stream()
@@ -54,7 +55,7 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineResponseById(Long id) {
+    public LineResponse findLineById(Long id) {
         Line persistLine = getLineById(id);
         List<Section> sections = sectionDao.findAllByLineId(persistLine.getId());
         Line line = new Line(persistLine.getId(),
