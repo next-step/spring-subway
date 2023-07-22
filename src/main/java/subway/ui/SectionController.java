@@ -22,10 +22,15 @@ public class SectionController {
     public ResponseEntity<SectionResponse> createSection(
             @PathVariable Long lineId,
             @RequestBody SectionRequest sectionRequest) {
-        SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
+        SectionResponse sectionResponse = getSectionResponse(lineId, sectionRequest);
         return ResponseEntity.created(
                         URI.create("/lines/" + lineId + "/sections/" + sectionResponse.getId()))
                 .body(sectionResponse);
+    }
+
+    private SectionResponse getSectionResponse(final Long lineId, final SectionRequest sectionRequest) {
+        SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
+        return sectionResponse;
     }
 
     @DeleteMapping("/lines/{lineId}/sections")

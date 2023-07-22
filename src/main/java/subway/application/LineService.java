@@ -33,7 +33,7 @@ public class LineService {
     public LineResponse saveLine(CreateLineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
-        sectionService.saveSection(
+        sectionService.saveFirstSection(
                 persistLine.getId(),
                 request.getUpStationId(),
                 request.getDownStationId(),

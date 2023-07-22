@@ -1,10 +1,8 @@
 package subway.domain;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import org.springframework.util.Assert;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Sections {
@@ -13,7 +11,44 @@ public class Sections {
     private final List<Section> sections;
 
     public Sections(List<Section> sections) {
+        Assert.isTrue(sections.size() >= MINIMUM_SIZE, "노선에 등록된 구간은 반드시 한개 이상이어야합니다.");
         this.sections = sort(sections);
+    }
+
+    private Map<Station, Section> initializeUpStationMap(List<Section> sections) {
+        Map<Station, Section> upStationMap = new HashMap<>();
+        for (Section section : sections) {
+            upStationMap.put(section.getUpStation(), section);
+        }
+        return upStationMap;
+    }
+
+    private Map<Station, Section> initializeDownStationMap(List<Section> sections) {
+        Map<Station, Section> downStationMap = new HashMap<>();
+        for (Section section : sections) {
+            downStationMap.put(section.getDownStation(), section);
+        }
+        return downStationMap;
+    }
+
+    private Section findFirstSection(List<Section> sections,
+                                     Map<Station, Section> downStationMap) {
+        Section pivot = sections.get(0);
+        while (downStationMap.containsKey(pivot.getUpStation())) {
+            pivot = downStationMap.get(pivot.getUpStation());
+        }
+        return pivot;
+    }
+
+    private List<Section> sortedSections(Map<Station, Section> upStationMap,
+                                         Section pivot) {
+        List<Section> result = new ArrayList<>();
+        result.add(pivot);
+        while (upStationMap.containsKey(pivot.getDownStation())) {
+            pivot = upStationMap.get(pivot.getDownStation());
+            result.add(pivot);
+        }
+        return result;
     }
 
     private List<Section> sort(List<Section> sections) {
@@ -32,42 +67,6 @@ public class Sections {
         return sortedSections(upStationMap, firstSection);
     }
 
-    private static Map<Station, Section> initializeUpStationMap(List<Section> sections) {
-        Map<Station, Section> upStationMap = new HashMap<>();
-        for (Section section : sections) {
-            upStationMap.put(section.getUpStation(), section);
-        }
-        return upStationMap;
-    }
-
-    private static Map<Station, Section> initializeDownStationMap(List<Section> sections) {
-        Map<Station, Section> downStationMap = new HashMap<>();
-        for (Section section : sections) {
-            downStationMap.put(section.getDownStation(), section);
-        }
-        return downStationMap;
-    }
-
-    private static Section findFirstSection(List<Section> sections,
-            Map<Station, Section> downStationMap) {
-        Section pivot = sections.get(0);
-        while (downStationMap.containsKey(pivot.getUpStation())) {
-            pivot = downStationMap.get(pivot.getUpStation());
-        }
-        return pivot;
-    }
-
-    private static List<Section> sortedSections(Map<Station, Section> upStationMap,
-            Section pivot) {
-        List<Section> result = new ArrayList<>();
-        result.add(pivot);
-        while (upStationMap.containsKey(pivot.getDownStation())) {
-            pivot = upStationMap.get(pivot.getDownStation());
-            result.add(pivot);
-        }
-        return result;
-    }
-
     public List<Station> toStations() {
         if (sections.isEmpty()) {
             return List.of();
@@ -80,18 +79,24 @@ public class Sections {
     }
 
     public Section findLastSection() {
-        validateSize(sections);
-        return sections.get(sections.size() - 1);
+        return sections.get(sectionLength() - 1);
     }
 
-    private static void validateSize(List<Section> sections) {
-        if (sections.size() <= MINIMUM_SIZE) {
-            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+    public int sectionLength() {
+        return sections.size();
+    }
+
+    public Section deleteLastSection() {
+        if (sectionLength() <= MINIMUM_SIZE) {
+            throw new IllegalStateException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
         }
+        final Section lastSection = findLastSection();
+        sections.remove(lastSection);
+        return lastSection;
     }
 
-    public List<Section> getSections() {
-        return new ArrayList<>(sections);
+    public boolean isLastDownStation(Station station) {
+        return findLastSection().getDownStation().equals(station);
     }
 
     @Override

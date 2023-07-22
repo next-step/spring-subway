@@ -1,9 +1,5 @@
 package subway.dao;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,143 +10,139 @@ import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.fixture.LineFixture;
+import subway.fixture.SectionFixture;
+import subway.fixture.StationFixture;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest
 @Transactional
 class SectionDaoTest {
+    private SectionFixture sectionFixture;
+    private LineFixture lineFixture;
+    private StationFixture stationFixture;
 
     @Autowired
     private SectionDao sectionDao;
-
-    private Section section1;
-    private Section section2;
-    private Section section3;
-
     @Autowired
     private LineDao lineDao;
-
     @Autowired
     private StationDao stationDao;
 
     @BeforeEach
     void setUp() {
-        Line line = lineDao.findById(1L);
-        Station station1 = stationDao.findById(1L);
-        Station station2 = stationDao.findById(2L);
-        Station station3 = stationDao.findById(3L);
-        Station station4 = stationDao.findById(4L);
+        lineFixture = new LineFixture();
+        stationFixture = new StationFixture();
+        sectionFixture = new SectionFixture();
 
-        section1 = new Section(line, station1, station2, new Distance(10L));
-        section2 = new Section(line, station2, station3, new Distance(10L));
-        section3 = new Section(line, station3, station4, new Distance(10L));
+        lineFixture.init(lineDao);
+        stationFixture.init(stationDao);
+        sectionFixture.init(sectionDao, lineFixture, stationFixture);
     }
 
-    @DisplayName("노선아이디와 상행역아이디와 하행역아이디와 거리를 가지고 구간을 생성한다.")
     @Test
-    void insert_success() {
-        // given  when
-        Section result = sectionDao.insert(section1);
-
-        // then
-        assertThat(result.getId()).isNotNull();
-        assertThat(result).extracting(
-                Section::getLineId,
-                Section::getUpStationId,
-                Section::getDownStationId,
-                Section::getDistance
-        ).contains(section1.getLineId(), section1.getUpStationId(), section1.getDownStationId(),
-                section1.getDistance());
-    }
-
-
-    @DisplayName("노선과 역 아이디에 해당하는 구간이 존재 여부 반환 - true")
-    @Test
-    void existByLineIdAndStationIdTrue() {
+    @DisplayName("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 모두 포함되어 있다면 참을 반환한다.")
+    void existAllInLineBySectionTest() {
         // given
-        long lineId = 1L;
-        sectionDao.insert(section1);
-        sectionDao.insert(section2);
-        sectionDao.insert(section3);
-        long stationId = 4L;
-        // when
-        boolean result = sectionDao.existByLineIdAndStationId(lineId, stationId);
+        final Line line = sectionFixture.getSectionA().getLine();
+        final Station upStation = sectionFixture.getSectionA().getUpStation();
+        final Station downStation = sectionFixture.getSectionA().getDownStation();
+        final Section newSection = new Section(line, upStation, downStation, new Distance(10L));
 
-        // then
-        assertThat(result).isTrue();
+        // when , then
+        assertThat(sectionDao.existAllOrNotingInLineBySection(line, newSection)).isTrue();
+
     }
 
-    @DisplayName("노선과 역 아이디에 해당하는 구간이 존재 여부 반환 - false")
     @Test
-    void existByLineIdAndStationIdFalse() {
+    @DisplayName("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 모두 포함되어 있지 않다면 참을 반환한다.")
+    void existNotingInLineBySectionTest() {
         // given
-        long lineId = 1L;
-        sectionDao.insert(section1);
-        sectionDao.insert(section2);
-        sectionDao.insert(section3);
-        long stationId = 5L;
-        // when
-        boolean result = sectionDao.existByLineIdAndStationId(lineId, stationId);
+        final Line line = sectionFixture.getSectionA().getLine();
+        final Station upStation = stationDao.insert(new Station("새로운 상행역"));
+        final Station downStation = stationDao.insert(new Station("새로운 하행역"));
+        final Section newSection = new Section(line, upStation, downStation, new Distance(10L));
 
-        // then
-        assertThat(result).isFalse();
+        // when , then
+        assertThat(sectionDao.existAllOrNotingInLineBySection(line, newSection)).isTrue();
+
     }
 
-    @DisplayName("구간 테이블에 특정 노선의 구간이 있는지 여부 반환 - true")
     @Test
-    void existByLineIdTrue() {
+    @DisplayName("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 하나만 포함되어 있는 경우 거짓을 반환한다.")
+    void existAllOrNotingInLineBySectionTest() {
         // given
-        long lineId = 1L;
-        sectionDao.insert(section1);
+        final Line line = sectionFixture.getSectionA().getLine();
+        final Station upStation = sectionFixture.getSectionA().getUpStation();
+        final Station downStation = stationDao.insert(new Station("새로운 하행역"));
+        final Section newSection = new Section(line, upStation, downStation, new Distance(10L));
+
+        // when , then
+        assertThat(sectionDao.existAllOrNotingInLineBySection(line, newSection)).isFalse();
+
+    }
+
+    @Test
+    @DisplayName("입력으로 받은 상행역이 라인에 포함되어 있는 세션의 상행역과 같은 것이 있다면 반환한다.")
+    void findSectionByUpStationPresent() {
+        // given
+        final Line line = sectionFixture.getSectionA().getLine();
+        final Station upStation = sectionFixture.getSectionA().getUpStation();
 
         // when
-        boolean result = sectionDao.existByLineId(lineId);
+        final Optional<Section> result = sectionDao.findSectionByUpStation(line, upStation);
 
         // then
-        assertThat(result).isTrue();
+        assertThat(result).isPresent();
+
     }
 
-    @DisplayName("구간 테이블에 특정 노선의 구간이 있는지 여부 반환 - false")
     @Test
-    void existByLineIdFalse() {
+    @DisplayName("입력으로 받은 상행역이 라인에 포함되어 있는 세션의 상행역과 같은 것이 있다면 반환한다.")
+    void findSectionByUpStationEmpty() {
         // given
-        long lineId = 1L;
+        final Line line = sectionFixture.getSectionA().getLine();
+        final Station upStation = stationDao.insert(new Station("새로운 상행역"));
 
         // when
-        boolean result = sectionDao.existByLineId(lineId);
+        final Optional<Section> result = sectionDao.findSectionByUpStation(line, upStation);
 
         // then
-        assertThat(result).isFalse();
+        assertThat(result).isEmpty();
+
     }
 
-    @DisplayName("구간 테이블에서 특정 노선에 해당하는 구간을 모두 반환한다.")
     @Test
-    void findAllByLineId() {
+    @DisplayName("입력으로 받은 상행역이 라인에 포함되어 있는 세션의 상행역과 같은 것이 있다면 반환한다.")
+    void findSectionByDownStationPresent() {
         // given
-        long lineId = 1L;
-        Section result1 = sectionDao.insert(section1);
-        Section result2 = sectionDao.insert(section2);
+        final Line line = sectionFixture.getSectionA().getLine();
+        final Station downStation = sectionFixture.getSectionA().getDownStation();
 
-        //  when
-        List<Section> sections = sectionDao.findAllByLineId(lineId);
+        // when
+        final Optional<Section> result = sectionDao.findSectionByDownStation(line, downStation);
 
         // then
-        assertThat(sections).hasSize(2);
-        assertThat(sections).containsAnyOf(result1, result2);
+        assertThat(result).isPresent();
+
     }
 
-    @DisplayName("구간 테이블에서 아이디를 기준으로 삭제")
     @Test
-    void deleteById() {
+    @DisplayName("입력으로 받은 상행역이 라인에 포함되어 있는 세션의 상행역과 같은 것이 있다면 반환한다.")
+    void findSectionByDownStationEmpty() {
         // given
-        long lineId = 1L;
-        sectionDao.insert(section1);
-        Section result = sectionDao.insert(section2);
+        final Line line = sectionFixture.getSectionA().getLine();
+        final Station downStation = stationDao.insert(new Station("새로운 하행역"));
 
-        //  when
-        assertDoesNotThrow(() -> sectionDao.deleteById(result.getId()));
+        // when
+        final Optional<Section> result = sectionDao.findSectionByDownStation(line, downStation);
 
         // then
-        assertThat(sectionDao.findAllByLineId(lineId)).hasSize(1);
+        assertThat(result).isEmpty();
+
     }
 }
