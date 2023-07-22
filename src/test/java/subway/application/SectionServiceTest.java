@@ -14,9 +14,9 @@ import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.domain.fixture.LineFixture;
+import subway.domain.fixture.StationFixture;
 import subway.dto.request.SectionRequest;
-import subway.fixture.LineFixture;
-import subway.fixture.StationFixture;
 
 import java.util.List;
 
@@ -296,7 +296,7 @@ class SectionServiceTest {
 
         // when , then
         Assertions.assertThatCode(() -> sectionService.deleteSection(line.getId(), stationB.getId()))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
     }
 }
