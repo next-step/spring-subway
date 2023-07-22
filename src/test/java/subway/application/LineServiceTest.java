@@ -11,9 +11,9 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Station;
+import subway.domain.fixture.StationFixture;
 import subway.dto.request.CreateLineRequest;
 import subway.dto.response.LineResponse;
-import subway.fixture.StationFixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

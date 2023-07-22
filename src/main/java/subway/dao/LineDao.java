@@ -45,18 +45,18 @@ public class LineDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Line findById(Long id) {
+    public Line findById(final Long id) {
         final String sql = "select id, name, color from LINE WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, rowMapper, id);
     }
 
-    public void update(Line newLine) {
+    public void update(final Line newLine) {
         final String sql = "update LINE set name = ?, color = ? where id = ?";
         jdbcTemplate.update(sql,
-                new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
+                newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(final Long id) {
         jdbcTemplate.update("delete from Line where id = ?", id);
     }
 }

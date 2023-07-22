@@ -6,7 +6,7 @@ import subway.dao.LineDao;
 import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.request.CreateLineRequest;
-import subway.dto.request.LineRequest;
+import subway.dto.request.LineUpdateRequest;
 import subway.dto.response.LineResponse;
 import subway.dto.response.LineWithStationsResponse;
 
@@ -43,30 +43,34 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findLineResponses() {
         return findLines().stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
+    private List<Line> findLines() {
         return lineDao.findAll();
     }
 
+    @Transactional(readOnly = true)
     public LineWithStationsResponse findLineResponseById(final Long id) {
         final Line persistLine = findLineById(id);
         final List<Station> stations = stationService.findStationByLineId(id);
         return LineWithStationsResponse.of(persistLine, stations);
     }
 
-    public Line findLineById(final Long id) {
+    private Line findLineById(final Long id) {
         return lineDao.findById(id);
     }
 
-    public void updateLine(final Long id, final LineRequest lineUpdateRequest) {
+    @Transactional
+    public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    @Transactional
     public void deleteLineById(final Long id) {
         lineDao.deleteById(id);
     }

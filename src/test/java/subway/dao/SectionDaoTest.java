@@ -10,9 +10,9 @@ import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.fixture.LineFixture;
-import subway.fixture.SectionFixture;
-import subway.fixture.StationFixture;
+import subway.domain.fixture.LineFixture;
+import subway.domain.fixture.SectionFixture;
+import subway.domain.fixture.StationFixture;
 
 import java.util.Optional;
 

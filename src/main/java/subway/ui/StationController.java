@@ -15,7 +15,7 @@ public class StationController {
 
     private final StationService stationService;
 
-    public StationController(StationService stationService) {
+    public StationController(final StationService stationService) {
         this.stationService = stationService;
     }
 

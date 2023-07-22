@@ -3,7 +3,6 @@ package subway.dto.request;
 public class CreateLineRequest {
     private String name;
     private String color;
-
     private Long upStationId;
     private Long downStationId;
     private Long distance;

@@ -9,9 +9,6 @@ public class Station {
     private Long id;
     private String name;
 
-    public Station() {
-    }
-
     public Station(final Long id, final String name) {
         Assert.hasText(name, "이름은 필수입니다.");
         Assert.notNull(id, "id는 null 일 수 없습니다");

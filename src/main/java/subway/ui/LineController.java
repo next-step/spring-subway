@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.dto.request.CreateLineRequest;
-import subway.dto.request.LineRequest;
+import subway.dto.request.LineUpdateRequest;
 import subway.dto.response.LineResponse;
 import subway.dto.response.LineWithStationsResponse;
 
@@ -39,7 +39,7 @@ public class LineController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateLine(@PathVariable final Long id,
-                                           @RequestBody final LineRequest lineUpdateRequest) {
+                                           @RequestBody final LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }

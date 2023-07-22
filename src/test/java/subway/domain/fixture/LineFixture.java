@@ -1,4 +1,4 @@
-package subway.fixture;
+package subway.domain.fixture;
 
 import subway.dao.LineDao;
 import subway.domain.Line;

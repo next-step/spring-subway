@@ -22,7 +22,7 @@ public class SubWayExceptionHandler {
     })
     public ResponseEntity<String> handleArgumentExceptionException(IllegalArgumentException exception) {
         return ResponseEntity.badRequest()
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.TEXT_PLAIN)
                 .body(exception.getMessage());
     }
 }

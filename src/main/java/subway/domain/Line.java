@@ -10,9 +10,6 @@ public class Line {
     private String name;
     private String color;
 
-    public Line() {
-    }
-
     public Line(final String name, final String color) {
         Assert.hasText(name, "이름은 필수입니다.");
         Assert.hasText(color, "색깔은 필수입니다.");
