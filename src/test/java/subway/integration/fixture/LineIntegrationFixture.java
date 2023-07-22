@@ -10,7 +10,7 @@ import subway.dto.response.LineResponse;
 
 public class LineIntegrationFixture {
 
-    public static Line createLine(CreateLineRequest createLineRequest) {
+    public static Line createLine(final CreateLineRequest createLineRequest) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

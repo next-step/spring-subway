@@ -7,7 +7,6 @@ import subway.dto.request.SectionRequest;
 import subway.dto.response.SectionResponse;
 
 import java.net.URI;
-import java.sql.SQLException;
 
 @RestController
 public class SectionController {
@@ -20,30 +19,20 @@ public class SectionController {
 
     @PostMapping("/lines/{lineId}/sections")
     public ResponseEntity<SectionResponse> createSection(
-            @PathVariable Long lineId,
-            @RequestBody SectionRequest sectionRequest) {
-        SectionResponse sectionResponse = getSectionResponse(lineId, sectionRequest);
+            @PathVariable final Long lineId,
+            @RequestBody final SectionRequest sectionRequest) {
+        final SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
         return ResponseEntity.created(
                         URI.create("/lines/" + lineId + "/sections/" + sectionResponse.getId()))
                 .body(sectionResponse);
     }
 
-    private SectionResponse getSectionResponse(final Long lineId, final SectionRequest sectionRequest) {
-        SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
-        return sectionResponse;
-    }
-
     @DeleteMapping("/lines/{lineId}/sections")
     public ResponseEntity<Void> deleteSection(
-            @PathVariable Long lineId,
-            @RequestParam Long stationId) {
+            @PathVariable final Long lineId,
+            @RequestParam final Long stationId) {
         sectionService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler({SQLException.class, IllegalArgumentException.class, IllegalStateException.class})
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
     }
 
 }

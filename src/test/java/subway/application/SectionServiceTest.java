@@ -79,7 +79,7 @@ class SectionServiceTest {
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
-        SectionRequest request = new SectionRequest(stationA.getId(), stationD.getId(), 5L);
+        final SectionRequest request = new SectionRequest(stationA.getId(), stationD.getId(), 5L);
 
         // when
         sectionService.saveSection(line.getId(), request);
@@ -107,7 +107,7 @@ class SectionServiceTest {
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
-        SectionRequest request = new SectionRequest(stationC.getId(), stationD.getId(), 5L);
+        final SectionRequest request = new SectionRequest(stationC.getId(), stationD.getId(), 5L);
 
         // when
         sectionService.saveSection(line.getId(), request);
@@ -136,7 +136,7 @@ class SectionServiceTest {
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
-        SectionRequest request = new SectionRequest(stationD.getId(), stationC.getId(), 5L);
+        final SectionRequest request = new SectionRequest(stationD.getId(), stationC.getId(), 5L);
 
         // when
         sectionService.saveSection(line.getId(), request);
@@ -165,7 +165,7 @@ class SectionServiceTest {
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
-        SectionRequest request = new SectionRequest(stationD.getId(), stationA.getId(), 5L);
+        final SectionRequest request = new SectionRequest(stationD.getId(), stationA.getId(), 5L);
 
         // when
         sectionService.saveSection(line.getId(), request);
@@ -192,7 +192,7 @@ class SectionServiceTest {
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
-        SectionRequest request = new SectionRequest(stationA.getId(), stationC.getId(), 5L);
+        final SectionRequest request = new SectionRequest(stationA.getId(), stationC.getId(), 5L);
 
         // when , then
         assertThatCode(() -> sectionService.saveSection(line.getId(), request))
@@ -213,7 +213,7 @@ class SectionServiceTest {
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
-        SectionRequest request = new SectionRequest(stationD.getId(), stationE.getId(), 5L);
+        final SectionRequest request = new SectionRequest(stationD.getId(), stationE.getId(), 5L);
 
         // when , then
         assertThatCode(() -> sectionService.saveSection(line.getId(), request))
@@ -233,7 +233,7 @@ class SectionServiceTest {
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
-        SectionRequest request = new SectionRequest(stationB.getId(), stationD.getId(), 11L);
+        final SectionRequest request = new SectionRequest(stationB.getId(), stationD.getId(), 11L);
 
         // when , then
         assertThatCode(() -> sectionService.saveSection(line.getId(), request))

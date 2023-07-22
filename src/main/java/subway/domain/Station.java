@@ -1,5 +1,7 @@
 package subway.domain;
 
+import org.springframework.util.Assert;
+
 import java.util.Objects;
 
 public class Station {
@@ -10,12 +12,14 @@ public class Station {
     public Station() {
     }
 
-    public Station(Long id, String name) {
+    public Station(final Long id, final String name) {
+        Assert.hasText(name, "이름은 필수입니다.");
+        Assert.notNull(id, "id는 null 일 수 없습니다");
         this.id = id;
         this.name = name;
     }
 
-    public Station(String name) {
+    public Station(final String name) {
         this.name = name;
     }
 

@@ -1,5 +1,7 @@
 package subway.domain;
 
+import org.springframework.util.Assert;
+
 import java.util.Objects;
 
 public class Distance {
@@ -8,12 +10,13 @@ public class Distance {
 
     private Long value;
 
-    public Distance(Long value) {
+    public Distance(final Long value) {
         validate(value);
         this.value = value;
     }
 
-    private void validate(Long value) {
+    private void validate(final Long value) {
+        Assert.notNull(value, "거리는 null 일 수 없습니다.");
         if (value < MIN_DISTANCE) {
             throw new IllegalArgumentException("거리는 " + MIN_DISTANCE + "이상이어야 합니다.");
         }

@@ -68,11 +68,8 @@ public class StationIntegrationTest extends IntegrationTest {
     void getStations() {
         /// given
         Map<String, String> params1 = Map.of("name", "강남역");
-
         final Station stationA = StationIntegrationFixture.createStation(params1);
-
         Map<String, String> params2 = Map.of("name", "역삼역");
-
         final Station stationB = StationIntegrationFixture.createStation(params2);
 
         // when
@@ -96,7 +93,6 @@ public class StationIntegrationTest extends IntegrationTest {
     void getStation() {
         /// given
         Map<String, String> params = Map.of("name", "강남역");
-
         final Station station = StationIntegrationFixture.createStation(params);
 
         // when
@@ -117,12 +113,10 @@ public class StationIntegrationTest extends IntegrationTest {
     void updateStation() {
         // given
         Map<String, String> params = Map.of("name", "강남역");
-
         Station station = StationIntegrationFixture.createStation(params);
 
         // when
-        Map<String, String> otherParams = new HashMap<>();
-        otherParams.put("name", "삼성역");
+        Map<String, String> otherParams = Map.of("name", "삼성역");
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -144,7 +138,6 @@ public class StationIntegrationTest extends IntegrationTest {
         Station station = StationIntegrationFixture.createStation(params);
 
         // when
-
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
                 .delete("/stations/{stationId}", station.getId())

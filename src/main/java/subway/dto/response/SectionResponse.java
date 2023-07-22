@@ -2,8 +2,6 @@ package subway.dto.response;
 
 import subway.domain.Section;
 
-import java.util.Objects;
-
 public class SectionResponse {
 
     private Long id;
@@ -53,34 +51,4 @@ public class SectionResponse {
         return distance;
     }
 
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        SectionResponse that = (SectionResponse) o;
-        return Objects.equals(id, that.id) && Objects.equals(lineId, that.lineId)
-                && Objects.equals(upStationId, that.upStationId) && Objects.equals(
-                downStationId, that.downStationId) && Objects.equals(distance, that.distance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, lineId, upStationId, downStationId, distance);
-    }
-
-    @Override
-    public String toString() {
-        return "SectionResponse{" +
-                "id=" + id +
-                ", lineId=" + lineId +
-                ", upStationId=" + upStationId +
-                ", downStationId=" + downStationId +
-                ", distance=" + distance +
-                '}';
-    }
 }

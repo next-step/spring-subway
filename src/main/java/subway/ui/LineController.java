@@ -9,7 +9,6 @@ import subway.dto.response.LineResponse;
 import subway.dto.response.LineWithStationsResponse;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -18,13 +17,13 @@ public class LineController {
 
     private final LineService lineService;
 
-    public LineController(LineService lineService) {
+    public LineController(final LineService lineService) {
         this.lineService = lineService;
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody CreateLineRequest request) {
-        LineResponse line = lineService.saveLine(request);
+    public ResponseEntity<LineResponse> createLine(@RequestBody final CreateLineRequest request) {
+        final LineResponse line = lineService.saveLine(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -34,26 +33,20 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineWithStationsResponse> findLineById(@PathVariable Long id) {
+    public ResponseEntity<LineWithStationsResponse> findLineById(@PathVariable final Long id) {
         return ResponseEntity.ok(lineService.findLineResponseById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id,
-                                           @RequestBody LineRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable final Long id,
+                                           @RequestBody final LineRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable final Long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException(SQLException sqlException) {
-        sqlException.printStackTrace();
-        return ResponseEntity.badRequest().build();
     }
 }

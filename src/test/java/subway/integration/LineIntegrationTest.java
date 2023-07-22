@@ -81,9 +81,7 @@ public class LineIntegrationTest extends IntegrationTest {
     void getLines() {
         // given
         final Line lineA = LineIntegrationFixture.createLine(createLineRequestA);
-
         final Line lineB = LineIntegrationFixture.createLine(createLineRequestB);
-
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -95,7 +93,6 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
         List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
                 .map(LineResponse::getId)
                 .collect(Collectors.toList());

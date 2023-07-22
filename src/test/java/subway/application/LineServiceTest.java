@@ -45,10 +45,10 @@ class LineServiceTest {
     @Test
     void saveLineAndSaveFirstSection() {
         // given
-        Line line = new Line("1호선", "그린");
-        Station upStation = stationFixture.getStationA();
-        Station downStation = stationFixture.getStationB();
-        CreateLineRequest createLineRequest = new CreateLineRequest(
+        final Line line = new Line("1호선", "그린");
+        final Station upStation = stationFixture.getStationA();
+        final Station downStation = stationFixture.getStationB();
+        final CreateLineRequest createLineRequest = new CreateLineRequest(
                 line.getName(),
                 line.getColor(),
                 upStation.getId(),
@@ -56,7 +56,7 @@ class LineServiceTest {
                 10L);
 
         // when
-        LineResponse lineResponse = lineService.saveLine(createLineRequest);
+        final LineResponse lineResponse = lineService.saveLine(createLineRequest);
 
         // then
         assertThat(lineDao.findById(lineResponse.getId()))

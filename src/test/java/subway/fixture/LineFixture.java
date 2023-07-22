@@ -7,7 +7,7 @@ public class LineFixture {
 
     private Line line;
 
-    public void init(LineDao lineDao) {
+    public void init(final LineDao lineDao) {
         line = lineDao.insert(new Line("1호선", "green"));
     }
 

@@ -22,16 +22,17 @@ public class LineService {
 
     private final SectionService sectionService;
 
-    public LineService(LineDao lineDao, StationService stationService,
-                       SectionService sectionService) {
+    public LineService(final LineDao lineDao,
+                       final StationService stationService,
+                       final SectionService sectionService) {
         this.lineDao = lineDao;
         this.stationService = stationService;
         this.sectionService = sectionService;
     }
 
     @Transactional
-    public LineResponse saveLine(CreateLineRequest request) {
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+    public LineResponse saveLine(final CreateLineRequest request) {
+        final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
         sectionService.saveFirstSection(
                 persistLine.getId(),
@@ -43,8 +44,7 @@ public class LineService {
     }
 
     public List<LineResponse> findLineResponses() {
-        List<Line> persistLines = findLines();
-        return persistLines.stream()
+        return findLines().stream()
                 .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
@@ -53,21 +53,21 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineWithStationsResponse findLineResponseById(Long id) {
-        Line persistLine = findLineById(id);
-        List<Station> stations = stationService.findStationByLineId(id);
+    public LineWithStationsResponse findLineResponseById(final Long id) {
+        final Line persistLine = findLineById(id);
+        final List<Station> stations = stationService.findStationByLineId(id);
         return LineWithStationsResponse.of(persistLine, stations);
     }
 
-    public Line findLineById(Long id) {
+    public Line findLineById(final Long id) {
         return lineDao.findById(id);
     }
 
-    public void updateLine(Long id, LineRequest lineUpdateRequest) {
+    public void updateLine(final Long id, final LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
-    public void deleteLineById(Long id) {
+    public void deleteLineById(final Long id) {
         lineDao.deleteById(id);
     }
 
