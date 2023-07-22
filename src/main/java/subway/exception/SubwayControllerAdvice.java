@@ -14,14 +14,8 @@ public class SubwayControllerAdvice {
         return ResponseEntity.internalServerError().body(exception.getLocalizedMessage());
     }
 
-    @ExceptionHandler(IllegalSectionException.class)
-    public ResponseEntity<String> illegalSectionExceptionHandler(IllegalSectionException exception) {
+    @ExceptionHandler(SubwayBadRequestException.class)
+    public ResponseEntity<String> illegalSectionExceptionHandler(SubwayBadRequestException exception) {
         return ResponseEntity.badRequest().body(exception.getLocalizedMessage());
     }
-
-    @ExceptionHandler(IllegalLineException.class)
-    public ResponseEntity<String> illegalLineExceptionHandler(IllegalLineException exception) {
-        return ResponseEntity.badRequest().body(exception.getLocalizedMessage());
-    }
-
 }
