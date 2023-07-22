@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
-import subway.dao.StationDao;
 import subway.domain.*;
 import subway.dto.request.SectionRequest;
 import subway.dto.response.SectionResponse;
@@ -14,18 +13,16 @@ import java.util.Optional;
 @Service
 public class SectionService {
 
+    private final StationService stationService;
+    private final LineDao lineDao;
     private final SectionDao sectionDao;
 
-    private final LineDao lineDao;
-
-    private final StationDao stationDao;
-
-    public SectionService(final SectionDao sectionDao,
+    public SectionService(final StationService stationService,
                           final LineDao lineDao,
-                          final StationDao stationDao) {
-        this.sectionDao = sectionDao;
+                          final SectionDao sectionDao) {
+        this.stationService = stationService;
         this.lineDao = lineDao;
-        this.stationDao = stationDao;
+        this.sectionDao = sectionDao;
     }
 
     @Transactional
@@ -96,15 +93,16 @@ public class SectionService {
     }
 
     private Section createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        final Line line = lineDao.findById(lineId);
-        final Station upStation = stationDao.findById(upStationId);
-        final Station downStation = stationDao.findById(downStationId);
+        final Line line = lineDao.findById(lineId)
+                .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
+        final Station upStation = stationService.findStationById(upStationId);
+        final Station downStation = stationService.findStationById(downStationId);
         return new Section(line, upStation, downStation, new Distance(distance));
     }
 
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
-        final Station station = stationDao.findById(stationId);
+        final Station station = stationService.findStationById(stationId);
         final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         validateDeleteConstraint(station, sections);
         final Section lastSection = sections.deleteLastSection();

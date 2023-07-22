@@ -2,14 +2,17 @@ package subway.dao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+
+import static org.springframework.dao.support.DataAccessUtils.singleResult;
 
 @Repository
 public class LineDao {
@@ -31,11 +34,7 @@ public class LineDao {
     }
 
     public Line insert(final Line line) {
-        final Map<String, Object> params = new HashMap<>();
-        params.put("id", line.getId());
-        params.put("name", line.getName());
-        params.put("color", line.getColor());
-
+        final SqlParameterSource params = new BeanPropertySqlParameterSource(line);
         final Long lineId = insertAction.executeAndReturnKey(params).longValue();
         return new Line(lineId, line.getName(), line.getColor());
     }
@@ -45,9 +44,9 @@ public class LineDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Line findById(final Long id) {
+    public Optional<Line> findById(final Long id) {
         final String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        return Optional.ofNullable(singleResult(jdbcTemplate.query(sql, rowMapper, id)));
     }
 
     public void update(final Line newLine) {

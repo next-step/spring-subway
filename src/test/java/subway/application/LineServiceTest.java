@@ -59,7 +59,7 @@ class LineServiceTest {
         final LineResponse lineResponse = lineService.saveLine(createLineRequest);
 
         // then
-        assertThat(lineDao.findById(lineResponse.getId()))
+        assertThat(lineDao.findById(lineResponse.getId()).get())
                 .extracting(Line::getName, Line::getColor)
                 .contains(line.getName(), line.getColor());
         assertThat(sectionDao.findAllByLineId(lineResponse.getId())).hasSize(1);

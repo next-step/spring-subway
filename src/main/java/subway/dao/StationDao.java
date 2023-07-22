@@ -10,6 +10,9 @@ import subway.domain.Station;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.dao.support.DataAccessUtils.singleResult;
 
 @Repository
 public class StationDao {
@@ -40,9 +43,9 @@ public class StationDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Station findById(final Long id) {
+    public Optional<Station> findById(final Long id) {
         final String sql = "select * from STATION where id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        return Optional.ofNullable(singleResult(jdbcTemplate.query(sql, rowMapper, id)));
     }
 
     public void update(final Station newStation) {

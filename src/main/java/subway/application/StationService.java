@@ -31,8 +31,14 @@ public class StationService {
     }
 
     @Transactional(readOnly = true)
-    public StationResponse findStationResponseById(final Long id) {
-        return StationResponse.of(stationDao.findById(id));
+    public StationResponse findStationResponseById(final Long stationId) {
+        final Station station = findStationById(stationId);
+        return StationResponse.of(station);
+    }
+
+    public Station findStationById(final Long stationId) {
+        return stationDao.findById(stationId)
+                .orElseThrow(() -> new IllegalStateException("역을 찾을 수 없습니다."));
     }
 
     @Transactional(readOnly = true)
@@ -43,13 +49,13 @@ public class StationService {
     }
 
     @Transactional
-    public void updateStation(final Long id, final StationRequest stationRequest) {
-        stationDao.update(new Station(id, stationRequest.getName()));
+    public void updateStation(final Long stationId, final StationRequest stationRequest) {
+        stationDao.update(new Station(stationId, stationRequest.getName()));
     }
 
     @Transactional
-    public void deleteStationById(final Long id) {
-        stationDao.deleteById(id);
+    public void deleteStationById(final Long stationId) {
+        stationDao.deleteById(stationId);
     }
 
     @Transactional(readOnly = true)
