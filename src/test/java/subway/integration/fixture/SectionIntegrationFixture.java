@@ -8,7 +8,7 @@ import subway.dto.request.SectionRequest;
 
 public class SectionIntegrationFixture {
 
-    public static ExtractableResponse<Response> createSection(Long lineId, SectionRequest sectionRequest) {
+    public static ExtractableResponse<Response> createSection(final Long lineId, final SectionRequest sectionRequest) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
