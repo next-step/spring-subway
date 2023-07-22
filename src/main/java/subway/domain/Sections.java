@@ -22,18 +22,26 @@ public class Sections {
         validateStations(base.getUpStationId(), base.getDownStationId());
 
         if (upStationMap.containsKey(base.getUpStationId())) {
-            Section conectedSection = upStationMap.get(base.getUpStationId());
-            validateDistance(conectedSection, base.getDistance());
-            return Optional.of(conectedSection.upStationId(base));
+            return findConnectedUpStation(base);
         }
 
         if (downStationMap.containsKey(base.getDownStationId())) {
-            Section connectedSection = downStationMap.get(base.getDownStationId());
-            validateDistance(connectedSection, base.getDistance());
-            return Optional.of(connectedSection.downStationId(base));
+            return findConnectedDownStation(base);
         }
 
         return Optional.empty();
+    }
+
+    private Optional<Section> findConnectedUpStation(Section base) {
+        Section conectedSection = upStationMap.get(base.getUpStationId());
+        validateDistance(conectedSection, base.getDistance());
+        return Optional.of(conectedSection.upStationId(base));
+    }
+
+    private Optional<Section> findConnectedDownStation(Section base) {
+        Section connectedSection = downStationMap.get(base.getDownStationId());
+        validateDistance(connectedSection, base.getDistance());
+        return Optional.of(connectedSection.downStationId(base));
     }
 
     private void validateStations(long upStationId, long downStationId) {
