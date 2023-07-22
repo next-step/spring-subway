@@ -1,33 +1,33 @@
 package subway.dao;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.sql.DataSource;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
 
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Repository
 public class LineDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
+    private final RowMapper<Line> lineRowMapper;
+    private final SectionDao sectionDao;
 
-    private RowMapper<Line> rowMapper = (rs, rowNum) ->
-            new Line(
-                    rs.getLong("id"),
-                    rs.getString("name"),
-                    rs.getString("color")
-            );
-
-    public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource, RowMapper<Line> lineRowMapper,
+            SectionDao sectionDao) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("line")
+                .withTableName("LINE")
                 .usingGeneratedKeyColumns("id");
+        this.lineRowMapper = lineRowMapper;
+        this.sectionDao = sectionDao;
     }
 
     public Line insert(Line line) {
@@ -41,21 +41,44 @@ public class LineDao {
     }
 
     public List<Line> findAll() {
-        String sql = "select id, name, color from LINE";
-        return jdbcTemplate.query(sql, rowMapper);
+        String sql = "SELECT * FROM LINE";
+        List<Line> linesWithOutSections = jdbcTemplate.query(sql, lineRowMapper);
+        List<Line> linesWithSections = new ArrayList<>();
+        for (Line line : linesWithOutSections) {
+            linesWithSections.add(
+                    new Line(line.getId(), line.getName(), line.getColor(), sectionDao.findAllByLineId(line.getId())));
+        }
+        return linesWithSections;
     }
 
-    public Line findById(Long id) {
-        String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    public Optional<Line> findById(Long id) {
+        String sql = "SELECT * FROM LINE AS L WHERE L.id = ?";
+        try {
+            Line line = jdbcTemplate.queryForObject(sql, lineRowMapper, id);
+            return Optional.of(
+                    new Line(line.getId(), line.getName(), line.getColor(), sectionDao.findAllByLineId(line.getId())));
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            return Optional.empty();
+        }
     }
 
     public void update(Line newLine) {
-        String sql = "update LINE set name = ?, color = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
+        String sql = "UPDATE LINE SET name = ?, color = ? WHERE id = ?";
+        jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
     public void deleteById(Long id) {
-        jdbcTemplate.update("delete from Line where id = ?", id);
+        jdbcTemplate.update("DELETE FROM LINE WHERE id = ?", id);
+    }
+
+    public Optional<Line> findByName(String name) {
+        String sql = "SELECT * FROM LINE WHERE name = ?";
+        try {
+            Line line = jdbcTemplate.queryForObject(sql, lineRowMapper, name);
+            return Optional.of(
+                    new Line(line.getId(), line.getName(), line.getColor(), sectionDao.findAllByLineId(line.getId())));
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            return Optional.empty();
+        }
     }
 }

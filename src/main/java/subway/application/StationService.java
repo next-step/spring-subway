@@ -1,13 +1,14 @@
 package subway.application;
 
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import subway.dao.StationDao;
 import subway.domain.Station;
-import subway.dto.StationRequest;
+import subway.dto.StationCreateRequest;
 import subway.dto.StationResponse;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import subway.dto.StationUpdateRequest;
 
 @Service
 public class StationService {
@@ -17,13 +18,22 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
+    public StationResponse saveStation(StationCreateRequest stationCreateRequest) {
+        stationDao.findByName(stationCreateRequest.getName())
+                .ifPresent(station -> {
+                    throw new IllegalArgumentException(
+                            MessageFormat.format("{0}에 해당하는 station이 이미 존재합니다.", stationCreateRequest.getName()));
+                });
+
+        Station station = stationDao.insert(new Station(stationCreateRequest.getName()));
         return StationResponse.of(station);
     }
 
     public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        Station station = stationDao.findById(id).orElseThrow(() -> new IllegalArgumentException(
+                MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id)));
+
+        return StationResponse.of(station);
     }
 
     public List<StationResponse> findAllStationResponses() {
@@ -34,8 +44,8 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public void updateStation(Long id, StationRequest stationRequest) {
-        stationDao.update(new Station(id, stationRequest.getName()));
+    public void updateStation(Long id, StationUpdateRequest stationUpdateRequest) {
+        stationDao.update(new Station(id, stationUpdateRequest.getName()));
     }
 
     public void deleteStationById(Long id) {
