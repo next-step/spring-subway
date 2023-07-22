@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,21 +24,19 @@ public class GlobalControllerAdvice {
         this.messageSource = messageSource;
     }
 
-    @ExceptionHandler(SQLException.class)
+    @ExceptionHandler({SQLException.class, DuplicateKeyException.class})
     public ResponseEntity<ErrorResponse> handleSQLException() {
-        return ResponseEntity.badRequest()
-            .body(new ErrorResponse("잘못된 요청입니다."));
+        return ResponseEntity.badRequest().body(new ErrorResponse("잘못된 요청입니다."));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleValidationException(
         MethodArgumentNotValidException e) {
-        return ResponseEntity.badRequest()
-            .body(new ErrorResponse(joinFieldErrorMessages(e)));
+        return ResponseEntity.badRequest().body(new ErrorResponse(joinFieldErrorMessages(e)));
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleValidationException(
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
         IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
     }
