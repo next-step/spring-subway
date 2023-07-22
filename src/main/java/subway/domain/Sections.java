@@ -1,6 +1,13 @@
 package subway.domain;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -46,7 +53,8 @@ public class Sections {
         final Section firstSection = findFirstSection().orElseThrow(IllegalArgumentException::new);
 
         final List<Long> result =
-                new ArrayList<>(List.of(firstSection.getUpStationId(), firstSection.getDownStationId()));
+                new ArrayList<>(
+                        List.of(firstSection.getUpStationId(), firstSection.getDownStationId()));
         Section next = upStationKeyMap.get(firstSection.getDownStationId());
 
         while (next != null) {
@@ -71,7 +79,10 @@ public class Sections {
         return differenceIds.contains(upStationId) || differenceIds.contains(downStationId);
     }
 
-    public Optional<Section> findContainStationSection(final Long upStationId, final Long downStationId) {
+    public Optional<Section> findContainStationSection(
+            final Long upStationId,
+            final Long downStationId
+    ) {
         return find(section -> section.containsStations(upStationId, downStationId));
     }
 
