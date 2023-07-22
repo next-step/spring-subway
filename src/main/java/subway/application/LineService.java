@@ -6,8 +6,8 @@ import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
-import subway.domain.LineSections;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
@@ -34,10 +34,8 @@ public class LineService {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = getStationOrElseThrow(request.getUpStationId());
         Station downStation = getStationOrElseThrow(request.getDownStationId());
-        Section persistSection = sectionDao.save(
+        sectionDao.save(
             new Section(persistLine, upStation, downStation, request.getDistance()));
-
-        new LineSections(persistLine, persistSection);
 
         return LineResponse.of(persistLine);
     }
@@ -57,8 +55,9 @@ public class LineService {
 
     @Transactional
     public LineResponse findLineResponseById(Long id) {
-        LineSections lineSections = sectionDao.findAllByLine(getLineOrElseThrow(id));
-        return LineResponse.of(lineSections);
+        final Line line = getLineOrElseThrow(id);
+        Sections sections = sectionDao.findAllByLine(line);
+        return LineResponse.of(line, sections);
     }
 
     private Station getStationOrElseThrow(Long id) {

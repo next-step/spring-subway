@@ -15,11 +15,12 @@ public class Sections {
     public static final int MIN_SECTION_COUNT = 1;
     private final List<Section> values;
 
-    public Sections(List<Section> values) {
-        validateNullOrEmpty(values);
-        this.values = sort(values);
+    public Sections(List<Section> candidateValues) {
+        validateNullOrEmpty(candidateValues);
+        validateAllBelongToSameLine(candidateValues);
+        this.values = sort(candidateValues);
 
-        validateConnectedSections(values, this.values);
+        validateConnectedSections(candidateValues, this.values);
     }
 
     private void validateNullOrEmpty(List<Section> values) {
@@ -34,9 +35,15 @@ public class Sections {
         }
     }
 
-    public boolean isSectionsAllBelongTo(Line line) {
-        return values.stream()
-            .allMatch(section -> section.belongTo(line));
+    private void validateAllBelongToSameLine(List<Section> values) {
+        final long distinctLineCount = values.stream()
+            .map(Section::getLine)
+            .distinct()
+            .count();
+
+        if (distinctLineCount > 1) {
+            throw new IllegalArgumentException("구간들은 모두 하나의 노선에 포함되어야 합니다.");
+        }
     }
 
     private List<Section> sort(List<Section> values) {
@@ -77,6 +84,8 @@ public class Sections {
     }
 
     public SectionAdditionResult add(Section section) {
+        validateSectionBelongToLine(section);
+
         validateOneInOneOut(section);
 
         if (section.canPrecede(getFirst())) {
@@ -91,6 +100,13 @@ public class Sections {
 
         return addSectionInMiddle(section);
     }
+
+    private void validateSectionBelongToLine(final Section section) {
+        if (!section.belongTo(getFirst().getLine())) {
+            throw new IllegalArgumentException("추가할 구간은 기존 노선에 포함되어야 합니다.");
+        }
+    }
+
 
     private SectionAdditionResult addSectionInMiddle(Section section) {
         Section foundSection = findMatchedSection(section);

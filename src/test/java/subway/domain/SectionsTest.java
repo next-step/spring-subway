@@ -113,4 +113,15 @@ class SectionsTest {
         assertThat(sections).isEqualTo(expectedSections);
         assertThat(removedSection).isEqualTo(sectionB);
     }
+
+    @Test
+    @DisplayName("다른 노선에 속한 구간들로 생성할 수 없습니다.")
+    void cannotCreateWithSectionsOfOtherLines() {
+        Line otherLine = new Line(2L, "lineB", "red");
+        Section sectionA = new Section(lineA, stationA, stationB, 3);
+        Section sectionB = new Section(otherLine, stationB, stationC, 3);
+
+        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 }

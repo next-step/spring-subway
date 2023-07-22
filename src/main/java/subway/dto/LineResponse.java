@@ -2,7 +2,7 @@ package subway.dto;
 
 import java.util.List;
 import subway.domain.Line;
-import subway.domain.LineSections;
+import subway.domain.Sections;
 import subway.domain.Station;
 
 public class LineResponse {
@@ -32,9 +32,8 @@ public class LineResponse {
         return new LineResponse(line.getId(), line.getName(), line.getColor());
     }
 
-    public static LineResponse of(LineSections lineSections) {
-        Line line = lineSections.getLine();
-        List<Station> stations = lineSections.getSections().getStations();
+    public static LineResponse of(Line line, Sections sections) {
+        List<Station> stations = sections.getStations();
 
         return new LineResponse(line.getId(), line.getName(), line.getColor(),
             StationResponse.listOf(stations));

@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
-import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
@@ -54,7 +53,7 @@ public class SectionDao {
             .usingGeneratedKeyColumns("id");
     }
 
-    public LineSections findAllByLine(Line line) {
+    public Sections findAllByLine(Line line) {
         String sql =
             "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
                 + "l.name AS line_name, color AS line_color, "
@@ -67,7 +66,7 @@ public class SectionDao {
 
         List<Section> values = jdbcTemplate.query(sql, rowToSectionMapper, line.getId());
 
-        return new LineSections(line, new Sections(values));
+        return new Sections(values);
     }
 
     public Section save(Section section) {

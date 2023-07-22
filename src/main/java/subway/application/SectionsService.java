@@ -6,8 +6,8 @@ import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
-import subway.domain.LineSections;
 import subway.domain.Section;
+import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
 import subway.vo.SectionAdditionResult;
@@ -28,10 +28,10 @@ public class SectionsService {
     @Transactional
     public void addSection(Long id, SectionAdditionRequest request) {
         Line line = getLineOrElseThrow(id);
-        LineSections lineSections = sectionDao.findAllByLine(line);
+        Sections sections = sectionDao.findAllByLine(line);
         Section section = createNewSectionBy(request);
 
-        SectionAdditionResult sectionAdditionResult = lineSections.add(section);
+        SectionAdditionResult sectionAdditionResult = sections.add(section);
 
         sectionAdditionResult.getSectionToRemove().ifPresent(sectionDao::delete);
         sectionAdditionResult.getSectionsToAdd().forEach(sectionDao::save);
@@ -46,10 +46,10 @@ public class SectionsService {
     @Transactional
     public void removeLast(Long lineId, Long stationId) {
         Line line = getLineOrElseThrow(lineId);
-        LineSections lineSections = sectionDao.findAllByLine(line);
+        Sections sections = sectionDao.findAllByLine(line);
         Station station = getStationOrElseThrow(stationId);
 
-        Section removedSection = lineSections.removeLast(station);
+        Section removedSection = sections.removeLast(station);
 
         sectionDao.delete(removedSection);
     }
