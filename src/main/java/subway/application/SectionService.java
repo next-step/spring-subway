@@ -9,8 +9,8 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.domain.vo.SectionRegistVo;
-import subway.dto.request.SectionRegistRequest;
+import subway.domain.vo.SectionRegisterVo;
+import subway.dto.request.SectionRegisterRequest;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,19 +27,19 @@ public class SectionService {
     }
 
     @Transactional
-    public void registSection(SectionRegistRequest sectionRegistRequest, Long lineId) {
-        Station upStation = stationDao.findById(sectionRegistRequest.getUpStationId());
-        Station downStation = stationDao.findById(sectionRegistRequest.getDownStationId());
+    public void registerSection(SectionRegisterRequest sectionRegisterRequest, Long lineId) {
+        Station upStation = stationDao.findById(sectionRegisterRequest.getUpStationId());
+        Station downStation = stationDao.findById(sectionRegisterRequest.getDownStationId());
         Line line = lineDao.findById(lineId);
         Section section = new Section(
             upStation,
             downStation,
             line,
-            sectionRegistRequest.getDistance()
+            sectionRegisterRequest.getDistance()
         );
 
         Sections sections = sectionDao.findAllByLineId(lineId);
-        SectionRegistVo result = sections.registSection(section);
+        SectionRegisterVo result = sections.registerSection(section);
 
         sectionDao.insert(result.getAddSection());
 

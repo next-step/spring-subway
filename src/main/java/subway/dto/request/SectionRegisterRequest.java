@@ -2,16 +2,16 @@ package subway.dto.request;
 
 import java.util.Objects;
 
-public final class SectionRegistRequest {
+public final class SectionRegisterRequest {
 
     private Long upStationId;
     private Long downStationId;
     private int distance;
 
-    public SectionRegistRequest() {
+    public SectionRegisterRequest() {
     }
 
-    public SectionRegistRequest(
+    public SectionRegisterRequest(
         Long upStationId,
         Long downStationId,
         int distance
@@ -42,7 +42,7 @@ public final class SectionRegistRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SectionRegistRequest that = (SectionRegistRequest) o;
+        SectionRegisterRequest that = (SectionRegisterRequest) o;
         return distance == that.distance && Objects.equals(downStationId, that.downStationId)
             && Objects.equals(upStationId, that.upStationId);
     }

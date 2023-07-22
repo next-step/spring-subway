@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.domain.vo.SectionRegistVo;
+import subway.domain.vo.SectionRegisterVo;
 
 class SectionsTest {
 
@@ -79,13 +79,13 @@ class SectionsTest {
     @Test
     @DisplayName("새로운 구간의 상행과 하행이 기존 섹션에 있을 경우 예외가 발생한다.")
     void validNewSectionDownStation() {
-        assertThatThrownBy(() -> sections.registSection(section1))
+        assertThatThrownBy(() -> sections.registerSection(section1))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("구간 등록 정상 동작")
-    void registSection() {
+    void registerSection() {
         Section section4 = new Section(
             4L,
             station4,
@@ -94,7 +94,7 @@ class SectionsTest {
             10
         );
         assertThatNoException()
-            .isThrownBy(() -> sections.registSection(section4));
+            .isThrownBy(() -> sections.registerSection(section4));
     }
 
     @Test
@@ -107,13 +107,13 @@ class SectionsTest {
             line1,
             10
         );
-        assertThatThrownBy(() -> sections.registSection(section4))
+        assertThatThrownBy(() -> sections.registerSection(section4))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("상행역과 하행역 둘 중 하나라도 포함되어있지 않으면 추가할 수 없음")
-    void sectionRegistReject() {
+    void sectionRegisterReject() {
         Section section4 = new Section(
             4L,
             station5,
@@ -121,7 +121,7 @@ class SectionsTest {
             line1,
             10
         );
-        assertThatThrownBy(() -> sections.registSection(section4))
+        assertThatThrownBy(() -> sections.registerSection(section4))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -147,9 +147,9 @@ class SectionsTest {
 
     @Test
     @DisplayName("Line에 역이 하나도 없다면 구간이 무조건 등록된다")
-    void registSectionInEmptyLine() {
+    void registerSectionInEmptyLine() {
         Sections sections = new Sections(Collections.emptyList());
-        assertThatNoException().isThrownBy(() -> sections.registSection(section1));
+        assertThatNoException().isThrownBy(() -> sections.registerSection(section1));
     }
 
     @Test
@@ -162,7 +162,7 @@ class SectionsTest {
 
     @Test
     @DisplayName("상행에서 추가: 새로운 구간을 등록할 때 기존 구간의 거리보다 짧으면 등록할 수 있다.")
-    void registMiddleUpSection() {
+    void registerMiddleUpSection() {
         Section addSection = new Section(
             station3,
             station5,
@@ -170,7 +170,7 @@ class SectionsTest {
             5
         );
 
-        SectionRegistVo result = sections.registSection(addSection);
+        SectionRegisterVo result = sections.registerSection(addSection);
 
         Section expectedNewSection = new Section(
             3L,
@@ -188,7 +188,7 @@ class SectionsTest {
 
     @Test
     @DisplayName("상행에서 추가: 새로운 구간을 등록할 때 기존 구간의 거리보다 길면 예외가 발생한다.")
-    void registMiddleUpSectionException() {
+    void registerMiddleUpSectionException() {
         Section newSection = new Section(
             station3,
             station5,
@@ -196,13 +196,13 @@ class SectionsTest {
             15
         );
 
-        assertThatThrownBy(() -> sections.registSection(newSection))
+        assertThatThrownBy(() -> sections.registerSection(newSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("하행에서 추가: 새로운 구간을 등록할 때 기존 구간의 거리보다 짧으면 등록할 수 있다.")
-    void registMiddleDownSection() {
+    void registerMiddleDownSection() {
         Section addSection = new Section(
             station5,
             station4,
@@ -216,7 +216,7 @@ class SectionsTest {
             line1,
             5
         );
-        SectionRegistVo result = sections.registSection(addSection);
+        SectionRegisterVo result = sections.registerSection(addSection);
         Assertions.assertAll(
             () -> assertThat(result.getAddSection().equals(addSection)).isTrue(),
             () -> assertThat(result.getUpdateSection().get().equals(expectedNewSection)).isTrue()
@@ -225,7 +225,7 @@ class SectionsTest {
 
     @Test
     @DisplayName("하행에서 추가: 새로운 구간을 등록할 때 기존 구간의 거리보다 길면 예외가 발생한다.")
-    void registMiddleDownSectionException() {
+    void registerMiddleDownSectionException() {
         Section newSection = new Section(
             station5,
             station4,
@@ -233,7 +233,7 @@ class SectionsTest {
             15
         );
 
-        assertThatThrownBy(() -> sections.registSection(newSection))
+        assertThatThrownBy(() -> sections.registerSection(newSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 

@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import subway.domain.vo.SectionRegistVo;
+import subway.domain.vo.SectionRegisterVo;
 
 public class Sections {
 
@@ -82,69 +82,69 @@ public class Sections {
             .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
     }
 
-    public SectionRegistVo registSection(Section section) {
+    public SectionRegisterVo registerSection(Section section) {
         if (sections.size() == 0) {
-            return new SectionRegistVo(section);
+            return new SectionRegisterVo(section);
         }
         if (findStations().contains(section.getUpStation())
             && findStations().contains(section.getDownStation())) {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
         if (findStations().contains(section.getUpStation())) {
-            return registUpSection(section);
+            return registerUpSection(section);
         }
         if (findStations().contains(section.getDownStation())) {
-            return registDownSection(section);
+            return registerDownSection(section);
         }
         throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
     }
 
-    private SectionRegistVo registUpSection(Section registSection) {
-        if (!findStartStations().contains(registSection.getUpStation())) {
-            return new SectionRegistVo(registSection);
+    private SectionRegisterVo registerUpSection(Section registerSection) {
+        if (!findStartStations().contains(registerSection.getUpStation())) {
+            return new SectionRegisterVo(registerSection);
         }
-        return registMiddleUpSection(registSection);
+        return registerMiddleUpSection(registerSection);
     }
 
-    private SectionRegistVo registMiddleUpSection(Section registSection) {
-        Distance distance = registSection.getDistance();
-        Section duplicatedUpSection = findSectionByUpStation(registSection.getUpStation());
+    private SectionRegisterVo registerMiddleUpSection(Section registerSection) {
+        Distance distance = registerSection.getDistance();
+        Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation());
 
         validateDistance(distance, duplicatedUpSection);
 
         Section modifySection = new Section(
             duplicatedUpSection.getId(),
-            registSection.getDownStation(),
+            registerSection.getDownStation(),
             duplicatedUpSection.getDownStation(),
-            registSection.getLine(),
+            registerSection.getLine(),
             duplicatedUpSection.getDistance().subtract(distance)
         );
 
-        return new SectionRegistVo(registSection, modifySection);
+        return new SectionRegisterVo(registerSection, modifySection);
     }
 
-    private SectionRegistVo registDownSection(Section registSection) {
-        if (!findEndStations().contains(registSection.getDownStation())) {
-            return new SectionRegistVo(registSection);
+    private SectionRegisterVo registerDownSection(Section registerSection) {
+        if (!findEndStations().contains(registerSection.getDownStation())) {
+            return new SectionRegisterVo(registerSection);
         }
-        return registMiddleDownSection(registSection);
+        return registerMiddleDownSection(registerSection);
     }
 
-    private SectionRegistVo registMiddleDownSection(Section registSection) {
-        Distance distance = registSection.getDistance();
-        Section duplicatedDownSection = findSectionByDownStation(registSection.getDownStation());
+    private SectionRegisterVo registerMiddleDownSection(Section registerSection) {
+        Distance distance = registerSection.getDistance();
+        Section duplicatedDownSection = findSectionByDownStation(registerSection.getDownStation());
 
         validateDistance(distance, duplicatedDownSection);
 
         Section modifySection = new Section(
             duplicatedDownSection.getId(),
             duplicatedDownSection.getUpStation(),
-            registSection.getUpStation(),
-            registSection.getLine(),
+            registerSection.getUpStation(),
+            registerSection.getLine(),
             duplicatedDownSection.getDistance().subtract(distance)
         );
 
-        return new SectionRegistVo(registSection, modifySection);
+        return new SectionRegisterVo(registerSection, modifySection);
     }
 
     private void validateDistance(Distance distance, Section duplicatedUpSection) {
