@@ -4,11 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.vo.SectionAdditionResult;
 
 class SectionsAddTest {
 
@@ -52,13 +50,13 @@ class SectionsAddTest {
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section targetSection = new Section(lineA, stationB, stationC, 3);
 
-        SectionAdditionResult sectionAdditionResult = sections.add(targetSection);
+        SectionChange sectionChange = sections.add(targetSection);
 
         Section createdSection = new Section(lineA, stationC, stationD, 2);
-        assertThat(sectionAdditionResult.getSectionsToAdd())
+        assertThat(sectionChange.getSectionsToAdd())
             .isEqualTo(List.of(targetSection, createdSection));
-        assertThat(sectionAdditionResult.getSectionToRemove())
-            .isEqualTo(Optional.of(secondSection));
+        assertThat(sectionChange.getSectionsToRemove())
+            .isEqualTo(List.of(secondSection));
         assertThat(sections)
             .isEqualTo(new Sections(List.of(firstSection, targetSection, createdSection)));
     }
@@ -71,13 +69,13 @@ class SectionsAddTest {
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section targetSection = new Section(lineA, stationC, stationD, 3);
 
-        SectionAdditionResult sectionAdditionResult = sections.add(targetSection);
+        SectionChange sectionChange = sections.add(targetSection);
 
         Section createdSection = new Section(lineA, stationB, stationC, 2);
-        assertThat(sectionAdditionResult.getSectionsToAdd())
+        assertThat(sectionChange.getSectionsToAdd())
             .isEqualTo(List.of(createdSection, targetSection));
-        assertThat(sectionAdditionResult.getSectionToRemove())
-            .isEqualTo(Optional.of(secondSection));
+        assertThat(sectionChange.getSectionsToRemove())
+            .isEqualTo(List.of(secondSection));
         assertThat(sections)
             .isEqualTo(new Sections(List.of(firstSection, createdSection, targetSection)));
     }
@@ -90,11 +88,11 @@ class SectionsAddTest {
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section targetSection = new Section(lineA, stationA, stationB, 3);
 
-        SectionAdditionResult sectionAdditionResult = sections.add(targetSection);
+        SectionChange sectionChange = sections.add(targetSection);
 
-        assertThat(sectionAdditionResult.getSectionsToAdd())
+        assertThat(sectionChange.getSectionsToAdd())
             .isEqualTo(List.of(targetSection));
-        assertThat(sectionAdditionResult.getSectionToRemove()).isEmpty();
+        assertThat(sectionChange.getSectionsToRemove()).isEmpty();
         assertThat(sections)
             .isEqualTo(new Sections(List.of(targetSection, firstSection, secondSection)));
     }
@@ -107,11 +105,11 @@ class SectionsAddTest {
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section targetSection = new Section(lineA, stationC, stationD, 3);
 
-        SectionAdditionResult sectionAdditionResult = sections.add(targetSection);
+        SectionChange sectionChange = sections.add(targetSection);
 
-        assertThat(sectionAdditionResult.getSectionsToAdd())
+        assertThat(sectionChange.getSectionsToAdd())
             .isEqualTo(List.of(targetSection));
-        assertThat(sectionAdditionResult.getSectionToRemove()).isEmpty();
+        assertThat(sectionChange.getSectionsToRemove()).isEmpty();
         assertThat(sections)
             .isEqualTo(new Sections(List.of(firstSection, secondSection, targetSection)));
     }

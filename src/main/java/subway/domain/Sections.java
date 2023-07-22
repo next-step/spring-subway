@@ -3,12 +3,10 @@ package subway.domain;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import subway.vo.SectionAdditionResult;
 
 public class Sections {
 
@@ -83,19 +81,23 @@ public class Sections {
             .collect(Collectors.toSet());
     }
 
-    public SectionAdditionResult add(Section section) {
+    public SectionChange add(Section section) {
         validateSectionBelongToLine(section);
 
         validateOneInOneOut(section);
 
         if (section.canPrecede(getFirst())) {
+            SectionChange sectionChange = new SectionChange();
             addFirst(section);
-            return new SectionAdditionResult(Optional.empty(), List.of(getFirst()));
+            sectionChange.appendSectionToAdd(section);
+            return sectionChange;
         }
 
         if (getLast().canPrecede(section)) {
+            SectionChange sectionChange = new SectionChange();
             addLast(section);
-            return new SectionAdditionResult(Optional.empty(), List.of(getLast()));
+            sectionChange.appendSectionToAdd(section);
+            return sectionChange;
         }
 
         return addSectionInMiddle(section);
@@ -108,14 +110,18 @@ public class Sections {
     }
 
 
-    private SectionAdditionResult addSectionInMiddle(Section section) {
+    private SectionChange addSectionInMiddle(Section section) {
         Section foundSection = findMatchedSection(section);
         List<Section> sectionsToAdd = foundSection.mergeSections(section);
 
         this.values.addAll(this.values.indexOf(foundSection), sectionsToAdd);
         this.values.remove(foundSection);
 
-        return new SectionAdditionResult(Optional.of(foundSection), sectionsToAdd);
+        final SectionChange sectionChange = new SectionChange();
+        sectionChange.appendSectionToRemove(foundSection);
+        sectionChange.appendSectionsToAdd(sectionsToAdd);
+
+        return sectionChange;
     }
 
     private Section findMatchedSection(Section section) {

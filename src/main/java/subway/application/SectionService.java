@@ -7,19 +7,19 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.SectionChange;
 import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
-import subway.vo.SectionAdditionResult;
 
 @Service
-public class SectionsService {
+public class SectionService {
 
     private final LineDao lineDao;
     private final StationDao stationDao;
     private final SectionDao sectionDao;
 
-    public SectionsService(LineDao lineDao, StationDao stationDao, SectionDao sectionDao) {
+    public SectionService(LineDao lineDao, StationDao stationDao, SectionDao sectionDao) {
         this.lineDao = lineDao;
         this.stationDao = stationDao;
         this.sectionDao = sectionDao;
@@ -31,10 +31,10 @@ public class SectionsService {
         Sections sections = sectionDao.findAllByLine(line);
         Section section = createNewSectionBy(request);
 
-        SectionAdditionResult sectionAdditionResult = sections.add(section);
+        SectionChange sectionChange = sections.add(section);
 
-        sectionAdditionResult.getSectionToRemove().ifPresent(sectionDao::delete);
-        sectionAdditionResult.getSectionsToAdd().forEach(sectionDao::save);
+        sectionChange.getSectionsToRemove().forEach(sectionDao::delete);
+        sectionChange.getSectionsToAdd().forEach(sectionDao::save);
     }
 
     private Section createNewSectionBy(SectionAdditionRequest request) {

@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
-import subway.application.SectionsService;
+import subway.application.SectionService;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
@@ -18,11 +18,11 @@ import subway.dto.SectionAdditionRequest;
 public class LineController {
 
     private final LineService lineService;
-    private final SectionsService sectionsService;
+    private final SectionService sectionService;
 
-    public LineController(LineService lineService, SectionsService sectionsService) {
+    public LineController(LineService lineService, SectionService sectionService) {
         this.lineService = lineService;
-        this.sectionsService = sectionsService;
+        this.sectionService = sectionService;
     }
 
     @PostMapping
@@ -55,13 +55,13 @@ public class LineController {
 
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionAdditionRequest sectionRequest) {
-        sectionsService.addSection(id, sectionRequest);
+        sectionService.addSection(id, sectionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
-        sectionsService.removeLast(id, stationId);
+        sectionService.removeLast(id, stationId);
         return ResponseEntity.noContent().build();
     }
 
