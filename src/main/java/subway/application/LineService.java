@@ -54,7 +54,7 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineResponseById(Long id) {
+    public LineResponse findLineWithSections(Long id) {
         Line persistLine = findLineById(id);
         Sections sections = sectionDao.findAllByLineId(id);
         List<Station> sortedStations = sections.sortStations();
