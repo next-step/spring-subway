@@ -8,7 +8,7 @@ import subway.domain.*;
 import subway.dto.request.SectionRequest;
 import subway.dto.response.SectionResponse;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class SectionService {
@@ -36,65 +36,34 @@ public class SectionService {
     @Transactional
     public SectionResponse saveSection(final Long lineId,
                                        final SectionRequest request) {
-        final Section section = createSection(
+        final Section newSection = createSection(
                 lineId,
                 request.getUpStationId(),
                 request.getDownStationId(),
                 request.getDistance());
-        final Line line = section.getLine();
-        throwIfAllOrNothingMatchInLine(section, line);
-        addIntersectionIfMatchInLine(section, line);
-        final Section persistSection = sectionDao.insert(section);
-        return SectionResponse.from(persistSection);
+        Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
+        final List<Section> beforeSection = sections.getSections();
+        sections.addSection(newSection);
+        final List<Section> afterSection = sections.getSections();
+        return SectionResponse.from(dirtyCheck(beforeSection, afterSection));
     }
 
-    private void throwIfAllOrNothingMatchInLine(final Section section, final Line line) {
-        if (sectionDao.existAllOrNotingInLineBySection(line, section)) {
-            throw new IllegalArgumentException("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
-        }
-    }
+    private Section dirtyCheck(List<Section> beforeSection, List<Section> afterSection) {
+        afterSection.stream()
+                .filter(section -> !beforeSection.contains(section))
+                .filter(section -> !section.isNew())
+                .findAny()
+                .ifPresent(sectionDao::update);
 
-    private void addIntersectionIfMatchInLine(final Section section, final Line line) {
-        final Optional<Section> optionalSection = sectionDao.findSectionByUpStation(line, section.getUpStation());
-        if (optionalSection.isPresent()) {
-            final Section originSection = optionalSection.get();
-            addIntersectionCaseByUpStation(line, section, originSection);
-            deleteOriginSection(originSection);
-            return;
-        }
-        addIntersectionIfDownStationMatchInLine(section, line);
-    }
-
-    private void addIntersectionIfDownStationMatchInLine(final Section section, final Line line) {
-        sectionDao
-                .findSectionByDownStation(line, section.getDownStation())
-                .ifPresent((originSection) -> {
-                    addIntersectionCaseByDownStation(line, section, originSection);
-                    deleteOriginSection(originSection);
-                });
-    }
-
-    private void addIntersectionCaseByUpStation(final Line line, final Section section, final Section originSection) {
-        sectionDao.insert(createSection(line.getId(),
-                section.getDownStationId(),
-                originSection.getDownStationId(),
-                originSection.getDistance() - section.getDistance()));
-    }
-
-    private void addIntersectionCaseByDownStation(final Line line, final Section section, final Section originSection) {
-        sectionDao.insert(createSection(line.getId(),
-                originSection.getUpStationId(),
-                section.getUpStationId(),
-                originSection.getDistance() - section.getDistance()));
-    }
-
-    private void deleteOriginSection(final Section originSection) {
-        sectionDao.deleteById(originSection.getId());
+        return sectionDao.insert(afterSection.stream()
+                .filter(section -> !beforeSection.contains(section))
+                .filter(Section::isNew)
+                .findAny()
+                .orElseThrow(IllegalStateException::new));
     }
 
     private Section createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        final Line line = lineDao.findById(lineId)
-                .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
+        final Line line = lineDao.findById(lineId).orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
         final Station upStation = stationService.findStationById(upStationId);
         final Station downStation = stationService.findStationById(downStationId);
         return new Section(line, upStation, downStation, new Distance(distance));

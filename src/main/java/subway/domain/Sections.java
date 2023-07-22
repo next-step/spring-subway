@@ -3,10 +3,13 @@ package subway.domain;
 import org.springframework.util.Assert;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 public class Sections {
 
+    public static final int FIRST_INDEX = 0;
     private static final int MINIMUM_SIZE = 1;
     private final List<Section> sections;
 
@@ -70,7 +73,7 @@ public class Sections {
         }
         final List<Station> result = sections.stream()
                 .map(Section::getUpStation)
-                .collect(Collectors.toList());
+                .collect(toList());
         result.add(sections.get(sections.size() - 1).getDownStation());
         return result;
     }
@@ -94,6 +97,70 @@ public class Sections {
 
     private Section findLastSection() {
         return sections.get(sectionLength() - 1);
+    }
+
+    public void addSection(Section newSection) {
+        final List<Station> upStations = sections.stream()
+                .map(Section::getUpStation)
+                .collect(toList());
+        final List<Station> downStations = sections.stream()
+                .map(Section::getDownStation)
+                .collect(toList());
+        throwIfAllOrNothingMatchInLine(newSection);
+        addIfMatchUpStation(newSection, upStations);
+        addIfMatchDownStation(newSection, downStations);
+    }
+
+    private void throwIfAllOrNothingMatchInLine(final Section newSection) {
+        final List<Station> stations = toStations();
+        if (stations.contains(newSection.getUpStation()) == stations.contains(newSection.getDownStation())) {
+            throw new IllegalArgumentException("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
+        }
+    }
+
+    private void addIfMatchDownStation(final Section newSection, final List<Station> stations) {
+        if (stations.contains(newSection.getDownStation())) {
+            final Section originSection = sections.stream()
+                    .filter(section -> section.getDownStation().equals(newSection.getDownStation()))
+                    .findFirst()
+                    .orElseThrow(IllegalStateException::new);
+            final Line line = newSection.getLine();
+            final Station upstation = originSection.getUpStation();
+            final Station downStation = newSection.getUpStation();
+            final long distance = originSection.getDistance() - newSection.getDistance();
+            sections.remove(originSection);
+            sections.add(newSection);
+            sections.add(new Section(originSection.getId(), line, upstation, downStation, new Distance(distance)));
+        }
+        if (stations.contains(newSection.getUpStation())) {
+            sections.add(newSection);
+        }
+    }
+
+    private void addIfMatchUpStation(final Section newSection, final List<Station> stations) {
+        if (stations.contains(newSection.getUpStation())) {
+            final Section originSection = sections.stream()
+                    .filter(section -> section.getUpStation().equals(newSection.getUpStation()))
+                    .findFirst()
+                    .orElseThrow(IllegalStateException::new);
+            final Line line = newSection.getLine();
+            final Station upstation = newSection.getDownStation();
+            final Station downStation = originSection.getDownStation();
+            final long distance = originSection.getDistance() - newSection.getDistance();
+            sections.remove(originSection);
+            sections.add(newSection);
+            sections.add(new Section(originSection.getId(), line, upstation, downStation, new Distance(distance)));
+        }
+        if (stations.contains(newSection.getDownStation())) {
+            sections.add(newSection);
+        }
+    }
+
+
+    public List<Section> getSections() {
+        return sections.stream()
+                .map(Section::new)
+                .collect(toUnmodifiableList());
     }
 
     @Override

@@ -13,10 +13,6 @@ import subway.domain.Station;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Optional;
-
-import static java.lang.Boolean.TRUE;
-import static org.springframework.dao.support.DataAccessUtils.singleResult;
 
 @Repository
 public class SectionDao {
@@ -80,42 +76,6 @@ public class SectionDao {
                 new Distance(section.getDistance()));
     }
 
-    public boolean existAllOrNotingInLineBySection(final Line line, final Section section) {
-        final String sql = "SELECT count(*) FROM SECTION WHERE line_id = ? and " +
-                " (up_station_id = ? or down_station_id = ?) ";
-        final boolean existUpStationCount = TRUE.equals(jdbcTemplate.queryForObject(
-                sql,
-                Boolean.class,
-                line.getId(),
-                section.getUpStationId(), section.getUpStationId()));
-        final boolean existDownStationCount = TRUE.equals(jdbcTemplate.queryForObject(
-                sql,
-                Boolean.class,
-                line.getId(),
-                section.getDownStationId(), section.getDownStationId()));
-        return existUpStationCount == existDownStationCount;
-    }
-
-    public Optional<Section> findSectionByUpStation(final Line line, final Station upStation) {
-        final String sql = ROW_MAPPER_SQL + " WHERE line_id = ? and up_station_id = ?";
-        final Section result = singleResult(jdbcTemplate.query(
-                sql,
-                rowMapper,
-                line.getId(),
-                upStation.getId()));
-        return Optional.ofNullable(result);
-    }
-
-    public Optional<Section> findSectionByDownStation(final Line line, final Station downStation) {
-        final String sql = ROW_MAPPER_SQL + " WHERE line_id = ? and down_station_id = ?";
-        final Section result = singleResult(jdbcTemplate.query(
-                sql,
-                rowMapper,
-                line.getId(),
-                downStation.getId()));
-        return Optional.ofNullable(result);
-    }
-
     public List<Section> findAllByLineId(final Long lineId) {
         final String sql = ROW_MAPPER_SQL + " where s.line_id = ? ";
         return jdbcTemplate.query(sql, rowMapper, lineId);
@@ -124,5 +84,10 @@ public class SectionDao {
     public void deleteById(final Long id) {
         final String sql = "delete from section where id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    public void update(final Section section) {
+        final String sql = "update section set up_station_id = ? , down_station_id = ? , distance = ? where id = ? ";
+        jdbcTemplate.update(sql, section.getUpStationId(), section.getDownStationId(), section.getDistance(), section.getId());
     }
 }

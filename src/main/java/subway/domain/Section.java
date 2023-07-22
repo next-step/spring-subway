@@ -36,7 +36,8 @@ public class Section {
         this.id = id;
     }
 
-    public Section() {
+    public Section(Section section) {
+        this(section.id, section.line, section.upStation, section.downStation, section.distance);
     }
 
 
@@ -72,6 +73,9 @@ public class Section {
         return distance.getValue();
     }
 
+    public boolean isNew() {
+        return id == null;
+    }
 
     @Override
     public boolean equals(Object o) {
