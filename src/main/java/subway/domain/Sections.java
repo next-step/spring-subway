@@ -17,8 +17,8 @@ public class Sections {
         return countByStationIds(upStationId, downStationId) == 2;
     }
 
-    public boolean containsNeither(final Long upStationId, final Long downStationId) {
-        return countByStationIds(upStationId, downStationId) == 0;
+    public boolean containsAny(final Long... stationIds) {
+        return countByStationIds(stationIds) == 0;
     }
 
     public List<Long> getSortedStationIds() {

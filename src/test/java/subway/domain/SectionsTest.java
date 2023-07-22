@@ -52,9 +52,9 @@ class SectionsTest {
         ));
 
         /* when & then */
-        assertThat(sections.containsNeither(4L, 5L)).isTrue();
-        assertThat(sections.containsNeither(3L, 4L)).isFalse();
-        assertThat(sections.containsNeither(2L, 3L)).isFalse();
+        assertThat(sections.containsAny(4L, 5L)).isTrue();
+        assertThat(sections.containsAny(3L, 4L)).isFalse();
+        assertThat(sections.containsAny(2L, 3L)).isFalse();
     }
 
     @Test
