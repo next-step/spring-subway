@@ -1,5 +1,7 @@
 package subway.dao;
 
+import static subway.dao.DaoUtil.queryForNullableObject;
+
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -44,7 +46,7 @@ public class StationDao {
 
     public Optional<Station> findById(Long id) {
         String sql = "select * from STATION where id = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        return queryForNullableObject(jdbcTemplate, sql, rowMapper, id);
     }
 
     public void update(Station newStation) {
