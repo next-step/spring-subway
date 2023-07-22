@@ -5,15 +5,16 @@ import static io.restassured.RestAssured.given;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.dto.LineRequest;
-import subway.dto.SectionRequest;
+import subway.dto.LineCreateRequest;
+import subway.dto.LineUpdateRequest;
+import subway.dto.SectionCreateRequest;
 
 class LineIntegrationSupporter {
 
-    static ExtractableResponse<Response> createLineByLineRequest(LineRequest lineRequest) {
+    static ExtractableResponse<Response> createLineByLineRequest(LineCreateRequest lineCreateRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -35,10 +36,10 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> updateLineByLineId(Long lineId, LineRequest lineRequest) {
+    static ExtractableResponse<Response> updateLineByLineId(Long lineId, LineUpdateRequest lineUpdateRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
+                .body(lineUpdateRequest)
                 .when().put("/lines/{lineId}", lineId)
                 .then().log().all()
                 .extract();
@@ -51,9 +52,9 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> registerSectionToLine(Long lineId, SectionRequest sectionRequest) {
+    static ExtractableResponse<Response> registerSectionToLine(Long lineId, SectionCreateRequest sectionCreateRequest) {
         return given().log().all()
-                .body(sectionRequest)
+                .body(sectionCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/lines/{lineId}/sections", lineId)
                 .then().log().all()

@@ -15,7 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import subway.dao.StationDao;
 import subway.domain.Station;
-import subway.dto.StationRequest;
+import subway.dto.StationCreateRequest;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = StationService.class)
@@ -37,12 +37,12 @@ class StationServiceTest {
         void Throw_IllegalArgumentException_If_Duplicated_Station_Name() {
             // given
             Station station = new Station("exists");
-            StationRequest stationRequest = new StationRequest("exists");
+            StationCreateRequest stationCreateRequest = new StationCreateRequest("exists");
 
             when(stationDao.findByName(station.getName())).thenReturn(Optional.of(station));
 
             // when
-            Exception exception = catchException(() -> stationService.saveStation(stationRequest));
+            Exception exception = catchException(() -> stationService.saveStation(stationCreateRequest));
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);

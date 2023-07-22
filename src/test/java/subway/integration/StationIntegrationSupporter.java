@@ -5,13 +5,14 @@ import static io.restassured.RestAssured.given;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.dto.StationRequest;
+import subway.dto.StationCreateRequest;
+import subway.dto.StationUpdateRequest;
 
 class StationIntegrationSupporter {
 
-    static ExtractableResponse<Response> createStation(StationRequest stationRequest) {
+    static ExtractableResponse<Response> createStation(StationCreateRequest stationCreateRequest) {
         return given().log().all()
-                .body(stationRequest)
+                .body(stationCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/stations")
@@ -35,10 +36,10 @@ class StationIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> updateStation(String uri, StationRequest stationRequest) {
+    static ExtractableResponse<Response> updateStation(String uri, StationUpdateRequest stationUpdateRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest)
+                .body(stationUpdateRequest)
                 .when()
                 .put(uri)
                 .then().log().all()

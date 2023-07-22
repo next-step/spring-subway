@@ -2,13 +2,13 @@ package subway.dto;
 
 import java.util.Objects;
 
-public class StationRequest {
+public class StationCreateRequest {
     private String name;
 
-    public StationRequest() {
+    public StationCreateRequest() {
     }
 
-    public StationRequest(String name) {
+    public StationCreateRequest(String name) {
         this.name = name;
     }
 
@@ -21,10 +21,10 @@ public class StationRequest {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof StationRequest)) {
+        if (!(o instanceof StationCreateRequest)) {
             return false;
         }
-        StationRequest that = (StationRequest) o;
+        StationCreateRequest that = (StationCreateRequest) o;
         return Objects.equals(name, that.name);
     }
 

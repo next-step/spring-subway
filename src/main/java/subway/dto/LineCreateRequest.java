@@ -2,17 +2,17 @@ package subway.dto;
 
 import java.util.Objects;
 
-public class LineRequest {
+public class LineCreateRequest {
     private String name;
     private String color;
-    private Long upStationId;
-    private Long downStationId;
-    private Integer distance;
+    private long upStationId;
+    private long downStationId;
+    private int distance;
 
-    public LineRequest() {
+    public LineCreateRequest() {
     }
 
-    public LineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public LineCreateRequest(String name, String color, long upStationId, long downStationId, int distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -28,15 +28,15 @@ public class LineRequest {
         return color;
     }
 
-    public Long getUpStationId() {
+    public long getUpStationId() {
         return upStationId;
     }
 
-    public Long getDownStationId() {
+    public long getDownStationId() {
         return downStationId;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 
@@ -45,13 +45,12 @@ public class LineRequest {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof LineRequest)) {
+        if (!(o instanceof LineCreateRequest)) {
             return false;
         }
-        LineRequest that = (LineRequest) o;
-        return Objects.equals(name, that.name) && Objects.equals(color, that.color)
-                && Objects.equals(upStationId, that.upStationId) && Objects.equals(downStationId,
-                that.downStationId) && Objects.equals(distance, that.distance);
+        LineCreateRequest that = (LineCreateRequest) o;
+        return upStationId == that.upStationId && downStationId == that.downStationId && distance == that.distance
+                && Objects.equals(name, that.name) && Objects.equals(color, that.color);
     }
 
     @Override
@@ -61,11 +60,11 @@ public class LineRequest {
 
     @Override
     public String toString() {
-        return "LineRequest{" +
+        return "LineCreateRequest{" +
                 "name='" + name + '\'' +
                 ", color='" + color + '\'' +
-                ", upStationId='" + upStationId + '\'' +
-                ", downStationId='" + downStationId + '\'' +
+                ", upStationId=" + upStationId +
+                ", downStationId=" + downStationId +
                 ", distance=" + distance +
                 '}';
     }

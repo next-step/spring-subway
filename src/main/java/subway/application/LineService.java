@@ -10,9 +10,10 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
+import subway.dto.LineUpdateRequest;
+import subway.dto.SectionCreateRequest;
 import subway.dto.StationResponse;
 
 @Service
@@ -27,7 +28,7 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
-    public LineResponse saveLine(LineRequest request) {
+    public LineResponse saveLine(LineCreateRequest request) {
         validLineRequest(request);
         Station upStation = getStation(request.getUpStationId());
         Station downStation = getStation(request.getDownStationId());
@@ -44,11 +45,11 @@ public class LineService {
         return LineResponse.from(line, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
     }
 
-    private void validLineRequest(LineRequest lineRequest) {
-        lineDao.findByName(lineRequest.getName()).ifPresent(
+    private void validLineRequest(LineCreateRequest lineCreateRequest) {
+        lineDao.findByName(lineCreateRequest.getName()).ifPresent(
                 line -> {
                     throw new IllegalArgumentException(
-                            MessageFormat.format("{0} 와 일치하는 line 의 이름이 이미 존재합니다.", lineRequest.getName()));
+                            MessageFormat.format("{0} 와 일치하는 line 의 이름이 이미 존재합니다.", lineCreateRequest.getName()));
                 }
         );
     }
@@ -78,10 +79,10 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public void connectSectionByStationId(Long lineId, SectionRequest sectionRequest) {
+    public void connectSectionByStationId(Long lineId, SectionCreateRequest sectionCreateRequest) {
         Line line = getLineById(lineId);
 
-        Section newSection = getNewSection(sectionRequest);
+        Section newSection = getNewSection(sectionCreateRequest);
         newSection = line.connectSection(newSection);
 
         sectionDao.insert(line.getId(), newSection);
@@ -112,7 +113,7 @@ public class LineService {
                 ));
     }
 
-    public void updateLine(Long id, LineRequest lineUpdateRequest) {
+    public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
@@ -120,14 +121,14 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
-    private Section getNewSection(SectionRequest sectionRequest) {
-        Station upStation = getStation(sectionRequest.getUpStationId());
-        Station downStation = getStation(sectionRequest.getDownStationId());
+    private Section getNewSection(SectionCreateRequest sectionCreateRequest) {
+        Station upStation = getStation(sectionCreateRequest.getUpStationId());
+        Station downStation = getStation(sectionCreateRequest.getDownStationId());
 
         return Section.builder()
                 .upStation(upStation)
                 .downStation(downStation)
-                .distance(sectionRequest.getDistance())
+                .distance(sectionCreateRequest.getDistance())
                 .build();
     }
 

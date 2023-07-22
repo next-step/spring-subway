@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
+import subway.dto.LineUpdateRequest;
+import subway.dto.SectionCreateRequest;
 import subway.util.ErrorTemplate;
 
 @RestController
@@ -32,8 +33,8 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreateRequest lineCreateRequest) {
+        LineResponse line = lineService.saveLine(lineCreateRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -48,7 +49,7 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
@@ -61,9 +62,9 @@ public class LineController {
 
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<Void> createSection(@PathVariable("lineId") Long lineId,
-            @RequestBody SectionRequest sectionRequest) {
+            @RequestBody SectionCreateRequest sectionCreateRequest) {
 
-        lineService.connectSectionByStationId(lineId, sectionRequest);
+        lineService.connectSectionByStationId(lineId, sectionCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

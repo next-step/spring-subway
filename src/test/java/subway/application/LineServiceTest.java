@@ -23,8 +23,8 @@ import subway.domain.DomainFixture;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.SectionRequest;
+import subway.dto.LineCreateRequest;
+import subway.dto.SectionCreateRequest;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = LineService.class)
@@ -52,12 +52,13 @@ class LineServiceTest {
         void Throw_IllegalArgumentException_If_CannotFind_Line() {
             // given
             Long lineId = 1L;
-            SectionRequest sectionRequest = new SectionRequest(2L, 3L, 10);
+            SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(2L, 3L, 10);
 
             when(lineDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
             // when
-            Exception exception = catchException(() -> lineService.connectSectionByStationId(lineId, sectionRequest));
+            Exception exception = catchException(() -> lineService.connectSectionByStationId(lineId,
+                    sectionCreateRequest));
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
@@ -76,7 +77,8 @@ class LineServiceTest {
 
             Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(upSection)));
 
-            SectionRequest sectionRequest = new SectionRequest(middleStation.getId(), downStation.getId(),
+            SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(middleStation.getId(),
+                    downStation.getId(),
                     downSection.getDistance());
 
             when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
@@ -88,7 +90,7 @@ class LineServiceTest {
 
             // when
             Exception exception = catchException(
-                    () -> lineService.connectSectionByStationId(line.getId(), sectionRequest));
+                    () -> lineService.connectSectionByStationId(line.getId(), sectionCreateRequest));
 
             // then
             assertThat(exception).isNull();
@@ -170,12 +172,12 @@ class LineServiceTest {
         @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
         void Throw_IllegalArgumentException_Cannot_Find_StationId() {
             // given
-            LineRequest lineRequest = new LineRequest("line", "red", 1L, 2L, 10);
+            LineCreateRequest lineCreateRequest = new LineCreateRequest("line", "red", 1L, 2L, 10);
 
             when(stationDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
             // when
-            Exception exception = catchException(() -> lineService.saveLine(lineRequest));
+            Exception exception = catchException(() -> lineService.saveLine(lineCreateRequest));
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
@@ -186,12 +188,12 @@ class LineServiceTest {
         void Throw_IllegalArgumentException_If_Exist_Duplicated_Named_Line() {
             // given
             Line line = new Line(1L, "line", "red");
-            LineRequest lineRequest = new LineRequest(line.getName(), "red", 1L, 2L, 10);
+            LineCreateRequest lineCreateRequest = new LineCreateRequest(line.getName(), "red", 1L, 2L, 10);
 
             when(lineDao.findByName(Mockito.anyString())).thenReturn(Optional.of(line));
 
             // when
-            Exception exception = catchException(() -> lineService.saveLine(lineRequest));
+            Exception exception = catchException(() -> lineService.saveLine(lineCreateRequest));
 
             // then
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);

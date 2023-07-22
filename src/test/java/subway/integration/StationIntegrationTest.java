@@ -10,8 +10,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.dto.StationRequest;
+import subway.dto.StationCreateRequest;
 import subway.dto.StationResponse;
+import subway.dto.StationUpdateRequest;
 
 @DisplayName("지하철역 관련 기능")
 class StationIntegrationTest extends IntegrationTest {
@@ -23,7 +24,7 @@ class StationIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.createStation(
-                new StationRequest(stationName));
+                new StationCreateRequest(stationName));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -35,11 +36,11 @@ class StationIntegrationTest extends IntegrationTest {
     void createStationWithDuplicateName() {
         // given
         String stationName = "강남역";
-        StationIntegrationSupporter.createStation(new StationRequest(stationName));
+        StationIntegrationSupporter.createStation(new StationCreateRequest(stationName));
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.createStation(
-                new StationRequest(stationName));
+                new StationCreateRequest(stationName));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -51,11 +52,11 @@ class StationIntegrationTest extends IntegrationTest {
         /// given
         String stationName1 = "강남역";
         ExtractableResponse<Response> createResponse1 = StationIntegrationSupporter.createStation(
-                new StationRequest(stationName1));
+                new StationCreateRequest(stationName1));
 
         String stationName2 = "역삼역";
         ExtractableResponse<Response> createResponse2 = StationIntegrationSupporter.createStation(
-                new StationRequest(stationName2));
+                new StationCreateRequest(stationName2));
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.findAllStation();
@@ -78,7 +79,7 @@ class StationIntegrationTest extends IntegrationTest {
         /// given
         String stationName = "강남역";
         ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(
-                new StationRequest(stationName));
+                new StationCreateRequest(stationName));
 
         Long stationId = Long.valueOf(createResponse.header("Location").split("/")[2]);
 
@@ -97,14 +98,14 @@ class StationIntegrationTest extends IntegrationTest {
         // given
         String stationName = "강남역";
         ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(
-                new StationRequest(stationName));
+                new StationCreateRequest(stationName));
 
         String updateName = "삼성역";
         String uri = createResponse.header("Location");
+        StationUpdateRequest stationUpdateRequest = new StationUpdateRequest(updateName);
 
         // when
-        ExtractableResponse<Response> response = StationIntegrationSupporter.updateStation(uri,
-                new StationRequest(updateName));
+        ExtractableResponse<Response> response = StationIntegrationSupporter.updateStation(uri, stationUpdateRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -116,7 +117,7 @@ class StationIntegrationTest extends IntegrationTest {
         // given
         String stationName = "강남역";
         ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(
-                new StationRequest(stationName));
+                new StationCreateRequest(stationName));
 
         String uri = createResponse.header("Location");
 
