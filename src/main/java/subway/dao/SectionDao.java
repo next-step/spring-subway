@@ -86,4 +86,8 @@ public class SectionDao {
     public void delete(Section section) {
         jdbcTemplate.update("delete from Section where id = ?", section.getId());
     }
+
+    public void deleteByLine(Line line) {
+        jdbcTemplate.update("delete from Section where line_id = ?", line.getId());
+    }
 }
