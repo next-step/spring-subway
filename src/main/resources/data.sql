@@ -1,9 +1,9 @@
-insert into LINE(`id`, `name`, `color`)
+insert into LINE(id, name, color)
 values (DEFAULT, '1호선', '남색'),
        (DEFAULT, '2호선', '초록색'),
        (DEFAULT, '3호선', '주황색');
 
-insert into STATION(`id`, `name`)
+insert into STATION(id, name)
 values (10, '소요산'),
        (11, '동두천'),
        (12, '보산'),
@@ -37,7 +37,7 @@ values (10, '소요산'),
        (38, '원흥'),
        (39, '삼송');
 
-insert into SECTION(`id`, `line_id`, `up_station_id`, `down_station_id`, `distance`)
+insert into SECTION(id, line_id, up_station_id, down_station_id, distance)
 values (DEFAULT, 1, 11, 12, 777),
 
        (DEFAULT, 2, 23, 24, 777),
@@ -45,6 +45,3 @@ values (DEFAULT, 1, 11, 12, 777),
 
        (DEFAULT, 3, 36, 37, 777),
        (DEFAULT, 3, 37, 38, 777);
-
-
-
