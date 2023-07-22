@@ -42,19 +42,6 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
-        return lineDao.findAll();
-    }
-
-    public LineResponse findLineResponseById(Long id) {
-        Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
-    }
-
-    public Line findLineById(Long id) {
-        return lineDao.findById(id);
-    }
-
     public LineResponse findLineAndStationsById(Long id) {
         final List<LineWithStations> lineWithStations = findAllById(id);
         final Sections sections = new Sections(sectionDao.findAllByLineId(id));
@@ -89,4 +76,7 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
+    private List<Line> findLines() {
+        return lineDao.findAll();
+    }
 }
