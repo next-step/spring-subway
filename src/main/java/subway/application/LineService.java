@@ -61,6 +61,7 @@ public class LineService {
         return LineWithStationsResponse.of(persistLine, stations);
     }
 
+    @Transactional(readOnly = true)
     public Line findLineById(final Long id) {
         return lineDao.findById(id)
                 .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));

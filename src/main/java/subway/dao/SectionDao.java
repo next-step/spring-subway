@@ -17,7 +17,7 @@ import java.util.List;
 @Repository
 public class SectionDao {
 
-    private static final String ROW_MAPPER_SQL =
+    private static final String ROW_MAPPER_BASE_SQL =
             " SELECT s.id as section_id, "
                     + " s.distance as distance, "
                     + " l.id as line_id, "
@@ -77,7 +77,7 @@ public class SectionDao {
     }
 
     public List<Section> findAllByLineId(final Long lineId) {
-        final String sql = ROW_MAPPER_SQL + " where s.line_id = ? ";
+        final String sql = ROW_MAPPER_BASE_SQL + " where s.line_id = ? ";
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 

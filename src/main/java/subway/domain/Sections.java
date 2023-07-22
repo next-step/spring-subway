@@ -8,8 +8,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 public class Sections {
-
-    public static final int FIRST_INDEX = 0;
     private static final int MINIMUM_SIZE = 1;
     private final List<Section> sections;
 
