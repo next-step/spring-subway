@@ -1,11 +1,12 @@
 package subway.domain;
 
 import java.util.Objects;
+import subway.domain.vo.SectionRegistVo;
 
 public class Section {
 
     public static final int POSSIBLE_DISTANCE = 0;
-    private  Long id;
+    private Long id;
     private Station upStation;
     private Station downStation;
     private Line line;
@@ -33,6 +34,58 @@ public class Section {
 
     public boolean isOverDistance(Distance distance) {
         return (this.distance.compareDistance(distance) <= POSSIBLE_DISTANCE);
+    }
+
+    public SectionRegistVo registUpSection(Sections sections) {
+        if (!sections.findUpStations().contains(upStation)) {
+            return new SectionRegistVo(this);
+        }
+        return registMiddleUpSection(sections);
+    }
+
+    private SectionRegistVo registMiddleUpSection(Sections sections) {
+        Section upSection = sections.findSectionByUpStation(upStation);
+
+        validateDistance(upSection);
+
+        Section modifiedSection = new Section(
+            upSection.getId(),
+            downStation,
+            upSection.getDownStation(),
+            line,
+            upSection.getDistance().subtract(distance)
+        );
+
+        return new SectionRegistVo(this, modifiedSection);
+    }
+
+    public SectionRegistVo registDownSection(Sections sections) {
+        if (!sections.findDownStations().contains(downStation)) {
+            return new SectionRegistVo(this);
+        }
+        return registMiddleDownSection(sections);
+    }
+
+    private SectionRegistVo registMiddleDownSection(Sections sections) {
+        Section downSection = sections.findSectionByDownStation(downStation);
+
+        validateDistance(downSection);
+
+        Section modifiedSection = new Section(
+            downSection.getId(),
+            downSection.getUpStation(),
+            upStation,
+            line,
+            downSection.getDistance().subtract(distance)
+        );
+
+        return new SectionRegistVo(this, modifiedSection);
+    }
+
+    private void validateDistance(Section targetSection) {
+        if (targetSection.isOverDistance(distance)) {
+            throw new IllegalArgumentException("기존 구간에 비해 거리가 길어 추가가 불가능 합니다.");
+        }
     }
 
     public Long getId() {

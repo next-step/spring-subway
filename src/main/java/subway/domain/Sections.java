@@ -92,76 +92,80 @@ public class Sections {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
         if (findStations().contains(section.getUpStation())) {
-            return registUpSection(section);
+            return section.registUpSection(this);
+//            return registUpSection(section);
         }
         if (findStations().contains(section.getDownStation())) {
-            return registDownSection(section);
+            return section.registDownSection(this);
+//            return registDownSection(section);
         }
         throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
     }
 
-    private SectionRegistVo registUpSection(Section registSection) {
-        if (!findStartStations().contains(registSection.getUpStation())) {
-            return new SectionRegistVo(registSection);
-        }
-        return registMiddleUpSection(registSection);
-    }
+//    private SectionRegistVo registUpSection(Section registSection) {
+//        if (!findUpStations().contains(registSection.getUpStation())) {
+//            return new SectionRegistVo(registSection);
+//        }
+//        return registMiddleUpSection(registSection);
+//    }
 
-    private SectionRegistVo registMiddleUpSection(Section registSection) {
-        Distance distance = registSection.getDistance();
-        Section duplicatedUpSection = findSectionByUpStation(registSection.getUpStation());
+//    private SectionRegistVo registMiddleUpSection(Section registSection) {
+//        Distance distance = registSection.getDistance();
+//        Section duplicatedUpSection = findSectionByUpStation(registSection.getUpStation());
+//
+//        validateDistance(distance, duplicatedUpSection);
+//
+//        Section modifySection = new Section(
+//            duplicatedUpSection.getId(),
+//            registSection.getDownStation(),
+//            duplicatedUpSection.getDownStation(),
+//            registSection.getLine(),
+//            duplicatedUpSection.getDistance().subtract(distance)
+//        );
+//
+//        return new SectionRegistVo(registSection, modifySection);
+//    }
 
-        validateDistance(distance, duplicatedUpSection);
+//    private SectionRegistVo registDownSection(Section registSection) {
+//        if (!findDownStations().contains(registSection.getDownStation())) {
+//            return new SectionRegistVo(registSection);
+//        }
+//        return registMiddleDownSection(registSection);
+//    }
 
-        Section modifySection = new Section(
-            duplicatedUpSection.getId(),
-            registSection.getDownStation(),
-            duplicatedUpSection.getDownStation(),
-            registSection.getLine(),
-            duplicatedUpSection.getDistance().subtract(distance)
-        );
+//    private SectionRegistVo registMiddleDownSection(Section registSection) {
+//        Distance distance = registSection.getDistance();
+//        Section duplicatedDownSection = findSectionByDownStation(registSection.getDownStation());
+//
+//        validateDistance(distance, duplicatedDownSection);
+//
+//        Section modifySection = new Section(
+//            duplicatedDownSection.getId(),
+//            duplicatedDownSection.getUpStation(),
+//            registSection.getUpStation(),
+//            registSection.getLine(),
+//            duplicatedDownSection.getDistance().subtract(distance)
+//        );
+//
+//        return new SectionRegistVo(registSection, modifySection);
+//    }
 
-        return new SectionRegistVo(registSection, modifySection);
-    }
+//    public void validateDistance(Distance distance, Section duplicatedUpSection) {
+//        if (duplicatedUpSection.isOverDistance(distance)) {
+//            throw new IllegalArgumentException("기존 구간에 비해 거리가 길어 추가가 불가능 합니다.");
+//        }
+//    }
 
-    private SectionRegistVo registDownSection(Section registSection) {
-        if (!findDownStations().contains(registSection.getDownStation())) {
-            return new SectionRegistVo(registSection);
-        }
-        return registMiddleDownSection(registSection);
-    }
-
-    private SectionRegistVo registMiddleDownSection(Section registSection) {
-        Distance distance = registSection.getDistance();
-        Section duplicatedDownSection = findSectionByDownStation(registSection.getDownStation());
-
-        validateDistance(distance, duplicatedDownSection);
-
-        Section modifySection = new Section(
-            duplicatedDownSection.getId(),
-            duplicatedDownSection.getUpStation(),
-            registSection.getUpStation(),
-            registSection.getLine(),
-            duplicatedDownSection.getDistance().subtract(distance)
-        );
-
-        return new SectionRegistVo(registSection, modifySection);
-    }
-
-    private void validateDistance(Distance distance, Section duplicatedUpSection) {
-        if (duplicatedUpSection.isOverDistance(distance)) {
-            throw new IllegalArgumentException("기존 구간에 비해 거리가 길어 추가가 불가능 합니다.");
-        }
-    }
-
-    private Section findSectionByDownStation(Station station) {
+    // TODO : Sections의 getter를 열어두고 Section 에 역할을 위임하는게 맞을까?
+    public Section findSectionByDownStation(Station station) {
         return sections.stream()
             .filter(section -> section.downStationEquals(station))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
     }
 
-    private Section findSectionByUpStation(Station station) {
+    // TODO : Sections의 getter를 열어두고 Section 에 역할을 위임하는게 맞을까?
+    public Section findSectionByUpStation(Station station) {
         return sections.stream()
             .filter(section -> section.upStationEquals(station))
             .findFirst()
@@ -182,7 +186,7 @@ public class Sections {
             .collect(Collectors.toSet());
     }
 
-    private Set<Station> findDownStations() {
+    public Set<Station> findDownStations() {
         return sections.stream()
             .map(Section::getDownStation)
             .collect(Collectors.toSet());
