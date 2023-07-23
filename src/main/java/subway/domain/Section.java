@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class Section {
 
+    public static final int POSSIBLE_DISTANCE = 0;
     private  Long id;
     private Station upStation;
     private Station downStation;
@@ -31,7 +32,7 @@ public class Section {
     }
 
     public boolean isOverDistance(Distance distance) {
-        return (this.distance.compareDistance(distance) <= 0);
+        return (this.distance.compareDistance(distance) <= POSSIBLE_DISTANCE);
     }
 
     public Long getId() {
