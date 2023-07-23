@@ -136,7 +136,9 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("상행 역과 하행 역이 이미 노선에 모두 등록되어 있는 경우 400 Bad Request로 응답한다.")
     void badRequestWithRegisteredUpStationAndDownStationOnLine() {
         /* given */
-        final SectionRequest sectionRequest = new SectionRequest(23L, 24L, 777L);
+        final Long upStationId = 23L;
+        final Long downStationId = 24L;
+        final SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, 777L);
         final Long lineId = 2L;
 
         /* when */
@@ -151,14 +153,16 @@ class SectionIntegrationTest extends IntegrationTest {
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().jsonPath().getString("message"))
-                .isEqualTo("상행 역과 하행 역이 이미 노선에 모두 등록되어 있습니다.");
+                .isEqualTo("상행 역과 하행 역이 이미 노선에 모두 등록되어 있습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId);
     }
 
     @Test
     @DisplayName("상행 역과 하행 역이 모두 노선에 없는 경우 400 Bad Request로 응답한다.")
     void badRequestWithNotExistUpStationAndDownStationOnLine() {
         /* given */
-        final SectionRequest sectionRequest = new SectionRequest(12345L, 1234L, 777L);
+        final Long upStationId = 12345L;
+        final Long downStationId = 1234L;
+        final SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, 777L);
         final Long lineId = 2L;
 
         /* when */
@@ -173,7 +177,7 @@ class SectionIntegrationTest extends IntegrationTest {
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().jsonPath().getString("message"))
-                .isEqualTo("상행 역과 하행 역이 모두 노선에 없습니다.");
+                .isEqualTo("상행 역과 하행 역이 모두 노선에 없습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId);
     }
 
     @Test
@@ -198,10 +202,11 @@ class SectionIntegrationTest extends IntegrationTest {
     void badRequestWithNotPrevSectionOnLine() {
         /* given */
         final Long lineId = 2L;
+        final Long downStationId = 24L;
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", "24")
+                .given().log().all().queryParam("stationId", downStationId)
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
@@ -209,7 +214,7 @@ class SectionIntegrationTest extends IntegrationTest {
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().jsonPath().getString("message"))
-                .isEqualTo("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다.");
+                .isEqualTo("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다. 노선 ID : " + lineId + " 하행 종점역 ID : " + downStationId);
     }
 
     @Test

@@ -30,9 +30,11 @@ public class SectionService {
     }
 
     private Section insertBetween(final Sections sections, final SectionRequest sectionRequest) {
-        final Section targetSection =
-                sections.findContainStationSection(sectionRequest.getUpStationId(), sectionRequest.getDownStationId())
-                        .orElseThrow(() -> new SubwayException("상행 역과 하행 역이 모두 노선에 없습니다."));
+        final Long upStationId = sectionRequest.getUpStationId();
+        final Long downStationId = sectionRequest.getDownStationId();
+        final Section targetSection = sections.findContainStationSection(upStationId, downStationId)
+                .orElseThrow(() -> new SubwayException(
+                        "상행 역과 하행 역이 모두 노선에 없습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId));
 
         validateDistance(targetSection.subtractDistance(sectionRequest.getDistance()));
         final Section requestSection = sectionRequest.toSection(targetSection.getLineId());
@@ -51,7 +53,8 @@ public class SectionService {
 
         final Section lastSection = getLastSection(sections);
         if (!lastSection.isSameDownStationId(downStationId)) {
-            throw new SubwayException("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다.");
+            throw new SubwayException(
+                    "해당 노선에 일치하는 하행 종점역이 존재하지 않습니다. 노선 ID : " + lineId + " 하행 종점역 ID : " + downStationId);
         }
 
         sectionDao.delete(lastSection.getId());
@@ -75,8 +78,11 @@ public class SectionService {
     }
 
     private void validateNotContainsBothStation(final Sections sections, final SectionRequest sectionRequest) {
-        if (sections.containsBoth(sectionRequest.getUpStationId(), sectionRequest.getDownStationId())) {
-            throw new SubwayException("상행 역과 하행 역이 이미 노선에 모두 등록되어 있습니다.");
+        final Long upStationId = sectionRequest.getUpStationId();
+        final Long downStationId = sectionRequest.getDownStationId();
+        if (sections.containsBoth(upStationId, downStationId)) {
+            throw new SubwayException(
+                    "상행 역과 하행 역이 이미 노선에 모두 등록되어 있습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId);
         }
     }
 }
