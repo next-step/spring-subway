@@ -69,7 +69,7 @@ public class StationDao {
 
     public void update(Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{newStation.getName(), newStation.getId()});
+        jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
     }
 
     public void deleteById(Long id) {

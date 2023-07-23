@@ -4,15 +4,16 @@ import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
+import subway.domain.ConnectedSections;
 import subway.domain.Line;
 import subway.domain.Section;
-import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,17 +50,15 @@ public class LineService {
     }
 
     public LineResponse findLineResponse(final Long lineId) {
-        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        final List<Station> stations = stationDao.findAllByLineId(lineId);
-        final Map<Long, Station> stationMap = stations.stream()
-                .collect(Collectors.toMap(Station::getId, station -> station));
+        final Map<Long, Station> stationMap = stationDao.findAllByLineId(lineId).stream()
+                .collect(Collectors.toMap(Station::getId, Function.identity()));
 
-        final List<Station> stationList = sections.getSortedStationIds().stream()
+        final ConnectedSections connectedSections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
+        final List<Station> stations = connectedSections.getSortedStationIds().stream()
                 .map(stationMap::get)
                 .collect(Collectors.toList());
 
-        final Line line = lineDao.findById(lineId);
-        return LineResponse.of(line, stationList);
+        return LineResponse.of(lineDao.findById(lineId), stations);
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {

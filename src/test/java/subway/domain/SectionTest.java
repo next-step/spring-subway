@@ -61,25 +61,16 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("구간의 상행역과 하행역에 특정 역이 있는지 확인할 수 있다.")
-    void containsStation() {
+    @DisplayName("구간에서 다른 구간을 뺄 수 있다.")
+    void subtract() {
         /* given */
-        Section section = new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
+        final Section from = new Section(1L, 11L, 13L, 777L);
+        final Section to = new Section(1L, 11L, 12L, 700L);
 
-        /* when & then */
-        assertThat(section.containsStation(UP_STATION_ID)).isTrue();
-        assertThat(section.containsStation(DOWN_STATION_ID)).isTrue();
-        assertThat(section.containsStation(123L)).isFalse();
-    }
+        /* when */
+        final Section subtracted = from.subtract(to);
 
-    @Test
-    @DisplayName("구간의 하행역이 특정 역과 같은 지 확인할 수 있다.")
-    void isSameDownStationId() {
-        /* given */
-        Section section = new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
-
-        /* when & then */
-        assertThat(section.isSameDownStationId(DOWN_STATION_ID)).isTrue();
-        assertThat(section.isSameDownStationId(UP_STATION_ID)).isFalse();
+        /* then */
+        assertThat(subtracted).isEqualTo(new Section(1L, 12L, 13L, 77L));
     }
 }

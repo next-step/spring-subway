@@ -42,13 +42,9 @@ public class SectionDao {
         params.put("distance", section.getDistance());
 
         final Long sectionId = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(
-                sectionId,
-                section.getLineId(),
-                section.getUpStationId(),
-                section.getDownStationId(),
-                section.getDistance()
-        );
+        section.setId(sectionId);
+
+        return section;
     }
 
     public List<Section> findAllByLineId(final Long lineId) {

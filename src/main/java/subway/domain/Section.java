@@ -7,10 +7,10 @@ import java.util.Objects;
 public class Section {
 
     private Long id;
-    private Long lineId;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
+    private final Long lineId;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final Long distance;
 
     public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
         this(null, lineId, upStationId, downStationId, distance);
@@ -23,7 +23,7 @@ public class Section {
             final Long downStationId,
             final Long distance
     ) {
-        validate(upStationId, downStationId, distance);
+        validateSectionValues(upStationId, downStationId, distance);
 
         this.id = id;
         this.lineId = lineId;
@@ -32,27 +32,27 @@ public class Section {
         this.distance = distance;
     }
 
-    public boolean containsStation(final Long stationId) {
-        return Objects.equals(this.upStationId, stationId) || Objects.equals(this.downStationId, stationId);
-    }
-
-    public boolean isSameDownStationId(final Long stationId) {
-        return this.downStationId.equals(stationId);
-    }
-
-    public Long subtractDistance(final Long distance) {
-        return this.distance - distance;
-    }
-
-    public boolean containsStations(final Long upStationId, final Long downStationId) {
-        return Objects.equals(this.upStationId, upStationId) || Objects.equals(this.downStationId, downStationId);
-    }
-
-    public Section subtract(final Section requestSection) {
-        if (Objects.equals(this.upStationId, requestSection.upStationId)) {
-            return new Section(this.lineId, requestSection.upStationId, this.downStationId, this.distance - requestSection.distance);
+    public Section subtract(final Section from) {
+        if (Objects.equals(this.upStationId, from.upStationId)) {
+            return new Section(this.lineId, from.downStationId, this.downStationId, this.distance - from.distance);
         }
-        return new Section(this.lineId, this.upStationId, requestSection.downStationId, this.distance - requestSection.distance);
+        return new Section(this.lineId, this.upStationId, from.upStationId, this.distance - from.distance);
+    }
+
+    public Long subtractDistance(final Section target) {
+        return this.distance - target.distance;
+    }
+
+    public boolean isSameUpStationId(final Section target) {
+        return Objects.equals(this.upStationId, target.upStationId);
+    }
+
+    public boolean isSameDownStationId(final Section target) {
+        return Objects.equals(this.downStationId, target.downStationId);
+    }
+
+    public boolean doesNotContainsDownStation(final Long targetStationId) {
+        return !Objects.equals(this.downStationId, targetStationId);
     }
 
     public Long getId() {
@@ -75,28 +75,32 @@ public class Section {
         return this.distance;
     }
 
-    private void validate(final Long upStationId, final Long downStationId, final Long distance) {
-        validateContainsUpStationAndDownStation(upStationId, downStationId);
-        validateDistanceNotNull(distance);
-        validateDistanceLessThanZero(distance);
+    private void validateSectionValues(final Long upStationId, final Long downStationId, final Long distance) {
+        validateStationValues(upStationId, downStationId);
+        validateDistanceValue(distance);
     }
 
-    private void validateDistanceLessThanZero(final Long distance) {
+    private void validateDistanceValue(final Long distance) {
+        if (distance == null) {
+            throw new SubwayException("구간 길이 정보는 입력해야 합니다.");
+        }
         if (distance <= 0L) {
             throw new SubwayException("구간 길이는 0보다 커야합니다.");
         }
     }
 
-    private void validateDistanceNotNull(final Long distance) {
-        if (distance == null) {
-            throw new SubwayException("구간 길이 정보는 입력해야 합니다.");
-        }
-    }
-
-    private void validateContainsUpStationAndDownStation(final Long upStationId, final Long downStationId) {
+    private void validateStationValues(final Long upStationId, final Long downStationId) {
         if (upStationId == null || downStationId == null) {
             throw new SubwayException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
         }
+    }
+
+    public boolean isHead(final Section target) {
+        return Objects.equals(this.downStationId, target.upStationId);
+    }
+
+    public void setId(final Long id) {
+        this.id = id;
     }
 
     @Override
