@@ -12,10 +12,6 @@ public class Section {
     private Long downStationId;
     private Long distance;
 
-    private Section() {
-        /* no-op */
-    }
-
     public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
         this(null, lineId, upStationId, downStationId, distance);
     }
