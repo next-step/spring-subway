@@ -2,26 +2,27 @@ package subway.ui;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
 import subway.application.StationService;
+import subway.dto.request.StationRequest;
+import subway.dto.response.StationResponse;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/stations")
 public class StationController {
+
     private final StationService stationService;
 
-    public StationController(StationService stationService) {
+    public StationController(final StationService stationService) {
         this.stationService = stationService;
     }
 
     @PostMapping
-    public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
+    public ResponseEntity<StationResponse> createStation(
+            @RequestBody final StationRequest stationRequest) {
+        final StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
@@ -30,25 +31,22 @@ public class StationController {
         return ResponseEntity.ok().body(stationService.findAllStationResponses());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
-        return ResponseEntity.ok().body(stationService.findStationResponseById(id));
+    @GetMapping("/{stationId}")
+    public ResponseEntity<StationResponse> showStation(@PathVariable final Long stationId) {
+        return ResponseEntity.ok().body(stationService.findStationResponseById(stationId));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> updateStation(@PathVariable Long id, @RequestBody StationRequest stationRequest) {
-        stationService.updateStation(id, stationRequest);
+    @PutMapping("/{stationId}")
+    public ResponseEntity<Void> updateStation(@PathVariable final Long stationId,
+                                              @RequestBody final StationRequest stationRequest) {
+        stationService.updateStation(stationId, stationRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
-        stationService.deleteStationById(id);
+    @DeleteMapping("/{stationId}")
+    public ResponseEntity<Void> deleteStation(@PathVariable final Long stationId) {
+        stationService.deleteStationById(stationId);
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
-    }
 }

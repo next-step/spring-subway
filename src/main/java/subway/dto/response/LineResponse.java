@@ -1,8 +1,9 @@
-package subway.dto;
+package subway.dto.response;
 
 import subway.domain.Line;
 
 public class LineResponse {
+
     private Long id;
     private String name;
     private String color;
@@ -11,6 +12,9 @@ public class LineResponse {
         this.id = id;
         this.name = name;
         this.color = color;
+    }
+
+    public LineResponse() {
     }
 
     public static LineResponse of(Line line) {

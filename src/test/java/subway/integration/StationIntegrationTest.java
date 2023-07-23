@@ -7,19 +7,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import subway.dto.StationResponse;
+import subway.domain.Station;
+import subway.dto.response.StationResponse;
+import subway.integration.helper.StationIntegrationHelper;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
 public class StationIntegrationTest extends IntegrationTest {
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -47,13 +48,7 @@ public class StationIntegrationTest extends IntegrationTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        StationIntegrationHelper.createStation(params);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -61,8 +56,7 @@ public class StationIntegrationTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/stations")
-                .then()
-                .log().all()
+                .then().log().all()
                 .extract();
 
         // then
@@ -73,25 +67,10 @@ public class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStations() {
         /// given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "강남역");
-        ExtractableResponse<Response> createResponse1 = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
-
-        Map<String, String> params2 = new HashMap<>();
-        params2.put("name", "역삼역");
-        ExtractableResponse<Response> createResponse2 = RestAssured.given().log().all()
-                .body(params2)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        Map<String, String> params1 = Map.of("name", "강남역");
+        final Station stationA = StationIntegrationHelper.createStation(params1);
+        Map<String, String> params2 = Map.of("name", "역삼역");
+        final Station stationB = StationIntegrationHelper.createStation(params2);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -102,66 +81,48 @@ public class StationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
-        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
+        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class)
+                .stream()
                 .map(StationResponse::getId)
                 .collect(Collectors.toList());
-        assertThat(resultStationIds).containsAll(expectedStationIds);
+        assertThat(resultStationIds).contains(stationA.getId(), stationB.getId());
     }
 
     @DisplayName("지하철역을 조회한다.")
     @Test
     void getStation() {
         /// given
-        Map<String, String> params1 = new HashMap<>();
-        params1.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params1)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        Map<String, String> params = Map.of("name", "강남역");
+        final Station station = StationIntegrationHelper.createStation(params);
 
         // when
-        Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
-                .get("/stations/{stationId}", stationId)
+                .get("/stations/{stationId}", station.getId())
                 .then().log().all()
                 .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         StationResponse stationResponse = response.as(StationResponse.class);
-        assertThat(stationResponse.getId()).isEqualTo(stationId);
+        assertThat(stationResponse.getId()).isEqualTo(station.getId());
     }
 
     @DisplayName("지하철역을 수정한다.")
     @Test
     void updateStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        Map<String, String> params = Map.of("name", "강남역");
+        Station station = StationIntegrationHelper.createStation(params);
 
         // when
-        Map<String, String> otherParams = new HashMap<>();
-        otherParams.put("name", "삼성역");
-        String uri = createResponse.header("Location");
+        Map<String, String> otherParams = Map.of("name", "삼성역");
+
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(otherParams)
                 .when()
-                .put(uri)
+                .put("/stations/{stationId}", station.getId())
                 .then().log().all()
                 .extract();
 
@@ -173,25 +134,18 @@ public class StationIntegrationTest extends IntegrationTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
-        ExtractableResponse<Response> createResponse = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+        Map<String, String> params = Map.of("name", "강남역");
+        Station station = StationIntegrationHelper.createStation(params);
 
         // when
-        String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
-                .delete(uri)
+                .delete("/stations/{stationId}", station.getId())
                 .then().log().all()
                 .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
 }

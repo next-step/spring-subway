@@ -1,44 +1,67 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import subway.dao.SectionDao;
 import subway.dao.StationDao;
+import subway.domain.Sections;
 import subway.domain.Station;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.dto.request.StationRequest;
+import subway.dto.response.StationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class StationService {
+
+    private final SectionDao sectionDao;
     private final StationDao stationDao;
 
-    public StationService(StationDao stationDao) {
+    public StationService(final SectionDao sectionDao, final StationDao stationDao) {
+        this.sectionDao = sectionDao;
         this.stationDao = stationDao;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
+    @Transactional
+    public StationResponse saveStation(final StationRequest stationRequest) {
+        final Station station = stationDao.insert(new Station(stationRequest.getName()));
         return StationResponse.of(station);
     }
 
-    public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+    @Transactional(readOnly = true)
+    public StationResponse findStationResponseById(final Long stationId) {
+        final Station station = findStationById(stationId);
+        return StationResponse.of(station);
     }
 
-    public List<StationResponse> findAllStationResponses() {
-        List<Station> stations = stationDao.findAll();
+    public Station findStationById(final Long stationId) {
+        return stationDao.findById(stationId)
+                .orElseThrow(() -> new IllegalStateException("역을 찾을 수 없습니다."));
+    }
 
-        return stations.stream()
+    @Transactional(readOnly = true)
+    public List<StationResponse> findAllStationResponses() {
+        return stationDao.findAll().stream()
                 .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public void updateStation(Long id, StationRequest stationRequest) {
-        stationDao.update(new Station(id, stationRequest.getName()));
+    @Transactional
+    public void updateStation(final Long stationId, final StationRequest stationRequest) {
+        stationDao.update(new Station(stationId, stationRequest.getName()));
     }
 
-    public void deleteStationById(Long id) {
-        stationDao.deleteById(id);
+    @Transactional
+    public void deleteStationById(final Long stationId) {
+        stationDao.deleteById(stationId);
     }
+
+    @Transactional(readOnly = true)
+    public List<Station> findStationByLineId(final Long lineId) {
+        Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
+        return sections.toStations();
+    }
+
+
 }
