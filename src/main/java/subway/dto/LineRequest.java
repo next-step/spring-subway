@@ -1,6 +1,7 @@
 package subway.dto;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 public class LineRequest {
@@ -11,15 +12,18 @@ public class LineRequest {
     @NotBlank
     private String color;
 
-    @NotBlank
+    @NotNull
     private Long upStationId;
 
-    @NotBlank
+    @NotNull
     private Long downStationId;
 
-    @NotBlank
+    @NotNull
     @Positive
     private Integer distance;
+
+    public LineRequest() {
+    }
 
     public LineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;

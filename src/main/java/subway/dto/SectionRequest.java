@@ -1,19 +1,22 @@
 package subway.dto;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 public class SectionRequest {
 
-    @NotBlank
-    private final Long upStationId;
+    @NotNull
+    private Long upStationId;
 
-    @NotBlank
-    private final Long downStationId;
+    @NotNull
+    private Long downStationId;
 
-    @NotBlank
+    @NotNull
     @Positive
-    private final Integer distance;
+    private Integer distance;
+
+    public SectionRequest() {
+    }
 
     public SectionRequest(Long upStationId, Long downStationId, Integer distance) {
         this.upStationId = upStationId;
