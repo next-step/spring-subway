@@ -22,13 +22,13 @@ public class StationService {
         return StationResponse.of(station);
     }
 
-    public StationResponse findStationResponseById(Long id) {
+    public StationResponse findStationById(Long id) {
         return stationDao.findById(id)
             .map(StationResponse::of)
             .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
     }
 
-    public List<StationResponse> findAllStationResponses() {
+    public List<StationResponse> findAllStations() {
         List<Station> stations = stationDao.findAll();
 
         return stations.stream()
