@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import subway.exception.SubwayException;
 
 public class Sections {
 
@@ -22,10 +23,6 @@ public class Sections {
 
     public boolean containsBoth(final Long upStationId, final Long downStationId) {
         return countByStationIds(upStationId, downStationId) == 2;
-    }
-
-    public boolean containsNeither(final Long upStationId, final Long downStationId) {
-        return countByStationIds(upStationId, downStationId) == 0;
     }
 
     public Optional<Section> findLastSection() {
@@ -50,11 +47,11 @@ public class Sections {
         final Map<Long, Section> upStationKeyMap = values.stream()
                 .collect(Collectors.toMap(Section::getUpStationId, section -> section));
 
-        final Section firstSection = findFirstSection().orElseThrow(IllegalArgumentException::new);
+        final Section firstSection = findFirstSection().orElseThrow(
+                () -> new SubwayException("노선에 구간이 존재하지 않습니다.")
+        );
 
-        final List<Long> result =
-                new ArrayList<>(
-                        List.of(firstSection.getUpStationId(), firstSection.getDownStationId()));
+        final List<Long> result = new ArrayList<>(List.of(firstSection.getUpStationId(), firstSection.getDownStationId()));
         Section next = upStationKeyMap.get(firstSection.getDownStationId());
 
         while (next != null) {
@@ -119,13 +116,13 @@ public class Sections {
                 .collect(Collectors.toSet());
     }
 
-    private int countByStationIds(final Long... targetIds) {
+    private int countByStationIds(final Long... targetStationIds) {
         final Set<Long> stationIds = new HashSet<>();
         for (Section section : values) {
             stationIds.add(section.getUpStationId());
             stationIds.add(section.getDownStationId());
         }
-        stationIds.retainAll(Arrays.asList(targetIds));
+        stationIds.retainAll(Arrays.asList(targetStationIds));
 
         return stationIds.size();
     }

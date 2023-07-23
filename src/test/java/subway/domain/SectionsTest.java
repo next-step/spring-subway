@@ -42,22 +42,6 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("Sections에 두 Section이 없는지 확인할 수 있다.")
-    void containsNeither() {
-        /* given */
-        final Sections sections = new Sections(List.of(
-                new Section(1L, 1L, 1L, 1L, 1L),
-                new Section(2L, 2L, 2L, 2L, 2L),
-                new Section(3L, 3L, 3L, 3L, 3L)
-        ));
-
-        /* when & then */
-        assertThat(sections.containsNeither(4L, 5L)).isTrue();
-        assertThat(sections.containsNeither(3L, 4L)).isFalse();
-        assertThat(sections.containsNeither(2L, 3L)).isFalse();
-    }
-
-    @Test
     @DisplayName("Sections에 마지막 하행 종점을 찾을 수 있다.")
     void findLastPrevSection() {
         /* given */
@@ -71,6 +55,7 @@ class SectionsTest {
 
         /* then */
         assertThat(lastSection).isPresent();
+        assertThat(lastSection.get()).isEqualTo(new Section(3L, 3L, 4L, 3L));
     }
 
     @Test
