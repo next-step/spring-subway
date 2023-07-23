@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.*;
 import subway.dto.request.SectionRequest;
 import subway.dto.response.SectionResponse;
@@ -11,14 +12,14 @@ import subway.dto.response.SectionResponse;
 @Service
 public class SectionService {
 
-    private final StationService stationService;
+    private final StationDao stationDao;
     private final LineDao lineDao;
     private final SectionDao sectionDao;
 
-    public SectionService(final StationService stationService,
+    public SectionService(final StationDao stationDao,
                           final LineDao lineDao,
                           final SectionDao sectionDao) {
-        this.stationService = stationService;
+        this.stationDao = stationDao;
         this.lineDao = lineDao;
         this.sectionDao = sectionDao;
     }
@@ -47,15 +48,15 @@ public class SectionService {
     }
 
     private Section createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        final Line line = lineDao.findById(lineId).orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
-        final Station upStation = stationService.findStationById(upStationId);
-        final Station downStation = stationService.findStationById(downStationId);
+        final Line line = getLineById(lineId);
+        final Station upStation = getStationById(upStationId);
+        final Station downStation = getStationById(downStationId);
         return new Section(line, upStation, downStation, new Distance(distance));
     }
 
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
-        final Station station = stationService.findStationById(stationId);
+        final Station station = getStationById(stationId);
         final SortedSections sortedSections = new SortedSections(sectionDao.findAllByLineId(lineId));
         validateDeleteConstraint(station, sortedSections);
         final Section lastSection = sortedSections.deleteLastSection();
@@ -66,5 +67,15 @@ public class SectionService {
         if (!sections.isLastDownStation(station)) {
             throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
         }
+    }
+
+    private Station getStationById(final Long stationId) {
+        return stationDao.findById(stationId)
+                .orElseThrow(() -> new IllegalStateException("역 찾을 수 없습니다."));
+    }
+
+    private Line getLineById(final Long lineId) {
+        return lineDao.findById(lineId)
+                .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
     }
 }
