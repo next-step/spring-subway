@@ -12,7 +12,8 @@ public class Section {
     private final Long downStationId;
     private final Long distance;
 
-    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
+    public Section(final Long lineId, final Long upStationId, final Long downStationId,
+            final Long distance) {
         this(null, lineId, upStationId, downStationId, distance);
     }
 
@@ -33,7 +34,8 @@ public class Section {
     }
 
     public boolean containsStation(final Long stationId) {
-        return Objects.equals(this.upStationId, stationId) || Objects.equals(this.downStationId, stationId);
+        return Objects.equals(this.upStationId, stationId) || Objects.equals(this.downStationId,
+                stationId);
     }
 
     public boolean isSameDownStationId(final Long stationId) {
@@ -45,14 +47,17 @@ public class Section {
     }
 
     public boolean containsStations(final Long upStationId, final Long downStationId) {
-        return Objects.equals(this.upStationId, upStationId) || Objects.equals(this.downStationId, downStationId);
+        return Objects.equals(this.upStationId, upStationId) || Objects.equals(this.downStationId,
+                downStationId);
     }
 
     public Section subtract(final Section requestSection) {
         if (Objects.equals(this.upStationId, requestSection.upStationId)) {
-            return new Section(this.lineId, requestSection.upStationId, this.downStationId, this.distance - requestSection.distance);
+            return new Section(this.lineId, requestSection.upStationId, this.downStationId,
+                    this.distance - requestSection.distance);
         }
-        return new Section(this.lineId, this.upStationId, requestSection.downStationId, this.distance - requestSection.distance);
+        return new Section(this.lineId, this.upStationId, requestSection.downStationId,
+                this.distance - requestSection.distance);
     }
 
     public Long getId() {
@@ -76,9 +81,16 @@ public class Section {
     }
 
     private void validate(final Long upStationId, final Long downStationId, final Long distance) {
+        validateSameStation(upStationId, downStationId);
         validateContainsUpStationAndDownStation(upStationId, downStationId);
         validateDistanceNotNull(distance);
         validateDistanceLessThanZero(distance);
+    }
+
+    private void validateSameStation(final Long upStationsId, final Long downStationsId) {
+        if (Objects.equals(upStationsId, downStationsId)) {
+            throw new SubwayException("입력된 하행역과 상행역이 같습니다.");
+        }
     }
 
     private void validateDistanceLessThanZero(final Long distance) {
@@ -93,7 +105,8 @@ public class Section {
         }
     }
 
-    private void validateContainsUpStationAndDownStation(final Long upStationId, final Long downStationId) {
+    private void validateContainsUpStationAndDownStation(final Long upStationId,
+            final Long downStationId) {
         if (upStationId == null || downStationId == null) {
             throw new SubwayException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
         }
@@ -101,8 +114,12 @@ public class Section {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         final Section section = (Section) o;
         return Objects.equals(id, section.id)
                 && Objects.equals(lineId, section.lineId)

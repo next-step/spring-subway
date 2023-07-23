@@ -61,6 +61,18 @@ class SectionTest {
     }
 
     @Test
+    @DisplayName("상행역과 하행역이 같은 구간 생성 시 SubwayException을 던진다.")
+    void distanceExceptionWithSameUpStationAndDownStation() {
+        /* given */
+
+        /* when & then */
+        assertThatThrownBy(() -> new Section(LINE_ID, UP_STATION_ID, UP_STATION_ID, DISTANCE))
+                .isInstanceOf(SubwayException.class);
+        assertThatThrownBy(() -> new Section(LINE_ID, DOWN_STATION_ID, DOWN_STATION_ID, DISTANCE))
+                .isInstanceOf(SubwayException.class);
+    }
+
+    @Test
     @DisplayName("구간의 상행역과 하행역에 특정 역이 있는지 확인할 수 있다.")
     void containsStation() {
         /* given */
