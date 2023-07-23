@@ -2,44 +2,63 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
+import subway.dao.SectionDao;
+import subway.dao.StationDao;
+import subway.domain.ConnectedSections;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class LineService {
     private final LineDao lineDao;
+    private final SectionDao sectionDao;
+    private final StationDao stationDao;
 
-    public LineService(LineDao lineDao) {
+    public LineService(final LineDao lineDao, final SectionDao sectionDao, final StationDao stationDao) {
         this.lineDao = lineDao;
+        this.sectionDao = sectionDao;
+        this.stationDao = stationDao;
     }
 
-    public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        return LineResponse.of(persistLine);
+    public Line saveLine(final LineRequest request) {
+        final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        sectionDao.insert(
+                new Section(
+                        persistLine.getId(),
+                        request.getUpStationId(),
+                        request.getDownStationId(),
+                        request.getDistance()
+                )
+        );
+
+        return persistLine;
     }
 
     public List<LineResponse> findLineResponses() {
-        List<Line> persistLines = findLines();
+        final List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(LineResponse::of)
+                .map(line -> findLineResponse(line.getId()))
                 .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
-        return lineDao.findAll();
-    }
+    public LineResponse findLineResponse(final Long lineId) {
+        final Map<Long, Station> stationMap = stationDao.findAllByLineId(lineId).stream()
+                .collect(Collectors.toMap(Station::getId, Function.identity()));
 
-    public LineResponse findLineResponseById(Long id) {
-        Line persistLine = findLineById(id);
-        return LineResponse.of(persistLine);
-    }
+        final ConnectedSections connectedSections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
+        final List<Station> stations = connectedSections.getSortedStationIds().stream()
+                .map(stationMap::get)
+                .collect(Collectors.toList());
 
-    public Line findLineById(Long id) {
-        return lineDao.findById(id);
+        return LineResponse.of(lineDao.findById(lineId), stations);
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
@@ -50,4 +69,7 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
+    private List<Line> findLines() {
+        return lineDao.findAll();
+    }
 }

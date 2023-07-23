@@ -1,25 +1,26 @@
 package subway.dto;
 
-public class LineRequest {
-    private String name;
+import subway.domain.Section;
+
+public class SectionRequest {
+
     private Long upStationId;
     private Long downStationId;
     private Long distance;
-    private String color;
 
-    public LineRequest() {
+    private SectionRequest() {
+        /* no-op */
     }
 
-    public LineRequest(final String name, final Long upStationId, final Long downStationId, final Long distance, final String color) {
-        this.name = name;
+    public SectionRequest(final Long upStationId, final Long downStationId, final Long distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-        this.color = color;
     }
 
-    public String getName() {
-        return this.name;
+    public Section toSection(final Long lineId) {
+
+        return new Section(lineId, this.upStationId, this.downStationId, this.distance);
     }
 
     public Long getUpStationId() {
@@ -32,9 +33,5 @@ public class LineRequest {
 
     public Long getDistance() {
         return this.distance;
-    }
-
-    public String getColor() {
-        return this.color;
     }
 }
