@@ -79,7 +79,7 @@ class LineDaoTest {
         // then
         assertThat(emptyResult.isEmpty()).isTrue();
         assertThat(result.isPresent()).isTrue();
-        assertThat(result.get()).isEqualTo(response);
+        assertThat(result).hasValue(response);
     }
 
     @Test
@@ -95,8 +95,7 @@ class LineDaoTest {
         // then
         Optional<Line> result = lineDao.findById(update.getId());
         assertThat(result.isPresent()).isTrue();
-        assertThat(result.get().getName()).isEqualTo(update.getName());
-        assertThat(result.get().getColor()).isEqualTo(update.getColor());
+        assertThat(result).hasValue(update);
     }
 
     @Test
@@ -126,7 +125,7 @@ class LineDaoTest {
         // then
         assertThat(emptyResult.isEmpty()).isTrue();
         assertThat(result.isPresent()).isTrue();
-        assertThat(result.get().getName()).isEqualTo(response.getName());
+        assertThat(result).hasValue(response);
     }
 
     @Test
