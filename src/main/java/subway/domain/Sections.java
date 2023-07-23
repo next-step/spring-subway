@@ -164,12 +164,11 @@ public class Sections {
         return stations;
     }
 
-    Section getFirst() {
+    private Section getFirst() {
         return this.values.get(0);
     }
 
-
-    Section getLast() {
+    private Section getLast() {
         return this.values.get(this.values.size() - 1);
     }
 
