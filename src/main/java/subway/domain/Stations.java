@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import subway.exception.IllegalStationsException;
 
 public class Stations {
@@ -20,6 +21,7 @@ public class Stations {
     }
 
     private List<Station> sort(final List<StationPair> stationPairs) {
+        validate(stationPairs);
         final Map<Station, Station> upToDownStations = convert(stationPairs);
         final Station startStation = findStartStation(upToDownStations);
         return connect(upToDownStations, startStation);
@@ -51,6 +53,19 @@ public class Stations {
                         StationPair::getUpStation,
                         StationPair::getDownStation)
                 );
+    }
+
+    private void validate(List<StationPair> stationPairs) {
+        int totalStationSize = stationPairs.size() * 2;
+        Set<Station> distinctStations = stationPairs.stream()
+            .flatMap(stationPair -> Stream.of(stationPair.getUpStation(), stationPair.getDownStation()))
+            .collect(Collectors.toSet());
+        if (distinctStations.isEmpty()) {
+            throw new IllegalStationsException("역 정보를 포함하고 있지 않습니다.");
+        }
+        if (distinctStations.size() != totalStationSize) {
+            throw new IllegalStationsException("중복된 역은 노선에 포함될 수 없습니다.");
+        }
     }
 
     public List<Station> getStations() {
