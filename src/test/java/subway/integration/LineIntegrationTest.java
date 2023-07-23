@@ -2,7 +2,6 @@ package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import subway.RestApi;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
@@ -22,6 +21,7 @@ import subway.dto.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
+
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
 
@@ -39,13 +39,7 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        ExtractableResponse<Response> response = RestApi.post(lineRequest1, "/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -56,22 +50,10 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLineWithDuplicateName() {
         // given
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        RestApi.post(lineRequest1, "/lines");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        ExtractableResponse<Response> response = RestApi.post(lineRequest1, "/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -81,38 +63,20 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
-
-        ExtractableResponse<Response> createResponse2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest2)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        ExtractableResponse<Response> createResponse1 = RestApi.post(lineRequest1, "/lines");
+        ExtractableResponse<Response> createResponse2 = RestApi.post(lineRequest2, "/lines");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.get("/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
+            .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+            .collect(Collectors.toList());
         List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
-                .map(LineResponse::getId)
-                .collect(Collectors.toList());
+            .map(LineResponse::getId)
+            .collect(Collectors.toList());
         assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
@@ -120,29 +84,11 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest("2", "3", 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest("3", "4", 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> createResponse = RestApi.post(lineRequest1, "/lines");
+        RestApi.post(new SectionRequest("2", "3", 10),
+            "/lines/1/sections");
+        RestApi.post(new SectionRequest("3", "4", 10),
+            "/lines/1/sections");
 
         List<StationResponse> stationResponses = new ArrayList<>();
         stationResponses.add(StationResponse.of(1L, "오이도"));
@@ -152,45 +98,34 @@ class LineIntegrationTest extends IntegrationTest {
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.get("/lines/{lindId}", lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineResponse resultResponse = response.as(LineResponse.class);
         assertThat(resultResponse.getId()).isEqualTo(lineId);
 
-        assertThat(resultResponse.getStations().get(0).getId()).isEqualTo(stationResponses.get(0).getId());
-        assertThat(resultResponse.getStations().get(1).getId()).isEqualTo(stationResponses.get(1).getId());
-        assertThat(resultResponse.getStations().get(2).getId()).isEqualTo(stationResponses.get(2).getId());
-        assertThat(resultResponse.getStations().get(3).getId()).isEqualTo(stationResponses.get(3).getId());
+        assertThat(resultResponse.getStations().get(0).getId()).isEqualTo(
+            stationResponses.get(0).getId());
+        assertThat(resultResponse.getStations().get(1).getId()).isEqualTo(
+            stationResponses.get(1).getId());
+        assertThat(resultResponse.getStations().get(2).getId()).isEqualTo(
+            stationResponses.get(2).getId());
+        assertThat(resultResponse.getStations().get(3).getId()).isEqualTo(
+            stationResponses.get(3).getId());
     }
 
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        ExtractableResponse<Response> createResponse = RestApi.post(lineRequest1,
+            "/lines");
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest2)
-                .when().put("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.put(lineRequest2,
+            "/lines/{lineId}", lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -200,21 +135,13 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        ExtractableResponse<Response> createResponse = RestApi.post(lineRequest1,
+            "/lines");
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.delete("/lines/{lineId}",
+            lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -226,36 +153,9 @@ class LineIntegrationTest extends IntegrationTest {
         final StationRequest stationRequest3 = new StationRequest("용산");
         final StationRequest stationRequest4 = new StationRequest("삼각지");
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest1)
-                .when().post("/stations")
-                .then().log().all().
-                extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest2)
-                .when().post("/stations")
-                .then().log().all().
-                extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest3)
-                .when().post("/stations")
-                .then().log().all().
-                extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest4)
-                .when().post("/stations")
-                .then().log().all().
-                extract();
+        RestApi.post(stationRequest1, "/stations");
+        RestApi.post(stationRequest2, "/stations");
+        RestApi.post(stationRequest3, "/stations");
+        RestApi.post(stationRequest4, "/stations");
     }
 }

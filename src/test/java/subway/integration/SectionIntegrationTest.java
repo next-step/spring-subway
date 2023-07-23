@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.RestApi;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
@@ -34,13 +35,7 @@ class SectionIntegrationTest extends IntegrationTest {
         // given
         createInitialLine();
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        RestApi.post(stationRequest, "stations");
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -55,12 +50,7 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
 
-        ExtractableResponse<Response> responseForCheck = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/1")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> responseForCheck = RestApi.get("/lines/1");
 
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
@@ -69,13 +59,8 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionWithUnmatchedLineId() {
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.post(sectionRequest,
+            "/lines/1/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -89,13 +74,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest badSectionRequest = new SectionRequest("1", "2", 5);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(badSectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.post(badSectionRequest, "/lines/1/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -109,13 +88,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest badSectionRequest = new SectionRequest("5", "6", 5);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(badSectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.post(badSectionRequest, "/lines/1/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -127,29 +100,11 @@ class SectionIntegrationTest extends IntegrationTest {
         // given
         createInitialLine();
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        RestApi.post(stationRequest, "/stations");
+        RestApi.post(sectionRequest, "/lines/1/sections");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=3")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.delete("/lines/1/sections?stationId=3");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -161,29 +116,11 @@ class SectionIntegrationTest extends IntegrationTest {
         // given
         createInitialLine();
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        RestApi.post(stationRequest, "/stations");
+        RestApi.post(sectionRequest, "/lines/1/sections");
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=1")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.delete("/lines/1/sections?stationId=1");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -196,12 +133,7 @@ class SectionIntegrationTest extends IntegrationTest {
         createInitialLine();
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=2")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestApi.delete("/lines/1/sections?stationId=2");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -212,28 +144,8 @@ class SectionIntegrationTest extends IntegrationTest {
         final StationRequest stationRequest1 = new StationRequest("인천");
         final StationRequest stationRequest2 = new StationRequest("부평");
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest1)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest2)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        RestApi.post(stationRequest1, "/stations");
+        RestApi.post(stationRequest2, "/stations");
+        RestApi.post(lineRequest, "/lines");
     }
 }
