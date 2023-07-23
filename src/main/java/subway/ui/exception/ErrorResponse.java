@@ -6,7 +6,7 @@ public class ErrorResponse {
 
     private String message;
 
-    public ErrorResponse() {
+    private ErrorResponse() {
     }
 
     public ErrorResponse(int code, String message) {

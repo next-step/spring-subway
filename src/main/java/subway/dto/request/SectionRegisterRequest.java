@@ -8,7 +8,7 @@ public final class SectionRegisterRequest {
     private Long downStationId;
     private int distance;
 
-    public SectionRegisterRequest() {
+    private SectionRegisterRequest() {
     }
 
     public SectionRegisterRequest(
@@ -29,26 +29,8 @@ public final class SectionRegisterRequest {
         return downStationId;
     }
 
-
     public int getDistance() {
         return distance;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        SectionRegisterRequest that = (SectionRegisterRequest) o;
-        return distance == that.distance && Objects.equals(downStationId, that.downStationId)
-            && Objects.equals(upStationId, that.upStationId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(downStationId, upStationId, distance);
-    }
 }

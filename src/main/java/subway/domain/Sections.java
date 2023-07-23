@@ -1,11 +1,7 @@
 package subway.domain;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,7 +44,7 @@ public class Sections {
         return findStations().stream()
             .filter(station -> !findStartStations().contains(station))
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
+            .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
     }
 
     public List<Station> sortStations() {
@@ -64,7 +60,7 @@ public class Sections {
             nowStation = section.getDownStation();
         }
 
-        return sortedStations;
+        return Collections.unmodifiableList(sortedStations);
     }
 
     private Map<Station, Section> initLayerMap() {
@@ -79,24 +75,29 @@ public class Sections {
         return findStations().stream()
             .filter(station -> !findEndStations().contains(station))
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
+            .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
     }
 
     public SectionRegisterVo registerSection(Section section) {
-        if (sections.size() == 0) {
-            return new SectionRegisterVo(section);
-        }
-        if (findStations().contains(section.getUpStation())
-            && findStations().contains(section.getDownStation())) {
-            throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
-        }
+        validRegisterSection(section);
         if (findStations().contains(section.getUpStation())) {
             return registerUpSection(section);
         }
         if (findStations().contains(section.getDownStation())) {
             return registerDownSection(section);
         }
-        throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
+        return new SectionRegisterVo(section);
+    }
+
+    private void validRegisterSection(Section section) {
+        if (findStations().contains(section.getUpStation())
+            && findStations().contains(section.getDownStation())) {
+            throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
+        }
+        if (!findStations().contains(section.getUpStation())
+                && !findStations().contains(section.getDownStation()) && !sections.isEmpty()) {
+            throw new IllegalArgumentException("등록하고자 하는 구간의 2개의 역이 모두 노선에 포함되지 않아 추가할 수 없습니다.");
+        }
     }
 
     private SectionRegisterVo registerUpSection(Section registerSection) {
