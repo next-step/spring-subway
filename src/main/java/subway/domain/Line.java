@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Line {
@@ -25,6 +26,10 @@ public class Line {
         this.name = name;
         this.color = color;
         this.sections = sections;
+    }
+
+    public Line addSections(final Section section) {
+        return new Line(id, name, color, new Sections(List.of(section)));
     }
 
     public Line addSection(final Section section) {
@@ -63,4 +68,6 @@ public class Line {
     public int hashCode() {
         return Objects.hash(id, name, color);
     }
+
+
 }

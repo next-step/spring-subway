@@ -7,6 +7,7 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.SectionsChange;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
@@ -31,28 +32,30 @@ public class LineService {
         Line line = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
+        Section section = new Section(upStation, downStation, request.getDistance());
 
-        sectionDao.insert(new Section(upStation, downStation, request.getDistance()), line.getId());
+        Line newLine = line.addSections(section);
+        sectionDao.insert(section, line.getId());
 
-        return LineResponse.of(line);
+        return LineResponse.of(newLine);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findLineResponses() {
-        List<Line> persistLines = findLines();
+        List<Line> persistLines = lineDao.findAll();
         return persistLines.stream()
                 .map(LineResponse::of)
+                .peek(s -> System.out.println(s.getName()))
                 .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
-        return lineDao.findAll();
-    }
-
+    @Transactional(readOnly = true)
     public LineResponse findLineResponseById(final Long id) {
         Line line = findLineById(id);
         return LineResponse.of(line);
     }
 
+    @Transactional(readOnly = true)
     public Line findLineById(final Long id) {
         return lineDao.findById(id);
     }

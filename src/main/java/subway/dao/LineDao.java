@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class LineDao {
@@ -28,7 +29,7 @@ public class LineDao {
                     rs.getString("name"),
                     rs.getString("color")
             );
-
+    private final RowMapper<Long> lineIdMapper = (rs, rowNum) -> rs.getLong("id");
     private final ResultSetExtractor<Line> extractor = rs -> {
         List<Section> sections = new ArrayList<>();
         boolean isNext = rs.next();
@@ -49,8 +50,7 @@ public class LineDao {
             isNext = rs.next();
         }
 
-        return new Line(id, name, color, new Sections(sections)
-        );
+        return new Line(id, name, color, new Sections(sections));
     };
 
     public LineDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
@@ -71,9 +71,12 @@ public class LineDao {
     }
 
     public List<Line> findAll() {
-        String sql = "select id, name, color from LINE";
+        String sql = "select id from LINE";
 
-        return jdbcTemplate.query(sql, lineRowMapper);
+        List<Long> lineId = jdbcTemplate.query(sql, lineIdMapper);
+        return lineId.stream()
+                .map(line -> findById(line))
+                .collect(Collectors.toList());
     }
 
     public Line findById(final Long id) {

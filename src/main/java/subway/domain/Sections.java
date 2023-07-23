@@ -45,7 +45,7 @@ public class Sections {
     }
 
     private void validateNoMatches(final Section section) {
-        if (!contains(section.getUpStation()) && !contains(section.getDownStation())) {
+        if (notContains(section.getUpStation()) && notContains(section.getDownStation())) {
             throw new IllegalArgumentException("두 역 중 하나는 기존 노선에 포함되어야 합니다");
         }
     }
@@ -56,6 +56,10 @@ public class Sections {
                 .distinct()
                 .collect(Collectors.toList())
                 .contains(station);
+    }
+
+    private boolean notContains(final Station station) {
+        return !contains(station);
     }
 
     private Section findTargetSection(final Section section) {
