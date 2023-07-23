@@ -76,7 +76,7 @@ public class Sections {
     }
 
     public SectionAdditionResult add(Section section) {
-        validateOneInOneOut(section);
+        validateOnlyOneStationIncludedInLine(section);
 
         if (section.canPrecede(getFirst())) {
             addFirst(section);
@@ -112,18 +112,20 @@ public class Sections {
             .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다."));
     }
 
-    private void validateOneInOneOut(Section section) {
-        Station upStation = section.getUpStation();
-        Station downStation = section.getDownStation();
+    private void validateOnlyOneStationIncludedInLine(Section section) {
+        checkBothStationsInLine(section);
+        checkNoneOfStationsInLine(section);
+    }
 
-        boolean upStationExists = isStationExists(upStation);
-        boolean downStationExists = isStationExists(downStation);
-
-        if (upStationExists && downStationExists) {
-            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다. upStation: " + upStation + " downStation: " + downStation);
+    private void checkBothStationsInLine(Section section) {
+        if (isStationExists(section.getUpStation()) && isStationExists(section.getDownStation())) {
+            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다. upStation: " + section.getUpStation() + " downStation: " + section.getDownStation());
         }
-        if (!upStationExists && !downStationExists) {
-            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다. upStation: " + upStation + " downStation: " + downStation);
+    }
+
+    private void checkNoneOfStationsInLine(Section section) {
+        if (!isStationExists(section.getUpStation()) && !isStationExists(section.getDownStation())) {
+            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다. upStation: " + section.getUpStation() + " downStation: " + section.getDownStation());
         }
     }
 

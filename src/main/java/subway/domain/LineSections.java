@@ -2,7 +2,7 @@ package subway.domain;
 
 import java.util.List;
 import java.util.Objects;
-import subway.vo.SectionAdditionResult;
+import subway.dto.SectionAdditionResult;
 
 public class LineSections {
 
