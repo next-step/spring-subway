@@ -2,20 +2,10 @@ package subway.ui.exception;
 
 public class ErrorResponse {
 
-    private int code;
-
     private String message;
 
-    public ErrorResponse() {
-    }
-
-    public ErrorResponse(int code, String message) {
-        this.code = code;
+    public ErrorResponse(String message) {
         this.message = message;
-    }
-
-    public int getCode() {
-        return code;
     }
 
     public String getMessage() {

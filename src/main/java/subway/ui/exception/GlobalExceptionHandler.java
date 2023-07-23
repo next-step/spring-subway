@@ -13,26 +13,32 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(RuntimeException.class)
+    public ErrorResponse exceptionHandle() {
+        return new ErrorResponse("잘못된 요청 정보 입니다.");
+    }
+
+    @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     public ErrorResponse illegalArgumentExceptionHandle(IllegalArgumentException exception) {
-        return new ErrorResponse(BAD_REQUEST.value(), exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
     }
 
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ExceptionHandler(IllegalStateException.class)
     public ErrorResponse illegalStateExceptionHandle(IllegalStateException exception) {
-        return new ErrorResponse(INTERNAL_SERVER_ERROR.value(), exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
     }
 
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(JsonProcessingException.class)
     public ErrorResponse jsonProcessingExceptionHandle() {
-        return new ErrorResponse(BAD_REQUEST.value(), "입력 값이 잘못되었습니다.");
+        return new ErrorResponse("입력 값이 잘못되었습니다.");
     }
 
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(SQLException.class)
     public ErrorResponse handleSQLException() {
-        return new ErrorResponse(BAD_REQUEST.value(), "잘못된 요청 정보 입니다.");
+        return new ErrorResponse("잘못된 요청 정보 입니다.");
     }
 }
