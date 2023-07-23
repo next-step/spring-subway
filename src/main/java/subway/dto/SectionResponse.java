@@ -4,14 +4,10 @@ import subway.domain.Section;
 
 public class SectionResponse {
 
-    private Long id;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
-
-    private SectionResponse() {
-        /* no-op */
-    }
+    private final Long id;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final Long distance;
 
     SectionResponse(final Long id, final Long upStationId, final Long downStationId, final Long distance) {
         this.id = id;

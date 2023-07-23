@@ -1,14 +1,12 @@
 package subway.dto;
 
 public class LineRequest {
-    private String name;
-    private Long upStationId;
-    private Long downStationId;
-    private Long distance;
-    private String color;
 
-    public LineRequest() {
-    }
+    private final String name;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final Long distance;
+    private final String color;
 
     public LineRequest(final String name, final Long upStationId, final Long downStationId, final Long distance, final String color) {
         this.name = name;
