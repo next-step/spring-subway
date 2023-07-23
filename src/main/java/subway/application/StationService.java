@@ -7,6 +7,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.IllegalStationsException;
 
 @Service
 public class StationService {
@@ -22,7 +23,9 @@ public class StationService {
     }
 
     public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        return stationDao.findById(id)
+            .map(StationResponse::of)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
     }
 
     public List<StationResponse> findAllStationResponses() {

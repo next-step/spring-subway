@@ -1,6 +1,7 @@
 package subway.dao;
 
 import java.util.List;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -40,14 +41,15 @@ public class StationDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Station findById(Long id) {
+    public Optional<Station> findById(Long id) {
         String sql = "select * from STATION where id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        return jdbcTemplate.query(sql, rowMapper, id)
+            .stream().findAny();
     }
 
     public void update(Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{newStation.getName(), newStation.getId()});
+        jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
     }
 
     public void deleteById(Long id) {
