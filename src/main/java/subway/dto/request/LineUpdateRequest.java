@@ -1,12 +1,12 @@
 package subway.dto.request;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 public class LineUpdateRequest {
 
-    @NotEmpty
+    @NotBlank
     private String name;
-    @NotEmpty
+    @NotBlank
     private String color;
 
     public String getName() {

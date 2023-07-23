@@ -1,11 +1,11 @@
 package subway.dto.request;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class LineCreationRequest {
 
-    @NotEmpty
+    @NotBlank
     private String name;
     @NotNull
     private Long upStationId;
@@ -13,7 +13,7 @@ public class LineCreationRequest {
     private Long downStationId;
     @NotNull
     private Integer distance;
-    @NotEmpty
+    @NotBlank
     private String color;
 
     public LineCreationRequest() {
