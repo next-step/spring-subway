@@ -37,9 +37,9 @@ class LineIntegrationTest extends IntegrationTest {
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
-    void createLine() {
+    void createLineTest() {
         // when
-        ExtractableResponse<Response> response = RestApi.post(lineRequest1, "/lines");
+        ExtractableResponse<Response> response = createLine(lineRequest1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -48,12 +48,12 @@ class LineIntegrationTest extends IntegrationTest {
 
     @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
     @Test
-    void createLineWithDuplicateName() {
+    void createLineWithDuplicateNameTest() {
         // given
-        RestApi.post(lineRequest1, "/lines");
+        createLine(lineRequest1);
 
         // when
-        ExtractableResponse<Response> response = RestApi.post(lineRequest1, "/lines");
+        ExtractableResponse<Response> response = createLine(lineRequest1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -61,10 +61,10 @@ class LineIntegrationTest extends IntegrationTest {
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
-    void getLines() {
+    void getLinesTest() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestApi.post(lineRequest1, "/lines");
-        ExtractableResponse<Response> createResponse2 = RestApi.post(lineRequest2, "/lines");
+        ExtractableResponse<Response> createResponse1 = createLine(lineRequest1);
+        ExtractableResponse<Response> createResponse2 = createLine(lineRequest2);
 
         // when
         ExtractableResponse<Response> response = RestApi.get("/lines");
@@ -82,19 +82,12 @@ class LineIntegrationTest extends IntegrationTest {
 
     @DisplayName("지하철 노선을 조회한다.")
     @Test
-    void getLine() {
+    void getLineTest() {
         // given
-        ExtractableResponse<Response> createResponse = RestApi.post(lineRequest1, "/lines");
-        RestApi.post(new SectionRequest("2", "3", 10),
-            "/lines/1/sections");
-        RestApi.post(new SectionRequest("3", "4", 10),
-            "/lines/1/sections");
+        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
+        createInitialSections();
 
-        List<StationResponse> stationResponses = new ArrayList<>();
-        stationResponses.add(StationResponse.of(1L, "오이도"));
-        stationResponses.add(StationResponse.of(2L, "장지"));
-        stationResponses.add(StationResponse.of(3L, "용산"));
-        stationResponses.add(StationResponse.of(4L, "삼각지"));
+        List<StationResponse> stationResponses = createStationResponses();
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -105,22 +98,16 @@ class LineIntegrationTest extends IntegrationTest {
         LineResponse resultResponse = response.as(LineResponse.class);
         assertThat(resultResponse.getId()).isEqualTo(lineId);
 
-        assertThat(resultResponse.getStations().get(0).getId()).isEqualTo(
-            stationResponses.get(0).getId());
-        assertThat(resultResponse.getStations().get(1).getId()).isEqualTo(
-            stationResponses.get(1).getId());
-        assertThat(resultResponse.getStations().get(2).getId()).isEqualTo(
-            stationResponses.get(2).getId());
-        assertThat(resultResponse.getStations().get(3).getId()).isEqualTo(
-            stationResponses.get(3).getId());
+        List<Long> expectedStationIds = extractIds(stationResponses);
+        List<Long> resultLineIds = extractIds(resultResponse.getStations());
+        assertThat(resultLineIds).containsAll(expectedStationIds);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
     @Test
-    void updateLine() {
+    void updateLineTest() {
         // given
-        ExtractableResponse<Response> createResponse = RestApi.post(lineRequest1,
-            "/lines");
+        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
@@ -133,15 +120,13 @@ class LineIntegrationTest extends IntegrationTest {
 
     @DisplayName("지하철 노선을 제거한다.")
     @Test
-    void deleteLine() {
+    void deleteLineTest() {
         // given
-        ExtractableResponse<Response> createResponse = RestApi.post(lineRequest1,
-            "/lines");
+        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestApi.delete("/lines/{lineId}",
-            lineId);
+        ExtractableResponse<Response> response = RestApi.delete("/lines/{lineId}", lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -157,5 +142,32 @@ class LineIntegrationTest extends IntegrationTest {
         RestApi.post(stationRequest2, "/stations");
         RestApi.post(stationRequest3, "/stations");
         RestApi.post(stationRequest4, "/stations");
+    }
+
+    private void createInitialSections() {
+        SectionRequest sectionRequest1 = new SectionRequest("2", "3", 10);
+        SectionRequest sectionRequest2 = new SectionRequest("3", "4", 10);
+
+        RestApi.post(sectionRequest1, "/lines/1/sections");
+        RestApi.post(sectionRequest2, "/lines/1/sections");
+    }
+
+    private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+        return RestApi.post(lineRequest, "/lines");
+    }
+
+    private List<StationResponse> createStationResponses() {
+        List<StationResponse> stationResponses = new ArrayList<>();
+        stationResponses.add(StationResponse.of(1L, "오이도"));
+        stationResponses.add(StationResponse.of(2L, "장지"));
+        stationResponses.add(StationResponse.of(3L, "용산"));
+        stationResponses.add(StationResponse.of(4L, "삼각지"));
+        return stationResponses;
+    }
+
+    private List<Long> extractIds(List<StationResponse> stationResponses) {
+        return stationResponses.stream()
+            .map(StationResponse::getId)
+            .collect(Collectors.toList());
     }
 }
