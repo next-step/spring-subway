@@ -94,7 +94,7 @@ class SectionDaoTest {
 
         // then
         assertThat(result).hasSize(2);
-        assertThat(result).containsAll(List.of(section1, section2));
+        assertThat(result).contains(section1, section2);
     }
 
     @Test

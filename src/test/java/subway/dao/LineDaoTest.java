@@ -63,7 +63,7 @@ class LineDaoTest {
         List<Line> result = lineDao.findAll();
 
         // then
-        assertThat(result).containsAll(List.of(response1, response2));
+        assertThat(result).contains(response1, response2);
     }
 
     @Test
@@ -145,7 +145,8 @@ class LineDaoTest {
         List<StationPair> result = lineDao.findAllStationPair(line.getId());
 
         // then
-        assertThat(result).contains(new StationPair(station1, station2));
-        assertThat(result).contains(new StationPair(station2, station3));
+        assertThat(result).contains(
+            new StationPair(station1, station2), new StationPair(station2, station3)
+        );
     }
 }
