@@ -59,9 +59,10 @@ public class LineDao {
         return jdbcTemplate.query(sql, lineRowMapper);
     }
 
-    public Line findById(Long id) {
+    public Optional<Line> findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, lineRowMapper, id);
+        return jdbcTemplate.query(sql, lineRowMapper, id)
+            .stream().findAny();
     }
 
     public void update(Line newLine) {

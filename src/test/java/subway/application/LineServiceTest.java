@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +39,8 @@ class LineServiceTest {
         Station station3 = new Station(3L, "안산");
         Station station4 = new Station(4L, "한대앞");
 
-        given(lineDao.findById(lineId)).willReturn(new Line(1L, "1호선", "blue"));
+        given(lineDao.findById(lineId)).willReturn(
+            Optional.of(new Line(1L, "1호선", "blue")));
         given(lineDao.findAllStationPair(lineId)).willReturn(List.of(
                 new StationPair(station4, station1),
                 new StationPair(station1, station3),
