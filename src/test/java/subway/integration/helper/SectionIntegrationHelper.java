@@ -1,4 +1,4 @@
-package subway.integration.fixture;
+package subway.integration.helper;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.dto.request.SectionRequest;
 
-public class SectionIntegrationFixture {
+public class SectionIntegrationHelper {
 
     public static ExtractableResponse<Response> createSection(final Long lineId, final SectionRequest sectionRequest) {
         return RestAssured

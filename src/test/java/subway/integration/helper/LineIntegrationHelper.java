@@ -1,20 +1,20 @@
-package subway.integration.fixture;
+package subway.integration.helper;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.domain.Line;
-import subway.dto.request.CreateLineRequest;
+import subway.dto.request.LineCreateRequest;
 import subway.dto.response.LineResponse;
 
-public class LineIntegrationFixture {
+public class LineIntegrationHelper {
 
-    public static Line createLine(final CreateLineRequest createLineRequest) {
+    public static Line createLine(final LineCreateRequest lineCreateRequest) {
         final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(createLineRequest)
+                .body(lineCreateRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();

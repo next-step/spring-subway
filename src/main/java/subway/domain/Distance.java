@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class Distance {
 
-    private static final Long MIN_DISTANCE = 1L;
+    private static final long MIN_DISTANCE = 1L;
 
-    private Long value;
+    private long value;
 
     public Distance(final long distance) {
         validateDistanceValue(distance);
@@ -19,7 +19,7 @@ public class Distance {
         }
     }
 
-    public Long getValue() {
+    public long getValue() {
         return value;
     }
 

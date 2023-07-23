@@ -8,10 +8,10 @@ public class SectionResponse {
     private Long lineId;
     private Long upStationId;
     private Long downStationId;
-    private Long distance;
+    private long distance;
 
     public SectionResponse(Long id, Long lineId, Long upStationId, Long downStationId,
-                           Long distance) {
+                           long distance) {
         this.id = id;
         this.lineId = lineId;
         this.upStationId = upStationId;
@@ -47,7 +47,7 @@ public class SectionResponse {
         return downStationId;
     }
 
-    public Long getDistance() {
+    public long getDistance() {
         return distance;
     }
 

@@ -12,7 +12,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Station;
 import subway.domain.fixture.StationFixture;
-import subway.dto.request.CreateLineRequest;
+import subway.dto.request.LineCreateRequest;
 import subway.dto.response.LineResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +48,7 @@ class LineServiceTest {
         final Line line = new Line("1호선", "그린");
         final Station upStation = stationFixture.getStationA();
         final Station downStation = stationFixture.getStationB();
-        final CreateLineRequest createLineRequest = new CreateLineRequest(
+        final LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 line.getName(),
                 line.getColor(),
                 upStation.getId(),
@@ -56,7 +56,7 @@ class LineServiceTest {
                 10L);
 
         // when
-        final LineResponse lineResponse = lineService.saveLine(createLineRequest);
+        final LineResponse lineResponse = lineService.saveLine(lineCreateRequest);
 
         // then
         assertThat(lineDao.findById(lineResponse.getId()).get())

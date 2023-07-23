@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.domain.Station;
 import subway.dto.response.StationResponse;
-import subway.integration.fixture.StationIntegrationFixture;
+import subway.integration.helper.StationIntegrationHelper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +48,7 @@ public class StationIntegrationTest extends IntegrationTest {
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "강남역");
-        StationIntegrationFixture.createStation(params);
+        StationIntegrationHelper.createStation(params);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -68,9 +68,9 @@ public class StationIntegrationTest extends IntegrationTest {
     void getStations() {
         /// given
         Map<String, String> params1 = Map.of("name", "강남역");
-        final Station stationA = StationIntegrationFixture.createStation(params1);
+        final Station stationA = StationIntegrationHelper.createStation(params1);
         Map<String, String> params2 = Map.of("name", "역삼역");
-        final Station stationB = StationIntegrationFixture.createStation(params2);
+        final Station stationB = StationIntegrationHelper.createStation(params2);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -93,7 +93,7 @@ public class StationIntegrationTest extends IntegrationTest {
     void getStation() {
         /// given
         Map<String, String> params = Map.of("name", "강남역");
-        final Station station = StationIntegrationFixture.createStation(params);
+        final Station station = StationIntegrationHelper.createStation(params);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -113,7 +113,7 @@ public class StationIntegrationTest extends IntegrationTest {
     void updateStation() {
         // given
         Map<String, String> params = Map.of("name", "강남역");
-        Station station = StationIntegrationFixture.createStation(params);
+        Station station = StationIntegrationHelper.createStation(params);
 
         // when
         Map<String, String> otherParams = Map.of("name", "삼성역");
@@ -135,7 +135,7 @@ public class StationIntegrationTest extends IntegrationTest {
     void deleteStation() {
         // given
         Map<String, String> params = Map.of("name", "강남역");
-        Station station = StationIntegrationFixture.createStation(params);
+        Station station = StationIntegrationHelper.createStation(params);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()

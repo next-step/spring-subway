@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.domain.Line;
 import subway.domain.Station;
-import subway.dto.request.CreateLineRequest;
+import subway.dto.request.LineCreateRequest;
 import subway.dto.request.LineUpdateRequest;
 import subway.dto.response.LineResponse;
 import subway.dto.response.LineWithStationsResponse;
@@ -31,7 +31,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(final CreateLineRequest request) {
+    public LineResponse saveLine(final LineCreateRequest request) {
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
         sectionService.saveFirstSection(
@@ -55,26 +55,26 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public LineWithStationsResponse findLineResponseById(final Long id) {
-        final Line persistLine = findLineById(id);
-        final List<Station> stations = stationService.findStationByLineId(id);
+    public LineWithStationsResponse findLineResponseById(final Long lineId) {
+        final Line persistLine = findLineById(lineId);
+        final List<Station> stations = stationService.findStationByLineId(lineId);
         return LineWithStationsResponse.of(persistLine, stations);
     }
 
     @Transactional(readOnly = true)
-    public Line findLineById(final Long id) {
-        return lineDao.findById(id)
+    public Line findLineById(final Long lineId) {
+        return lineDao.findById(lineId)
                 .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
     }
 
     @Transactional
-    public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
-        lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
+    public void updateLine(final Long lineId, final LineUpdateRequest lineUpdateRequest) {
+        lineDao.update(new Line(lineId, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
     @Transactional
-    public void deleteLineById(final Long id) {
-        lineDao.deleteById(id);
+    public void deleteLineById(final Long lineId) {
+        lineDao.deleteById(lineId);
     }
 
 }

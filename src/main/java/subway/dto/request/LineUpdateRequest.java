@@ -8,11 +8,6 @@ public class LineUpdateRequest {
     public LineUpdateRequest() {
     }
 
-    public LineUpdateRequest(String name, String color) {
-        this.name = name;
-        this.color = color;
-    }
-
     public String getName() {
         return name;
     }

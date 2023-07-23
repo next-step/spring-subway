@@ -10,11 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.domain.Line;
 import subway.domain.Station;
-import subway.dto.request.CreateLineRequest;
+import subway.dto.request.LineCreateRequest;
 import subway.dto.request.SectionRequest;
-import subway.integration.fixture.LineIntegrationFixture;
-import subway.integration.fixture.SectionIntegrationFixture;
-import subway.integration.fixture.StationIntegrationFixture;
+import subway.integration.helper.LineIntegrationHelper;
+import subway.integration.helper.SectionIntegrationHelper;
+import subway.integration.helper.StationIntegrationHelper;
 
 import java.util.Map;
 
@@ -34,13 +34,13 @@ class SectionIntegrationTest extends IntegrationTest {
     public void setUp() {
         super.setUp();
 
-        Station upStation = StationIntegrationFixture.createStation(Map.of("name", "낙성대"));
-        Station downStation = StationIntegrationFixture.createStation(Map.of("name", "사당"));
-        Station newStationA = StationIntegrationFixture.createStation(Map.of("name", "방배"));
-        Station newStationB = StationIntegrationFixture.createStation(Map.of("name", "서초"));
-        Station newStationC = StationIntegrationFixture.createStation(Map.of("name", "교대"));
+        Station upStation = StationIntegrationHelper.createStation(Map.of("name", "낙성대"));
+        Station downStation = StationIntegrationHelper.createStation(Map.of("name", "사당"));
+        Station newStationA = StationIntegrationHelper.createStation(Map.of("name", "방배"));
+        Station newStationB = StationIntegrationHelper.createStation(Map.of("name", "서초"));
+        Station newStationC = StationIntegrationHelper.createStation(Map.of("name", "교대"));
 
-        final Line line = LineIntegrationFixture.createLine(new CreateLineRequest("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10L));
+        final Line line = LineIntegrationHelper.createLine(new LineCreateRequest("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10L));
 
         lineId = line.getId();
         sectionRequestA = new SectionRequest(downStation.getId(), newStationA.getId(), 10L);
@@ -71,8 +71,8 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionFailDistance() {
         // given
-        SectionIntegrationFixture.createSection(lineId, sectionRequestA);
-        SectionIntegrationFixture.createSection(lineId, sectionRequestB);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestA);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestB);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -94,7 +94,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionFailBothExist() {
         // given
-        SectionIntegrationFixture.createSection(lineId, sectionRequestA);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestA);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -116,7 +116,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionFailBothNothing() {
         // given
-        SectionIntegrationFixture.createSection(lineId, sectionRequestA);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestA);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -138,8 +138,8 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteLastSection() {
         // given
-        SectionIntegrationFixture.createSection(lineId, sectionRequestA);
-        SectionIntegrationFixture.createSection(lineId, sectionRequestB);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestA);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestB);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -157,8 +157,8 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteNotLastSectionThenBadRequest() {
         // given
-        SectionIntegrationFixture.createSection(lineId, sectionRequestA);
-        SectionIntegrationFixture.createSection(lineId, sectionRequestB);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestA);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestB);
 
         // when
         ExtractableResponse<Response> response = RestAssured

@@ -69,7 +69,7 @@ public class Section {
         return downStation.getId();
     }
 
-    public Long getDistance() {
+    public long getDistance() {
         return distance.getValue();
     }
 

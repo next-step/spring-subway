@@ -1,4 +1,4 @@
-package subway.integration.fixture;
+package subway.integration.helper;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -9,7 +9,7 @@ import subway.dto.response.StationResponse;
 
 import java.util.Map;
 
-public class StationIntegrationFixture {
+public class StationIntegrationHelper {
     public static Station createStation(final Map<String, String> params) {
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .body(params)

@@ -3,7 +3,7 @@ package subway.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
-import subway.dto.request.CreateLineRequest;
+import subway.dto.request.LineCreateRequest;
 import subway.dto.request.LineUpdateRequest;
 import subway.dto.response.LineResponse;
 import subway.dto.response.LineWithStationsResponse;
@@ -22,7 +22,7 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody final CreateLineRequest request) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody final LineCreateRequest request) {
         final LineResponse line = lineService.saveLine(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -32,21 +32,21 @@ public class LineController {
         return ResponseEntity.ok(lineService.findLineResponses());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<LineWithStationsResponse> findLineById(@PathVariable final Long id) {
-        return ResponseEntity.ok(lineService.findLineResponseById(id));
+    @GetMapping("/{lineId}")
+    public ResponseEntity<LineWithStationsResponse> findLineById(@PathVariable final Long lineId) {
+        return ResponseEntity.ok(lineService.findLineResponseById(lineId));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable final Long id,
+    @PutMapping("/{lineId}")
+    public ResponseEntity<Void> updateLine(@PathVariable final Long lineId,
                                            @RequestBody final LineUpdateRequest lineUpdateRequest) {
-        lineService.updateLine(id, lineUpdateRequest);
+        lineService.updateLine(lineId, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable final Long id) {
-        lineService.deleteLineById(id);
+    @DeleteMapping("/{lineId}")
+    public ResponseEntity<Void> deleteLine(@PathVariable final Long lineId) {
+        lineService.deleteLineById(lineId);
         return ResponseEntity.noContent().build();
     }
 }

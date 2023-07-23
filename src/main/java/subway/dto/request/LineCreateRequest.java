@@ -1,13 +1,13 @@
 package subway.dto.request;
 
-public class CreateLineRequest {
+public class LineCreateRequest {
     private String name;
     private String color;
     private Long upStationId;
     private Long downStationId;
-    private Long distance;
+    private long distance;
 
-    public CreateLineRequest(String name, String color, Long upStationId, Long downStationId, Long distance) {
+    public LineCreateRequest(String name, String color, Long upStationId, Long downStationId, long distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;
@@ -15,7 +15,7 @@ public class CreateLineRequest {
         this.distance = distance;
     }
 
-    public CreateLineRequest() {
+    public LineCreateRequest() {
     }
 
     public String getName() {
@@ -34,7 +34,7 @@ public class CreateLineRequest {
         return downStationId;
     }
 
-    public Long getDistance() {
+    public long getDistance() {
         return distance;
     }
 }

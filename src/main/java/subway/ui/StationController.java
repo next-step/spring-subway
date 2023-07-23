@@ -31,21 +31,21 @@ public class StationController {
         return ResponseEntity.ok().body(stationService.findAllStationResponses());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<StationResponse> showStation(@PathVariable final Long id) {
-        return ResponseEntity.ok().body(stationService.findStationResponseById(id));
+    @GetMapping("/{stationId}")
+    public ResponseEntity<StationResponse> showStation(@PathVariable final Long stationId) {
+        return ResponseEntity.ok().body(stationService.findStationResponseById(stationId));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> updateStation(@PathVariable final Long id,
+    @PutMapping("/{stationId}")
+    public ResponseEntity<Void> updateStation(@PathVariable final Long stationId,
                                               @RequestBody final StationRequest stationRequest) {
-        stationService.updateStation(id, stationRequest);
+        stationService.updateStation(stationId, stationRequest);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStation(@PathVariable final Long id) {
-        stationService.deleteStationById(id);
+    @DeleteMapping("/{stationId}")
+    public ResponseEntity<Void> deleteStation(@PathVariable final Long stationId) {
+        stationService.deleteStationById(stationId);
         return ResponseEntity.noContent().build();
     }
 
