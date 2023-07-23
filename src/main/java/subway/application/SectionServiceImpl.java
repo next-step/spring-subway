@@ -30,9 +30,9 @@ public class SectionServiceImpl implements SectionService {
     @Override
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
-        Line line = lineDao.findById(lineId);
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+        Line line = lineDao.findById(lineId).orElseThrow();
+        Station upStation = stationDao.findById(request.getUpStationId()).get();
+        Station downStation = stationDao.findById(request.getDownStationId()).get();
         Distance distance = new Distance(request.getDistance());
         Section section = new Section(
                 line,
@@ -42,7 +42,7 @@ public class SectionServiceImpl implements SectionService {
 
         preprocessSaveSection(section);
 
-        Section result = sectionDao.insert(section);
+        Section result = sectionDao.insert(section).orElseThrow();
         return SectionResponse.from(result);
     }
 

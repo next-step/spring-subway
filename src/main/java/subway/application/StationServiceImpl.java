@@ -25,13 +25,13 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
+        Station station = stationDao.insert(new Station(stationRequest.getName())).orElseThrow();
         return StationResponse.of(station);
     }
 
     @Override
     public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        return StationResponse.of(stationDao.findById(id).orElseThrow());
     }
 
     @Override

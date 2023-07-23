@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SectionDao {
-    Section insert(Section section);
+    Optional<Section> insert(Section section);
 
     List<Section> findAllByLineId(long lineId);
 

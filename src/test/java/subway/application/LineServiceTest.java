@@ -43,7 +43,7 @@ class LineServiceTest {
 
         // then
 
-        assertThat(lineDao.findById(lineResponse.getId())).extracting(
+        assertThat(lineDao.findById(lineResponse.getId()).get()).extracting(
                 Line::getName,
                 Line::getColor
         ).contains("5호선", "green");

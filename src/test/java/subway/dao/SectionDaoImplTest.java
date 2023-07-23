@@ -36,11 +36,11 @@ class SectionDaoTest {
 
     @BeforeEach
     void setUp() {
-        Line line = lineDaoImpl.findById(1L);
-        Station station1 = stationDaoImpl.findById(1L);
-        Station station2 = stationDaoImpl.findById(2L);
-        Station station3 = stationDaoImpl.findById(3L);
-        Station station4 = stationDaoImpl.findById(4L);
+        Line line = lineDaoImpl.findById(1L).get();
+        Station station1 = stationDaoImpl.findById(1L).get();
+        Station station2 = stationDaoImpl.findById(2L).get();
+        Station station3 = stationDaoImpl.findById(3L).get();
+        Station station4 = stationDaoImpl.findById(4L).get();
 
         section1 = new Section(line, station1, station2, new Distance(10L));
         section2 = new Section(line, station2, station3, new Distance(10L));
@@ -51,7 +51,7 @@ class SectionDaoTest {
     @Test
     void insert_success() {
         // given  when
-        Section result = sectionDao.insert(section1);
+        Section result = sectionDao.insert(section1).get();
 
         // then
         assertThat(result.getId()).isNotNull();
@@ -129,8 +129,8 @@ class SectionDaoTest {
     void findAllByLineId() {
         // given
         long lineId = 1L;
-        Section result1 = sectionDao.insert(section1);
-        Section result2 = sectionDao.insert(section2);
+        Section result1 = sectionDao.insert(section1).get();
+        Section result2 = sectionDao.insert(section2).get();
 
         //  when
         List<Section> sections = sectionDao.findAllByLineId(lineId);
@@ -146,7 +146,7 @@ class SectionDaoTest {
         // given
         long lineId = 1L;
         sectionDao.insert(section1);
-        Section result = sectionDao.insert(section2);
+        Section result = sectionDao.insert(section2).get();
 
         //  when
         assertDoesNotThrow(() -> sectionDao.deleteById(result.getId()));

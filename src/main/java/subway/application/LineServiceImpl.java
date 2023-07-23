@@ -31,7 +31,7 @@ public class LineServiceImpl implements LineService {
     @Override
     @Transactional
     public LineResponse saveLine(LineRequest request) {
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor())).orElseThrow();
         sectionServiceImpl.saveSection(persistLine.getId(),
                 new SectionRequest(request.getUpStationId(), request.getDownStationId(),
                         request.getDistance()));
@@ -60,7 +60,7 @@ public class LineServiceImpl implements LineService {
 
     @Override
     public Line findLineById(Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id).orElseThrow();
     }
 
     @Override

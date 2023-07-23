@@ -3,13 +3,14 @@ package subway.dao;
 import subway.domain.Line;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LineDao {
-    Line insert(Line line);
+    Optional<Line> insert(Line line);
 
     List<Line> findAll();
 
-    Line findById(Long id);
+    Optional<Line> findById(Long id);
 
     void update(Line newLine);
 

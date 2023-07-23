@@ -33,7 +33,7 @@ public class SectionDaoImpl implements SectionDao {
                 rs.getString("up_name")
         );
 
-        Station donwStation = new Station(
+        Station downStation = new Station(
                 rs.getLong("down_id"),
                 rs.getString("down_name")
         );
@@ -46,7 +46,7 @@ public class SectionDaoImpl implements SectionDao {
                 rs.getLong("section_id"),
                 line,
                 upStation,
-                donwStation,
+                downStation,
                 distance);
     };
 
@@ -58,15 +58,15 @@ public class SectionDaoImpl implements SectionDao {
     }
 
     @Override
-    public Section insert(Section section) {
+    public Optional<Section> insert(Section section) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(section);
         Long id = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(
+        return Optional.ofNullable(new Section(
                 id,
                 section.getLine(),
                 section.getUpStation(),
                 section.getDownStation(),
-                new Distance(section.getDistance()));
+                new Distance(section.getDistance())));
     }
 
     @Override

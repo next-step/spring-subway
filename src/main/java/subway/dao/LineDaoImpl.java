@@ -1,5 +1,6 @@
 package subway.dao;
 
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -10,6 +11,7 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class LineDaoImpl implements LineDao {
@@ -32,14 +34,14 @@ public class LineDaoImpl implements LineDao {
     }
 
     @Override
-    public Line insert(Line line) {
+    public Optional<Line> insert(Line line) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", line.getId());
         params.put("name", line.getName());
         params.put("color", line.getColor());
 
         Long lineId = insertAction.executeAndReturnKey(params).longValue();
-        return new Line(lineId, line.getName(), line.getColor());
+        return Optional.of(new Line(lineId, line.getName(), line.getColor()));
     }
 
     @Override
@@ -49,9 +51,9 @@ public class LineDaoImpl implements LineDao {
     }
 
     @Override
-    public Line findById(Long id) {
+    public Optional<Line> findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        return Optional.ofNullable(DataAccessUtils.singleResult(jdbcTemplate.query(sql, rowMapper, id)));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package subway.dao;
 
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -10,6 +11,7 @@ import subway.domain.Station;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class StationDaoImpl implements StationDao {
@@ -32,10 +34,10 @@ public class StationDaoImpl implements StationDao {
     }
 
     @Override
-    public Station insert(Station station) {
+    public Optional<Station> insert(Station station) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(station);
         Long id = insertAction.executeAndReturnKey(params).longValue();
-        return new Station(id, station.getName());
+        return Optional.ofNullable(new Station(id, station.getName()));
     }
 
     @Override
@@ -45,9 +47,9 @@ public class StationDaoImpl implements StationDao {
     }
 
     @Override
-    public Station findById(Long id) {
+    public Optional<Station> findById(Long id) {
         String sql = "select * from STATION where id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        return Optional.ofNullable(DataAccessUtils.singleResult(jdbcTemplate.query(sql, rowMapper, id)));
     }
 
     @Override
