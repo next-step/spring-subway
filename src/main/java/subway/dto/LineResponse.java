@@ -1,8 +1,8 @@
 package subway.dto;
 
-import java.util.List;
-import java.util.Objects;
 import subway.domain.Line;
+
+import java.util.List;
 
 public class LineResponse {
     private final Long id;

@@ -1,11 +1,11 @@
 package subway.integration;
 
-import static io.restassured.RestAssured.given;
-
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 import subway.dto.StationRequest;
+
+import static io.restassured.RestAssured.given;
 
 class StationIntegrationSupporter {
 

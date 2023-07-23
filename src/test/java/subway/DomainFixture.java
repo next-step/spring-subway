@@ -1,6 +1,5 @@
 package subway;
 
-import subway.domain.Line;
 import subway.domain.Station;
 
 public class DomainFixture {
