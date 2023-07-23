@@ -9,12 +9,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.domain.StationPair;
 
 @DisplayName("라인 Dao 테스트")
+@Transactional
 @SpringBootTest
 class LineDaoTest {
 
@@ -71,9 +73,11 @@ class LineDaoTest {
         Line response = lineDao.insert(lineRequest1);
 
         // when
+        Optional<Line> emptyResult = lineDao.findById(12L);
         Optional<Line> result = lineDao.findById(response.getId());
 
         // then
+        assertThat(emptyResult.isEmpty()).isTrue();
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get()).isEqualTo(response);
     }
@@ -116,9 +120,11 @@ class LineDaoTest {
         Line response = lineDao.insert(lineRequest1);
 
         // when
+        Optional<Line> emptyResult = lineDao.findByName("notExistName");
         Optional<Line> result = lineDao.findByName(response.getName());
 
         // then
+        assertThat(emptyResult.isEmpty()).isTrue();
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get().getName()).isEqualTo(response.getName());
     }
