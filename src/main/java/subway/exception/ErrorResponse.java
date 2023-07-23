@@ -1,7 +1,10 @@
 package subway.exception;
 
 public class ErrorResponse {
-    private final String message;
+    private String message;
+
+    public ErrorResponse() {
+    }
 
     public ErrorResponse(String message) {
         this.message = message;

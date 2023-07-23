@@ -80,12 +80,12 @@ public class Sections {
 
         if (section.canPrecede(getFirst())) {
             addFirst(section);
-            return new SectionAdditionResult(Collections.emptyList(), List.of(getFirst()));
+            return new SectionAdditionResult(null, List.of(getFirst()));
         }
 
         if (getLast().canPrecede(section)) {
             addLast(section);
-            return new SectionAdditionResult(Collections.emptyList(), List.of(getLast()));
+            return new SectionAdditionResult(null, List.of(getLast()));
         }
 
         return addSectionInMiddle(section);
@@ -102,7 +102,7 @@ public class Sections {
         this.values.addAll(this.values.indexOf(foundSection), sectionsToAdd);
         this.values.remove(foundSection);
 
-        return new SectionAdditionResult(List.of(foundSection), sectionsToAdd);
+        return new SectionAdditionResult(foundSection, sectionsToAdd);
     }
 
     private Section findMatchedSection(Section section) {

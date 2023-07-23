@@ -33,7 +33,7 @@ public class SectionsService {
 
         SectionAdditionResult sectionAdditionResult = lineSections.add(section);
 
-        sectionAdditionResult.getSectionToRemove().forEach(sectionDao::delete);
+        sectionAdditionResult.getSectionToRemove().ifPresent(sectionDao::delete);
         sectionAdditionResult.getSectionsToAdd().forEach(sectionDao::save);
     }
 
