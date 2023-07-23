@@ -16,6 +16,10 @@ public class LineSections {
         validateAllSectionsBelongToThisLine();
     }
 
+    public LineSections(Line line, Section section) {
+        this(line, new Sections(List.of(section)));
+    }
+
     private void validateAllSectionsBelongToThisLine() {
         if (!this.sections.isSectionsAllBelongTo(this.line)) {
             throw new IllegalArgumentException(
@@ -23,12 +27,15 @@ public class LineSections {
         }
     }
 
-    public LineSections(Line line, Section section) {
-        this(line, new Sections(List.of(section)));
+    public SectionAdditionResult add(Section section) {
+        validateSectionInLine(section);
+        return sections.add(section);
     }
 
-    public SectionAdditionResult add(Section section) {
-        return sections.add(new Section(this.line, section));
+    private void validateSectionInLine(Section section) {
+        if (!section.belongTo(this.line)) {
+            throw new IllegalArgumentException("추가할 구간은 다른 노선에 속해있습니다. 현재 노선: " + line + " 추가할 구간: " + section);
+        }
     }
 
     public Section removeLast(Station station) {

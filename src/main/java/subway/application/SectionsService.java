@@ -29,7 +29,7 @@ public class SectionsService {
     public void addSection(Long id, SectionAdditionRequest request) {
         Line line = getLineOrElseThrow(id);
         LineSections lineSections = sectionDao.findAllByLine(line);
-        Section section = createNewSectionBy(request);
+        Section section = createNewSectionBy(line, request);
 
         SectionAdditionResult sectionAdditionResult = lineSections.add(section);
 
@@ -37,10 +37,10 @@ public class SectionsService {
         sectionAdditionResult.getSectionsToAdd().forEach(sectionDao::save);
     }
 
-    private Section createNewSectionBy(SectionAdditionRequest request) {
+    private Section createNewSectionBy(Line line, SectionAdditionRequest request) {
         Station upStation = getStationOrElseThrow(request.getUpStationId());
         Station downStation = getStationOrElseThrow(request.getDownStationId());
-        return new Section(upStation, downStation, request.getDistance());
+        return new Section(line, upStation, downStation, request.getDistance());
     }
 
     @Transactional

@@ -27,10 +27,6 @@ public class Section {
         this(null, line, upStation, downStation, distance);
     }
 
-    public Section(Station upStation, Station downStation, int distance) {
-        this(null, null, upStation, downStation, distance);
-    }
-
     public Section(Line line, Section section) {
         this(section.getId(), line, section.getUpStation(), section.getDownStation(), section.getDistance());
     }
