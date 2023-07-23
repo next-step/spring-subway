@@ -76,7 +76,7 @@ public class Sections {
     }
 
     public SectionAdditionResult add(Section section) {
-        validateOnlyOneStationIncludedInLine(section);
+        validateOnlyOneStationIncludedInSections(section);
 
         if (section.canPrecede(getFirst())) {
             addFirst(section);
@@ -112,7 +112,7 @@ public class Sections {
             .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다."));
     }
 
-    private void validateOnlyOneStationIncludedInLine(Section section) {
+    private void validateOnlyOneStationIncludedInSections(Section section) {
         checkBothStationsInLine(section);
         checkNoneOfStationsInLine(section);
     }
