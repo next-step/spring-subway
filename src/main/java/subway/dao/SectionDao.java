@@ -3,6 +3,7 @@ package subway.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -84,10 +85,32 @@ public class SectionDao {
     }
 
     public void delete(Section section) {
-        jdbcTemplate.update("delete from Section where id = ?", section.getId());
+        jdbcTemplate.update("delete from SECTION where id = ?", section.getId());
     }
 
     public void deleteByLine(Line line) {
-        jdbcTemplate.update("delete from Section where line_id = ?", line.getId());
+        jdbcTemplate.update("delete from SECTION where line_id = ?", line.getId());
+    }
+
+    public void update(Section section) {
+        String sql = "update SECTION set line_id = ?, up_station_id = ?, down_station_id = ?, distance = ? where id = ?";
+        jdbcTemplate.update(sql, section.getLine().getId(), section.getUpStation().getId(),
+            section.getDownStation().getId(), section.getDistance(), section.getId());
+
+    }
+
+    public Optional<Section> findById(Long id) {
+        String sql =
+            "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
+                + "l.name AS line_name, color AS line_color, "
+                + "us.name AS up_station_name, "
+                + "ds.name AS down_station_name "
+                + "from SECTION s join LINE l on s.line_id = l.id "
+                + "join STATION us on up_station_id = us.id "
+                + "join STATION ds on down_station_id = ds.id "
+                + "WHERE s.id = ?";
+
+        return jdbcTemplate.queryForStream(sql, rowToSectionMapper, id)
+            .findAny();
     }
 }
