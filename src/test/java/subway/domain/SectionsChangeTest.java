@@ -29,11 +29,11 @@ class SectionsChangeTest {
                 10
         );
 
-        Sections sections1 = new Sections(List.of(section1, section2));
-        Sections sections2 = new Sections(List.of(section2, section3));
+        Line line1= new Line("2호선", "노랑", new Sections(List.of(section1, section2)));
+        Line line2= new Line("2호선", "노랑",  new Sections(List.of(section2, section3)));
 
         // when
-        SectionsChange sectionsChange = SectionsChange.of(sections1, sections2);
+        SectionsChange sectionsChange = SectionsChange.of(line1, line2);
 
         // then
         assertAll(
