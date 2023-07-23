@@ -16,9 +16,9 @@ class SectionsTest {
     void create() {
         /* given */
         final List<Section> sections = List.of(
-                new Section(1L, 1L, 1L, 1L),
-                new Section(2L, 2L, 2L, 2L),
-                new Section(3L, 3L, 3L, 3L)
+                new Section(1L, 1L, 2L, 1L),
+                new Section(2L, 2L, 3L, 2L),
+                new Section(3L, 3L, 4L, 3L)
         );
 
         /* when & then */
@@ -30,15 +30,15 @@ class SectionsTest {
     void containsBoth() {
         /* given */
         final Sections sections = new Sections(List.of(
-                new Section(1L, 1L, 1L, 1L, 1L),
-                new Section(2L, 2L, 2L, 2L, 2L),
-                new Section(3L, 3L, 3L, 3L, 3L)
+                new Section(1L, 1L, 2L, 1L),
+                new Section(2L, 2L, 3L, 2L),
+                new Section(3L, 3L, 4L, 3L)
         ));
 
         /* when & then */
-        assertThat(sections.containsBoth(2L, 3L)).isTrue();
-        assertThat(sections.containsBoth(3L, 4L)).isFalse();
+        assertThat(sections.containsBoth(3L, 4L)).isTrue();
         assertThat(sections.containsBoth(4L, 5L)).isFalse();
+        assertThat(sections.containsBoth(5L, 6L)).isFalse();
     }
 
     @Test
