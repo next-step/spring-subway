@@ -8,8 +8,6 @@ import subway.domain.*;
 import subway.dto.request.SectionRequest;
 import subway.dto.response.SectionResponse;
 
-import java.util.List;
-
 @Service
 public class SectionService {
 
@@ -42,24 +40,10 @@ public class SectionService {
                 request.getDownStationId(),
                 request.getDistance());
         Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        final List<Section> beforeSection = sections.getSections();
+        Sections beforeSections = new Sections(sections.getSections());
         sections.addSection(newSection);
-        final List<Section> afterSection = sections.getSections();
-        return SectionResponse.from(dirtyCheck(beforeSection, afterSection));
-    }
-
-    private Section dirtyCheck(List<Section> beforeSection, List<Section> afterSection) {
-        afterSection.stream()
-                .filter(section -> !beforeSection.contains(section))
-                .filter(section -> !section.isNew())
-                .findAny()
-                .ifPresent(sectionDao::update);
-
-        return sectionDao.insert(afterSection.stream()
-                .filter(section -> !beforeSection.contains(section))
-                .filter(Section::isNew)
-                .findAny()
-                .orElseThrow(IllegalStateException::new));
+        final Section persistNewSection = sectionDao.dirtyChecking(beforeSections, sections);
+        return SectionResponse.from(persistNewSection);
     }
 
     private Section createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
@@ -72,13 +56,13 @@ public class SectionService {
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
         final Station station = stationService.findStationById(stationId);
-        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        validateDeleteConstraint(station, sections);
-        final Section lastSection = sections.deleteLastSection();
+        final SortedSections sortedSections = new SortedSections(sectionDao.findAllByLineId(lineId));
+        validateDeleteConstraint(station, sortedSections);
+        final Section lastSection = sortedSections.deleteLastSection();
         sectionDao.deleteById(lastSection.getId());
     }
 
-    private void validateDeleteConstraint(final Station station, final Sections sections) {
+    private void validateDeleteConstraint(final Station station, final SortedSections sections) {
         if (!sections.isLastDownStation(station)) {
             throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
         }

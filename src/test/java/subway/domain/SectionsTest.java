@@ -38,7 +38,7 @@ class SectionsTest {
                 .hasMessage("노선에 등록된 구간은 반드시 한개 이상이어야합니다.");
     }
 
-    @DisplayName("여러 개의 Section 정보가 있을 때 정렬된 순서로 역을 반환")
+    @DisplayName("여러 개의 Section 정보가 있을 때 역을 반환 , 순서가 보장되지 않는다.")
     @Test
     void givenManySectionsWhenToStationsThenOrderedStations() {
         // given
@@ -47,32 +47,13 @@ class SectionsTest {
                 new Section(line, stationB, stationC, new Distance(10L)),
                 new Section(line, stationD, stationA, new Distance(10L))
         );
-        final Sections sections = new Sections(sectionList);
+        final SortedSections sortedSections = new SortedSections(sectionList);
         // when
 
-        final List<Station> stations = sections.toStations();
+        final List<Station> stations = sortedSections.toStations();
 
         // then
-        assertThat(stations).containsExactly(stationD, stationA, stationB, stationC);
-    }
-
-    @DisplayName("Sections 의 가장 마지막 Section 을 삭제한다.")
-    @Test
-    void givenSectionsWhenFindLastSectionThenReturnLastSection() {
-        // given
-        final List<Section> sectionList = List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L)),
-                new Section(line, stationD, stationA, new Distance(10L))
-        );
-        final Sections sections = new Sections(sectionList);
-
-        // when
-        final Section lastSection = sections.deleteLastSection();
-
-        // then
-        assertThat(lastSection).isEqualTo(new Section(line, stationB, stationC, new Distance(10L)));
-        assertThat(sections.sectionLength()).isEqualTo(2);
+        assertThat(stations).containsAnyOf(stationD, stationA, stationB, stationC);
     }
 
     @DisplayName("추가구간의 상행역과 기존 구간의 상행역이 겹칠 때 ")

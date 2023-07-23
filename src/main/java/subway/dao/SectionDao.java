@@ -6,10 +6,7 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import subway.domain.Distance;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Station;
+import subway.domain.*;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -89,5 +86,20 @@ public class SectionDao {
     public void update(final Section section) {
         final String sql = "update section set up_station_id = ? , down_station_id = ? , distance = ? where id = ? ";
         jdbcTemplate.update(sql, section.getUpStationId(), section.getDownStationId(), section.getDistance(), section.getId());
+    }
+
+    public Section dirtyChecking(Sections beforeSections, Sections afterSections) {
+        List<Section> afterSection = afterSections.getSections();
+        List<Section> beforeSection = beforeSections.getSections();
+        afterSection.stream()
+                .filter(section -> !beforeSection.contains(section))
+                .filter(section -> !section.isNew())
+                .findAny()
+                .ifPresent(this::update);
+        return insert(afterSection.stream()
+                .filter(section -> !beforeSection.contains(section))
+                .filter(Section::isNew)
+                .findAny()
+                .orElseThrow(IllegalStateException::new));
     }
 }
