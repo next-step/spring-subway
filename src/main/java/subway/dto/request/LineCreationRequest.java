@@ -1,11 +1,19 @@
 package subway.dto.request;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class LineCreationRequest {
 
+    @NotEmpty
     private String name;
+    @NotNull
     private Long upStationId;
+    @NotNull
     private Long downStationId;
+    @NotNull
     private Integer distance;
+    @NotEmpty
     private String color;
 
     public LineCreationRequest() {
