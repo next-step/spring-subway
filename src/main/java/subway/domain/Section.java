@@ -56,27 +56,6 @@ public class Section {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Section section = (Section) o;
-        return Objects.equals(id, section.id)
-            && Objects.equals(upStation, section.upStation)
-            && Objects.equals(downStation, section.downStation)
-            && Objects.equals(line, section.line)
-            && Objects.equals(distance, section.distance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, upStation, downStation, line, distance);
-    }
-
-    @Override
     public String toString() {
         return "Section{" +
             "id=" + id +
