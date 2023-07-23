@@ -3,6 +3,7 @@ package subway.domain;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -81,33 +82,21 @@ public class Sections {
             .collect(Collectors.toSet());
     }
 
-    public SectionChange add(Section section) {
+    public Optional<Section> add(Section section) {
         validateSectionInLine(section);
         validateOnlyOneStationInLine(section);
 
         if (section.isUpperSectionOf(getFirst())) {
-            return addFirst(section);
+            this.values.add(0, section);
+            return Optional.empty();
         }
 
         if (getLast().isUpperSectionOf(section)) {
-            return addLast(section);
+            this.values.add(section);
+            return Optional.empty();
         }
 
         return addSectionInMiddle(section);
-    }
-
-    private SectionChange addFirst(final Section section) {
-        this.values.add(0, section);
-        SectionChange sectionChange = new SectionChange();
-        sectionChange.appendSectionToAdd(section);
-        return sectionChange;
-    }
-
-    private SectionChange addLast(final Section section) {
-        this.values.add(section);
-        SectionChange sectionChange = new SectionChange();
-        sectionChange.appendSectionToAdd(section);
-        return sectionChange;
     }
 
     private void validateSectionInLine(final Section section) {
@@ -116,18 +105,21 @@ public class Sections {
         }
     }
 
-    private SectionChange addSectionInMiddle(Section section) {
-        Section foundSection = findMatchedSection(section);
-        List<Section> sectionsToAdd = foundSection.mergeSections(section);
+    private Optional<Section> addSectionInMiddle(Section section) {
+        Section mergeTarget = findMatchedSection(section);
+        List<Section> mergeResults = mergeTarget.mergeSections(section);
 
-        this.values.addAll(this.values.indexOf(foundSection), sectionsToAdd);
-        this.values.remove(foundSection);
+        int insertIndex = this.values.indexOf(mergeTarget);
+        this.values.remove(mergeTarget);
+        this.values.addAll(insertIndex, mergeResults);
 
-        final SectionChange sectionChange = new SectionChange();
-        sectionChange.appendSectionToRemove(foundSection);
-        sectionChange.appendSectionsToAdd(sectionsToAdd);
+        return findUpdatedSection(mergeResults);
+    }
 
-        return sectionChange;
+    private static Optional<Section> findUpdatedSection(final List<Section> mergeResults) {
+        return mergeResults.stream()
+            .filter(result -> Objects.nonNull(result.getId()))
+            .findAny();
     }
 
     private Section findMatchedSection(Section section) {

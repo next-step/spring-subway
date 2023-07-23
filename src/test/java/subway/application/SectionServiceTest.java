@@ -53,8 +53,7 @@ class SectionServiceTest {
         sectionService.addSection(lineA.getId(), request);
 
         //then
-        verify(sectionDao, times(1)).delete(any());
-        verify(sectionDao, times(2)).save(any());
+        verify(sectionDao, times(1)).update(any());
     }
 
     @Test

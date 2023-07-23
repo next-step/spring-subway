@@ -7,7 +7,6 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
-import subway.domain.SectionChange;
 import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
@@ -31,10 +30,8 @@ public class SectionService {
         Sections sections = sectionDao.findAllByLine(line);
         Section section = createNewSectionBy(line, request);
 
-        SectionChange sectionChange = sections.add(section);
-
-        sectionChange.getSectionsToRemove().forEach(sectionDao::delete);
-        sectionChange.getSectionsToAdd().forEach(sectionDao::save);
+        sections.add(section).ifPresent(sectionDao::update);
+        sectionDao.save(section);
     }
 
     private Section createNewSectionBy(Line line, SectionAdditionRequest request) {
@@ -56,7 +53,8 @@ public class SectionService {
 
     private Line getLineOrElseThrow(Long id) {
         return lineDao.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
+            .orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 
     private Station getStationOrElseThrow(Long id) {

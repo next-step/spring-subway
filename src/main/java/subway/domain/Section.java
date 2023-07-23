@@ -79,8 +79,8 @@ public class Section {
     private List<Section> mergeUp(Section section) {
         List<Section> mergedSections = new ArrayList<>();
         mergedSections.add(section);
-        mergedSections.add(new Section(
-            section.line, section.downStation, this.downStation, this.distance - section.distance));
+        mergedSections.add(new Section(this.id, section.line, section.downStation, this.downStation,
+            this.distance - section.distance));
         return mergedSections;
     }
 
@@ -91,8 +91,8 @@ public class Section {
 
     private List<Section> mergeDown(Section section) {
         List<Section> mergedSections = new ArrayList<>();
-        mergedSections.add(new Section(
-            section.line, this.upStation, section.upStation, this.distance - section.distance));
+        mergedSections.add(new Section(this.id, section.line, this.upStation, section.upStation,
+            this.distance - section.distance));
         mergedSections.add(section);
         return mergedSections;
     }

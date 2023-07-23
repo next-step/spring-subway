@@ -3,8 +3,10 @@ package subway.domain;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static subway.domain.SectionTest.doSectionsHaveSameFields;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -130,8 +132,8 @@ class SectionsTest {
     @Test
     @DisplayName("추가할 구간의 한 역만 기존 노선에 포함되어야 한다.")
     void canAddSectionToLineContainingOnlyOneStation() {
-        Section firstSection = new Section(lineA, stationA, stationB, 5);
-        Section secondSection = new Section(lineA, stationB, stationC, 5);
+        Section firstSection = new Section(1L, lineA, stationA, stationB, 5);
+        Section secondSection = new Section(2L, lineA, stationB, stationC, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section bothContainedSection = new Section(lineA, stationA, stationC, 3);
         Section bothNotContainedSection = new Section(lineA, stationD, stationE, 3);
@@ -145,54 +147,46 @@ class SectionsTest {
     @Test
     @DisplayName("노선의 특정 구간과 상행역만 같은 경우 노선에 추가한다.")
     void addSectionOfSameUpStationAsLinesSection() {
-        Section firstSection = new Section(lineA, stationA, stationB, 5);
-        Section secondSection = new Section(lineA, stationB, stationD, 5);
+        Section firstSection = new Section(1L, lineA, stationA, stationB, 5);
+        Section secondSection = new Section(2L, lineA, stationB, stationD, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section targetSection = new Section(lineA, stationB, stationC, 3);
 
-        SectionChange sectionChange = sections.add(targetSection);
+        Section result = sections.add(targetSection).get();
 
-        Section createdSection = new Section(lineA, stationC, stationD, 2);
-        assertThat(sectionChange.getSectionsToAdd())
-            .isEqualTo(List.of(targetSection, createdSection));
-        assertThat(sectionChange.getSectionsToRemove())
-            .isEqualTo(List.of(secondSection));
-        assertThat(sections)
-            .isEqualTo(new Sections(List.of(firstSection, targetSection, createdSection)));
+        Section sectionToUpdate = new Section(2L, lineA, stationC, stationD, 2);
+        assertThat(result.getId()).isEqualTo(sectionToUpdate.getId());
+        assertThat(doSectionsHaveSameFields(result, sectionToUpdate)).isTrue();
+        assertThat(sections).isEqualTo(new Sections(List.of(firstSection, targetSection, result)));
     }
 
     @Test
     @DisplayName("노선의 특정 구간과 하행역만 같은 경우 노선에 추가한다.")
     void addSectionOfSameDownStationAsLinesSection() {
-        Section firstSection = new Section(lineA, stationA, stationB, 5);
-        Section secondSection = new Section(lineA, stationB, stationD, 5);
+        Section firstSection = new Section(1L, lineA, stationA, stationB, 5);
+        Section secondSection = new Section(2L, lineA, stationB, stationD, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section targetSection = new Section(lineA, stationC, stationD, 3);
 
-        SectionChange sectionChange = sections.add(targetSection);
+        Section result = sections.add(targetSection).get();
 
-        Section createdSection = new Section(lineA, stationB, stationC, 2);
-        assertThat(sectionChange.getSectionsToAdd())
-            .isEqualTo(List.of(createdSection, targetSection));
-        assertThat(sectionChange.getSectionsToRemove())
-            .isEqualTo(List.of(secondSection));
-        assertThat(sections)
-            .isEqualTo(new Sections(List.of(firstSection, createdSection, targetSection)));
+        Section sectionToUpdate = new Section(2L, lineA, stationB, stationC, 2);
+        assertThat(result.getId()).isEqualTo(sectionToUpdate.getId());
+        assertThat(doSectionsHaveSameFields(result, sectionToUpdate)).isTrue();
+        assertThat(sections).isEqualTo(new Sections(List.of(firstSection, result, targetSection)));
     }
 
     @Test
     @DisplayName("추가할 구간의 하행역이 기존 노선의 상행 종점역과 같은 경우 노선의 맨 앞에 추가한다.")
     void addFirst() {
-        Section firstSection = new Section(lineA, stationB, stationC, 5);
-        Section secondSection = new Section(lineA, stationC, stationD, 5);
+        Section firstSection = new Section(1L, lineA, stationB, stationC, 5);
+        Section secondSection = new Section(2L, lineA, stationC, stationD, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section targetSection = new Section(lineA, stationA, stationB, 3);
 
-        SectionChange sectionChange = sections.add(targetSection);
+        Optional<Section> result = sections.add(targetSection);
 
-        assertThat(sectionChange.getSectionsToAdd())
-            .isEqualTo(List.of(targetSection));
-        assertThat(sectionChange.getSectionsToRemove()).isEmpty();
+        assertThat(result).isEmpty();
         assertThat(sections)
             .isEqualTo(new Sections(List.of(targetSection, firstSection, secondSection)));
     }
@@ -200,17 +194,15 @@ class SectionsTest {
     @Test
     @DisplayName("추가할 구간의 상행역이 기존 노선의 하행 종점역과 같은 경우 노선의 맨 뒤에 추가한다.")
     void addLast() {
-        Section firstSection = new Section(lineA, stationA, stationB, 5);
-        Section secondSection = new Section(lineA, stationB, stationC, 5);
+        Section firstSection = new Section(1L, lineA, stationA, stationB, 5);
+        Section secondSection = new Section(2L, lineA, stationB, stationC, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
         Section targetSection = new Section(lineA, stationC, stationD, 3);
 
-        SectionChange sectionChange = sections.add(targetSection);
+        Optional<Section> result = sections.add(targetSection);
 
-        assertThat(sectionChange.getSectionsToAdd())
-            .isEqualTo(List.of(targetSection));
-        assertThat(sectionChange.getSectionsToRemove()).isEmpty();
-        assertThat(sections)
-            .isEqualTo(new Sections(List.of(firstSection, secondSection, targetSection)));
+        assertThat(result).isEmpty();
+        assertThat(sections).isEqualTo(
+            new Sections(List.of(firstSection, secondSection, targetSection)));
     }
 }

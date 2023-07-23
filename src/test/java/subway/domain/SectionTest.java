@@ -147,7 +147,7 @@ class SectionTest {
     }
 
 
-    private boolean doSectionsHaveSameFields(Section section, Section other) {
+    static boolean doSectionsHaveSameFields(Section section, Section other) {
         return Objects.equals(section.getLine(), other.getLine())
             && Objects.equals(section.getUpStation(), other.getUpStation())
             && Objects.equals(section.getDownStation(), other.getDownStation())
