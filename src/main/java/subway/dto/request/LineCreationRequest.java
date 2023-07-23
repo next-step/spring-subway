@@ -8,11 +8,11 @@ public class LineCreationRequest {
     @NotBlank
     private String name;
     @NotNull
-    private Long upStationId;
+    private long upStationId;
     @NotNull
-    private Long downStationId;
+    private long downStationId;
     @NotNull
-    private Integer distance;
+    private int distance;
     @NotBlank
     private String color;
 

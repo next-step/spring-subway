@@ -5,9 +5,9 @@ import javax.validation.constraints.NotNull;
 public class SectionAdditionRequest {
 
     @NotNull
-    private final Long upStationId;
+    private final long upStationId;
     @NotNull
-    private final Long downStationId;
+    private final long downStationId;
     @NotNull
     private final int distance;
 
