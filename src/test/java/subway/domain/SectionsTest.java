@@ -16,8 +16,11 @@ class SectionsTest {
     @DisplayName("Sections 생성에 성공한다.")
     @Test
     void createSectionsTest() {
-        assertThatNoException()
-                .isThrownBy(() -> new Sections(List.of(new Section(1L, 1L, 2L, 10))));
+        // given
+        List<Section> sections = createSections();
+
+        // when & then
+        assertThatNoException().isThrownBy(() -> new Sections(sections));
     }
 
     @DisplayName("해당 구간이 추가 가능한 구간인지 검증에 성공한다.")
@@ -25,7 +28,8 @@ class SectionsTest {
     void validateSectionTest() {
         // given
         SectionRequest sectionRequest = new SectionRequest("5", "6", 10);
-        Sections sections = new Sections(createSections());
+        List<Section> sectionList = createSections();
+        Sections sections = new Sections(sectionList);
 
         // when & then
         assertThatNoException()
@@ -36,11 +40,16 @@ class SectionsTest {
     @Test
     void validateSectionFailBothContainTest() {
         // given
-        SectionRequest sectionRequest = new SectionRequest("1", "4", 10);
         Sections sections = new Sections(createSections());
 
+        String duplicateUpStationId = "1";
+        String duplicateDownStationId ="4";
+        SectionRequest duplicateRequest = new SectionRequest(
+            duplicateUpStationId, duplicateDownStationId, 10
+        );
+
         // when & then
-        assertThatThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)))
+        assertThatThrownBy(() -> sections.findConnectedSection(duplicateRequest.to(1L)))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
@@ -49,11 +58,14 @@ class SectionsTest {
     @Test
     void validateSectionFailNeitherContainTest() {
         // given
-        SectionRequest sectionRequest = new SectionRequest("6", "7", 5);
         Sections sections = new Sections(createSections());
 
+        String notExistUpStationId = "6";
+        String notExistDownStationId = "7";
+        SectionRequest request = new SectionRequest(notExistUpStationId, notExistDownStationId, 5);
+
         // when & then
-        assertThatThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)))
+        assertThatThrownBy(() -> sections.findConnectedSection(request.to(1L)))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
@@ -62,8 +74,10 @@ class SectionsTest {
     @Test
     void validateSectionDistanceFailTest() {
         // given
-        SectionRequest sectionRequest = new SectionRequest("1", "6", 10);
         Sections sections = new Sections(createSections());
+
+        int invalidDistance = 10;
+        SectionRequest sectionRequest = new SectionRequest("1", "6", invalidDistance);
 
         // when & then
         assertThatThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)))
@@ -75,8 +89,10 @@ class SectionsTest {
     @Test
     void validateSectionDistanceTest() {
         // given
-        SectionRequest sectionRequest = new SectionRequest("1", "6", 3);
         Sections sections = new Sections(createSections());
+
+        int validDistance = 3;
+        SectionRequest sectionRequest = new SectionRequest("1", "6", validDistance);
 
         // when & then
         assertThatNoException()

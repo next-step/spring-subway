@@ -12,13 +12,27 @@ class SectionTest {
     @DisplayName("생성 테스트")
     @Test
     void createSectionTest() {
-        assertThatNoException().isThrownBy(() -> new Section(1L,  2L, 4L,10));
+        // given
+        long lindId = 1L;
+        long upStationId = 2L;
+        long downStationId = 4L;
+        int distance = 10;
+
+        // when & then
+        assertThatNoException().isThrownBy(() -> new Section(lindId,  upStationId, downStationId, distance));
     }
 
     @DisplayName("길이 유효성 검증 테스트")
     @Test
     void validateDistanceTest() {
-        assertThatThrownBy(() -> new Section(1L, 2L, 4L,0))
+        // given
+        long lindId = 1L;
+        long upStationId = 2L;
+        long downStationId = 4L;
+        int invalidDistance = 0;
+
+        // when & then
+        assertThatThrownBy(() -> new Section(lindId,  upStationId, downStationId, invalidDistance))
                 .hasMessage("구간 길이는 0보다 커야한다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
