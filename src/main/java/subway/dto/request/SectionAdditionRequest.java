@@ -11,17 +11,17 @@ public class SectionAdditionRequest {
     @NotNull
     private final int distance;
 
-    public SectionAdditionRequest(Long upStationId, Long downStationId, int distance) {
+    public SectionAdditionRequest(long upStationId, long downStationId, int distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public Long getDownStationId() {
+    public long getDownStationId() {
         return downStationId;
     }
 
-    public Long getUpStationId() {
+    public long getUpStationId() {
         return upStationId;
     }
 
