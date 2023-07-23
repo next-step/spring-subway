@@ -100,9 +100,6 @@ class SectionsTest {
     @Test
     @DisplayName("마지막 구간을 삭제한다")
     void removeLast() {
-        Station stationA = new Station(1L, "A");
-        Station stationB = new Station(2L, "B");
-        Station stationC = new Station(3L, "C");
         Section sectionA = new Section(lineA, stationA, stationB, 1);
         Section sectionB = new Section(lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(sectionA, sectionB));
@@ -112,5 +109,17 @@ class SectionsTest {
         Sections expectedSections = new Sections(List.of(sectionA));
         assertThat(sections).isEqualTo(expectedSections);
         assertThat(removedSection).isEqualTo(sectionB);
+    }
+
+    @Test
+    @DisplayName("구간들의 역 목록을 순서대로 가져온다")
+    void getStationOfSections() {
+        Section sectionA = new Section(lineA, stationA, stationB, 1);
+        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        List<Station> stations = sections.getStations();
+
+        assertThat(stations).containsExactly(stationA, stationB, stationC);
     }
 }
