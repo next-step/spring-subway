@@ -8,7 +8,7 @@ public final class SectionRegistRequest {
     private Long downStationId;
     private int distance;
 
-    public SectionRegistRequest() {
+    private SectionRegistRequest() {
     }
 
     public SectionRegistRequest(
