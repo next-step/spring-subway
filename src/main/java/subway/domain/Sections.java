@@ -83,7 +83,7 @@ public class Sections {
     }
 
     public SectionRegistVo registSection(Section section) {
-        if (sections.size() == 0) {
+        if (sections.isEmpty()) {
             return new SectionRegistVo(section);
         }
         if (findStations().contains(section.getUpStation())
