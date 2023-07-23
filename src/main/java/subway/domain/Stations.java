@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import subway.exception.IllegalStationsException;
@@ -54,5 +55,29 @@ public class Stations {
 
     public List<Station> getStations() {
         return Collections.unmodifiableList(stations);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Stations stations1 = (Stations) o;
+        return Objects.equals(stations, stations1.stations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stations);
+    }
+
+    @Override
+    public String toString() {
+        return "Stations{" +
+            "stations=" + stations +
+            '}';
     }
 }

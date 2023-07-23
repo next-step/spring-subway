@@ -3,6 +3,7 @@ package subway.domain;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
@@ -68,5 +69,31 @@ public class Sections {
         if (existSection.isDistanceLessThanOrEqualTo(other)) {
             throw new IllegalSectionException("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Sections sections = (Sections) o;
+        return Objects.equals(upStationMap, sections.upStationMap)
+            && Objects.equals(downStationMap, sections.downStationMap);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(upStationMap, downStationMap);
+    }
+
+    @Override
+    public String toString() {
+        return "Sections{" +
+            "upStationMap=" + upStationMap +
+            ", downStationMap=" + downStationMap +
+            '}';
     }
 }
