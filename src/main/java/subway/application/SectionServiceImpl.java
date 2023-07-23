@@ -1,22 +1,19 @@
 package subway.application;
 
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.Distance;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Sections;
-import subway.domain.Station;
+import subway.domain.*;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
-public class SectionService {
+public class SectionServiceImpl implements SectionService {
 
     private final SectionDao sectionDao;
 
@@ -24,12 +21,13 @@ public class SectionService {
 
     private final StationDao stationDao;
 
-    public SectionService(SectionDao sectionDao, LineDao lineDao, StationDao stationDao) {
+    public SectionServiceImpl(SectionDao sectionDao, LineDao lineDao, StationDao stationDao) {
         this.sectionDao = sectionDao;
         this.lineDao = lineDao;
         this.stationDao = stationDao;
     }
 
+    @Override
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
         Line line = lineDao.findById(lineId);
@@ -105,6 +103,7 @@ public class SectionService {
         sectionDao.update(generatedSection);
     }
 
+    @Override
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         List<Section> sectionList = sectionDao.findAllByLineId(lineId);

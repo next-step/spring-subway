@@ -1,33 +1,28 @@
 package subway.ui;
 
-import java.net.URI;
-import java.sql.SQLException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import subway.application.SectionService;
+import org.springframework.web.bind.annotation.*;
+import subway.application.SectionServiceImpl;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+
+import java.net.URI;
+import java.sql.SQLException;
 
 @RestController
 public class SectionController {
 
-    private final SectionService sectionService;
+    private final SectionServiceImpl sectionServiceImpl;
 
-    public SectionController(SectionService sectionService) {
-        this.sectionService = sectionService;
+    public SectionController(SectionServiceImpl sectionServiceImpl) {
+        this.sectionServiceImpl = sectionServiceImpl;
     }
 
     @PostMapping("/lines/{lineId}/sections")
     public ResponseEntity<SectionResponse> createSection(
             @PathVariable Long lineId,
             @RequestBody SectionRequest sectionRequest) {
-        SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
+        SectionResponse sectionResponse = sectionServiceImpl.saveSection(lineId, sectionRequest);
         return ResponseEntity.created(
                         URI.create("/lines/" + lineId + "/sections/" + sectionResponse.getId()))
                 .body(sectionResponse);
@@ -38,7 +33,7 @@ public class SectionController {
             @PathVariable Long lineId,
             @RequestParam Long stationId
     ) {
-        sectionService.deleteSection(lineId, stationId);
+        sectionServiceImpl.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,9 +1,5 @@
 package subway.dao;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +10,11 @@ import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 
 @SpringBootTest
@@ -28,18 +29,18 @@ class SectionDaoTest {
     private Section section3;
 
     @Autowired
-    private LineDao lineDao;
+    private LineDaoImpl lineDaoImpl;
 
     @Autowired
-    private StationDao stationDao;
+    private StationDaoImpl stationDaoImpl;
 
     @BeforeEach
     void setUp() {
-        Line line = lineDao.findById(1L);
-        Station station1 = stationDao.findById(1L);
-        Station station2 = stationDao.findById(2L);
-        Station station3 = stationDao.findById(3L);
-        Station station4 = stationDao.findById(4L);
+        Line line = lineDaoImpl.findById(1L);
+        Station station1 = stationDaoImpl.findById(1L);
+        Station station2 = stationDaoImpl.findById(2L);
+        Station station3 = stationDaoImpl.findById(3L);
+        Station station4 = stationDaoImpl.findById(4L);
 
         section1 = new Section(line, station1, station2, new Distance(10L));
         section2 = new Section(line, station2, station3, new Distance(10L));

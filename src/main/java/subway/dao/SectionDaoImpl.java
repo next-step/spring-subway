@@ -1,8 +1,5 @@
 package subway.dao;
 
-import java.util.List;
-import java.util.Optional;
-import javax.sql.DataSource;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,8 +12,12 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 
+import javax.sql.DataSource;
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-public class SectionDao {
+public class SectionDaoImpl implements SectionDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
@@ -49,13 +50,14 @@ public class SectionDao {
                 distance);
     };
 
-    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    public SectionDaoImpl(JdbcTemplate jdbcTemplate, DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("section")
                 .usingGeneratedKeyColumns("id");
     }
 
+    @Override
     public Section insert(Section section) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(section);
         Long id = insertAction.executeAndReturnKey(params).longValue();
@@ -67,6 +69,7 @@ public class SectionDao {
                 new Distance(section.getDistance()));
     }
 
+    @Override
     public List<Section> findAllByLineId(long lineId) {
         String sql = "select s.id as section_id, "
                 + "s.distance as distance, "
@@ -85,12 +88,14 @@ public class SectionDao {
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
+    @Override
     public boolean existByLineId(Long lineId) {
         String sql = "select count(*) from section where line_id = ? ";
 
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, lineId));
     }
 
+    @Override
     public boolean existByLineIdAndStationId(Long lineId, Long stationId) {
         String sql = "select count(*) from section where line_id = ? and (down_station_id = ? or up_station_id = ?)";
 
@@ -98,11 +103,13 @@ public class SectionDao {
                 jdbcTemplate.queryForObject(sql, Boolean.class, lineId, stationId, stationId));
     }
 
+    @Override
     public void deleteById(Long id) {
         String sql = "delete from section where id = ?";
         jdbcTemplate.update(sql, id);
     }
 
+    @Override
     public Optional<Section> findByLineIdAndUpStationId(Long lineId, Long upStationId) {
         String sql = "select s.id as section_id, "
                 + "s.distance as distance, "
@@ -123,6 +130,7 @@ public class SectionDao {
                         jdbcTemplate.query(sql, rowMapper, lineId, upStationId)));
     }
 
+    @Override
     public Optional<Section> findByLineIdAndDownStationId(Long lineId, Long downStationId) {
         String sql = "select s.id as section_id, "
                 + "s.distance as distance, "
@@ -143,6 +151,7 @@ public class SectionDao {
                         jdbcTemplate.query(sql, rowMapper, lineId, downStationId)));
     }
 
+    @Override
     public void update(Section section) {
         String sql = "update section set "
                 + " line_id = ?, "
