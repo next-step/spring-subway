@@ -23,14 +23,6 @@ public class Section {
         this.distance = distance;
     }
 
-    private void validateStationsNotEqual(Station upStation, Station downStation) {
-        if (upStation.equals(downStation)) {
-            throw new IllegalArgumentException(
-                "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
-                    + downStation);
-        }
-    }
-
     public Section(Line line, Station upStation, Station downStation, int distance) {
         this(null, line, upStation, downStation, distance);
     }
@@ -46,6 +38,14 @@ public class Section {
     private void validatePositive(int distance) {
         if (distance <= 0) {
             throw new IllegalArgumentException("구간 길이는 양수여야합니다 distance: \"" + distance + "\"");
+        }
+    }
+
+    private void validateStationsNotEqual(Station upStation, Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new IllegalArgumentException(
+                "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
+                    + downStation);
         }
     }
 

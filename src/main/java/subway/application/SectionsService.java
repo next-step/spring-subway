@@ -10,7 +10,7 @@ import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.request.SectionAdditionRequest;
-import subway.vo.SectionAdditionResult;
+import subway.dto.SectionAdditionResult;
 
 @Service
 public class SectionsService {
