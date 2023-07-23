@@ -40,7 +40,7 @@ public class Section {
             return new Section(upStation, other.upStation, distance.subtract(other.distance));
         }
 
-        return this;
+        throw new IllegalArgumentException("입력으로 들어온 section이 현재 section에 포함되지 않습니다");
     }
 
     public boolean matchOneStation(final Section other) {
