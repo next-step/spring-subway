@@ -1,16 +1,18 @@
 package subway.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
-import subway.domain.*;
+import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.StationPair;
+import subway.domain.Stations;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.exception.IllegalLineException;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class LineService {

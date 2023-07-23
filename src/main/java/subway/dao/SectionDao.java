@@ -1,5 +1,8 @@
 package subway.dao;
 
+import java.util.List;
+import java.util.Optional;
+import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -8,17 +11,13 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Section;
 
-import javax.sql.DataSource;
-import java.util.List;
-import java.util.Optional;
-
 @Repository
 public class SectionDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
-    private RowMapper<Section> rowMapper = (rs, rowNum) ->
+    private final RowMapper<Section> rowMapper = (rs, rowNum) ->
             new Section(
                     rs.getLong("id"),
                     rs.getLong("line_id"),

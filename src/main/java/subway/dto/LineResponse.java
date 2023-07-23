@@ -1,11 +1,10 @@
 package subway.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import subway.domain.Line;
-import subway.domain.Station;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import subway.domain.Line;
+import subway.domain.Station;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LineResponse {
@@ -48,10 +47,6 @@ public class LineResponse {
 
     public String getName() {
         return name;
-    }
-
-    public String getColor() {
-        return color;
     }
 
     public List<StationResponse> getStations() {

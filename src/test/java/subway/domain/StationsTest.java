@@ -1,13 +1,11 @@
 package subway.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class StationsTest {
 
@@ -21,7 +19,6 @@ class StationsTest {
     @Test
     void getSortedStationsTest() {
         // given
-        Long lineId = 1L;
         Station station1 = new Station(1L, "오이도");
         Station station2 = new Station(2L, "정왕");
         Station station3 = new Station(3L, "안산");

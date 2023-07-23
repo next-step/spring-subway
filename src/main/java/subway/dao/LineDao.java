@@ -1,32 +1,31 @@
 package subway.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
-import subway.domain.StationPair;
 import subway.domain.Station;
-
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import subway.domain.StationPair;
 
 @Repository
 public class LineDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
-    private RowMapper<Line> lineRowMapper = (rs, rowNum) ->
+    private final RowMapper<Line> lineRowMapper = (rs, rowNum) ->
             new Line(
                     rs.getLong("id"),
                     rs.getString("name"),
                     rs.getString("color")
             );
 
-    private RowMapper<StationPair> stationPairRowMapper = (rs, rowNum) ->
+    private final RowMapper<StationPair> stationPairRowMapper = (rs, rowNum) ->
             new StationPair(
                     new Station(
                             rs.getLong("s1_id"),

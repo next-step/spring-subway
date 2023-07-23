@@ -1,9 +1,11 @@
 package subway.domain;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
-
-import java.util.*;
 
 public class Sections {
 

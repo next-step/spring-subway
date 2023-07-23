@@ -1,5 +1,10 @@
 package subway.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
+
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,16 +13,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
 import subway.domain.Line;
-import subway.domain.StationPair;
 import subway.domain.Station;
+import subway.domain.StationPair;
 import subway.dto.LineResponse;
 import subway.dto.StationResponse;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.BDDMockito.given;
 
 @DisplayName("라인 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
