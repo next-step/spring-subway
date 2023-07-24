@@ -37,11 +37,19 @@ public class LineServiceImpl implements LineService {
     @Override
     @Transactional
     public LineResponse saveLine(LineRequest request) {
+        validateDuplicatedName(request);
+        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        insertFirstSection(request, persistLine);
+        return LineResponse.of(persistLine);
+    }
+
+    private void validateDuplicatedName(LineRequest request) {
         if (lineDao.existByName(request.getName())) {
             throw new LineAlreadyExistException(request.getName());
         }
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+    }
 
+    private void insertFirstSection(LineRequest request, Line persistLine) {
         Station upStation = stationDao.findById(request.getUpStationId())
                 .orElseThrow(() -> new StationNotFoundException(request.getUpStationId()));
         Station downStation = stationDao.findById(request.getDownStationId())
@@ -49,8 +57,6 @@ public class LineServiceImpl implements LineService {
         Distance distance = new Distance(request.getDistance());
         Section section = new Section(persistLine, upStation, downStation, distance);
         sectionDao.insert(section);
-
-        return LineResponse.of(persistLine);
     }
 
     @Override
