@@ -37,7 +37,7 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("구간이 한개 이상이면, 중간역 삭제 성공")
+    @DisplayName("구간이 한 개 이상이면, 중간역 삭제 성공")
     void 구간_한개_이상_중간역_삭제_성공() {
         // given
         Station deleteStation = new Station("신대방역");
@@ -67,6 +67,66 @@ class SectionsTest {
         );
     }
 
+    @Test
+    @DisplayName("구간이 한 개 이상이면, 하행 종점 역 삭제 성공")
+    void 구간_한개_이상_하행_종점_삭제_성공() {
+        // given
+        Station deleteStation = new Station("서울대입구역");
+        Sections sections = new Sections(List.of(
+            new Section(
+                deleteStation,
+                new Station("상도역"),
+                10
+            ),
+            new Section(
+                new Station("상도역"),
+                new Station("신대방역"),
+                4
+            )
+        ));
+
+        // when
+        Sections newSections = sections.removeStation(deleteStation);
+        // then
+        assertThat(newSections.getSections()).containsAll(
+            List.of(new Section(
+                new Station("상도역"),
+                new Station("신대방역"),
+                4)
+            )
+        );
+    }
+
+
+    @Test
+    @DisplayName("구간이 한 개 이상이면, 상행 종점 역 삭제 성공")
+    void 구간_한개_이상_상행_종점_삭제_성공() {
+        // given
+        Station deleteStation = new Station("신대방역");
+        Sections sections = new Sections(List.of(
+            new Section(
+                new Station("서울대입구역"),
+                new Station("상도역"),
+                10
+            ),
+            new Section(
+                new Station("상도역"),
+                deleteStation,
+                4
+            )
+        ));
+
+        // when
+        Sections newSections = sections.removeStation(deleteStation);
+        // then
+        assertThat(newSections.getSections()).containsAll(
+            List.of(new Section(
+                new Station("서울대입구역"),
+                new Station("상도역"),
+                10)
+            )
+        );
+    }
 
     @Test
     @DisplayName("노선에 구간이 하나일 때는 삭제할 수 없다.")

@@ -63,38 +63,42 @@ public class Sections {
         validateSize();
 
         List<Section> newSections = new ArrayList<>(this.sections);
+        List<Section> removeSection = findRemoveSections(station, newSections);
+        removeSection.stream().forEach(newSections::remove);
 
-        Optional<Section> upSection = sections.stream()
-            .filter(section -> section.getUpStation().equals(station)).findAny();
-        Optional<Section> downSection = sections.stream()
-            .filter(section -> section.getDownStation().equals(station)).findAny();
-        if (upSection.isPresent() && downSection.isPresent()) {
-            Section newSection = downSection.get().add(upSection.get());
-            newSections.add(newSection);
+        if (isMiddleStation(station)) {
+            newSections.add(reArrangeSection(station));
         }
+        return new Sections(newSections);
+    }
 
+    private Section reArrangeSection(final Station station) {
+        Optional<Section> upSection = sections.stream()
+            .filter(section -> section.getUpStation().equals(station))
+            .findAny();
+        Optional<Section> downSection = sections.stream()
+            .filter(section -> section.getDownStation().equals(station))
+            .findAny();
+        return downSection.get().add(upSection.get());
+    }
+
+    private boolean isMiddleStation(final Station station) {
+        return sections.stream()
+            .filter(s -> s.matchOneStation(station))
+            .count() > 1;
+    }
+
+    private List<Section> findRemoveSections(
+        final Station station,
+        final List<Section> newSections
+    ) {
         List<Section> removeSection = new ArrayList<>();
         for (Section section : newSections) {
             if (station.equals(section.getDownStation())) {
                 removeSection.add(section);
             }
         }
-        removeSection.stream().forEach(newSections::remove);
-        return new Sections(newSections);
-    }
-
-    private boolean isTerminalDownStation(final Station station) {
-        Set<Station> upStations = sections.stream()
-            .map(Section::getUpStation)
-            .collect(Collectors.toSet());
-
-        Station terminal = sections.stream()
-            .map(Section::getDownStation)
-            .filter(downStation -> !upStations.contains(downStation))
-            .findAny()
-            .orElseThrow(() -> new IllegalStateException("하행 종점이 존재하지 않습니다."));
-
-        return station.equals(terminal);
+        return removeSection;
     }
 
     private void validateSize() {
@@ -120,7 +124,7 @@ public class Sections {
         return sortedStation(stationMap, start);
     }
 
-    private List<Station> sortedStation(Map<Station, Station> stationMap, Station start) {
+    private List<Station> sortedStation(final Map<Station, Station> stationMap, Station start) {
         List<Station> sortedStations = new ArrayList<>();
 
         while (start != null) {

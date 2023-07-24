@@ -92,4 +92,7 @@ public class Section {
             distance.add(newSection.distance));
     }
 
+    public boolean matchOneStation(Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
 }

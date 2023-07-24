@@ -63,7 +63,6 @@ public class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    // 31
     @Test
     @DisplayName("노선 상행 종점이 하행역인 구간을 추가한다.")
     void createSectionTest2() {
@@ -81,7 +80,6 @@ public class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    //13
     @Test
     @DisplayName("상행역이 일치하는 구간에, 새로운 구간을 추가한다.")
     void createSectionTest3() {
@@ -99,7 +97,6 @@ public class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    //32
     @Test
     @DisplayName("하행역이 일치하는 구간에, 새로운 구간을 추가한다.")
     void createSectionTest4() {
@@ -117,7 +114,6 @@ public class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    // 12
     @Test
     @DisplayName("두 역이 모두 기존 노선에 존재하면, 추가할 수 없다.")
     void createSectionTest5() {
@@ -135,7 +131,6 @@ public class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    //34
     @Test
     @DisplayName("노선에 구간이 하나도 포함 되지 않으면, 구간을 추가할 수 없다.")
     void createSectionTest6() {
@@ -157,7 +152,6 @@ public class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    // 32
     @Test
     @DisplayName("새로운 구간의 길이가 기존 구간의 길이보다 크거나 같으면, 추가할 수 없다.")
     void createSectionTest7() {
@@ -217,7 +211,7 @@ public class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("노선의 하행 종점역이 아니면 삭제할 수 없다.")
+    @DisplayName("노선에서 중간역을 삭제 할 수 있다")
     void removeNotDownStationBadRequest() {
         // given
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
@@ -237,7 +231,31 @@ public class SectionIntegrationTest extends IntegrationTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("노선에서 상행 종점역을 삭제할 수 있다.")
+    void removeUpStation() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
+        RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(sectionRequest)
+            .when().post("/lines/{lineId}/sections", lineId)
+            .then().log().all()
+            .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station1Id)
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
