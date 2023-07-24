@@ -33,7 +33,7 @@ class SectionServiceTest {
     SectionDao sectionDao;
 
     @Test
-    @DisplayName("올바른 구간 추가 요청이 들어오면, 삭제할 구간과 생성할 구간을 구한 뒤 DAO로 전달한다.")
+    @DisplayName("올바른 구간 추가 요청이 들어오면, 업데이트할 구간과 생성할 구간을 구한 뒤 DAO로 전달한다.")
     void addSection() {
         //given
         final Station stationA = new Station(1L, "stationA");
@@ -53,7 +53,8 @@ class SectionServiceTest {
         sectionService.addSection(lineA.getId(), request);
 
         //then
-        verify(sectionDao, times(1)).update(any());
+        verify(sectionDao).update(any());
+        verify(sectionDao).save(any());
     }
 
     @Test
