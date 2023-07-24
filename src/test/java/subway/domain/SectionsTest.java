@@ -3,7 +3,6 @@ package subway.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.IncorrectRequestException;
-import subway.exception.InternalStateException;
 
 import java.util.ArrayList;
 import java.util.List;

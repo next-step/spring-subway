@@ -70,6 +70,20 @@ public class Sections {
                 .orElseThrow();
     }
 
+    public Section mergeTwoSectionsBasedOn(Station station) {
+        Section upSection = sections.stream()
+                .filter(section -> section.getDownStation().equals(station))
+                .findFirst()
+                .orElseThrow();
+
+        Section downSection = sections.stream()
+                .filter(section -> section.getUpStation().equals(station))
+                .findFirst()
+                .orElseThrow();
+
+        return upSection.mergeWith(downSection);
+    }
+
     public List<Station> toStations() {
         List<Station> stations = sections.stream()
                 .map(Section::getUpStation)
@@ -90,6 +104,12 @@ public class Sections {
         boolean containsDownStation = this.downStations.contains(newSection.getDownStation());
 
         return containsUpStation || containsDownStation;
+    }
+
+    public boolean isMiddleStation(Station station) {
+        Set<Station> middleStations = new HashSet<>(upStations);
+        middleStations.retainAll(downStations);
+        return middleStations.contains(station);
     }
 
     public void validateInsert(final Section newSection) {

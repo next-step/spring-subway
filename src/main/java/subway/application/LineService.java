@@ -93,10 +93,13 @@ public class LineService {
         Station deleteStation = stationDao.findById(stationId);
         Sections sections = sectionDao.findAllByLineId(lineId);
         sections.validateDelete(deleteStation);
+        if (sections.isMiddleStation(deleteStation)) {
+            sectionDao.insert(sections.mergeTwoSectionsBasedOn(deleteStation), lineId);
+        }
         sectionDao.deleteByStation(deleteStation, lineId);
     }
 
-    private Section newSection(SectionRequest request) {
+    private Section newSection(final SectionRequest request) {
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
         return new Section(upStation, downStation, request.getDistance());
