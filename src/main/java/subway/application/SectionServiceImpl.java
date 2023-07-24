@@ -58,7 +58,7 @@ public class SectionServiceImpl implements SectionService {
     private void preProcess(Long lineId, Station upStation, Station downStation,
             Distance distance) {
         Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        Optional<Section> cuttedSection = sections.validateAndGetCuttedSection(
+        Optional<Section> cuttedSection = sections.validateAndCutSectionIfExist(
                 upStation, downStation, distance);
         cuttedSection.ifPresent(sectionDao::update);
     }

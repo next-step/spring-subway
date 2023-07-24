@@ -26,19 +26,19 @@ public class Sections {
                 Section::getUpStation,
                 Function.identity()
         ));
-
         Map<Station, Section> downStationMap = sections.stream().collect(Collectors.toMap(
                 Section::getDownStation,
                 Function.identity()
         ));
 
         Section firstSection = findFirstSection(sections, downStationMap);
-
         return sortedSections(upStationMap, firstSection);
     }
 
-    private static Section findFirstSection(List<Section> sections,
+    private static Section findFirstSection(
+            List<Section> sections,
             Map<Station, Section> downStationMap) {
+
         Section pivot = sections.get(0);
         while (downStationMap.containsKey(pivot.getUpStation())) {
             pivot = downStationMap.get(pivot.getUpStation());
@@ -46,8 +46,10 @@ public class Sections {
         return pivot;
     }
 
-    private static List<Section> sortedSections(Map<Station, Section> upStationMap,
+    private static List<Section> sortedSections(
+            Map<Station, Section> upStationMap,
             Section pivot) {
+
         List<Section> result = new ArrayList<>();
         result.add(pivot);
         while (upStationMap.containsKey(pivot.getDownStation())) {
@@ -79,6 +81,56 @@ public class Sections {
         }
     }
 
+    public Optional<Section> validateAndCutSectionIfExist(Station upStation, Station downStation,
+            Distance distance) {
+        if (sections.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<Section> upStationSection = sections.stream()
+                .filter(section -> section.getUpStation().equals(upStation)).findAny();
+        Optional<Section> downStationSection = sections.stream()
+                .filter(section -> section.getDownStation().equals(downStation)).findAny();
+        boolean isLast = sections.get(sections.size() - 1).getDownStation().equals(upStation);
+        boolean isFirst = sections.get(0).getUpStation().equals(downStation);
+
+        validateStationNotExist(
+                upStationSection.isEmpty(), downStationSection.isEmpty(), isLast, isFirst);
+        validateStationBothExist(
+                upStationSection.isPresent(), downStationSection.isPresent(), isLast, isFirst);
+
+        if (upStationSection.isPresent()) {
+            return cutSection(upStation, downStation, distance, upStationSection.get());
+        }
+
+        if (downStationSection.isPresent()) {
+            return cutSection(upStation, downStation, distance, downStationSection.get());
+        }
+
+        return Optional.empty();
+    }
+
+    private static Optional<Section> cutSection(Station upStation, Station downStation,
+            Distance distance, Section originalSection) {
+        return Optional.of(originalSection
+                .cuttedSection(upStation, downStation, distance));
+    }
+
+    private static void validateStationBothExist(boolean upStationSection,
+            boolean downStationSection, boolean isLast, boolean isFirst) {
+        if ((upStationSection || isLast)
+                && (downStationSection || isFirst)) {
+            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
+        }
+    }
+
+    private static void validateStationNotExist(boolean upStationSection,
+            boolean downStationSection, boolean isLast, boolean isFirst) {
+        if (upStationSection && downStationSection && !isLast && !isFirst) {
+            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
+        }
+    }
+
     public List<Section> getSections() {
         return new ArrayList<>(sections);
     }
@@ -105,52 +157,5 @@ public class Sections {
         return "Sections{" +
                 "sections=" + sections +
                 '}';
-    }
-
-    public boolean existStation(Station station) {
-        return this.toStations().contains(station);
-    }
-
-    public Optional<Section> validateAndGetCuttedSection(Station upStation, Station downStation,
-            Distance distance) {
-        if (sections.isEmpty()) {
-            return Optional.empty();
-        }
-
-        boolean isUpStationInLine = existStation(upStation);
-        boolean isDownStationInLine = existStation(downStation);
-
-        if (!isUpStationInLine && !isDownStationInLine) {
-            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
-        }
-
-        if (isUpStationInLine && isDownStationInLine) {
-            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
-        }
-
-        if (isUpStationInLine) {
-            Optional<Section> originalSection = sections.stream()
-                    .filter(section -> section.getUpStation().equals(upStation))
-                    .findFirst();
-            if (originalSection.isPresent()) {
-                Section generatedSection = originalSection.get()
-                        .cuttedSection(upStation, downStation,
-                                distance);
-                return Optional.of(generatedSection);
-            }
-        }
-        if (isDownStationInLine) {
-            Optional<Section> originalSection = sections.stream()
-                    .filter(section -> section.getDownStation().equals(downStation))
-                    .findFirst();
-            if (originalSection.isPresent()) {
-                Section generatedSection = originalSection.get()
-                        .cuttedSection(upStation, downStation,
-                                distance);
-                return Optional.of(generatedSection);
-            }
-        }
-
-        return Optional.empty();
     }
 }
