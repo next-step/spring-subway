@@ -17,6 +17,7 @@ import subway.dto.SectionRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @Service
 public class LineService {
 
@@ -38,7 +39,6 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
-    @Transactional(readOnly = true)
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
@@ -46,19 +46,16 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     public List<Line> findLines() {
         return lineDao.findAll();
     }
 
-    @Transactional(readOnly = true)
     public LineStationsResponse findLineResponseById(final Long id) {
         Line persistLine = findLineById(id);
         Sections sections = sectionDao.findAllByLineId(id);
         return LineStationsResponse.from(persistLine, sections.toStations());
     }
 
-    @Transactional(readOnly = true)
     public Line findLineById(final Long id) {
         return lineDao.findById(id);
     }
