@@ -93,10 +93,10 @@ public class Sections {
     public SectionsRegister registerSection(Section section) {
         validRegisterSection(section);
         if (findStations().contains(section.getUpStation())) {
-            return registerUpSection(section);
+            return registerDownStation(section);
         }
         if (findStations().contains(section.getDownStation())) {
-            return registerDownSection(section);
+            return registerUpStation(section);
         }
         return new SectionsRegister(section);
     }
@@ -113,26 +113,26 @@ public class Sections {
         }
     }
 
-    private SectionsRegister registerUpSection(Section registerSection) {
+    private SectionsRegister registerDownStation(Section registerSection) {
         if (!findUpStations().contains(registerSection.getUpStation())) {
             return new SectionsRegister(registerSection);
         }
-        return registerMiddleUpSection(registerSection);
+        return registerNewSectionByUpStation(registerSection);
     }
 
-    private SectionsRegister registerMiddleUpSection(Section registerSection) {
+    private SectionsRegister registerNewSectionByUpStation(Section registerSection) {
         Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation());
         return new SectionsRegister(registerSection, registerSection.makeNewUpSection(duplicatedUpSection));
     }
 
-    private SectionsRegister registerDownSection(Section registerSection) {
+    private SectionsRegister registerUpStation(Section registerSection) {
         if (!findDownStations().contains(registerSection.getDownStation())) {
             return new SectionsRegister(registerSection);
         }
-        return registerMiddleDownSection(registerSection);
+        return registerNewSectionByDownStation(registerSection);
     }
 
-    private SectionsRegister registerMiddleDownSection(Section registerSection) {
+    private SectionsRegister registerNewSectionByDownStation(Section registerSection) {
         Section duplicatedDownSection = findSectionByDownStation(registerSection.getDownStation());
         return new SectionsRegister(registerSection, registerSection.makeNewDownSection(duplicatedDownSection));
     }
