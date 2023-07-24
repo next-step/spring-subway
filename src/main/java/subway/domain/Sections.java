@@ -79,6 +79,12 @@ public class Sections {
         return stations;
     }
 
+    private Set<Station> gatherAllStations() {
+        Set<Station> allStations = new HashSet<>(upStations);
+        allStations.addAll(downStations);
+        return allStations;
+    }
+
     public boolean isInsertedMiddle(final Section newSection) {
         boolean containsUpStation = this.upStations.contains(newSection.getUpStation());
         boolean containsDownStation = this.downStations.contains(newSection.getDownStation());
@@ -87,8 +93,7 @@ public class Sections {
     }
 
     public void validateInsert(final Section newSection) {
-        Set<Station> allStations = new HashSet<>(upStations);
-        allStations.addAll(downStations);
+        Set<Station> allStations = gatherAllStations();
 
         boolean hasUpStation = allStations.contains(newSection.getUpStation());
         boolean hasDownStation = allStations.contains(newSection.getDownStation());
@@ -98,14 +103,16 @@ public class Sections {
 
     public void validateDelete(final Station lastStation) {
         validateAtLeastOneSection();
-        if (!lastSection().getDownStation().equals(lastStation)) {
+
+        Set<Station> allStations = gatherAllStations();
+        if (!allStations.contains(lastStation)) {
             throw new IncorrectRequestException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
         }
     }
 
     private void validateAtLeastOneSection() {
         if (this.sections.size() <= 1) {
-            throw new InternalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
         }
     }
 

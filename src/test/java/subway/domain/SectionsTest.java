@@ -154,40 +154,41 @@ class SectionsTest {
         assertFalse(sections.isInsertedMiddle(newSection));
     }
 
-    @DisplayName("마지막 구간을 제거할 수 있는지 확인한다.")
+    @DisplayName("구간 내에서 역을 제거할 수 있는지 확인한다.")
     @Test
     void deleteLastSection() {
         // given
         Station upStation = new Station(4L, "강변역");
-        Station downStation = new Station(3L, "구의역");
-        Station newUpStation = new Station(3L, "구의역");
-        Station newDownStation = new Station(2L, "건대입구역");
+        Station midStation = new Station(3L, "구의역");
+        Station downStation = new Station(2L, "건대입구역");
         int distance = 10;
 
         Sections sections = new Sections(List.of(
-                new Section(upStation, downStation, distance),
-                new Section(newUpStation, newDownStation, distance)));
+                new Section(upStation, midStation, distance),
+                new Section(midStation, downStation, distance)));
 
         // when & then
-        assertDoesNotThrow(() -> sections.validateDelete(newDownStation));
+        assertDoesNotThrow(() -> sections.validateDelete(upStation));
+        assertDoesNotThrow(() -> sections.validateDelete(midStation));
+        assertDoesNotThrow(() -> sections.validateDelete(downStation));
     }
 
-    @DisplayName("마지막이 아닌 구간을 제거하면 예외를 던진다.")
+    @DisplayName("존재하지 않는 역을 제거하면 예외를 던진다.")
     @Test
-    void deleteNotLastSection() {
+    void deleteNotExist() {
         // given
         Station upStation = new Station(4L, "강변역");
-        Station downStation = new Station(3L, "구의역");
-        Station newUpStation = new Station(3L, "구의역");
-        Station newDownStation = new Station(2L, "건대입구역");
+        Station midStation = new Station(3L, "구의역");
+        Station downStation = new Station(1L, "잠실역");
+        Station notExist = new Station(2L, "건대입구역");
         int distance = 10;
 
         Sections sections = new Sections(List.of(
-                new Section(upStation, downStation, distance),
-                new Section(newUpStation, newDownStation, distance)));
+                new Section(upStation, midStation, distance),
+                new Section(midStation, downStation, distance)));
 
         // when & then
-        assertThrows(IncorrectRequestException.class, () -> sections.validateDelete(downStation));
+        assertThrows(IncorrectRequestException.class, () -> sections.validateDelete(notExist));
     }
 
     @DisplayName("구간이 1개만 있을 때 구간을 제거하면 예외를 던진다.")
@@ -201,6 +202,6 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
 
         // when & then
-        assertThrows(InternalStateException.class, () -> sections.validateDelete(downStation));
+        assertThrows(IncorrectRequestException.class, () -> sections.validateDelete(downStation));
     }
 }
