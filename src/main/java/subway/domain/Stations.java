@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import subway.exception.IllegalStationsException;
 
 public class Stations {
@@ -20,8 +19,13 @@ public class Stations {
         this.stations = sort(stationPairs);
     }
 
+    public List<Station> getStations() {
+        return Collections.unmodifiableList(stations);
+    }
+
     private List<Station> sort(final List<StationPair> stationPairs) {
-        validate(stationPairs);
+        validateDuplicateUpStation(stationPairs);
+        validateDuplicateDownStation(stationPairs);
         final Map<Station, Station> upToDownStations = convert(stationPairs);
         final Station startStation = findStartStation(upToDownStations);
         return connect(upToDownStations, startStation);
@@ -42,9 +46,11 @@ public class Stations {
         final Collection<Station> downStations = upToDownStations.values();
 
         upStations.removeAll(downStations);
+        validateFirstStations(upStations);
+
         return upStations.stream()
-                .findAny()
-                .orElseThrow(() -> new IllegalStationsException("역들이 제대로 연결되지 않았습니다."));
+            .findFirst()
+            .orElseThrow(() -> new IllegalStationsException("역들이 제대로 연결되지 않았습니다."));
     }
 
     private Map<Station, Station> convert(final List<StationPair> stationPairs) {
@@ -55,18 +61,30 @@ public class Stations {
                 );
     }
 
-    private void validate(List<StationPair> stationPairs) {
-        int totalStationSize = stationPairs.size() * 2;
-        Set<Station> distinctStations = stationPairs.stream()
-            .flatMap(stationPair -> Stream.of(stationPair.getUpStation(), stationPair.getDownStation()))
-            .collect(Collectors.toSet());
-        if (distinctStations.size() != totalStationSize) {
+    private void validateFirstStations(Set<Station> upStations) {
+        if (upStations.size() != 1) {
+            throw new IllegalStationsException("역들이 제대로 연결되지 않았습니다.");
+        }
+    }
+
+    private void validateDuplicateUpStation(List<StationPair> stationPairs) {
+        long distinctUpStationCount = stationPairs.stream()
+            .map(StationPair::getUpStation)
+            .distinct()
+            .count();
+        if (distinctUpStationCount != stationPairs.size()) {
             throw new IllegalStationsException("중복된 역은 노선에 포함될 수 없습니다.");
         }
     }
 
-    public List<Station> getStations() {
-        return Collections.unmodifiableList(stations);
+    private void validateDuplicateDownStation(List<StationPair> stationPairs) {
+        long distinctUpStationCount = stationPairs.stream()
+            .map(StationPair::getDownStation)
+            .distinct()
+            .count();
+        if (distinctUpStationCount != stationPairs.size()) {
+            throw new IllegalStationsException("중복된 역은 노선에 포함될 수 없습니다.");
+        }
     }
 
     @Override

@@ -71,7 +71,25 @@ class StationsTest {
 
         // when & then
         assertThatThrownBy(() -> new Stations(List.of(stationPair1, stationPair2)))
-            .hasMessage("동일한 역은 중복으로 포함될 수 없습니다.")
+            .hasMessage("역들이 제대로 연결되지 않았습니다.")
+            .isInstanceOf(IllegalStationsException.class);
+    }
+
+    @DisplayName("정상적으로 연결되지 않은 역이 존재할 경우 예외를 던진다.")
+    @Test
+    void createStationsUnconnectedStationExceptionTest() {
+        // given
+        Station upStation = new Station(1L, "범계");
+        Station downStation = new Station(2L, "장지");
+        Station unConnectedStation1 = new Station(3L, "잠실");
+        Station unConnectedStation2 = new Station(4L, "잠실나루");
+
+        StationPair stationPair1 = new StationPair(upStation, downStation);
+        StationPair stationPair2 = new StationPair(unConnectedStation1, unConnectedStation2);
+
+        // when & then
+        assertThatThrownBy(() -> new Stations(List.of(stationPair1, stationPair2)))
+            .hasMessage("역들이 제대로 연결되지 않았습니다.")
             .isInstanceOf(IllegalStationsException.class);
     }
 
