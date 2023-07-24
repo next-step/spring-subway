@@ -1,23 +1,24 @@
 package subway.domain;
 
-import org.springframework.util.Assert;
-
 import java.util.Objects;
+
+import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.Assert.notNull;
 
 public class Station {
 
+    private final String name;
     private Long id;
-    private String name;
 
-    public Station(final Long id, final String name) {
-        Assert.hasText(name, "이름은 필수입니다.");
-        Assert.notNull(id, "id는 null 일 수 없습니다");
-        this.id = id;
+    public Station(final String name) {
+        hasText(name, "이름은 필수입니다.");
         this.name = name;
     }
 
-    public Station(final String name) {
-        this.name = name;
+    public Station(final Long id, final String name) {
+        this(name);
+        notNull(id, "id는 필수입니다.");
+        this.id = id;
     }
 
     public Long getId() {

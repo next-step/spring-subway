@@ -1,20 +1,19 @@
 package subway.domain;
 
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
+import static org.springframework.util.Assert.isTrue;
 
 public class Sections {
     protected static final int MINIMUM_SIZE = 1;
     protected List<Section> sections;
 
     public Sections(final List<Section> sections) {
-        Assert.isTrue(sections.size() >= MINIMUM_SIZE, "노선에 등록된 구간은 반드시 한개 이상이어야합니다.");
+        isTrue(sections.size() >= MINIMUM_SIZE, "노선에 등록된 구간은 반드시 한개 이상이어야합니다.");
         this.sections = new ArrayList<>(sections);
     }
 
@@ -52,14 +51,14 @@ public class Sections {
         return sections.stream()
                 .filter(section -> section.getDownStation().equals(newSection.getDownStation()))
                 .findFirst()
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow(() -> new IllegalStateException("새로운 하행 구간과 매치되는 기존 하행 구간을 찾지 못했습니다."));
     }
 
     private Section findOriginSectionByUpStation(final Section newSection) {
         return sections.stream()
                 .filter(section -> section.getUpStation().equals(newSection.getUpStation()))
                 .findFirst()
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow(() -> new IllegalStateException("새로운 상행 구간과 매치되는 기존 상행 구간을 찾지 못했습니다."));
     }
 
     private void addNewSection(final Section newSection) {
@@ -76,9 +75,6 @@ public class Sections {
         sections.add(new Section(originSection.getId(), line, upStation, downStation, new Distance(distance)));
     }
 
-    /**
-     * @return 구간에 포함된 순서가 보장되지 않는 노선 정보들을 리턴합니다.
-     */
     public List<Station> toStations() {
         final List<Station> stations = getUpStations();
         stations.addAll(getDownStations());
@@ -87,7 +83,6 @@ public class Sections {
 
     public List<Section> getSections() {
         return sections.stream()
-                .map(Section::new)
                 .collect(toUnmodifiableList());
     }
 

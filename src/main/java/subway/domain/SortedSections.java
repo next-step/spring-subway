@@ -13,9 +13,6 @@ public class SortedSections extends Sections {
         this.sections = sort(sections);
     }
 
-    /**
-     * @return 구간에 포함된 순서가 보장된 노선 정보들을 리턴합니다.
-     */
     @Override
     public List<Station> toStations() {
         final List<Station> result = sections.stream()
@@ -56,11 +53,11 @@ public class SortedSections extends Sections {
 
     private Section findFirstSection(final List<Section> sections,
                                      final Map<Station, Section> downStationMap) {
-        Section pivot = sections.get(0);
-        while (downStationMap.containsKey(pivot.getUpStation())) {
-            pivot = downStationMap.get(pivot.getUpStation());
+        Section firstSection = sections.get(0);
+        while (downStationMap.containsKey(firstSection.getUpStation())) {
+            firstSection = downStationMap.get(firstSection.getUpStation());
         }
-        return pivot;
+        return firstSection;
     }
 
     private List<Section> sortedSections(final Map<Station, Section> upStationMap,

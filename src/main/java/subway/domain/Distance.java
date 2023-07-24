@@ -6,7 +6,7 @@ public class Distance {
 
     private static final long MIN_DISTANCE = 1L;
 
-    private long value;
+    private final long value;
 
     public Distance(final long distance) {
         validateDistanceValue(distance);

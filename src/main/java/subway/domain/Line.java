@@ -1,25 +1,26 @@
 package subway.domain;
 
-import org.springframework.util.Assert;
-
 import java.util.Objects;
+
+import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.Assert.notNull;
 
 public class Line {
 
+    private final String name;
+    private final String color;
     private Long id;
-    private String name;
-    private String color;
 
     public Line(final String name, final String color) {
-        Assert.hasText(name, "이름은 필수입니다.");
-        Assert.hasText(color, "색깔은 필수입니다.");
+        hasText(name, "이름은 필수입니다.");
+        hasText(color, "색깔은 필수입니다.");
         this.name = name;
         this.color = color;
     }
 
     public Line(final Long id, final String name, final String color) {
         this(name, color);
-        Assert.notNull(id, "id는 null 일 수 없습니다");
+        notNull(id, "id는 필수입니다.");
         this.id = id;
     }
 
