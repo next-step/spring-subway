@@ -5,14 +5,14 @@ import javax.validation.constraints.Positive;
 
 public class SectionRequest {
 
-    @NotNull
+    @NotNull(message = "상행역을 선택해주세요.")
     private Long upStationId;
 
-    @NotNull
+    @NotNull(message = "하행역을 선택해주세요.")
     private Long downStationId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "거리를 입력해주세요.")
+    @Positive(message = "거리는 양수여야합니다.")
     private Integer distance;
 
     public SectionRequest() {
