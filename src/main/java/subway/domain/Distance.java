@@ -17,8 +17,8 @@ public class Distance {
         }
     }
 
-    public int compareDistance(Distance otherDistance) {
-        return Integer.compare(this.distance, otherDistance.distance);
+    public boolean isOverDistance(Distance otherDistance) {
+        return this.distance <= otherDistance.distance;
     }
 
     public int subtract(Distance otherDistance) {

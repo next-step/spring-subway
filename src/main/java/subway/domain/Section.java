@@ -37,7 +37,7 @@ public class Section {
     }
 
     public boolean isOverDistance(Distance distance) {
-        return (this.distance.compareDistance(distance) <= 0);
+        return this.distance.isOverDistance(distance);
     }
 
     public Long getId() {
