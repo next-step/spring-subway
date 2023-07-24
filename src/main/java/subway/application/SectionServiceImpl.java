@@ -44,7 +44,7 @@ public class SectionServiceImpl implements SectionService {
                 .orElseThrow(() -> new StationNotFoundException(request.getDownStationId()));
         Distance distance = new Distance(request.getDistance());
 
-        preProcess(lineId, upStation, downStation, distance);
+        preProcessSaveSection(lineId, upStation, downStation, distance);
 
         Section section = new Section(
                 line,
@@ -56,7 +56,7 @@ public class SectionServiceImpl implements SectionService {
         return SectionResponse.from(result);
     }
 
-    private void preProcess(Long lineId, Station upStation, Station downStation,
+    private void preProcessSaveSection(Long lineId, Station upStation, Station downStation,
             Distance distance) {
         Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         Optional<Section> cuttedSection = sections.validateAndCutSectionIfExist(
