@@ -38,8 +38,8 @@ public class LineSections {
         }
     }
 
-    public Section removeLast(Station station) {
-        return sections.removeLast(station);
+    public SectionRemovalResult remove(Station station) {
+        return sections.remove(station);
     }
 
     public Line getLine() {

@@ -78,6 +78,7 @@ public class LineService {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    //Todo: 라인 삭제시 구간도 함께 삭제
     @Transactional
     public void deleteLineById(Long id) {
         lineDao.deleteById(id);

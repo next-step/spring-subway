@@ -88,8 +88,15 @@ public class Sections {
             return new SectionAdditionResult(null, List.of(getLast()));
         }
 
-        //Todo: 방어적 코드 짜기
-        return addSectionInMiddle(section);
+        if (isMiddleAddableSection(section)) {
+            return addSectionInMiddle(section);
+        }
+
+        throw new IllegalStateException("예상하지 못한 경우입니다.");
+    }
+
+    private boolean isMiddleAddableSection(Section section) {
+        return this.values.stream().anyMatch(value -> value.hasSameUpStationOrDownStation(section));
     }
 
     private void validateOnlyOneStationIncludedInSections(Section section) {
@@ -207,25 +214,6 @@ public class Sections {
 
     private Section removeLast() {
         return values.remove(values.size() - 1);
-    }
-
-    /**
-     * @deprecated
-     * why: 제거 기능 개선으로인한 삭제 예정
-     *
-     */
-    @Deprecated(forRemoval=true)
-    public Section removeLast(Station station) {
-        validateFinalDownStationSameAs(station);
-
-        return values.remove(values.size() - 1);
-    }
-
-    private void validateFinalDownStationSameAs(Station station) {
-        if (!getLast().hasDownStationSameAs(station)) {
-            throw new IllegalArgumentException(
-                "삭제할 역이 해당 노선의 하행종점역이 아닙니다 요청 station: " + station + " 하행 종점 구간 : " + getLast());
-        }
     }
 
     private void validateMinSectionSize() {
