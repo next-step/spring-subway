@@ -54,7 +54,7 @@ public class LineController {
     public ResponseEntity<SectionResponse> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         SectionResponse sectionResponse = sectionService.saveSection(id, sectionRequest);
         return ResponseEntity
-                .created(URI.create("/sections/" + sectionResponse.getId()))
+                .created(URI.create("/lines/" + id + "/sections/" + sectionResponse.getId()))
                 .body(sectionResponse);
     }
 
