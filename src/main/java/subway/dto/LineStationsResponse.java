@@ -7,11 +7,15 @@ import java.util.List;
 
 public class LineStationsResponse {
 
-    private final LineResponse lineResponse;
+    private final Long id;
+    private final String name;
+    private final String color;
     private final List<Station> stations;
 
     public LineStationsResponse(final Long id, final String name, final String color, final List<Station> stations) {
-        this.lineResponse = new LineResponse(id, name, color);
+        this.id = id;
+        this.name = name;
+        this.color = color;
         this.stations = stations;
     }
 
@@ -19,8 +23,16 @@ public class LineStationsResponse {
         return new LineStationsResponse(line.getId(), line.getName(), line.getColor(), stations);
     }
 
-    public LineResponse getLineResponse() {
-        return lineResponse;
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
     }
 
     public List<Station> getStations() {

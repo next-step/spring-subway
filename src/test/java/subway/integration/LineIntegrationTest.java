@@ -142,7 +142,7 @@ class LineIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineStationsResponse resultResponse = response.as(LineStationsResponse.class);
-        assertThat(resultResponse.getLineResponse().getId()).isEqualTo(lineId);
+        assertThat(resultResponse.getId()).isEqualTo(lineId);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
