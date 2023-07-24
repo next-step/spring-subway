@@ -18,8 +18,8 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
 
-@DisplayName("지하철 노선 관련 기능")
-public class LineIntegrationTest extends IntegrationTest {
+@DisplayName("지하철 노선 관련 기능 인수 테스트")
+class LineIntegrationTest extends IntegrationTest {
 
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
@@ -202,6 +202,25 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    @DisplayName("없는 지하철 노선을 수정 시 예외 발샐")
+    @Test
+    void updateLineNotFound() {
+        // given
+        Long lineId = 99999L;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest2)
+                .when().put("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteLine() {
@@ -224,5 +243,22 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("없는 지하철 노선을 제거 시 예외발생")
+    @Test
+    void deleteLineNotFound() {
+        // given
+        Long lineId = 99999L;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }

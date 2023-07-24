@@ -68,8 +68,7 @@ public class LineServiceImpl implements LineService {
 
     @Override
     public LineWithStationsResponse findLineResponseById(Long id) {
-        Line persistLine = lineDao.findById(id)
-                .orElseThrow(() -> new LineNotFoundException(id));
+        Line persistLine = findLineOrThrow(id);
         List<Section> sectionList = sectionDao.findAllByLineId(id);
         Sections sections = new Sections(sectionList);
         return LineWithStationsResponse.of(persistLine, sections.toStations());
@@ -78,12 +77,19 @@ public class LineServiceImpl implements LineService {
     @Override
     @Transactional
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
+        findLineOrThrow(id);
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
     @Override
     @Transactional
     public void deleteLineById(Long id) {
+        findLineOrThrow(id);
         lineDao.deleteById(id);
+    }
+
+    private Line findLineOrThrow(Long id) {
+        return lineDao.findById(id)
+                .orElseThrow(() -> new LineNotFoundException(id));
     }
 }

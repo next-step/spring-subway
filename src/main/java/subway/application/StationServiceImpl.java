@@ -35,8 +35,7 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id)
-                .orElseThrow(() -> new StationNotFoundException(id)));
+        return StationResponse.of(findStationOrThrow(id));
     }
 
     @Override
@@ -51,12 +50,18 @@ public class StationServiceImpl implements StationService {
     @Override
     @Transactional
     public void updateStation(Long id, StationRequest stationRequest) {
+        findStationOrThrow(id);
         stationDao.update(new Station(id, stationRequest.getName()));
     }
 
     @Override
     @Transactional
     public void deleteStationById(Long id) {
+        findStationOrThrow(id);
         stationDao.deleteById(id);
+    }
+
+    private Station findStationOrThrow(Long id) {
+        return stationDao.findById(id).orElseThrow(() -> new StationNotFoundException(id));
     }
 }

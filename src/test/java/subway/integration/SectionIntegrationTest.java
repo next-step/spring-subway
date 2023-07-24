@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.SectionRequest;
 
-@DisplayName("지하철 구간 관련 기능")
+@DisplayName("지하철 구간 관련 기능 인수 테스트")
 class SectionIntegrationTest extends IntegrationTest {
 
     private Long lineId;

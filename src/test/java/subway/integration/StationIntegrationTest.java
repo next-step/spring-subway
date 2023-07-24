@@ -17,8 +17,8 @@ import org.springframework.http.MediaType;
 import subway.dto.ErrorResponse;
 import subway.dto.StationResponse;
 
-@DisplayName("지하철역 관련 기능")
-public class StationIntegrationTest extends IntegrationTest {
+@DisplayName("지하철역 관련 기능 인수테스트")
+class StationIntegrationTest extends IntegrationTest {
 
     @DisplayName("지하철역을 생성한다.")
     @Test
@@ -189,6 +189,27 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    @DisplayName("없는 지하철역을 수정할 시 예외발생")
+    @Test
+    void updateStationNotFound() {
+        // given
+        String uri = "/stations/99999";
+        Map<String, String> otherParams = new HashMap<>();
+        otherParams.put("name", "삼성역");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(otherParams)
+                .when()
+                .put(uri)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
@@ -213,5 +234,22 @@ public class StationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("없는 지하철역을 제거 시 예외 발생")
+    @Test
+    void deleteStationNotFound() {
+        // given
+        String uri = "/stations/99999";
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }
