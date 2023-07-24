@@ -18,15 +18,21 @@ import subway.dto.StationRequest;
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
 
-    private StationRequest stationRequest;
-    private SectionRequest sectionRequest;
+    private StationRequest stationRequest1;
+    private StationRequest stationRequest2;
+
+    private SectionRequest sectionRequest1;
+    private SectionRequest sectionRequest2;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        stationRequest = new StationRequest("서울");
-        sectionRequest = new SectionRequest( "2", "3",10);
+        stationRequest1 = new StationRequest("서울");
+        stationRequest2 = new StationRequest("동묘앞");
+
+        sectionRequest1 = new SectionRequest( "2", "3",10);
+        sectionRequest2 =  new SectionRequest("3", "4", 10);
     }
 
     @DisplayName("지하철 구간을 생성한다.")
@@ -35,13 +41,13 @@ class SectionIntegrationTest extends IntegrationTest {
         // given
         createInitialLine();
 
-        RestApi.post(stationRequest, "stations");
+        RestApi.post(stationRequest1, "stations");
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
+                .body(sectionRequest1)
                 .when().post("/lines/1/sections")
                 .then().log().all()
                 .extract();
@@ -59,7 +65,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionWithUnmatchedLineId() {
         // when
-        ExtractableResponse<Response> response = RestApi.post(sectionRequest,
+        ExtractableResponse<Response> response = RestApi.post(sectionRequest1,
             "/lines/1/sections");
 
         // then
@@ -94,14 +100,15 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("지하철 구간을 삭제한다.")
+    @DisplayName("지하철 중간 구간을 삭제한다.")
     @Test
-    void deleteSection() {
+    void deleteMiddleSection() {
         // given
         createInitialLine();
-
-        RestApi.post(stationRequest, "/stations");
-        RestApi.post(sectionRequest, "/lines/1/sections");
+        RestApi.post(stationRequest1, "/stations");
+        RestApi.post(stationRequest2, "/stations");
+        RestApi.post(sectionRequest1, "/lines/1/sections");
+        RestApi.post(sectionRequest2, "/lines/1/sections");
 
         // when
         ExtractableResponse<Response> response = RestApi.delete("/lines/1/sections?stationId=3");
@@ -110,20 +117,21 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @DisplayName("지하철 노선의 하행 종점역이 아닐 때 구간 제거 실패")
+    @DisplayName("지하철 종점 구간을 삭제한다.")
     @Test
-    void deleteSectionWithNotLastStation() {
+    void deleteLastSection() {
         // given
         createInitialLine();
-
-        RestApi.post(stationRequest, "/stations");
-        RestApi.post(sectionRequest, "/lines/1/sections");
+        RestApi.post(stationRequest1, "/stations");
+        RestApi.post(stationRequest2, "/stations");
+        RestApi.post(sectionRequest1, "/lines/1/sections");
+        RestApi.post(sectionRequest2, "/lines/1/sections");
 
         // when
-        ExtractableResponse<Response> response = RestApi.delete("/lines/1/sections?stationId=1");
+        ExtractableResponse<Response> response = RestApi.delete("/lines/1/sections?stationId=4");
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("지하철 노선에 구간이 1개일 때 구간 제거 실패")
