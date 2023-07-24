@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
 import subway.dto.StationResponse;
 
@@ -24,6 +25,16 @@ public class CreateHelper {
         return stations.jsonPath().getList(".", StationResponse.class).stream()
                 .map(StationResponse::getId)
                 .collect(Collectors.toList());
+    }
+
+    public static int getStationCountInLine(final Long lineId) {
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/lines/" + lineId)
+                .then().log().all()
+                .extract();
+        return response.jsonPath().getObject(".", LineStationsResponse.class)
+                .getStations().size();
     }
 
     public static void createSection(List<Long> stationIds, int index, int index1, Long lineId) {

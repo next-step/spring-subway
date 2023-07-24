@@ -100,15 +100,13 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createNotSame() {
         // given
-        CreateHelper.createStation("강남역");
-        CreateHelper.createStation("역삼역");
         CreateHelper.createStation("잠실역");
         CreateHelper.createStation("강변역");
         Long lineId = CreateHelper.createLine("2호선", "bg-123");
 
         List<Long> stationIds = CreateHelper.getStationIds();
 
-        SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(0), 10);
+        SectionRequest params = new SectionRequest(stationIds.get(2), stationIds.get(3), 10);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -123,9 +121,53 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    @DisplayName("지하철 구간을 제거한다.")
+    @DisplayName("상행 종점역을 제거한다.")
     @Test
-    void deleteSection() {
+    void deleteUpEndStation() {
+        // given
+        CreateHelper.createStation("잠실역");
+        Long lineId = CreateHelper.createLine("2호선", "bg-123");
+
+        List<Long> stationIds = CreateHelper.getStationIds();
+        CreateHelper.createSection(stationIds, 1, 2, lineId);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationIds.get(0))
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(CreateHelper.getStationCountInLine(lineId)).isEqualTo(2);
+    }
+
+    @DisplayName("중간역을 제거한다.")
+    @Test
+    void deleteMidStation() {
+        // given
+        CreateHelper.createStation("잠실역");
+        Long lineId = CreateHelper.createLine("2호선", "bg-123");
+
+        List<Long> stationIds = CreateHelper.getStationIds();
+        CreateHelper.createSection(stationIds, 1, 2, lineId);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationIds.get(1))
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(CreateHelper.getStationCountInLine(lineId)).isEqualTo(2);
+    }
+
+    @DisplayName("하행 종점역을 제거한다.")
+    @Test
+    void deleteDownEndStation() {
         // given
         CreateHelper.createStation("잠실역");
         Long lineId = CreateHelper.createLine("2호선", "bg-123");
@@ -143,5 +185,6 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(CreateHelper.getStationCountInLine(lineId)).isEqualTo(2);
     }
 }
