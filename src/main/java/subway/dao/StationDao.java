@@ -1,5 +1,6 @@
 package subway.dao;
 
+import java.util.Collections;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -40,6 +41,17 @@ public class StationDao {
     public List<Station> findAll() {
         final String sql = "select * from STATION";
         return jdbcTemplate.query(sql, rowMapper);
+    }
+
+    public List<Station> findAllByStationIdIn(final List<Long> stationIds) {
+        if (stationIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String in = String.join(", ", Collections.nCopies(stationIds.size(), "?"));
+        final String sql = String.format("select id, name from STATION where id in (%s)", in);
+
+        return jdbcTemplate.query(sql, rowMapper, stationIds.toArray());
     }
 
     public Station findById(final Long id) {
