@@ -1,7 +1,6 @@
 package subway.domain;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,16 +19,8 @@ public class Sections {
     private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
 
     private final List<Section> sections;
-    private final Set<Station> upStations;
-    private final Set<Station> downStations;
 
     public Sections(final List<Section> sections) {
-        this.upStations = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
-        this.downStations = sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet());
         this.sections = sorted(sections);
     }
 
@@ -61,7 +52,7 @@ public class Sections {
     private List<Section> combineUnsortedSections(final List<Section> sections, final Map<Station, Section> stationToSection) {
         List<Section> sortedSection = new ArrayList<>();
 
-        Section nextSection = findByUpStation(sections, findFirstStation());
+        Section nextSection = findByUpStation(sections, findFirstStation(sections));
         sortedSection.add(nextSection);
 
         for (int i = 1; i < sections.size(); i++) {
@@ -80,9 +71,9 @@ public class Sections {
                 .orElseThrow(() -> new IllegalStateException(CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
     }
 
-    private Station findFirstStation() {
-        Set<Station> endUpStations = new HashSet<>(this.upStations);
-        endUpStations.removeAll(downStations);
+    private Station findFirstStation(final List<Section> sections) {
+        Set<Station> endUpStations = createUpStations(sections);
+        endUpStations.removeAll(createDownStations(sections));
 
         if (endUpStations.size() > 1) {
             throw new IllegalStateException(TWO_MORE_START_STATION_EXCEPTION_MESSAGE);
@@ -100,8 +91,8 @@ public class Sections {
     }
 
     public boolean isInsertedMiddle(final Section newSection) {
-        boolean containsUpStation = this.upStations.contains(newSection.getUpStation());
-        boolean containsDownStation = this.downStations.contains(newSection.getDownStation());
+        boolean containsUpStation = createUpStations(this.sections).contains(newSection.getUpStation());
+        boolean containsDownStation = createDownStations(this.sections).contains(newSection.getDownStation());
 
         return containsUpStation || containsDownStation;
     }
@@ -120,10 +111,22 @@ public class Sections {
     }
 
     public Section oldSection(final Section newSection) {
-        return sections.stream()
+        return this.sections.stream()
                 .filter(section -> section.isSameUpStation(newSection) || section.isSameDownStation(newSection))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    private Set<Station> createUpStations(final List<Section> sections) {
+        return sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Station> createDownStations(final List<Section> sections) {
+        return sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet());
     }
 
     public List<Station> toStations() {
@@ -136,8 +139,8 @@ public class Sections {
     }
 
     public void validateInsert(final Section newSection) {
-        Set<Station> allStations = new HashSet<>(upStations);
-        allStations.addAll(downStations);
+        Set<Station> allStations = createUpStations(this.sections);
+        allStations.addAll(createDownStations(this.sections));
 
         boolean hasUpStation = allStations.contains(newSection.getUpStation());
         boolean hasDownStation = allStations.contains(newSection.getDownStation());
