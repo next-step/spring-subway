@@ -110,11 +110,15 @@ public class Sections {
     }
 
     public void validateDelete(final Station lastStation) {
-        if (this.sections.size() <= 1) {
-            throw new InternalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
-        }
+        validateAtLeastOneSection();
         if (!lastSection().getDownStation().equals(lastStation)) {
             throw new IncorrectRequestException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
+        }
+    }
+
+    private void validateAtLeastOneSection() {
+        if (this.sections.size() <= 1) {
+            throw new InternalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
         }
     }
 
@@ -140,18 +144,5 @@ public class Sections {
         if (endStations.size() > 1) {
             throw new InternalStateException(TWO_MORE_START_STATION_EXCEPTION_MESSAGE);
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Sections sections1 = (Sections) o;
-        return Objects.equals(sections, sections1.sections);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sections);
     }
 }
