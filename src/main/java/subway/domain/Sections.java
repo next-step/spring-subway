@@ -75,7 +75,7 @@ public class Sections {
 
     private Section findByUpStation(final List<Section> sections, final Station upStation) {
         return sections.stream()
-                .filter(section -> section.getUpStation().equals(upStation))
+                .filter(section -> section.isSameUpStation(upStation))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
     }
