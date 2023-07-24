@@ -35,15 +35,6 @@ public class SectionServiceImpl implements SectionService {
     @Override
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
-        Section section = validateAndMakeSectionObject(lineId, request);
-
-        preprocessSaveSection(section);
-
-        Section result = sectionDao.insert(section);
-        return SectionResponse.from(result);
-    }
-
-    private Section validateAndMakeSectionObject(Long lineId, SectionRequest request) {
         Line line = lineDao.findById(lineId)
                 .orElseThrow(() -> new LineNotFoundException(lineId));
         Station upStation = stationDao.findById(request.getUpStationId())
@@ -51,68 +42,25 @@ public class SectionServiceImpl implements SectionService {
         Station downStation = stationDao.findById(request.getDownStationId())
                 .orElseThrow(() -> new StationNotFoundException(request.getDownStationId()));
         Distance distance = new Distance(request.getDistance());
-        return new Section(
+
+        preProcess(lineId, upStation, downStation, distance);
+
+        Section section = new Section(
                 line,
                 upStation,
                 downStation,
                 distance);
+
+        Section result = sectionDao.insert(section);
+        return SectionResponse.from(result);
     }
 
-    private void preprocessSaveSection(Section section) {
-        if (!sectionDao.existByLineId(section.getLineId())) {
-            return;
-        }
-
-        boolean isUpStationInLine = sectionDao.existByLineIdAndStationId(section.getLineId(),
-                section.getUpStationId());
-        boolean isDownStationInLine = sectionDao.existByLineIdAndStationId(section.getLineId(),
-                section.getDownStationId());
-
-        validateBothExistOrNot(isUpStationInLine, isDownStationInLine);
-
-        updateOriginalSectionIfExist(section, isUpStationInLine, isDownStationInLine);
-    }
-
-    private void updateOriginalSectionIfExist(
-            Section section,
-            boolean isUpStationInLine,
-            boolean isDownStationInLine) {
-        if (isUpStationInLine) {
-            optionalSectionWithUpStation(section).ifPresent(
-                    originalSection -> updateOriginalSection(section, originalSection));
-        }
-
-        if (isDownStationInLine) {
-            optionalSectionWithDownStation(section).ifPresent(
-                    originalSection -> updateOriginalSection(section, originalSection));
-        }
-    }
-
-    private void validateBothExistOrNot(boolean isUpStationInLine, boolean isDownStationInLine) {
-        if (!isUpStationInLine && !isDownStationInLine) {
-            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
-        }
-
-        if (isUpStationInLine && isDownStationInLine) {
-            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
-        }
-    }
-
-    private Optional<Section> optionalSectionWithUpStation(Section section) {
-        return sectionDao.findByLineIdAndUpStationId(
-                section.getLineId(),
-                section.getUpStationId());
-    }
-
-    private Optional<Section> optionalSectionWithDownStation(Section section) {
-        return sectionDao.findByLineIdAndDownStationId(
-                section.getLineId(),
-                section.getDownStationId());
-    }
-
-    private void updateOriginalSection(Section section, Section originalSection) {
-        Section generatedSection = originalSection.cuttedSection(section);
-        sectionDao.update(generatedSection);
+    private void preProcess(Long lineId, Station upStation, Station downStation,
+            Distance distance) {
+        Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
+        Optional<Section> cuttedSection = sections.validateAndGetCuttedSection(
+                upStation, downStation, distance);
+        cuttedSection.ifPresent(sectionDao::update);
     }
 
     @Override

@@ -1,10 +1,11 @@
 package subway.domain;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Sections {
@@ -21,31 +22,19 @@ public class Sections {
             return List.of();
         }
 
-        Map<Station, Section> upStationMap = initializeUpStationMap(
-                sections);
+        Map<Station, Section> upStationMap = sections.stream().collect(Collectors.toMap(
+                Section::getUpStation,
+                Function.identity()
+        ));
 
-        Map<Station, Section> downStationMap = initializeDownStationMap(
-                sections);
+        Map<Station, Section> downStationMap = sections.stream().collect(Collectors.toMap(
+                Section::getDownStation,
+                Function.identity()
+        ));
 
         Section firstSection = findFirstSection(sections, downStationMap);
 
         return sortedSections(upStationMap, firstSection);
-    }
-
-    private static Map<Station, Section> initializeUpStationMap(List<Section> sections) {
-        Map<Station, Section> upStationMap = new HashMap<>();
-        for (Section section : sections) {
-            upStationMap.put(section.getUpStation(), section);
-        }
-        return upStationMap;
-    }
-
-    private static Map<Station, Section> initializeDownStationMap(List<Section> sections) {
-        Map<Station, Section> downStationMap = new HashMap<>();
-        for (Section section : sections) {
-            downStationMap.put(section.getDownStation(), section);
-        }
-        return downStationMap;
     }
 
     private static Section findFirstSection(List<Section> sections,
@@ -116,5 +105,52 @@ public class Sections {
         return "Sections{" +
                 "sections=" + sections +
                 '}';
+    }
+
+    public boolean existStation(Station station) {
+        return this.toStations().contains(station);
+    }
+
+    public Optional<Section> validateAndGetCuttedSection(Station upStation, Station downStation,
+            Distance distance) {
+        if (sections.isEmpty()) {
+            return Optional.empty();
+        }
+
+        boolean isUpStationInLine = existStation(upStation);
+        boolean isDownStationInLine = existStation(downStation);
+
+        if (!isUpStationInLine && !isDownStationInLine) {
+            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
+        }
+
+        if (isUpStationInLine && isDownStationInLine) {
+            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
+        }
+
+        if (isUpStationInLine) {
+            Optional<Section> originalSection = sections.stream()
+                    .filter(section -> section.getUpStation().equals(upStation))
+                    .findFirst();
+            if (originalSection.isPresent()) {
+                Section generatedSection = originalSection.get()
+                        .cuttedSection(upStation, downStation,
+                                distance);
+                return Optional.of(generatedSection);
+            }
+        }
+        if (isDownStationInLine) {
+            Optional<Section> originalSection = sections.stream()
+                    .filter(section -> section.getDownStation().equals(downStation))
+                    .findFirst();
+            if (originalSection.isPresent()) {
+                Section generatedSection = originalSection.get()
+                        .cuttedSection(upStation, downStation,
+                                distance);
+                return Optional.of(generatedSection);
+            }
+        }
+
+        return Optional.empty();
     }
 }

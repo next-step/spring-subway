@@ -55,6 +55,36 @@ public class Section {
         throw new IllegalArgumentException("상행역과 하행역 중 하나는 같아야 합니다.");
     }
 
+    public Section cuttedSection(Station upStation, Station downStation, Distance distance) {
+        validateDistance(distance);
+
+        if (this.upStation.equals(upStation)) {
+            return new Section(
+                    this.id,
+                    this.line,
+                    downStation,
+                    this.downStation,
+                    new Distance(this.getDistance() - distance.getValue()));
+        }
+
+        if (this.downStation.equals(downStation)) {
+            return new Section(
+                    this.id,
+                    this.line,
+                    this.upStation,
+                    upStation,
+                    new Distance(this.getDistance() - distance.getValue()));
+        }
+
+        throw new IllegalArgumentException("상행역과 하행역 중 하나는 같아야 합니다.");
+    }
+
+    private void validateDistance(Distance distance) {
+        if (this.getDistance() <= distance.getValue()) {
+            throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
+        }
+    }
+
     private void validateDistance(Section section) {
         if (this.getDistance() <= section.getDistance()) {
             throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
