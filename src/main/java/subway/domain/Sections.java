@@ -140,6 +140,7 @@ public class Sections {
     }
 
     public SectionRemovalResult remove(Station station) {
+        validateExistsInSections(station);
         validateMinSectionSize();
 
         if (isFinalUpStation(station)) {
@@ -155,6 +156,12 @@ public class Sections {
         }
 
         throw new IllegalStateException("예상하지 못한 경우입니다.");
+    }
+
+    private void validateExistsInSections(Station station) {
+        if (!isStationExists(station)) {
+            throw new IllegalArgumentException("삭제할 역이 노선 내에 존재하지 않습니다. 삭제할 역: " + station);
+        }
     }
 
     private SectionRemovalResult removeMiddleStation(Station station) {

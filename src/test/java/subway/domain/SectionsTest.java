@@ -76,6 +76,18 @@ class SectionsTest {
     }
 
     @Test
+    @DisplayName("삭제할 역이 구간들 내에 없는경우 삭제할 수 없다")
+    void cannotRemoveStationNotInSections() {
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Section section = new Section(lineA, stationA, stationB, 1);
+        Sections sections = new Sections(List.of(section));
+
+        assertThatThrownBy(() -> sections.remove(stationC))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     @DisplayName("구간이 1개인 경우 구간을 삭제할 수 없다")
     void cannotRemoveOneSizeSections() {
         Station stationA = new Station(1L, "A");
