@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.util.Assert;
+import subway.domain.response.SectionDisconnectResponse;
 
 public class Line {
 
@@ -108,6 +109,18 @@ public class Line {
 
         upSection.disconnectDownSection();
         sections.remove(downSection);
+    }
+
+    public SectionDisconnectResponse disconnectSection(Station station) {
+        Assert.isTrue(sections.size() > MIN_DELETABLE_SIZE, () -> "line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.");
+        Section downSection = sections.get(0).findDownSection();
+
+        Section upSection = downSection.getUpSection();
+
+        SectionDisconnectResponse sectionDisconnectResponse = upSection.disconnectStation(station);
+        sections.remove(sectionDisconnectResponse.getDeletedSection());
+
+        return sectionDisconnectResponse;
     }
 
     public Long getId() {

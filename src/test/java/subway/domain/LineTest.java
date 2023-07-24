@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import subway.domain.response.SectionDisconnectResponse;
 
 @DisplayName("Line 클래스")
 class LineTest {
@@ -220,6 +221,98 @@ class LineTest {
 
             // then
             assertThat(result).containsExactly(upStation, middleStation, downStation);
+        }
+    }
+
+    @Nested
+    @DisplayName("disconnectSection 메소드는")
+    class DisconnectSection_Method {
+
+        @Test
+        @DisplayName("line의 하행 Station과 일치하는 Station이 들어오면 연결을 끊는다")
+        void Disconnect_Section_When_Matched_Up_Station() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
+            line.connectSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = line.disconnectSection(downStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isNull();
+            assertThat(result.getUpdatedSections()).containsExactly(upSection);
+            assertThat(result.getDeletedSection()).isEqualTo(downSection);
+        }
+
+        @Test
+        @DisplayName("line에 구간이 하나만 있다면, IllegalArgumentException을 던진다")
+        void Throw_IllegalArgumentException_When_Line_Size_1() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, downStation);
+
+            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
+
+            // when
+            Exception exception = catchException(() -> line.disconnectSection(downStation));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("Line의 상행 Station과 일치하는 Station이 들어오면 연결을 끊는다.")
+        void Disconnect_Section_When_Matched_Down_Station() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
+            line.connectSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = line.disconnectSection(upStation);
+
+            // then
+            assertThat(downSection.getUpSection()).isNull();
+            assertThat(result.getUpdatedSections()).containsExactly(downSection);
+            assertThat(result.getDeletedSection()).isEqualTo(upSection);
+        }
+
+        @Test
+        @DisplayName("Line의 중간 Station과 일치하는 Station이 들어오면 연결을 끊는다.")
+        void Disconnect_Section_When_Matched_Middle_Station() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(3L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
+            line.connectSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = line.disconnectSection(middleStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isNull();
+            assertThat(result.getUpdatedSections()).containsExactly(upSection);
+            assertThat(result.getDeletedSection()).isEqualTo(downSection);
         }
     }
 }
