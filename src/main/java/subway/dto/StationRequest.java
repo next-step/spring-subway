@@ -1,18 +1,26 @@
 package subway.dto;
 
-import org.springframework.util.Assert;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import subway.exception.IllegalRequestException;
 
-public class StationRequest {
+public final class StationRequest {
 
     private String name;
 
-    public StationRequest() {
+    private StationRequest() {
     }
 
+    @JsonCreator
     public StationRequest(final String name) {
-        Assert.notNull(name, "이름을 입력해야 합니다.");
+        validateName(name);
 
         this.name = name;
+    }
+
+    private void validateName(final String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalRequestException("역의 이름은 최소 한 글자 이상이어야 합니다.");
+        }
     }
 
     public String getName() {
