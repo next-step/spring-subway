@@ -92,27 +92,6 @@ public class Sections {
         return addSectionInMiddle(section);
     }
 
-    private void addLast(Section section) {
-        this.values.add(section);
-    }
-
-    private SectionAdditionResult addSectionInMiddle(Section section) {
-        Section foundSection = findMatchedSection(section);
-        List<Section> sectionsToAdd = foundSection.mergeSections(section);
-
-        this.values.addAll(this.values.indexOf(foundSection), sectionsToAdd);
-        this.values.remove(foundSection);
-
-        return new SectionAdditionResult(foundSection, sectionsToAdd);
-    }
-
-    private Section findMatchedSection(Section section) {
-        return this.values.stream()
-            .filter(value -> value.hasSameUpStationOrDownStation(section))
-            .findAny()
-            .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다."));
-    }
-
     private void validateOnlyOneStationIncludedInSections(Section section) {
         checkBothStationsInLine(section);
         checkNoneOfStationsInLine(section);
@@ -128,6 +107,27 @@ public class Sections {
         if (!isStationExists(section.getUpStation()) && !isStationExists(section.getDownStation())) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다. upStation: " + section.getUpStation() + " downStation: " + section.getDownStation());
         }
+    }
+
+    private void addLast(Section section) {
+        this.values.add(section);
+    }
+
+    private SectionAdditionResult addSectionInMiddle(Section section) {
+        Section foundSection = findMatchedSectionWithAnyStation(section);
+        List<Section> sectionsToAdd = foundSection.mergeSections(section);
+
+        this.values.addAll(this.values.indexOf(foundSection), sectionsToAdd);
+        this.values.remove(foundSection);
+
+        return new SectionAdditionResult(foundSection, sectionsToAdd);
+    }
+
+    private Section findMatchedSectionWithAnyStation(Section section) {
+        return this.values.stream()
+            .filter(value -> value.hasSameUpStationOrDownStation(section))
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다."));
     }
 
     private boolean isStationExists(Station upStation) {
@@ -147,37 +147,43 @@ public class Sections {
         }
 
         if (isFinalDownStation(station)) {
-            return new SectionRemovalResult(null, List.of(removeLast2()));
+            return new SectionRemovalResult(null, List.of(removeLast()));
         }
 
         if (isMiddleStation(station)) {
-            Section matchedSection = findMatchedSectionSameDownStation(station);
-            Section nextSection = this.values.get(this.values.indexOf(matchedSection) + 1);
-
-            Section connectedSection = matchedSection.connect(nextSection);
-
-            this.values.add(this.values.indexOf(matchedSection), connectedSection);
-            List<Section> sectionToRemove = List.of(matchedSection, nextSection);
-            this.values.removeAll(sectionToRemove);
-
-            return new SectionRemovalResult(connectedSection, sectionToRemove);
+            return removeMiddleStation(station);
         }
 
-        throw new IllegalStateException("여기 오면 안되는데? ^^");
+        throw new IllegalStateException("예상하지 못한 경우입니다.");
+    }
+
+    private SectionRemovalResult removeMiddleStation(Station station) {
+        Section matchedSection = findMatchedSectionSameDownStation(station);
+        Section nextSection = findNextSectionOf(matchedSection);
+
+        Section connectedSection = matchedSection.connect(nextSection);
+        this.values.add(this.values.indexOf(matchedSection), connectedSection);
+
+        List<Section> sectionToRemove = List.of(matchedSection, nextSection);
+        this.values.removeAll(sectionToRemove);
+        return new SectionRemovalResult(connectedSection, sectionToRemove);
+    }
+
+    private Section findMatchedSectionSameDownStation(Station station) {
+        return this.values.stream()
+            .filter(section -> section.hasDownStationSameAs(station))
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다"));
+    }
+
+    private Section findNextSectionOf(Section matchedSection) {
+        return this.values.get(this.values.indexOf(matchedSection) + 1);
     }
 
     private boolean isMiddleStation(Station station) {
         return this.values.stream()
             .anyMatch(section -> section.hasDownStationSameAs(station)) &&
                 !getLast().hasDownStationSameAs(station);
-    }
-
-    //Todo:네이밍 고려
-    private Section findMatchedSectionSameDownStation(Station station) {
-        return this.values.stream()
-            .filter(section -> section.hasDownStationSameAs(station))
-            .findAny()
-            .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다"));
     }
 
     private boolean isFinalUpStation(Station station) {
@@ -192,11 +198,16 @@ public class Sections {
         return values.remove(0);
     }
 
-    private Section removeLast2() {
+    private Section removeLast() {
         return values.remove(values.size() - 1);
     }
 
-    @Deprecated
+    /**
+     * @deprecated
+     * why: 제거 기능 개선으로인한 삭제 예정
+     *
+     */
+    @Deprecated(forRemoval=true)
     public Section removeLast(Station station) {
         validateFinalDownStationSameAs(station);
 

@@ -54,7 +54,6 @@ public class Section {
             station);
     }
 
-    //Todo: 네이밍 다시 볼것
     public boolean containsDownStationOf(Section section) {
         return this.upStation.equals(section.downStation) || this.downStation.equals(
             section.downStation);
