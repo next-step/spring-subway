@@ -14,7 +14,6 @@ public class Sections {
     private static final String DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE = "마지막 구간만 삭제할 수 있습니다.";
     private static final String TWO_MORE_START_STATION_EXCEPTION_MESSAGE = "상행 종점역이 두 개 이상입니다.";
     private static final String CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE = "상행 종점역을 찾을 수 없습니다.";
-    private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
 
     private final List<Section> sections;
     private final Set<Station> upStations;
@@ -64,19 +63,7 @@ public class Sections {
         return this.sections.get(this.sections.size() - 1);
     }
 
-    public Section createConnectedSection(final Section overlappedSection, final Section newSection) {
-        validateDistance(overlappedSection, newSection);
-        Distance reducedDistance = overlappedSection.distanceDifference(newSection);
-
-        if (overlappedSection.isSameUpStation(newSection)) {
-            return new Section(newSection.getDownStation(), overlappedSection.getDownStation(), reducedDistance);
-        }
-
-        return new Section(overlappedSection.getUpStation(), newSection.getUpStation(), reducedDistance);
-
-    }
-
-    public Section overlappedSection(final Section newSection) {
+    public Section findOverlappedSection(final Section newSection) {
         return sections.stream()
                 .filter(section -> section.isSameUpStation(newSection) || section.isSameDownStation(newSection))
                 .findFirst()
@@ -119,12 +106,6 @@ public class Sections {
     private void validateAtLeastOneSection() {
         if (this.sections.size() <= 1) {
             throw new InternalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
-        }
-    }
-
-    private void validateDistance(final Section oldSection, final Section newSection) {
-        if (oldSection.shorterOrEqualTo(newSection)) {
-            throw new IncorrectRequestException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
         }
     }
 

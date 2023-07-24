@@ -78,11 +78,14 @@ public class LineService {
         sections.validateInsert(newSection);
 
         if (sections.isInsertedMiddle(newSection)) {
-            Section overlappedSection = sections.overlappedSection(newSection);
-            sectionDao.deleteById(overlappedSection.getId());
-            sectionDao.insert(sections.createConnectedSection(overlappedSection, newSection), lineId);
+            Section overlappedSection = sections.findOverlappedSection(newSection);
+            updateOverlappedSection(lineId, newSection, overlappedSection);
         }
         sectionDao.insert(newSection, lineId);
+    }
+
+    private void updateOverlappedSection(final Long lineId, final Section newSection, final Section overlappedSection) {
+        sectionDao.update(overlappedSection.subtractWith(newSection), lineId);
     }
 
     @Transactional

@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
@@ -54,8 +55,11 @@ public class SectionDao {
                 station.getId(), lineId);
     }
 
-    public void deleteById(final Long id) {
-        String sql = "delete from SECTION where id = ?";
-        jdbcTemplate.update(sql, id);
+    public void update(final Section newSection, final Long lineId) {
+        Long upStationId = newSection.getUpStation().getId();
+        Long downStationId = newSection.getDownStation().getId();
+        int distance = newSection.getDistance().getValue();
+        String sql = "update SECTION set up_station_id = ?, down_station_id = ?, line_id = ?, distance = ? where id = ?";
+        jdbcTemplate.update(sql, new Object[]{upStationId, downStationId, lineId, distance, newSection.getId()});
     }
 }

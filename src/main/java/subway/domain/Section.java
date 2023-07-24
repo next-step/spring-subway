@@ -7,6 +7,8 @@ import java.util.Objects;
 public class Section {
 
     private static final String SAME_STATION_EXCEPTION_MESSAGE = "상행역과 하행역은 다른 역이어야 합니다.";
+    private static final String SECTION_NOT_OVERLAP_EXCEPTION_MESSAGE = "구간이 서로 겹치지 않습니다.";
+    private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
 
     private Long id;
     private Station upStation;
@@ -35,6 +37,31 @@ public class Section {
         this.upStation = upStation;
         this.downStation = downStation;
         this.distance = distance;
+    }
+
+    public Section subtractWith(final Section other) {
+        validateOverlapped(other);
+        validateDistance(other);
+        Distance reducedDistance = distanceDifference(other);
+
+        if (isSameUpStation(other)) {
+            return new Section(this.id, other.downStation, this.downStation, reducedDistance);
+        }
+
+        return new Section(this.id, this.upStation, other.upStation, reducedDistance);
+
+    }
+
+    private void validateDistance(final Section other) {
+        if (shorterOrEqualTo(other)) {
+            throw new IncorrectRequestException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
+        }
+    }
+
+    private void validateOverlapped(Section other) {
+        if (!isSameUpStation(other) && !isSameDownStation(other)) {
+            throw new IncorrectRequestException(SECTION_NOT_OVERLAP_EXCEPTION_MESSAGE);
+        }
     }
 
     private void validateDifferent(final Station upStation, final Station downStation) {
