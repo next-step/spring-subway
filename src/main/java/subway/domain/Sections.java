@@ -95,7 +95,9 @@ public class Sections {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
         if (!findStations().contains(section.getUpStation())
-                && !findStations().contains(section.getDownStation()) && !sections.isEmpty()) {
+                && !findStations().contains(section.getDownStation())
+                && !sections.isEmpty()
+        ) {
             throw new IllegalArgumentException("등록하고자 하는 구간의 2개의 역이 모두 노선에 포함되지 않아 추가할 수 없습니다.");
         }
     }
@@ -118,7 +120,7 @@ public class Sections {
             registerSection.getDownStation(),
             duplicatedUpSection.getDownStation(),
             registerSection.getLine(),
-            duplicatedUpSection.getDistance().subtract(distance)
+            duplicatedUpSection.getDistance().subtract(distance).getDistance()
         );
 
         return new SectionRegisterVo(registerSection, modifySection);
@@ -142,7 +144,7 @@ public class Sections {
             duplicatedDownSection.getUpStation(),
             registerSection.getUpStation(),
             registerSection.getLine(),
-            duplicatedDownSection.getDistance().subtract(distance)
+            duplicatedDownSection.getDistance().subtract(distance).getDistance()
         );
 
         return new SectionRegisterVo(registerSection, modifySection);
