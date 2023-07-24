@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,13 +46,6 @@ public class Sections {
         }
     }
 
-    private Station findDownPointStation() {
-        return findStations().stream()
-            .filter(station -> !findUpStations().contains(station))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
-    }
-
     public List<Station> sortStations() {
         List<Station> sortedStations = new ArrayList<>();
         Map<Station, Section> stationLayerMap = initLayerMap();
@@ -76,6 +70,63 @@ public class Sections {
             ));
     }
 
+    public SectionRegistVo registSection(Section newSection) {
+        if (sections.isEmpty()) {
+            return new SectionRegistVo(newSection);
+        }
+        validRegistSection(newSection);
+
+        Optional<Section> targetSection = findTargetSection(newSection);
+        if (targetSection.isEmpty()) {
+            return new SectionRegistVo(newSection);
+        }
+        return registMiddleSection(newSection, targetSection.get());
+    }
+
+    private void validRegistSection(Section newSection) {
+        validDuplicatedStation(newSection);
+        validExistedStation(newSection);
+    }
+
+    private void validExistedStation(Section newSection) {
+        if (!isMatchUpStation(newSection) && !isMatchDownStation(newSection)) {
+            throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
+        }
+    }
+
+    private void validDuplicatedStation(Section newSection) {
+        if (isMatchUpStation(newSection) && isMatchDownStation(newSection)) {
+            throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
+        }
+    }
+
+
+    private SectionRegistVo registMiddleSection(Section newSection, Section targetSection) {
+        if (isMatchUpStation(newSection)) {
+            return new SectionRegistVo(newSection, newSection.findMiddleUpSection(targetSection));
+        }
+        if (isMatchDownStation(newSection)) {
+            return new SectionRegistVo(newSection, newSection.findMiddleDownSection(targetSection));
+        }
+
+        throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
+    }
+
+    private Optional<Section> findTargetSection(Section newSection) {
+        return sections.stream()
+            .map(newSection::targetSection)
+            .filter(Objects::nonNull)
+            .findFirst();
+    }
+
+    private boolean isMatchUpStation(Section newSection) {
+        return findStations().contains(newSection.getUpStation());
+    }
+
+    private boolean isMatchDownStation(Section newSection) {
+        return findStations().contains(newSection.getDownStation());
+    }
+
     private Station findUpPointStation() {
         return findStations().stream()
             .filter(station -> !findDownStations().contains(station))
@@ -83,93 +134,11 @@ public class Sections {
             .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
     }
 
-    public SectionRegistVo registSection(Section section) {
-        if (sections.isEmpty()) {
-            return new SectionRegistVo(section);
-        }
-        if (findStations().contains(section.getUpStation())
-            && findStations().contains(section.getDownStation())) {
-            throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
-        }
-        if (findStations().contains(section.getUpStation())) {
-            return section.registUpSection(this);
-//            return registUpSection(section);
-        }
-        if (findStations().contains(section.getDownStation())) {
-            return section.registDownSection(this);
-//            return registDownSection(section);
-        }
-        throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
-    }
-
-//    private SectionRegistVo registUpSection(Section registSection) {
-//        if (!findUpStations().contains(registSection.getUpStation())) {
-//            return new SectionRegistVo(registSection);
-//        }
-//        return registMiddleUpSection(registSection);
-//    }
-
-//    private SectionRegistVo registMiddleUpSection(Section registSection) {
-//        Distance distance = registSection.getDistance();
-//        Section duplicatedUpSection = findSectionByUpStation(registSection.getUpStation());
-//
-//        validateDistance(distance, duplicatedUpSection);
-//
-//        Section modifySection = new Section(
-//            duplicatedUpSection.getId(),
-//            registSection.getDownStation(),
-//            duplicatedUpSection.getDownStation(),
-//            registSection.getLine(),
-//            duplicatedUpSection.getDistance().subtract(distance)
-//        );
-//
-//        return new SectionRegistVo(registSection, modifySection);
-//    }
-
-//    private SectionRegistVo registDownSection(Section registSection) {
-//        if (!findDownStations().contains(registSection.getDownStation())) {
-//            return new SectionRegistVo(registSection);
-//        }
-//        return registMiddleDownSection(registSection);
-//    }
-
-//    private SectionRegistVo registMiddleDownSection(Section registSection) {
-//        Distance distance = registSection.getDistance();
-//        Section duplicatedDownSection = findSectionByDownStation(registSection.getDownStation());
-//
-//        validateDistance(distance, duplicatedDownSection);
-//
-//        Section modifySection = new Section(
-//            duplicatedDownSection.getId(),
-//            duplicatedDownSection.getUpStation(),
-//            registSection.getUpStation(),
-//            registSection.getLine(),
-//            duplicatedDownSection.getDistance().subtract(distance)
-//        );
-//
-//        return new SectionRegistVo(registSection, modifySection);
-//    }
-
-//    public void validateDistance(Distance distance, Section duplicatedUpSection) {
-//        if (duplicatedUpSection.isOverDistance(distance)) {
-//            throw new IllegalArgumentException("기존 구간에 비해 거리가 길어 추가가 불가능 합니다.");
-//        }
-//    }
-
-    // TODO : Sections의 getter를 열어두고 Section 에 역할을 위임하는게 맞을까?
-    public Section findSectionByDownStation(Station station) {
-        return sections.stream()
-            .filter(section -> section.downStationEquals(station))
+    private Station findDownPointStation() {
+        return findStations().stream()
+            .filter(station -> !findUpStations().contains(station))
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
-    }
-
-    // TODO : Sections의 getter를 열어두고 Section 에 역할을 위임하는게 맞을까?
-    public Section findSectionByUpStation(Station station) {
-        return sections.stream()
-            .filter(section -> section.upStationEquals(station))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
+            .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
     }
 
     private Set<Station> findStations() {
@@ -180,13 +149,13 @@ public class Sections {
             .collect(Collectors.toSet());
     }
 
-    public Set<Station> findUpStations() {
+    private Set<Station> findUpStations() {
         return sections.stream()
             .map(Section::getUpStation)
             .collect(Collectors.toSet());
     }
 
-    public Set<Station> findDownStations() {
+    private Set<Station> findDownStations() {
         return sections.stream()
             .map(Section::getDownStation)
             .collect(Collectors.toSet());

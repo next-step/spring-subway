@@ -1,7 +1,6 @@
 package subway.domain;
 
 import java.util.Objects;
-import subway.domain.vo.SectionRegistVo;
 
 public class Section {
 
@@ -24,68 +23,46 @@ public class Section {
         this.distance = new Distance(distance);
     }
 
-    public boolean upStationEquals(Station station) {
-        return upStation.equals(station);
-    }
-
-    public boolean downStationEquals(Station station) {
-        return downStation.equals(station);
-    }
-
-    public boolean isOverDistance(Distance distance) {
+    private boolean isOverDistance(Distance distance) {
         return (this.distance.compareDistance(distance) <= POSSIBLE_DISTANCE);
     }
 
-    public SectionRegistVo registUpSection(Sections sections) {
-        if (!sections.findUpStations().contains(upStation)) {
-            return new SectionRegistVo(this);
-        }
-        return registMiddleUpSection(sections);
-    }
+    public Section findMiddleUpSection(Section targetSection) {
+        validateDistance(targetSection);
 
-    private SectionRegistVo registMiddleUpSection(Sections sections) {
-        Section upSection = sections.findSectionByUpStation(upStation);
-
-        validateDistance(upSection);
-
-        Section modifiedSection = new Section(
-            upSection.getId(),
+        return new Section(
+            targetSection.getId(),
             downStation,
-            upSection.getDownStation(),
+            targetSection.getDownStation(),
             line,
-            upSection.getDistance().subtract(distance)
+            targetSection.getDistance().subtract(distance)
         );
-
-        return new SectionRegistVo(this, modifiedSection);
     }
 
-    public SectionRegistVo registDownSection(Sections sections) {
-        if (!sections.findDownStations().contains(downStation)) {
-            return new SectionRegistVo(this);
-        }
-        return registMiddleDownSection(sections);
-    }
+    public Section findMiddleDownSection(Section targetSection) {
+        validateDistance(targetSection);
 
-    private SectionRegistVo registMiddleDownSection(Sections sections) {
-        Section downSection = sections.findSectionByDownStation(downStation);
-
-        validateDistance(downSection);
-
-        Section modifiedSection = new Section(
-            downSection.getId(),
-            downSection.getUpStation(),
+        return new Section(
+            targetSection.getId(),
+            targetSection.getUpStation(),
             upStation,
             line,
-            downSection.getDistance().subtract(distance)
+            targetSection.getDistance().subtract(distance)
         );
-
-        return new SectionRegistVo(this, modifiedSection);
     }
 
     private void validateDistance(Section targetSection) {
         if (targetSection.isOverDistance(distance)) {
             throw new IllegalArgumentException("기존 구간에 비해 거리가 길어 추가가 불가능 합니다.");
         }
+    }
+
+    public Section targetSection(Section otherSection) {
+        if (upStation.equals(otherSection.getUpStation())
+            || downStation.equals(otherSection.getDownStation())) {
+            return otherSection;
+        }
+        return null;
     }
 
     public Long getId() {
