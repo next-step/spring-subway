@@ -34,14 +34,12 @@ public class Sections {
     private List<Section> sorted(final List<Section> sections) {
         Map<Station, Section> stationToSection = new HashMap<>();
         sections.forEach(section -> stationToSection.put(section.getUpStation(), section));
-        Section first = stationToSection.get(findFirstStation());
-
-        return sortSections(sections, first, stationToSection);
+        return sortSections(sections, stationToSection);
     }
 
-    private List<Section> sortSections(List<Section> sections, Section first, Map<Station, Section> stationToSection) {
+    private List<Section> sortSections(final List<Section> sections, final Map<Station, Section> stationToSection) {
         List<Section> sortedSection = new ArrayList<>();
-        Section nextSection = first;
+        Section nextSection = stationToSection.get(findFirstStation());
         sortedSection.add(nextSection);
         for (int i = 1; i < sections.size(); i++) {
             Station lastDownStation = nextSection.getDownStation();
