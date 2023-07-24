@@ -7,7 +7,6 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.*;
 import subway.dto.request.SectionRequest;
-import subway.dto.response.SectionResponse;
 
 @Service
 public class SectionService {
@@ -25,26 +24,24 @@ public class SectionService {
     }
 
     @Transactional
-    public void saveFirstSection(final Long lineId,
-                                 final Long upStationId,
-                                 final Long downStationId,
-                                 final Long distance) {
+    public void createFirstSection(final Long lineId,
+                                   final Long upStationId,
+                                   final Long downStationId,
+                                   final Long distance) {
         sectionDao.insert(createSection(lineId, upStationId, downStationId, distance));
     }
 
     @Transactional
-    public SectionResponse saveSection(final Long lineId,
-                                       final SectionRequest request) {
+    public void createSection(final Long lineId,
+                              final SectionRequest request) {
         final Section newSection = createSection(
                 lineId,
                 request.getUpStationId(),
                 request.getDownStationId(),
                 request.getDistance());
         Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        Sections beforeSections = new Sections(sections.getSections());
         sections.addSection(newSection);
-        final Section persistNewSection = sectionDao.dirtyChecking(beforeSections, sections);
-        return SectionResponse.from(persistNewSection);
+        sectionDao.updateSections(lineId, sections);
     }
 
     private Section createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {

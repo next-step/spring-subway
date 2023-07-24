@@ -88,18 +88,20 @@ public class SectionDao {
         jdbcTemplate.update(sql, section.getUpStationId(), section.getDownStationId(), section.getDistance(), section.getId());
     }
 
-    public Section dirtyChecking(Sections beforeSections, Sections afterSections) {
-        List<Section> afterSection = afterSections.getSections();
-        List<Section> beforeSection = beforeSections.getSections();
+    public void updateSections(Long lineId, Sections sections) {
+        dirtyChecking(findAllByLineId(lineId), sections.getSections());
+    }
+
+    private void dirtyChecking(List<Section> beforeSection, List<Section> afterSection) {
         afterSection.stream()
                 .filter(section -> !beforeSection.contains(section))
                 .filter(section -> !section.isNew())
                 .findAny()
                 .ifPresent(this::update);
-        return insert(afterSection.stream()
+        insert(afterSection.stream()
                 .filter(section -> !beforeSection.contains(section))
                 .filter(Section::isNew)
                 .findAny()
-                .orElseThrow(IllegalStateException::new));
+                .orElseThrow(() -> new IllegalStateException("새로운 구간을 추가하는 것을 실패하였습니다.")));
     }
 }
