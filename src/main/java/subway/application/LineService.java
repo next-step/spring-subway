@@ -89,10 +89,8 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteSectionByStationId(final Long lineId, final String stationId) {
-        Long deleteId = Long.parseLong(stationId);
-        Station deleteStation = stationDao.findById(deleteId);
-
+    public void deleteSectionByStationId(final Long lineId, final Long stationId) {
+        Station deleteStation = stationDao.findById(stationId);
         Sections sections = sectionDao.findAllByLineId(lineId);
         sections.validateDelete(deleteStation);
         sectionDao.deleteByStation(deleteStation, lineId);

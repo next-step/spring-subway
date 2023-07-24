@@ -7,6 +7,7 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.exception.IncorrectRequestException;
 
 import java.net.URI;
 import java.util.List;
@@ -57,7 +58,15 @@ public class LineController {
 
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam String stationId) {
-        lineService.deleteSectionByStationId(id, stationId);
+        lineService.deleteSectionByStationId(id, parseIdInParam(stationId));
         return ResponseEntity.noContent().build();
+    }
+
+    private static Long parseIdInParam(final String stationId) {
+        try {
+            return Long.parseLong(stationId);
+        } catch (NumberFormatException e) {
+            throw new IncorrectRequestException(stationId + "는 올바른 역 id가 아닙니다.");
+        }
     }
 }
