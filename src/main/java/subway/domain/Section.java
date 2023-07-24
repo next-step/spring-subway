@@ -1,7 +1,5 @@
 package subway.domain;
 
-import subway.domain.vo.SectionsRegister;
-
 import java.util.Objects;
 
 public class Section {
