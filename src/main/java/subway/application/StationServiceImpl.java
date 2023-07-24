@@ -1,25 +1,20 @@
 package subway.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-import subway.dao.SectionDao;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.StationDao;
-import subway.domain.Section;
-import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class StationServiceImpl implements StationService {
 
-    private final SectionDao sectionDao;
     private final StationDao stationDao;
 
-    public StationServiceImpl(SectionDao sectionDao, StationDao stationDao) {
-        this.sectionDao = sectionDao;
+    public StationServiceImpl(StationDao stationDao) {
         this.stationDao = stationDao;
     }
 
@@ -44,21 +39,14 @@ public class StationServiceImpl implements StationService {
     }
 
     @Override
+    @Transactional
     public void updateStation(Long id, StationRequest stationRequest) {
         stationDao.update(new Station(id, stationRequest.getName()));
     }
 
     @Override
+    @Transactional
     public void deleteStationById(Long id) {
         stationDao.deleteById(id);
     }
-
-    @Override
-    public List<Station> findStationByLineId(Long lineId) {
-        List<Section> sectionList = sectionDao.findAllByLineId(lineId);
-        Sections sections = new Sections(sectionList);
-        return sections.toStations();
-    }
-
-
 }

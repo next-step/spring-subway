@@ -1,11 +1,9 @@
 package subway.application;
 
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
-import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-
-import java.util.List;
 
 public interface StationService {
 
@@ -21,6 +19,4 @@ public interface StationService {
 
     @Transactional
     void deleteStationById(Long id);
-
-    List<Station> findStationByLineId(Long lineId);
 }
