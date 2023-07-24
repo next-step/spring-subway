@@ -16,6 +16,8 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
 import subway.exception.LineAlreadyExistException;
+import subway.exception.LineNotFoundException;
+import subway.exception.StationNotFoundException;
 
 @Service
 public class LineServiceImpl implements LineService {
@@ -40,8 +42,10 @@ public class LineServiceImpl implements LineService {
         }
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
-        Station upStation = stationDao.findById(request.getUpStationId()).orElseThrow();
-        Station downStation = stationDao.findById(request.getDownStationId()).orElseThrow();
+        Station upStation = stationDao.findById(request.getUpStationId())
+                .orElseThrow(() -> new StationNotFoundException(request.getUpStationId()));
+        Station downStation = stationDao.findById(request.getDownStationId())
+                .orElseThrow(() -> new StationNotFoundException(request.getDownStationId()));
         Distance distance = new Distance(request.getDistance());
         Section section = new Section(persistLine, upStation, downStation, distance);
         sectionDao.insert(section);
@@ -64,7 +68,8 @@ public class LineServiceImpl implements LineService {
 
     @Override
     public LineWithStationsResponse findLineResponseById(Long id) {
-        Line persistLine = lineDao.findById(id).orElseThrow();
+        Line persistLine = lineDao.findById(id)
+                .orElseThrow(() -> new LineNotFoundException(id));
         List<Section> sectionList = sectionDao.findAllByLineId(id);
         Sections sections = new Sections(sectionList);
         return LineWithStationsResponse.of(persistLine, sections.toStations());
@@ -72,7 +77,8 @@ public class LineServiceImpl implements LineService {
 
     @Override
     public Line findLineById(Long id) {
-        return lineDao.findById(id).orElseThrow();
+        return lineDao.findById(id)
+                .orElseThrow(() -> new LineNotFoundException(id));
     }
 
     @Override

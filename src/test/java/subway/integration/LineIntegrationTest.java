@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ErrorResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
@@ -70,6 +71,22 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+
+    @DisplayName("지하철 노선을 생성하면서 존재하지 않는 역으로 구간 생성을 시도하고 예외가 발생한다..")
+    @Test
+    void createLineStationNotFound() {
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new LineRequest("신분당선", "bg-red-600", 1L, 99999L, 10L))
+                .when().post("/lines")
+                .then().log().all().
+                extract();
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
@@ -136,6 +153,27 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         LineWithStationsResponse resultResponse = response.as(LineWithStationsResponse.class);
         assertThat(resultResponse.getId()).isEqualTo(lineId);
+    }
+
+
+    @DisplayName("존재하지 않는 지하철 노선을 조회 후 예외 발생")
+    @Test
+    void getLineNotFound() {
+        // given
+        Long lineId = 99998L;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        ErrorResponse resultResponse = response.as(ErrorResponse.class);
+        assertThat(resultResponse.getMessage()).isEqualTo("해당하는 아이디의 노선이 없습니다. 입력값 : 99998");
     }
 
     @DisplayName("지하철 노선을 수정한다.")

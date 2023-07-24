@@ -14,6 +14,8 @@ import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.LineNotFoundException;
+import subway.exception.StationNotFoundException;
 
 @Service
 public class SectionServiceImpl implements SectionService {
@@ -33,9 +35,12 @@ public class SectionServiceImpl implements SectionService {
     @Override
     @Transactional
     public SectionResponse saveSection(Long lineId, SectionRequest request) {
-        Line line = lineDao.findById(lineId).orElseThrow();
-        Station upStation = stationDao.findById(request.getUpStationId()).orElseThrow();
-        Station downStation = stationDao.findById(request.getDownStationId()).orElseThrow();
+        Line line = lineDao.findById(lineId)
+                .orElseThrow(() -> new LineNotFoundException(lineId));
+        Station upStation = stationDao.findById(request.getUpStationId())
+                .orElseThrow(() -> new StationNotFoundException(request.getUpStationId()));
+        Station downStation = stationDao.findById(request.getDownStationId())
+                .orElseThrow(() -> new StationNotFoundException(request.getDownStationId()));
         Distance distance = new Distance(request.getDistance());
         Section section = new Section(
                 line,

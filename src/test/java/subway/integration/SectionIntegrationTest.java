@@ -45,6 +45,54 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
+    @DisplayName("노선이 존재하지 않는데 지하철 구간을 생성할 시 예외 발생")
+    @Test
+    void createLineLineNotFound() {
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest1)
+                .when().post("/lines/{lineId}/sections", 99999)
+                .then().log().all().
+                extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @DisplayName("상행역이 존재하지 않는데 지하철 구간을 생성할 시 예외 발생")
+    @Test
+    void createLineUpStationNotFound() {
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new SectionRequest(99999L, 2L, 10L))
+                .when().post("/lines/{lineId}/sections", 1L)
+                .then().log().all().
+                extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @DisplayName("하행역이 존재하지 않는데 지하철 구간을 생성할 시 예외 발생")
+    @Test
+    void createLineDownStationNotFound() {
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new SectionRequest(1L, 99999L, 10L))
+                .when().post("/lines/{lineId}/sections", 1L)
+                .then().log().all().
+                extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     @DisplayName("지하철 노선을 제거한다.")
     @Test
     void deleteLine() {

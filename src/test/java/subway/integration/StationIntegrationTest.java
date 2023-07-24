@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ErrorResponse;
 import subway.dto.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
@@ -137,6 +138,25 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         StationResponse stationResponse = response.as(StationResponse.class);
         assertThat(stationResponse.getId()).isEqualTo(stationId);
+    }
+
+    @DisplayName("없는 지하철역을 조회 후 예외 발생")
+    @Test
+    void getStationNotFound() {
+        /// given
+        Long stationId = 99999L;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/stations/{stationId}", stationId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        ErrorResponse resultResponse = response.as(ErrorResponse.class);
+        assertThat(resultResponse.getMessage()).isEqualTo("해당하는 아이디의 역이 없습니다. 입력값 : 99999");
     }
 
     @DisplayName("지하철역을 수정한다.")

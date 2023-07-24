@@ -9,6 +9,7 @@ import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 import subway.exception.StationAlreadyExistException;
+import subway.exception.StationNotFoundException;
 
 @Service
 public class StationServiceImpl implements StationService {
@@ -34,7 +35,8 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id).orElseThrow());
+        return StationResponse.of(stationDao.findById(id)
+                .orElseThrow(() -> new StationNotFoundException(id)));
     }
 
     @Override
