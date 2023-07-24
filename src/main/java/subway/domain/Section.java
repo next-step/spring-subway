@@ -2,6 +2,7 @@ package subway.domain;
 
 import java.util.Objects;
 import org.springframework.util.Assert;
+import subway.exception.SectionCreateException;
 
 public class Section {
 
@@ -32,27 +33,7 @@ public class Section {
     }
 
     public Section cuttedSection(Section section) {
-        validateDistance(section);
-
-        if (this.upStation.equals(section.upStation)) {
-            return new Section(
-                    this.id,
-                    section.line,
-                    section.downStation,
-                    this.downStation,
-                    new Distance(this.getDistance() - section.getDistance()));
-        }
-
-        if (this.downStation.equals(section.downStation)) {
-            return new Section(
-                    this.id,
-                    section.line,
-                    this.upStation,
-                    section.upStation,
-                    new Distance(this.getDistance() - section.getDistance()));
-        }
-
-        throw new IllegalArgumentException("상행역과 하행역 중 하나는 같아야 합니다.");
+        return cuttedSection(section.upStation, section.downStation, section.distance);
     }
 
     public Section cuttedSection(Station upStation, Station downStation, Distance distance) {
@@ -76,18 +57,12 @@ public class Section {
                     new Distance(this.getDistance() - distance.getValue()));
         }
 
-        throw new IllegalArgumentException("상행역과 하행역 중 하나는 같아야 합니다.");
+        throw new SectionCreateException("상행역과 하행역 중 하나는 같아야 합니다.");
     }
 
     private void validateDistance(Distance distance) {
         if (this.getDistance() <= distance.getValue()) {
-            throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
-        }
-    }
-
-    private void validateDistance(Section section) {
-        if (this.getDistance() <= section.getDistance()) {
-            throw new IllegalArgumentException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
+            throw new SectionCreateException("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
         }
     }
 

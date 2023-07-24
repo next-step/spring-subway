@@ -15,6 +15,7 @@ import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.LineNotFoundException;
+import subway.exception.SectionDeleteException;
 import subway.exception.StationNotFoundException;
 
 @Service
@@ -75,7 +76,7 @@ public class SectionServiceImpl implements SectionService {
 
     private static void validateIsNotLast(Long stationId, Section lastSection) {
         if (!lastSection.getDownStationId().equals(stationId)) {
-            throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
+            throw new SectionDeleteException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
         }
     }
 }

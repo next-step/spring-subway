@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import subway.exception.SectionCreateException;
+import subway.exception.SectionDeleteException;
 
 public class Sections {
 
@@ -77,7 +79,7 @@ public class Sections {
 
     private static void validateSize(List<Section> sections) {
         if (sections.size() <= MINIMUM_SIZE) {
-            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+            throw new SectionDeleteException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
         }
     }
 
@@ -120,14 +122,14 @@ public class Sections {
             boolean downStationSection, boolean isLast, boolean isFirst) {
         if ((upStationSection || isLast)
                 && (downStationSection || isFirst)) {
-            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
+            throw new SectionCreateException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
         }
     }
 
     private static void validateStationNotExist(boolean upStationSection,
             boolean downStationSection, boolean isLast, boolean isFirst) {
         if (upStationSection && downStationSection && !isLast && !isFirst) {
-            throw new IllegalArgumentException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
+            throw new SectionCreateException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
         }
     }
 

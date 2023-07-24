@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SectionCreateException;
 
 class SectionTest {
 
@@ -134,7 +135,7 @@ class SectionTest {
 
         // when, then
         assertThatCode(() -> section1.cuttedSection(section2))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SectionCreateException.class)
                 .hasMessage("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
     }
 
@@ -150,7 +151,7 @@ class SectionTest {
 
         // when, then
         assertThatCode(() -> section1.cuttedSection(section2))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SectionCreateException.class)
                 .hasMessage("상행역과 하행역 중 하나는 같아야 합니다.");
     }
 }

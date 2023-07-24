@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SectionCreateException;
 
 class SectionsTest {
 
@@ -227,7 +228,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections
                 .validateAndCutSectionIfExist(station5, station4, new Distance(5L)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(SectionCreateException.class);
     }
 
     @DisplayName("구간 추가 로직 검증 및 업데이트될 구간 반환 - 상행역과 하행역이 노선에 둘 다 있으면 예외 발생")
@@ -252,7 +253,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections
                 .validateAndCutSectionIfExist(station5, station4, new Distance(5L)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(SectionCreateException.class);
     }
 
     @DisplayName("구간 추가 로직 검증 및 업데이트될 구간 반환 - 추가하려는 구간의 길이가 기존 구간보다 길면 예외 발생")
@@ -276,6 +277,6 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections
                 .validateAndCutSectionIfExist(station2, station5, new Distance(50L)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(SectionCreateException.class);
     }
 }

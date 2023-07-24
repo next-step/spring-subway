@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.SectionCreateException;
+import subway.exception.SectionDeleteException;
 
 @SpringBootTest
 @Transactional
@@ -142,7 +144,7 @@ class SectionServiceTest {
 
         // when , then
         assertThatCode(() -> sectionService.saveSection(lineId, request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SectionCreateException.class)
                 .hasMessage("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
     }
 
@@ -160,7 +162,7 @@ class SectionServiceTest {
 
         // when , then
         assertThatCode(() -> sectionService.saveSection(lineId, request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SectionCreateException.class)
                 .hasMessage("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
     }
 
@@ -178,7 +180,7 @@ class SectionServiceTest {
 
         // when , then
         assertThatCode(() -> sectionService.saveSection(lineId, request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SectionCreateException.class)
                 .hasMessage("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
     }
 
@@ -212,7 +214,7 @@ class SectionServiceTest {
 
         // when, then
         assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId + 1))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SectionDeleteException.class)
                 .hasMessage("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
     }
 
@@ -227,7 +229,7 @@ class SectionServiceTest {
 
         // when, then
         assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SectionDeleteException.class)
                 .hasMessage("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
     }
 }
