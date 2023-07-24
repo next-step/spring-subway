@@ -46,7 +46,7 @@ public class Sections {
             nextSection = stationToSection.get(lastDownStation);
             sortedSection.add(nextSection);
         }
-        return sortedSection;
+        return Collections.unmodifiableList(sortedSection);
     }
 
     private Station findFirstStation() {
