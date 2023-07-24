@@ -60,9 +60,6 @@ public class Stations {
         Set<Station> distinctStations = stationPairs.stream()
             .flatMap(stationPair -> Stream.of(stationPair.getUpStation(), stationPair.getDownStation()))
             .collect(Collectors.toSet());
-        if (distinctStations.isEmpty()) {
-            throw new IllegalStationsException("역 정보를 포함하고 있지 않습니다.");
-        }
         if (distinctStations.size() != totalStationSize) {
             throw new IllegalStationsException("중복된 역은 노선에 포함될 수 없습니다.");
         }
