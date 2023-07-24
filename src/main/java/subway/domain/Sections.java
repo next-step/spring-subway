@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 import subway.domain.vo.SectionRegisterVo;
 
 public class Sections {
@@ -61,13 +61,13 @@ public class Sections {
 
     public List<Station> sortStations() {
         List<Station> sortedStations = new ArrayList<>();
-        Map<Station, Section> stationLayerMap = initLayerMap();
+        Map<Station, Section> sectionMapByUpStation = initSectionMapByUpStation();
 
         Station nowStation = findTopStation();
         sortedStations.add(nowStation);
 
-        while (stationLayerMap.containsKey(nowStation)) {
-            Section section = stationLayerMap.get(nowStation);
+        while (sectionMapByUpStation.containsKey(nowStation)) {
+            Section section = sectionMapByUpStation.get(nowStation);
             sortedStations.add(section.getDownStation());
             nowStation = section.getDownStation();
         }
@@ -75,7 +75,7 @@ public class Sections {
         return Collections.unmodifiableList(sortedStations);
     }
 
-    private Map<Station, Section> initLayerMap() {
+    private Map<Station, Section> initSectionMapByUpStation() {
         return sections.stream()
             .collect(Collectors.toMap(
                 Section::getUpStation,
