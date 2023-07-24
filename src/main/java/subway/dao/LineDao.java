@@ -1,5 +1,6 @@
 package subway.dao;
 
+import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -45,17 +46,18 @@ public class LineDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Line findById(Long id) {
-        String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    public Optional<Line> findById(Long id) {
+        String sql = "select id, name, color from LINE where id = ?";
+        return jdbcTemplate.queryForStream(sql, rowMapper, id)
+            .findAny();
     }
 
     public void update(Line newLine) {
         String sql = "update LINE set name = ?, color = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
+        jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
-    public void deleteById(Long id) {
-        jdbcTemplate.update("delete from Line where id = ?", id);
+    public void delete(Line line) {
+        jdbcTemplate.update("delete from Line where id = ?", line.getId());
     }
 }

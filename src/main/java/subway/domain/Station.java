@@ -2,7 +2,11 @@ package subway.domain;
 
 import java.util.Objects;
 
+/**
+ * 지하철 역
+ */
 public class Station {
+
     private Long id;
     private String name;
 
@@ -27,15 +31,27 @@ public class Station {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Station station = (Station) o;
-        return id.equals(station.id) && name.equals(station.name);
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Station station = (Station) o;
+        return Objects.equals(id, station.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Station{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            '}';
     }
 }
