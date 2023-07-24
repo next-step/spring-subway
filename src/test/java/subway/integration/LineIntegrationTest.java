@@ -1,14 +1,11 @@
 package subway.integration;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import subway.domain.Station;
 import subway.dto.*;
 
 import java.util.ArrayList;
@@ -31,7 +28,7 @@ class LineIntegrationTest extends IntegrationTest {
         lineRequest1 = new LineRequest("신분당선", 1L, 2L, 10, "bg-red-600");
         lineRequest2 = new LineRequest("구신분당선", 3L, 4L, 5, "bg-red-600");
 
-        createInitialStations();
+        createStations();
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -137,42 +134,15 @@ class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private void createInitialStations() {
+    private void createStations() {
         final StationRequest stationRequest1 = new StationRequest("오이도");
         final StationRequest stationRequest2 = new StationRequest("장지");
         final StationRequest stationRequest3 = new StationRequest("용산");
         final StationRequest stationRequest4 = new StationRequest("삼각지");
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest1)
-                .when().post("/stations")
-                .then().log().all().
-                extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest2)
-                .when().post("/stations")
-                .then().log().all().
-                extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest3)
-                .when().post("/stations")
-                .then().log().all().
-                extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest4)
-                .when().post("/stations")
-                .then().log().all().
-                extract();
+        StationIntegrationSupporter.createStation(stationRequest1);
+        StationIntegrationSupporter.createStation(stationRequest2);
+        StationIntegrationSupporter.createStation(stationRequest3);
+        StationIntegrationSupporter.createStation(stationRequest4);
     }
 }
