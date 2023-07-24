@@ -215,12 +215,13 @@ class SectionsTest {
     void removeInMiddle() {
         Section sectionA = new Section(1L, lineA, stationA, stationB, 2);
         Section sectionB = new Section(2L, lineA, stationB, stationC, 5);
-        Sections sections = new Sections(List.of(sectionA, sectionB));
+        Section sectionC = new Section(3L, lineA, stationC, stationD, 6);
+        Sections sections = new Sections(List.of(sectionA, sectionB, sectionC));
 
         Section sectionToUpdate = sections.remove(stationB).get();
 
         Section expectedSection = new Section(1L, lineA, stationA, stationC, 7);
         assertThat(doSectionsHaveSameFields(sectionToUpdate, expectedSection)).isTrue();
-        assertThat(sections).isEqualTo(new Sections(List.of(expectedSection)));
+        assertThat(sections).isEqualTo(new Sections(List.of(expectedSection, sectionC)));
     }
 }

@@ -93,7 +93,7 @@ class SectionIntegrationTest extends IntegrationTest {
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .pathParam("id", lineA.getId())
-            .param("stationId", stationC.getId())
+            .param("stationId", stationB.getId())
             .when().delete("/lines/{id}/sections")
             .then().log().all().
             extract();
