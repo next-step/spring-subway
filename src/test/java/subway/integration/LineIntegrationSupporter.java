@@ -50,13 +50,4 @@ public class LineIntegrationSupporter {
                 .then().log().all()
                 .extract();
     }
-
-    static ExtractableResponse<Response> createSectionInLine(Long lineId, SectionRequest sectionRequest) {
-        return given().log().all()
-                .body(sectionRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
-    }
 }

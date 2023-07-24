@@ -34,33 +34,16 @@ class SectionIntegrationTest extends IntegrationTest {
         // given
         createInitialLine();
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
+        StationIntegrationSupporter.createStation(stationRequest);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.createSectionInLine(1L, sectionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
 
-        ExtractableResponse<Response> responseForCheck = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/1")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> responseForCheck = LineIntegrationSupporter.findLine(1L);
 
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
@@ -69,13 +52,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionWithUnmatchedLineId() {
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.createSectionInLine(1L, sectionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -89,13 +66,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest badSectionRequest = new SectionRequest("1", "2", 5);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(badSectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.createSectionInLine(1L, badSectionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -109,13 +80,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest badSectionRequest = new SectionRequest("5", "6", 5);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(badSectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.createSectionInLine(1L, badSectionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -127,29 +92,11 @@ class SectionIntegrationTest extends IntegrationTest {
         // given
         createInitialLine();
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        StationIntegrationSupporter.createStation(stationRequest);
+        SectionIntegrationSupporter.createSectionInLine(1L, sectionRequest);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=3")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(1L, 3L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -161,29 +108,11 @@ class SectionIntegrationTest extends IntegrationTest {
         // given
         createInitialLine();
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        StationIntegrationSupporter.createStation(stationRequest);
+        SectionIntegrationSupporter.createSectionInLine(1L, sectionRequest);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=1")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(1L, 1L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -196,12 +125,7 @@ class SectionIntegrationTest extends IntegrationTest {
         createInitialLine();
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=2")
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(1L, 2L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -212,28 +136,8 @@ class SectionIntegrationTest extends IntegrationTest {
         final StationRequest stationRequest1 = new StationRequest("인천");
         final StationRequest stationRequest2 = new StationRequest("부평");
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest1)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(stationRequest2)
-                .when().post("/stations")
-                .then().log().all()
-                .extract();
-
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
-                .when().post("/lines")
-                .then().log().all()
-                .extract();
+        StationIntegrationSupporter.createStation(stationRequest1);
+        StationIntegrationSupporter.createStation(stationRequest2);
+        LineIntegrationSupporter.createLine(lineRequest);
     }
 }

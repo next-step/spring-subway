@@ -82,8 +82,8 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         final ExtractableResponse<Response> createResponse = LineIntegrationSupporter.createLine(lineRequest1);
 
-        LineIntegrationSupporter.createSectionInLine(1L, new SectionRequest("2", "3", 10));
-        LineIntegrationSupporter.createSectionInLine(1L, new SectionRequest("3", "4", 10));
+        SectionIntegrationSupporter.createSectionInLine(1L, new SectionRequest("2", "3", 10));
+        SectionIntegrationSupporter.createSectionInLine(1L, new SectionRequest("3", "4", 10));
 
         final List<StationResponse> stationResponses = new ArrayList<>();
         stationResponses.add(StationResponse.of(1L, "오이도"));
