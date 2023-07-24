@@ -4,11 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 class SectionsTest {
 
@@ -51,11 +48,10 @@ class SectionsTest {
         /* given */
 
         /* when */
-        final Optional<Section> lastSection = SECTIONS.findLastSection();
+        final Section lastSection = SECTIONS.getLastSection();
 
         /* then */
-        assertThat(lastSection).isPresent();
-        assertThat(lastSection.get()).isEqualTo(new Section(4L, 1L, 4L, 5L, 4L));
+        assertThat(lastSection).isEqualTo(new Section(4L, 1L, 4L, 5L, 4L));
     }
 
     @Test
@@ -70,25 +66,18 @@ class SectionsTest {
         assertThat(sections.isEqualSizeToOne()).isTrue();
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"0,1", "5,6"})
-    @DisplayName("Sections의 종점인 경우 true를 반환한다.")
-    void isEndStation(final Long upStationId, final Long downStationId) {
-        /* given */
-
-        /* when & then */
-        assertThat(SECTIONS.isEndStation(upStationId, downStationId)).isTrue();
-        assertThat(SECTIONS.isEndStation(upStationId, downStationId)).isTrue();
+    @Test
+    @DisplayName("현재 구간들 중 상행 종점역인지 확인한다.")
+    void isFirstStation() {
+        assertThat(SECTIONS.isFirstStation(1L)).isTrue();
+        assertThat(SECTIONS.isFirstStation(5L)).isFalse();
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"3,4", "7,8"})
-    @DisplayName("Sections의 종점이 아닌 경우 false를 반환한다.")
-    void isNotEndStation(final Long upStationId, final Long downStationId) {
-        /* given */
-
-        /* when & then */
-        assertThat(SECTIONS.isEndStation(upStationId, downStationId)).isFalse();
-        assertThat(SECTIONS.isEndStation(upStationId, downStationId)).isFalse();
+    @Test
+    @DisplayName("현재 구간들 중 하행 종점역인지 확인한다.")
+    void isLastStation() {
+        assertThat(SECTIONS.isLastStation(5L)).isTrue();
+        assertThat(SECTIONS.isLastStation(1L)).isFalse();
     }
+
 }

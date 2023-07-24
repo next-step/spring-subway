@@ -22,7 +22,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest = new SectionRequest(24L, 26L, 66L);
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
@@ -43,7 +43,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest = new SectionRequest(26L, 24L, 66L);
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
@@ -65,7 +65,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest2 = new SectionRequest(24L, 26L, 888L);
 
         /* when */
-        ExtractableResponse<Response> response1 = RestAssured // TODO: final
+        final ExtractableResponse<Response> response1 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest1)
@@ -73,7 +73,7 @@ class SectionIntegrationTest extends IntegrationTest {
                 .then().log().all()
                 .extract();
 
-        ExtractableResponse<Response> response2 = RestAssured
+        final ExtractableResponse<Response> response2 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest2)
@@ -98,7 +98,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest = new SectionRequest(10L, 11L, 777L);
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
@@ -119,7 +119,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest = new SectionRequest(12L, 13L, 777L);
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
@@ -142,7 +142,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long lineId = 2L;
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
@@ -166,7 +166,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long lineId = 2L;
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest)
@@ -187,7 +187,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long lineId = 2L;
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all().queryParam("stationId", "25")
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
@@ -205,7 +205,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long downStationId = 24L;
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all().queryParam("stationId", downStationId)
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
@@ -224,7 +224,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long lineId = 1L;
 
         /* when */
-        ExtractableResponse<Response> response = RestAssured
+        final ExtractableResponse<Response> response = RestAssured
                 .given().log().all().queryParam("stationId", "12")
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()

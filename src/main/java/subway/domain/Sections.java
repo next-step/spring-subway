@@ -18,45 +18,25 @@ public class Sections {
     private final List<Section> values;
 
     public Sections(final List<Section> values) {
-        this.values = Collections.unmodifiableList(values);
+        this.values = Collections.unmodifiableList(getSortedSections(values));
     }
 
     public boolean containsBoth(final Long upStationId, final Long downStationId) {
         return countByStationIds(upStationId, downStationId) == 2;
     }
 
-    public Optional<Section> findLastSection() {
-        final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
-        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
-
-        downStationIds.removeAll(intersection(upStationIds, downStationIds));
-
-        return find(section -> downStationIds.contains(section.getDownStationId()));
-    }
-
-    public Optional<Section> findFirstSection() {
-        final Set<Long> upStationIds = toSetWithMapper(Section::getUpStationId);
-        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
-
-        upStationIds.removeAll(intersection(upStationIds, downStationIds));
-
-        return find(section -> upStationIds.contains(section.getUpStationId()));
+    public Section getLastSection() {
+        if (this.values.size() < 1) {
+            throw new SubwayException("노선에 구간이 존재하지 않습니다.");
+        }
+        return this.values.get(this.values.size() - 1);
     }
 
     public List<Long> getSortedStationIds() {
-        final Map<Long, Section> upStationKeyMap = values.stream()
-                .collect(Collectors.toMap(Section::getUpStationId, section -> section));
+        final List<Long> result = new ArrayList<>(List.of(this.values.get(0).getUpStationId()));
 
-        final Section firstSection = findFirstSection().orElseThrow(
-                () -> new SubwayException("노선에 구간이 존재하지 않습니다.")
-        );
-
-        final List<Long> result = new ArrayList<>(List.of(firstSection.getUpStationId(), firstSection.getDownStationId()));
-        Section next = upStationKeyMap.get(firstSection.getDownStationId());
-
-        while (next != null) {
-            result.add(next.getDownStationId());
-            next = upStationKeyMap.get(next.getDownStationId());
+        for (Section section : this.values) {
+            result.add(section.getDownStationId());
         }
 
         return result;
@@ -66,34 +46,56 @@ public class Sections {
         return this.values.size() == 1;
     }
 
-    public boolean isEndStation(final Long upStationId, final Long downStationId) {
-        final Set<Long> upStationsIds = toSetWithMapper(Section::getUpStationId);
-        final Set<Long> downStationIds = toSetWithMapper(Section::getDownStationId);
+    public boolean isFirstStation(final Long downStationId) {
+        final Long firstUpStationId = this.values.get(0).getUpStationId();
 
-        final Set<Long> differenceIds =
-                difference(union(upStationsIds, downStationIds), intersection(upStationsIds, downStationIds));
+        return firstUpStationId.equals(downStationId);
+    }
 
-        return differenceIds.contains(upStationId) || differenceIds.contains(downStationId);
+    public boolean isLastStation(final Long upStationId) {
+        final Long lastDownStationId = this.values.get(this.values.size() - 1).getDownStationId();
+
+        return lastDownStationId.equals(upStationId);
     }
 
     public Optional<Section> findContainStationSection(
             final Long upStationId,
             final Long downStationId
     ) {
-        return find(section -> section.containsStations(upStationId, downStationId));
+        return find(this.values, section -> section.containsStations(upStationId, downStationId));
     }
 
-    private Optional<Section> find(final Predicate<Section> predicate) {
+    private Optional<Section> findFirstSectionInNotSortedSections(final List<Section> values) {
+        final Set<Long> upStationIds = toSetWithMapper(values, Section::getUpStationId);
+        final Set<Long> downStationIds = toSetWithMapper(values, Section::getDownStationId);
+
+        upStationIds.removeAll(intersection(upStationIds, downStationIds));
+
+        return find(values, section -> upStationIds.contains(section.getUpStationId()));
+    }
+
+    private List<Section> getSortedSections(final List<Section> values) {
+        final Map<Long, Section> upStationKeyMap = values.stream()
+                .collect(Collectors.toMap(Section::getUpStationId, section -> section));
+
+        final Section firstSection = findFirstSectionInNotSortedSections(values).orElseThrow(
+                () -> new SubwayException("노선에 구간이 존재하지 않습니다."));
+
+        final List<Section> result = new ArrayList<>(List.of(firstSection));
+        Section next = upStationKeyMap.get(firstSection.getDownStationId());
+
+        while (next != null) {
+            result.add(next);
+            next = upStationKeyMap.get(next.getDownStationId());
+        }
+
+        return result;
+    }
+
+    private Optional<Section> find(final List<Section> values, final Predicate<Section> predicate) {
         return values.stream()
                 .filter(predicate)
                 .findAny();
-    }
-
-    private Set<Long> union(final Set<Long> upStationIds, final Set<Long> downStationIds) {
-        final Set<Long> unionIds = new HashSet<>(upStationIds);
-        unionIds.addAll(downStationIds);
-
-        return unionIds;
     }
 
     private Set<Long> intersection(final Set<Long> upStationIds, final Set<Long> downStationIds) {
@@ -103,14 +105,7 @@ public class Sections {
         return intersectionIds;
     }
 
-    private Set<Long> difference(final Set<Long> upStationIds, final Set<Long> downStationIds) {
-        final Set<Long> differenceIds = new HashSet<>(upStationIds);
-        differenceIds.removeAll(downStationIds);
-
-        return differenceIds;
-    }
-
-    private Set<Long> toSetWithMapper(final Function<Section, Long> mapper) {
+    private Set<Long> toSetWithMapper(final List<Section> values, final Function<Section, Long> mapper) {
         return values.stream()
                 .map(mapper)
                 .collect(Collectors.toSet());

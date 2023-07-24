@@ -21,7 +21,8 @@ public class SectionService {
         final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         validateNotContainsBothStation(sections, sectionRequest);
 
-        if (sections.isEndStation(sectionRequest.getUpStationId(), sectionRequest.getDownStationId())) {
+        if (sections.isFirstStation(sectionRequest.getDownStationId()) ||
+                sections.isLastStation(sectionRequest.getUpStationId())) {
             final Section section = sectionDao.insert(sectionRequest.toSection(lineId));
             return SectionResponse.of(section);
         }
@@ -51,7 +52,7 @@ public class SectionService {
         final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         validateSectionsSizeIsNotOne(sections);
 
-        final Section lastSection = getLastSection(sections);
+        final Section lastSection = sections.getLastSection();
         if (!lastSection.isSameDownStationId(downStationId)) {
             throw new SubwayException(
                     "해당 노선에 일치하는 하행 종점역이 존재하지 않습니다. 노선 ID : " + lineId + " 하행 종점역 ID : " + downStationId);
@@ -64,11 +65,6 @@ public class SectionService {
         if (distance <= 0) {
             throw new SubwayException("새로운 구간의 길이는 기존 구간의 길이보다 짧아야 합니다.");
         }
-    }
-
-    private Section getLastSection(final Sections sections) {
-        return sections.findLastSection()
-                .orElseThrow(() -> new SubwayException("노선에 구간이 존재하지 않습니다."));
     }
 
     private void validateSectionsSizeIsNotOne(final Sections sections) {
