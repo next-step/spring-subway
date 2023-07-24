@@ -42,6 +42,12 @@ public class SubwayControllerAdvice {
         return new ErrorResponse(message);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse illegalArgumentExceptionHandler(IllegalArgumentException exception) {
+        return new ErrorResponse(exception.getMessage());
+    }
+
     private static String extractMessage(final HttpMessageNotReadableException exception) {
         if (exception.getRootCause() != null) {
             return exception.getRootCause().getMessage();
