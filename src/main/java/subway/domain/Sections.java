@@ -6,7 +6,7 @@ import subway.exception.IllegalSectionException;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class Sections {
+public final class Sections {
 
     private final List<Section> sections;
 
@@ -21,47 +21,50 @@ public class Sections {
         }
     }
 
-    public Optional<Section> updateBeforeInsert(final Section newSection) {
-        final boolean isUpStationExists = checkIsUpStationExists(newSection);
+    public Optional<Section> findConnectedSection(final Section newSection) {
+        final boolean connectWithUpStation = checkConnection(newSection);
+        final Optional<Section> connectedSection = findConnectedSection(newSection, connectWithUpStation);
 
-        final Section existSection = findExistSection(newSection, isUpStationExists);
-
-        if (existSection == null) {
-            return Optional.empty();
-        }
-
-        validateDistance(existSection, newSection.getDistance());
-        if (isUpStationExists) {
-            return Optional.of(existSection.upStationId(newSection));
-        }
-        return Optional.of(existSection.downStationId(newSection));
+        return connectedSection.flatMap(section ->
+                connectedSection(section, newSection, connectWithUpStation)
+        );
     }
 
-    private boolean checkIsUpStationExists(final Section section) {
+    private Optional<Section> connectedSection(final Section existSection,
+                                               final Section section,
+                                               final boolean isUpStation) {
+        validateDistance(existSection, section.getDistance());
+
+        if (isUpStation) {
+            return Optional.of(existSection.upStationId(section));
+        }
+        return Optional.of(existSection.downStationId(section));
+    }
+
+    private boolean checkConnection(final Section section) {
         final boolean isUpStationExists = checkStationExist(section.getUpStationId());
         final boolean isDownStationExists = checkStationExist(section.getDownStationId());
         validateStations(isUpStationExists, isDownStationExists);
         return isUpStationExists;
     }
 
-    private static void validateStations(final boolean isUpStationExists, final boolean isDownStationExists) {
+    private void validateStations(final boolean isUpStationExists, final boolean isDownStationExists) {
         if (isUpStationExists == isDownStationExists) {
             throw new IllegalSectionException("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
         }
     }
 
-    private Section findExistSection(final Section section, final boolean isUpStation) {
+    private Optional<Section> findConnectedSection(final Section section, final boolean isUpStation) {
         if (isUpStation) {
-            return existSection(section::compareUpStationId);
+            return connectedSection(section::compareUpStationId);
         }
-        return existSection(section::compareDownStationId);
+        return connectedSection(section::compareDownStationId);
     }
 
-    private Section existSection(final Predicate<Section> compareStationId) {
+    private Optional<Section> connectedSection(final Predicate<Section> compareStationId) {
         return sections.stream()
                 .filter(compareStationId)
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     private boolean checkStationExist(final long stationId) {

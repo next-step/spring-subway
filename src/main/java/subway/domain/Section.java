@@ -10,7 +10,11 @@ public class Section {
     private final Long downStationId;
     private final Integer distance;
 
-    public Section(final Long id, final Long lineId, final Long upStationId, final Long downStationId, final Integer distance) {
+    public Section(final Long id,
+                   final Long lineId,
+                   final Long upStationId,
+                   final Long downStationId,
+                   final Integer distance) {
         validateStations(upStationId, downStationId);
         validateDistance(distance);
 

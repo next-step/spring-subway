@@ -23,7 +23,7 @@ public class SectionService {
         final Sections sections = new Sections(sectionDao.findAll(lineId));
         final Section section = sectionRequest.to(lineId);
 
-        sections.updateBeforeInsert(section)
+        sections.findConnectedSection(section)
                 .ifPresent(sectionDao::update);
 
         return SectionResponse.of(insert(section));
