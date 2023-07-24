@@ -73,7 +73,14 @@ public class Section {
     }
 
     public Section combineSection(Section otherSection) {
+        validateCombineSection(otherSection);
         return new Section(this.upStation, otherSection.downStation, this.line, this.distance.add(otherSection.distance).getDistance());
+    }
+
+    private void validateCombineSection(Section otherSection) {
+        if (!Objects.equals(this.downStation, otherSection.upStation)) {
+            throw new IllegalArgumentException("결합하려는 역은 상행과 하행이 같아야 합니다.");
+        }
     }
 
     public Long getId() {

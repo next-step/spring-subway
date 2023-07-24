@@ -19,9 +19,9 @@ class SectionTest {
     @DisplayName("Section combine 정상 실행 테스트")
     void combine() {
         Line line = new Line(1L, "7호선", "주황");
-        Station station1 = new Station("부천시청역");
-        Station station2 = new Station("신중동역");
-        Station station3 = new Station("춘의역");
+        Station station1 = new Station(1L, "부천시청역");
+        Station station2 = new Station(2L, "신중동역");
+        Station station3 = new Station(3L, "춘의역");
         Section section1 = new Section(station1, station2, line, 10);
         Section section2 = new Section(station2, station3, line, 10);
 
@@ -36,4 +36,19 @@ class SectionTest {
 
     }
 
+    @Test
+    @DisplayName("Section combine 예외 상황(상행과 하행이 다름) 테스트")
+    void combineException() {
+        Line line = new Line(1L, "7호선", "주황");
+        Station station1 = new Station(1L, "부천시청역");
+        Station station2 = new Station(2L, "신중동역");
+        Station station3 = new Station(3L, "춘의역");
+        Station station4 = new Station(4L, "상동역");
+        Section section1 = new Section(station1, station4, line, 10);
+        Section section2 = new Section(station2, station3, line, 10);
+
+        Assertions.assertThatThrownBy(() -> section1.combineSection(section2))
+                .isInstanceOf(IllegalArgumentException.class);
+
+    }
 }
