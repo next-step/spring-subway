@@ -78,11 +78,11 @@ public class Section {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation) && Objects.equals(distance, section.distance);
+        return Objects.equals(id, section.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, upStation, downStation, distance);
+        return Objects.hash(id);
     }
 }
