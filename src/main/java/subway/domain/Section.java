@@ -74,7 +74,12 @@ public class Section {
 
     public Section combineSection(Section otherSection) {
         validateCombineSection(otherSection);
-        return new Section(this.upStation, otherSection.downStation, this.line, this.distance.add(otherSection.distance).getDistance());
+        return new Section(
+                this.upStation,
+                otherSection.downStation,
+                this.line,
+                this.distance.add(otherSection.distance).getDistance()
+        );
     }
 
     private void validateCombineSection(Section otherSection) {
@@ -113,10 +118,10 @@ public class Section {
         }
         Section section = (Section) o;
         return Objects.equals(id, section.id)
-            && Objects.equals(upStation, section.upStation)
-            && Objects.equals(downStation, section.downStation)
-            && Objects.equals(line, section.line)
-            && Objects.equals(distance, section.distance);
+                && Objects.equals(upStation, section.upStation)
+                && Objects.equals(downStation, section.downStation)
+                && Objects.equals(line, section.line)
+                && Objects.equals(distance, section.distance);
     }
 
     @Override
@@ -127,11 +132,11 @@ public class Section {
     @Override
     public String toString() {
         return "Section{" +
-            "id=" + id +
-            ", upStation=" + upStation +
-            ", downStation=" + downStation +
-            ", line=" + line +
-            ", distance=" + distance +
-            '}';
+                "id=" + id +
+                ", upStation=" + upStation +
+                ", downStation=" + downStation +
+                ", line=" + line +
+                ", distance=" + distance +
+                '}';
     }
 }

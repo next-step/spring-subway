@@ -34,10 +34,10 @@ public class SectionService {
         Station downStation = stationDao.findById(sectionRegisterRequest.getDownStationId());
         Line line = lineDao.findById(lineId);
         Section section = new Section(
-            upStation,
-            downStation,
-            line,
-            sectionRegisterRequest.getDistance()
+                upStation,
+                downStation,
+                line,
+                sectionRegisterRequest.getDistance()
         );
 
         Sections sections = sectionDao.findAllByLineId(lineId);
@@ -64,7 +64,10 @@ public class SectionService {
         makeCombineSection(sectionByUpStation, sectionByDownStation);
     }
 
-    private void deleteSectionsContainingDeleteStation(Optional<Section> sectionByUpStation, Optional<Section> sectionByDownStation) {
+    private void deleteSectionsContainingDeleteStation(
+            Optional<Section> sectionByUpStation,
+            Optional<Section> sectionByDownStation
+    ) {
         sectionByUpStation.ifPresent(section -> sectionDao.deleteById(section.getId()));
         sectionByDownStation.ifPresent(section -> sectionDao.deleteById(section.getId()));
     }

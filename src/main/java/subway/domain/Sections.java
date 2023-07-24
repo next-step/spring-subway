@@ -19,9 +19,9 @@ public class Sections {
 
     private void validSections(List<Section> sections) {
         long sectionsLinesCount = sections.stream()
-            .map(Section::getLine)
-            .distinct()
-            .count();
+                .map(Section::getLine)
+                .distinct()
+                .count();
 
         if (sectionsLinesCount > 1L) {
             throw new IllegalArgumentException("서로 다른 호선의 구간이 들어가 있습니다.");
@@ -38,9 +38,9 @@ public class Sections {
 
     private Station findEndStation() {
         return findStations().stream()
-            .filter(station -> !findUpStations().contains(station))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
+                .filter(station -> !findUpStations().contains(station))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
     }
 
     public List<Station> sortStations() {
@@ -61,17 +61,17 @@ public class Sections {
 
     private Map<Station, Section> initSectionMapByUpStation() {
         return sections.stream()
-            .collect(Collectors.toMap(
-                Section::getUpStation,
-                Function.identity()
-            ));
+                .collect(Collectors.toMap(
+                        Section::getUpStation,
+                        Function.identity()
+                ));
     }
 
     private Station findTopStation() {
         return findStations().stream()
-            .filter(station -> !findDownStations().contains(station))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
+                .filter(station -> !findDownStations().contains(station))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
     }
 
     public SectionsRegister registerSection(Section section) {
@@ -87,7 +87,7 @@ public class Sections {
 
     private void validRegisterSection(Section section) {
         if (findStations().contains(section.getUpStation())
-            && findStations().contains(section.getDownStation())) {
+                && findStations().contains(section.getDownStation())) {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
         if (!findStations().contains(section.getUpStation())
@@ -125,14 +125,14 @@ public class Sections {
 
     public Optional<Section> findSectionByDownStation(Station station) {
         return sections.stream()
-            .filter(section -> section.downStationEquals(station))
-            .findFirst();
+                .filter(section -> section.downStationEquals(station))
+                .findFirst();
     }
 
     public Optional<Section> findSectionByUpStation(Station station) {
         return sections.stream()
-            .filter(section -> section.upStationEquals(station))
-            .findFirst();
+                .filter(section -> section.upStationEquals(station))
+                .findFirst();
     }
 
     private Set<Station> findStations() {
@@ -144,14 +144,14 @@ public class Sections {
 
     private Set<Station> findUpStations() {
         return sections.stream()
-            .map(Section::getUpStation)
-            .collect(Collectors.toSet());
+                .map(Section::getUpStation)
+                .collect(Collectors.toSet());
     }
 
     private Set<Station> findDownStations() {
         return sections.stream()
-            .map(Section::getDownStation)
-            .collect(Collectors.toSet());
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -174,7 +174,7 @@ public class Sections {
     @Override
     public String toString() {
         return "Sections{" +
-            "sections=" + sections +
-            '}';
+                "sections=" + sections +
+                '}';
     }
 }
