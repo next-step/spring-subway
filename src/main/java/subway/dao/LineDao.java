@@ -6,7 +6,7 @@ import subway.domain.Line;
 
 public interface LineDao {
 
-    Optional<Line> insert(Line line);
+    Line insert(Line line);
 
     List<Line> findAll();
 

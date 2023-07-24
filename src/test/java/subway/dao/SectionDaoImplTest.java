@@ -50,7 +50,7 @@ class SectionDaoTest {
     @Test
     void insert_success() {
         // given  when
-        Section result = sectionDao.insert(section1).get();
+        Section result = sectionDao.insert(section1);
 
         // then
         assertThat(result.getId()).isNotNull();
@@ -128,8 +128,8 @@ class SectionDaoTest {
     void findAllByLineId() {
         // given
         long lineId = 1L;
-        Section result1 = sectionDao.insert(section1).get();
-        Section result2 = sectionDao.insert(section2).get();
+        Section result1 = sectionDao.insert(section1);
+        Section result2 = sectionDao.insert(section2);
 
         //  when
         List<Section> sections = sectionDao.findAllByLineId(lineId);
@@ -145,7 +145,7 @@ class SectionDaoTest {
         // given
         long lineId = 1L;
         sectionDao.insert(section1);
-        Section result = sectionDao.insert(section2).get();
+        Section result = sectionDao.insert(section2);
 
         //  when
         assertDoesNotThrow(() -> sectionDao.deleteById(result.getId()));

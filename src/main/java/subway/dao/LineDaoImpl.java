@@ -33,14 +33,14 @@ public class LineDaoImpl implements LineDao {
     }
 
     @Override
-    public Optional<Line> insert(Line line) {
+    public Line insert(Line line) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", line.getId());
         params.put("name", line.getName());
         params.put("color", line.getColor());
 
         Long lineId = insertAction.executeAndReturnKey(params).longValue();
-        return Optional.of(new Line(lineId, line.getName(), line.getColor()));
+        return new Line(lineId, line.getName(), line.getColor());
     }
 
     @Override

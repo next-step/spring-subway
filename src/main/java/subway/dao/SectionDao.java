@@ -6,7 +6,7 @@ import subway.domain.Section;
 
 public interface SectionDao {
 
-    Optional<Section> insert(Section section);
+    Section insert(Section section);
 
     List<Section> findAllByLineId(long lineId);
 

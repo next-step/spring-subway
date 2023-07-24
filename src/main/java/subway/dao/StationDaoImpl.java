@@ -33,10 +33,10 @@ public class StationDaoImpl implements StationDao {
     }
 
     @Override
-    public Optional<Station> insert(Station station) {
+    public Station insert(Station station) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(station);
         Long id = insertAction.executeAndReturnKey(params).longValue();
-        return Optional.ofNullable(new Station(id, station.getName()));
+        return new Station(id, station.getName());
     }
 
     @Override

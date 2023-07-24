@@ -22,7 +22,7 @@ public class StationServiceImpl implements StationService {
     @Override
     public StationResponse saveStation(StationRequest stationRequest) {
         validateDuplicatedName(stationRequest);
-        Station station = stationDao.insert(new Station(stationRequest.getName())).orElseThrow();
+        Station station = stationDao.insert(new Station(stationRequest.getName()));
         return StationResponse.of(station);
     }
 

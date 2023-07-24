@@ -38,14 +38,13 @@ public class LineServiceImpl implements LineService {
         if (lineDao.existByName(request.getName())) {
             throw new LineAlreadyExistException(request.getName());
         }
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()))
-                .orElseThrow();
+        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
         Station upStation = stationDao.findById(request.getUpStationId()).orElseThrow();
         Station downStation = stationDao.findById(request.getDownStationId()).orElseThrow();
         Distance distance = new Distance(request.getDistance());
         Section section = new Section(persistLine, upStation, downStation, distance);
-        sectionDao.insert(section).orElseThrow();
+        sectionDao.insert(section);
 
         return LineResponse.of(persistLine);
     }

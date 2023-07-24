@@ -45,7 +45,7 @@ public class SectionServiceImpl implements SectionService {
 
         preprocessSaveSection(section);
 
-        Section result = sectionDao.insert(section).orElseThrow();
+        Section result = sectionDao.insert(section);
         return SectionResponse.from(result);
     }
 

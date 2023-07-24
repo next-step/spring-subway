@@ -57,15 +57,15 @@ public class SectionDaoImpl implements SectionDao {
     }
 
     @Override
-    public Optional<Section> insert(Section section) {
+    public Section insert(Section section) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(section);
         Long id = insertAction.executeAndReturnKey(params).longValue();
-        return Optional.ofNullable(new Section(
+        return new Section(
                 id,
                 section.getLine(),
                 section.getUpStation(),
                 section.getDownStation(),
-                new Distance(section.getDistance())));
+                new Distance(section.getDistance()));
     }
 
     @Override

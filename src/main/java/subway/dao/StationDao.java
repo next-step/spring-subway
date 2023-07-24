@@ -6,7 +6,7 @@ import subway.domain.Station;
 
 public interface StationDao {
 
-    Optional<Station> insert(Station station);
+    Station insert(Station station);
 
     List<Station> findAll();
 
