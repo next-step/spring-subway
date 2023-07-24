@@ -7,10 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
+import subway.dao.StationPairDao;
 import subway.domain.Line;
 import subway.domain.StationPair;
 import subway.domain.Station;
-import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
 import subway.dto.StationResponse;
 
@@ -30,6 +30,9 @@ class LineServiceTest {
     @Mock
     private LineDao lineDao;
 
+    @Mock
+    private StationPairDao stationPairDao;
+
     @DisplayName("상행 종점부터 하행 종점까지 정렬된 역들을 반환한다.")
     @Test
     void findStationsInLine() {
@@ -41,7 +44,7 @@ class LineServiceTest {
         Station station4 = new Station(4L, "한대앞");
 
         given(lineDao.findById(lineId)).willReturn(new Line(1L, "1호선", "blue"));
-        given(lineDao.findAllStationPair(lineId)).willReturn(List.of(
+        given(stationPairDao.findAllStationPair(lineId)).willReturn(List.of(
                 new StationPair(station4, station1),
                 new StationPair(station1, station3),
                 new StationPair(station3, station2)
