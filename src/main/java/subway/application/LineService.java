@@ -38,6 +38,7 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
@@ -45,6 +46,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<Line> findLines() {
         return lineDao.findAll();
     }
@@ -56,6 +58,7 @@ public class LineService {
         return LineStationsResponse.from(persistLine, sections.toStations());
     }
 
+    @Transactional(readOnly = true)
     public Line findLineById(final Long id) {
         return lineDao.findById(id);
     }
