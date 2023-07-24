@@ -278,4 +278,21 @@ class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+    @DisplayName("역 id가 올바르지 않은 경우 예외 처리한다.")
+    @Test
+    void deleteIdNotValid() {
+        // given
+        Long lineId = CreateHelper.createLine("2호선", "bg-123", "강남역", "역삼역");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, "강남역")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
