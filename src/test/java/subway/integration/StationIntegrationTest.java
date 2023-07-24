@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.integration.supporter.StationIntegrationSupporter;
 
 import java.util.List;
 import java.util.stream.Collectors;

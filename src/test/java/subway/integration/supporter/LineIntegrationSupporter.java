@@ -1,4 +1,4 @@
-package subway.integration;
+package subway.integration.supporter;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,7 +10,7 @@ import static io.restassured.RestAssured.given;
 
 public class LineIntegrationSupporter {
 
-    static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+    public static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest)
@@ -19,7 +19,7 @@ public class LineIntegrationSupporter {
                 extract();
     }
 
-    static ExtractableResponse<Response> findAllLines() {
+    public static ExtractableResponse<Response> findAllLines() {
         return given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines")
@@ -27,7 +27,7 @@ public class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> findLine(Long lineId) {
+    public static ExtractableResponse<Response> findLine(Long lineId) {
         return given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/{lineId}", lineId)
@@ -35,7 +35,7 @@ public class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> updateLine(Long lineId, LineRequest lineRequest) {
+    public static ExtractableResponse<Response> updateLine(Long lineId, LineRequest lineRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest)
@@ -44,7 +44,7 @@ public class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> deleteLine(Long lineId) {
+    public static ExtractableResponse<Response> deleteLine(Long lineId) {
         return given().log().all()
                 .when().delete("/lines/{lineId}", lineId)
                 .then().log().all()

@@ -1,4 +1,4 @@
-package subway.integration;
+package subway.integration.supporter;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -9,7 +9,7 @@ import static io.restassured.RestAssured.given;
 
 public class SectionIntegrationSupporter {
 
-    static ExtractableResponse<Response> createSectionInLine(Long lineId, SectionRequest sectionRequest) {
+    public static ExtractableResponse<Response> createSectionInLine(Long lineId, SectionRequest sectionRequest) {
         return given().log().all()
                 .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -18,7 +18,7 @@ public class SectionIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> deleteSectionInLineByStationId(Long lineId, Long stationId) {
+    public static ExtractableResponse<Response> deleteSectionInLineByStationId(Long lineId, Long stationId) {
         return given().log().all()
                 .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
                 .then().log().all()

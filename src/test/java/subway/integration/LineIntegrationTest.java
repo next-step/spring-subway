@@ -7,6 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.dto.*;
+import subway.integration.supporter.LineIntegrationSupporter;
+import subway.integration.supporter.SectionIntegrationSupporter;
+import subway.integration.supporter.StationIntegrationSupporter;
 
 import java.util.ArrayList;
 import java.util.List;
