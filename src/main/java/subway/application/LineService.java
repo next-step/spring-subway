@@ -77,7 +77,7 @@ public class LineService {
     }
 
     @Transactional
-    public void saveSection(final SectionRequest request, final Long lineId) {
+    public Long saveSection(final SectionRequest request, final Long lineId) {
         Section newSection = newSection(request);
         Sections sections = sectionDao.findAllByLineId(lineId);
 
@@ -89,6 +89,9 @@ public class LineService {
             sectionDao.insert(sections.cut(oldSection, newSection), lineId);
         }
         sectionDao.insert(newSection, lineId);
+
+        return sectionDao.findIdByStationIdsAndLineId(
+                newSection.getUpStation().getId(), newSection.getDownStation().getId(), lineId);
     }
 
     @Transactional

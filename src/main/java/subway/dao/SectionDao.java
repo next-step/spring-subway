@@ -17,6 +17,7 @@ public class SectionDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
     private final RowMapper<Section> rowMapper;
+    private final RowMapper<Long> idRowMapper;
 
     public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource, final StationDao stationDao) {
         this.jdbcTemplate = jdbcTemplate;
@@ -30,6 +31,7 @@ public class SectionDao {
                         stationDao.findById(rs.getLong("down_station_id")),
                         rs.getInt("distance")
                 );
+        this.idRowMapper = (rs, rowNum) -> rs.getLong("id");
     }
 
     public void insert(final Section section, final Long lineId) {
@@ -41,6 +43,12 @@ public class SectionDao {
         params.put("distance", section.getDistance().getValue());
 
         insertAction.executeAndReturnKey(params);
+    }
+
+    public Long findIdByStationIdsAndLineId(final Long upStationId, final Long downStationId, final Long lineId) {
+        String sql = "select id from SECTION where up_station_id = ? and down_station_id = ? and line_id = ?";
+
+        return jdbcTemplate.queryForObject(sql, idRowMapper, upStationId, downStationId, lineId);
     }
 
     public Sections findAllByLineId(final Long lineId) {
