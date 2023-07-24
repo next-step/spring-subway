@@ -1,13 +1,13 @@
 package subway.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import subway.exception.IllegalStationsException;
 
 @Service
 public class StationService {
@@ -22,11 +22,13 @@ public class StationService {
         return StationResponse.of(station);
     }
 
-    public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+    public StationResponse findStationById(Long id) {
+        return stationDao.findById(id)
+            .map(StationResponse::of)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
     }
 
-    public List<StationResponse> findAllStationResponses() {
+    public List<StationResponse> findAllStations() {
         List<Station> stations = stationDao.findAll();
 
         return stations.stream()

@@ -1,26 +1,40 @@
 package subway.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
-
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import subway.domain.Station;
+import subway.domain.StationPair;
 
 @Repository
 public class LineDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
-    private RowMapper<Line> rowMapper = (rs, rowNum) ->
+    private final RowMapper<Line> lineRowMapper = (rs, rowNum) ->
             new Line(
                     rs.getLong("id"),
                     rs.getString("name"),
                     rs.getString("color")
+            );
+
+    private final RowMapper<StationPair> stationPairRowMapper = (rs, rowNum) ->
+            new StationPair(
+                    new Station(
+                            rs.getLong("s1_id"),
+                            rs.getString("s1_name")
+                    ),
+                    new Station(
+                            rs.getLong("s2_id"),
+                            rs.getString("s2_name")
+                    )
             );
 
     public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
@@ -42,12 +56,13 @@ public class LineDao {
 
     public List<Line> findAll() {
         String sql = "select id, name, color from LINE";
-        return jdbcTemplate.query(sql, rowMapper);
+        return jdbcTemplate.query(sql, lineRowMapper);
     }
 
-    public Line findById(Long id) {
+    public Optional<Line> findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        return jdbcTemplate.query(sql, lineRowMapper, id)
+            .stream().findAny();
     }
 
     public void update(Line newLine) {
@@ -57,5 +72,23 @@ public class LineDao {
 
     public void deleteById(Long id) {
         jdbcTemplate.update("delete from Line where id = ?", id);
+    }
+
+    public Optional<Line> findByName(final String name) {
+        String sql = "select * from LINE WHERE name = ?";
+        return jdbcTemplate.query(sql, lineRowMapper, name)
+                .stream()
+                .findAny();
+    }
+
+    public List<StationPair> findAllStationPair(final Long lineId) {
+        String sql = "select s1.id as s1_id, s1.name as s1_name, s2.id as s2_id, s2.name as s2_name " +
+                "from section " +
+                "join station as s1 " +
+                "on section.up_station_id = s1.id " +
+                "join station as s2 " +
+                "on section.down_station_id = s2.id " +
+                "where line_id = ?";
+        return jdbcTemplate.query(sql, stationPairRowMapper, lineId);
     }
 }
