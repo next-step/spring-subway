@@ -249,7 +249,7 @@ class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("Line의 하행 Section을 제거한다")
+    @DisplayName("Line의 하행 Station을 제거한다")
     void deleteDownSectionOfLine() {
         // given
         Long lineId = createLineByLineRequest(lineCreateRequest1).body().as(LineResponse.class).getId();

@@ -126,17 +126,6 @@ public class Section {
         return upSection.findUpSection();
     }
 
-    public void disconnectDownSection() {
-        Assert.notNull(downSection, () -> "downSection이 null 일때, \"disconnectDownSection()\" 를 호출할 수 없습니다");
-        if (downSection.downSection == null) {
-            downSection.upSection = null;
-            downSection = null;
-            return;
-        }
-        downSection.downSection.upSection = this;
-        downSection = downSection.downSection;
-    }
-
     public SectionDisconnectResponse disconnectStation(Station station) {
         if (isUpStation(station)) {
             downSection.upSection = null;
@@ -168,15 +157,15 @@ public class Section {
     }
 
     private boolean isUpStation(Station station) {
-        return station == upStation && upSection == null;
+        return station.equals(upStation) && upSection == null;
     }
 
     private boolean isDownStation(Station station) {
-        return station == downStation && downSection == null;
+        return station.equals(downStation) && downSection == null;
     }
 
     private boolean isMiddleStation(Station station) {
-        return station == downStation && downSection != null;
+        return station.equals(downStation) && downSection != null;
     }
 
     public Long getId() {

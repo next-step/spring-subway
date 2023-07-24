@@ -73,11 +73,6 @@ public class SectionDao {
                 .build();
     }
 
-    public void deleteByLineIdAndDownStationId(Long lineId, Long stationId) {
-        String deleteSql = "DELETE FROM SECTIONS AS S WHERE S.line_id = ? AND S.down_station_id = ?";
-        jdbcTemplate.update(deleteSql, lineId, stationId);
-    }
-
     public void update(Section section) {
         String sql = "UPDATE SECTIONS SET (up_station_id, down_station_id, distance) = (?, ?, ?) WHERE id = ?";
         jdbcTemplate.update(sql, section.getUpStation().getId(), section.getDownStation().getId(),

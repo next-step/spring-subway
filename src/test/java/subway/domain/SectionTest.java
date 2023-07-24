@@ -184,48 +184,6 @@ class SectionTest {
     }
 
     @Nested
-    @DisplayName("disconnectDownSection 메소드는")
-    class DisconnectDownSection_Method {
-
-        @Test
-        @DisplayName("호출되면, DownSection과 연결을 해제한다")
-        void Disconnect_DownSection() {
-            // given
-            Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(1L, "middleStation");
-            Station downStation = new Station(2L, "downStation");
-
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-
-            upSection.connectDownSection(downSection);
-
-            // when
-            upSection.disconnectDownSection();
-
-            // then
-            assertThat(upSection.getDownSection()).isNull();
-            assertThat(downSection.getUpSection()).isNull();
-        }
-
-        @Test
-        @DisplayName("downSection이 null 이라면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Null_DownSection() {
-            // given
-            Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(1L, "middleStation");
-
-            Section section = DomainFixture.Section.buildWithStations(upStation, middleStation);
-
-            // when
-            Exception exception = catchException(section::disconnectDownSection);
-
-            // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
-        }
-    }
-
-    @Nested
     @DisplayName("findUpSection 메소드는")
     class FindUpSection_Method {
 

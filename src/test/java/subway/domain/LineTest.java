@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -58,97 +57,6 @@ class LineTest {
             assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
 
-    }
-
-    @Nested
-    @DisplayName("disconnectDownSection 메소드는")
-    class DisconnectDownSection_Method {
-
-        @Test
-        @DisplayName("line의 하행 Station과 일치하는 Station이 들어오면 연결을 끊는다")
-        void Return_True_When_Input_Station() {
-            // given
-            Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(2L, "middleStation");
-            Station downStation = new Station(3L, "downStation");
-
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-
-            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
-            line.connectSection(downSection);
-
-            // when
-            line.disconnectDownSection(downStation);
-
-            // then
-            assertThat(upSection.getDownSection()).isNull();
-            assertThat(downSection.getUpSection()).isNull();
-        }
-
-        @Test
-        @DisplayName("입력된 Station이 line의 하행 Station과 일치 하지 않으면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Not_Equal_Station() {
-            // given
-            Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(2L, "middleStation");
-            Station downStation = new Station(3L, "downStation");
-
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-
-            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
-            line.connectSection(downSection);
-
-            // when
-            Exception exception = catchException(() -> line.disconnectDownSection(upStation));
-
-            // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test
-        @DisplayName("line에 구간이 하나만 있다면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Line_Size_1() {
-            // given
-            Station upStation = new Station(1L, "upStation");
-            Station downStation = new Station(3L, "downStation");
-
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, downStation);
-
-            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
-
-            // when
-            Exception exception = catchException(() -> line.disconnectDownSection(downStation));
-
-            // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @Test
-        @DisplayName("line의 중간에 있는 section을 삭제하려고 할 경우, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Disconnect_Middle_Section() {
-            // given
-            Station upStation = new Station(1L, "upStation");
-            Station middleUpStation = new Station(2L, "middleUpStation");
-            Station middleDownStation = new Station(3L, "middleDownStation");
-            Station downStation = new Station(4L, "downStation");
-
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleUpStation);
-            Section middleUpSection = DomainFixture.Section.buildWithStations(middleUpStation, middleDownStation);
-            Section middleDownSection = DomainFixture.Section.buildWithStations(middleDownStation, downStation);
-
-            upSection.connectSection(middleUpSection);
-            middleUpSection.connectSection(middleDownSection);
-
-            Line line = new Line("line", "red", Arrays.asList(upSection, middleUpSection, middleDownSection));
-
-            // when
-            Exception exception = catchException(() -> line.disconnectDownSection(middleUpStation));
-
-            // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
-        }
     }
 
     @Nested

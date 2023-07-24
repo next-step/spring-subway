@@ -98,38 +98,6 @@ class SectionDaoTest {
     }
 
     @Nested
-    @DisplayName("deleteByLineIdAndDownStationId 메소드는")
-    class DeleteByLineIdAndDownStationId_Method {
-
-        @Test
-        @DisplayName("lineId와 stationId에 일치하는 Section을 삭제한다")
-        void Delete_Section_Equals_LineId_And_StationId() {
-            // given
-            Line line = lineDao.insert(new Line("line", "red", List.of()));
-
-            Station upStation = stationDao.insert(new Station("upStationName"));
-            Station middleStation = stationDao.insert(new Station("middleStationName"));
-            Station downStation = stationDao.insert(new Station("downStationName"));
-
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-
-            upSection = sectionDao.insert(line.getId(), upSection);
-            downSection = sectionDao.insert(line.getId(), downSection);
-
-            upSection.connectDownSection(downSection);
-
-            // when
-            sectionDao.deleteByLineIdAndDownStationId(line.getId(), downStation.getId());
-            List<Section> sections = sectionDao.findAllByLineId(line.getId());
-
-            // then
-            assertThat(sections).hasSize(1).doesNotContain(downSection);
-        }
-
-    }
-
-    @Nested
     @DisplayName("update 메소드는")
     class Update_Method {
 
