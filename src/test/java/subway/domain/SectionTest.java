@@ -49,4 +49,18 @@ class SectionTest {
 
         assertThrows(IncorrectRequestException.class, () -> oldSection.subtractWith(newSection));
     }
+
+    @DisplayName("역을 삭제할 수 있도록 기존 구간들을 합쳐서 반환한다.")
+    @Test
+    void mergeSections() {
+        Station upStation = new Station(4L, "잠실나루역");
+        Station midStation = new Station(2L, "잠실역");
+        Station downStation = new Station(1L, "강변역");
+
+        Section upMidSection = new Section(upStation, midStation,  3);
+        Section midDownSection = new Section(midStation, downStation, 7);
+        Section expected = new Section(upStation, downStation, 10);
+
+        assertEquals(upMidSection.mergeWith(midDownSection), expected);
+    }
 }

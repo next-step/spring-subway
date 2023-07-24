@@ -8,6 +8,7 @@ public class Section {
 
     private static final String SAME_STATION_EXCEPTION_MESSAGE = "상행역과 하행역은 다른 역이어야 합니다.";
     private static final String SECTION_NOT_OVERLAP_EXCEPTION_MESSAGE = "구간이 서로 겹치지 않습니다.";
+    private static final String SECTION_NOT_CONNECT_EXCEPTION_MESSAGE = "서로 연결되어 있지 않은 구간을 합칠 수 없습니다.";
     private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
 
     private Long id;
@@ -42,18 +43,33 @@ public class Section {
     public Section subtractWith(final Section other) {
         validateOverlapped(other);
         validateDistance(other);
-        Distance reducedDistance = distanceDifference(other);
+        Distance reducedDistance = this.distance.subtract(other.distance);
 
         if (isSameUpStation(other)) {
             return new Section(this.id, other.downStation, this.downStation, reducedDistance);
         }
 
         return new Section(this.id, this.upStation, other.upStation, reducedDistance);
+    }
 
+    public Section mergeWith(Section other) {
+        validateConnected(other);
+        Distance addedDistance = this.distance.add(other.distance);
+
+        if (isUpConnected(other)) {
+            return new Section(other.upStation, this.downStation, addedDistance);
+        }
+        return new Section(this.upStation, other.downStation, addedDistance);
+    }
+
+    private void validateConnected(Section other) {
+        if (!isUpConnected(other) && !isDownConnected(other)) {
+            throw new IncorrectRequestException(SECTION_NOT_CONNECT_EXCEPTION_MESSAGE);
+        }
     }
 
     private void validateDistance(final Section other) {
-        if (shorterOrEqualTo(other)) {
+        if (this.distance.shorterOrEqualTo(other.distance)) {
             throw new IncorrectRequestException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
         }
     }
@@ -78,12 +94,12 @@ public class Section {
         return downStation.equals(other.downStation);
     }
 
-    public boolean shorterOrEqualTo(final Section other) {
-        return distance.shorterOrEqualTo(other.distance);
+    public boolean isUpConnected(final Section other) {
+        return upStation.equals(other.downStation);
     }
 
-    public Distance distanceDifference(final Section other) {
-        return this.distance.difference(other.distance);
+    public boolean isDownConnected(final Section other) {
+        return downStation.equals(other.upStation);
     }
 
     public Long getId() {
