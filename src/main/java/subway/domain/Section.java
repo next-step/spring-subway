@@ -54,7 +54,7 @@ public class Section {
     }
 
     public Distance distanceDifference(final Section other) {
-        return this.distance.difference(other.distance);
+        return this.distance.subtract(other.distance);
     }
 
     public Long getId() {
