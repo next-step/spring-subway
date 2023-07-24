@@ -72,14 +72,18 @@ public class Section {
     }
 
     public Section rearrangeSections(Section section) {
+        validateConnection(section);
+
+        return new Section(this.id, this.line, this.upStation, section.downStation,
+            this.distance + section.distance);
+    }
+
+    private void validateConnection(final Section section) {
         if (!this.downStation.equals(section.upStation)) {
             throw new IllegalArgumentException(
                 "구간의 하행역이 재배치 대상 구간의 상행역과 같지 않으면 재배치할 수 없습니다. 기존 구간: " + this + ", 대상 구간: "
                     + section);
         }
-
-        return new Section(this.id, this.line, this.upStation, section.downStation,
-            this.distance + section.distance);
     }
 
     private boolean isOnlyUpStationMatch(Section section) {

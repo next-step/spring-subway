@@ -87,16 +87,24 @@ public class Sections {
         validateOnlyOneStationInLine(section);
 
         if (section.isUpperSectionOf(getFirst())) {
-            this.values.add(0, section);
+            addFirst(section);
             return Optional.empty();
         }
 
         if (getLast().isUpperSectionOf(section)) {
-            this.values.add(section);
+            addLast(section);
             return Optional.empty();
         }
 
         return addSectionInMiddle(section);
+    }
+
+    private void addFirst(final Section section) {
+        this.values.add(0, section);
+    }
+
+    private boolean addLast(final Section section) {
+        return this.values.add(section);
     }
 
     private void validateSectionInLine(final Section section) {
@@ -142,65 +150,82 @@ public class Sections {
         validateBothStationsNotInLine(upStationExists, downStationExists);
     }
 
-    private void validateBothStationsInLine(final boolean upStationExists, final boolean downStationExists) {
+    private void validateBothStationsInLine(final boolean upStationExists,
+        final boolean downStationExists) {
         if (upStationExists && downStationExists) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다.");
         }
     }
 
-    private void validateBothStationsNotInLine(final boolean upStationExists, final boolean downStationExists) {
+    private void validateBothStationsNotInLine(final boolean upStationExists,
+        final boolean downStationExists) {
         if (!upStationExists && !downStationExists) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다.");
         }
     }
 
-    public Section removeLast(Station station) {
-        validateSize();
-        validateFinalDownStationSameAs(station);
-
-        return values.remove(values.size() - 1);
-    }
-
     public Optional<Section> remove(Station station) {
         validateSize();
+        validateStationInLine(station);
 
-        if (!getStations().contains(station)) {
-            throw new IllegalArgumentException("노선에 등록되어 있지 않은 역은 제거할 수 없습니다.");
-        }
-
-        if (getLast().hasDownStationSameAs(station)) {
-            values.remove(values.size() - 1);
+        if (isLastInLine(station)) {
+            removeLast();
             return Optional.empty();
         }
 
-        if (getFirst().hasUpStationSameAs(station)) {
-            values.remove(0);
+        if (isFirstInLine(station)) {
+            removeFirst();
             return Optional.empty();
         }
 
-        Section upperSection = values.stream()
-            .filter(section -> section.hasDownStationSameAs(station))
-            .findAny()
-            .orElseThrow(() -> new IllegalStateException("1111"));
+        return removeInMiddle(station);
+    }
 
-        Section lowerSection = values.stream()
-            .filter(section -> section.hasUpStationSameAs(station))
-            .findAny()
-            .orElseThrow(() -> new IllegalStateException("1111"));
+    private Section removeFirst() {
+        return values.remove(0);
+    }
 
+    private void removeLast() {
+        values.remove(values.size() - 1);
+    }
+
+    private boolean isFirstInLine(final Station station) {
+        return getFirst().hasUpStationSameAs(station);
+    }
+
+    private boolean isLastInLine(final Station station) {
+        return getLast().hasDownStationSameAs(station);
+    }
+
+    private Optional<Section> removeInMiddle(final Station station) {
+        Section upperSection = findUpperSectionOf(station);
+        Section lowerSection = findLowerSectionOf(station);
         Section rearrangedSection = upperSection.rearrangeSections(lowerSection);
+
         int insertLocation = values.indexOf(upperSection);
-        values.remove(upperSection);
-        values.remove(lowerSection);
+        values.removeAll(List.of(upperSection, lowerSection));
         values.add(insertLocation, rearrangedSection);
 
         return Optional.of(rearrangedSection);
     }
 
-    private void validateFinalDownStationSameAs(Station station) {
-        if (!getLast().hasDownStationSameAs(station)) {
-            throw new IllegalArgumentException(
-                "삭제할 역이 해당 노선의 하행종점역이 아닙니다 요청 station: " + station + " 하행 종점 구간 : " + getLast());
+    private Section findUpperSectionOf(final Station station) {
+        return values.stream()
+            .filter(section -> section.hasDownStationSameAs(station))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("해당 역을 하행역으로 가지는 구간을 찾을 수 없습니다."));
+    }
+
+    private Section findLowerSectionOf(final Station station) {
+        return values.stream()
+            .filter(section -> section.hasUpStationSameAs(station))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("해당 역을 상행역으로 가지는 구간을 찾을 수 없습니다."));
+    }
+
+    private void validateStationInLine(final Station station) {
+        if (!getStations().contains(station)) {
+            throw new IllegalArgumentException("노선에 등록되어 있지 않은 역은 제거할 수 없습니다.");
         }
     }
 
