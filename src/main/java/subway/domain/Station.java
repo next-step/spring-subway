@@ -35,4 +35,8 @@ public class Station {
     public int hashCode() {
         return Objects.hash(id, name);
     }
+
+    public boolean isNotEqual(Station other) {
+        return !this.equals(other);
+    }
 }

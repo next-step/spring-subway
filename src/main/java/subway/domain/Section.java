@@ -75,4 +75,11 @@ public class Section {
     public int hashCode() {
         return Objects.hash(id, upStation, downStation, distance);
     }
+
+    public Section add(Section newSection) {
+        if (upStation.isNotEqual(newSection.downStation)) {
+            throw new IllegalArgumentException("입력으로 들어온 section이 현재 section에 포함되지 않습니다");
+        }
+        return new Section(this.upStation, newSection.downStation, distance.add(newSection.distance));
+    }
 }

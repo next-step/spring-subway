@@ -36,4 +36,8 @@ public class Distance {
     public int hashCode() {
         return Objects.hash(distance);
     }
+
+    public Distance add(Distance other) {
+        return new Distance(distance+ other.distance);
+    }
 }
