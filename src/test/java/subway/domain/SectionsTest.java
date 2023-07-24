@@ -222,7 +222,7 @@ class SectionsTest {
 
     @DisplayName("존재하는 역을 제거하려는 경우 검증을 통과한다.")
     @Test
-    void deleteLastSection() {
+    void deleteExistStation() {
         // given
         Station upStation = new Station(4L, "강변역");
         Station downStation = new Station(3L, "구의역");
@@ -241,7 +241,7 @@ class SectionsTest {
 
     @DisplayName("존재하지 않는 역을 제거하려는 경우 예외를 던진다.")
     @Test
-    void deleteNotLastSection() {
+    void deleteNotExistStation() {
         // given
         Station upStation = new Station(4L, "강변역");
         Station downStation = new Station(3L, "구의역");
