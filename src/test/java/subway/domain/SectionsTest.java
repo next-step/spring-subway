@@ -1,6 +1,5 @@
 package subway.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -221,43 +220,41 @@ class SectionsTest {
         assertThrows(IllegalArgumentException.class, () -> sections.cut(oldSection, newSection));
     }
 
-    @DisplayName("마지막 구간을 제거하는 경우")
+    @DisplayName("존재하는 역을 제거하려는 경우 검증을 통과한다.")
     @Test
     void deleteLastSection() {
         // given
         Station upStation = new Station(4L, "강변역");
         Station downStation = new Station(3L, "구의역");
-        Station newUpStation = new Station(3L, "구의역");
         Station newDownStation = new Station(2L, "건대입구역");
         int distance = 10;
 
         Sections sections = new Sections(List.of(
                 new Section(upStation, downStation, distance),
-                new Section(newUpStation, newDownStation, distance)));
+                new Section(downStation, newDownStation, distance)));
 
-        // when
-        sections.delete(newDownStation);
-
-        // then
-        assertThat(sections).isEqualTo(new Sections(List.of(new Section(upStation, downStation, distance))));
+        // when & then
+        assertDoesNotThrow(() -> sections.validateDelete(upStation));
+        assertDoesNotThrow(() -> sections.validateDelete(downStation));
+        assertDoesNotThrow(() -> sections.validateDelete(newDownStation));
     }
 
-    @DisplayName("마지막이 아닌 구간을 제거하는 경우 예외를 던진다.")
+    @DisplayName("존재하지 않는 역을 제거하려는 경우 예외를 던진다.")
     @Test
     void deleteNotLastSection() {
         // given
         Station upStation = new Station(4L, "강변역");
         Station downStation = new Station(3L, "구의역");
-        Station newUpStation = new Station(3L, "구의역");
         Station newDownStation = new Station(2L, "건대입구역");
+        Station notExistsStation = new Station(100L, "존재하지 않는 역");
         int distance = 10;
 
         Sections sections = new Sections(List.of(
                 new Section(upStation, downStation, distance),
-                new Section(newUpStation, newDownStation, distance)));
+                new Section(downStation, newDownStation, distance)));
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> sections.delete(downStation));
+        assertThrows(IllegalArgumentException.class, () -> sections.validateDelete(notExistsStation));
     }
 
     @DisplayName("구간이 1개만 있을 때 구간을 제거하는 경우 예외를 던진다.")
@@ -271,6 +268,6 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
 
         // when & then
-        assertThrows(IllegalStateException.class, () -> sections.delete(downStation));
+        assertThrows(IllegalStateException.class, () -> sections.validateDelete(downStation));
     }
 }
