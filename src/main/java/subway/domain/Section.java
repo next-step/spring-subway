@@ -72,6 +72,10 @@ public class Section {
         }
     }
 
+    public Section combineSection(Section otherSection) {
+        return new Section(this.upStation, otherSection.downStation, this.line, this.distance.add(otherSection.distance).getDistance());
+    }
+
     public Long getId() {
         return id;
     }

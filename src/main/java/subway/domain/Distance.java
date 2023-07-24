@@ -25,6 +25,10 @@ public class Distance {
         return new Distance(this.distance - otherDistance.distance);
     }
 
+    public Distance add(Distance otherDistance) {
+        return new Distance(this.distance + otherDistance.distance);
+    }
+
     public int getDistance() {
         return distance;
     }
