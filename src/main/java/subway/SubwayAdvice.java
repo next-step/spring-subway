@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class SubwayAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SQLException.class)
-    public ResponseEntity<ErrorResponse> handleSQLException(SQLException e) {
+    public ResponseEntity<ErrorResponse> handleSQLException() {
         ErrorResponse response = new ErrorResponse("Invalid SQL Request.");
         return handleExceptionInternal(response, HttpStatus.CONFLICT);
     }
