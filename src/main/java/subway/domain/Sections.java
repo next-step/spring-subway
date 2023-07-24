@@ -140,11 +140,10 @@ public class Sections {
     }
 
     private Set<Station> findStations() {
-        return Stream.concat(
-                findUpStations().stream(),
-                findDownStations().stream()
-            )
-            .collect(Collectors.toSet());
+        Set<Station> stations = new HashSet<>();
+        stations.addAll(findUpStations());
+        stations.addAll(findDownStations());
+        return stations;
     }
 
     private Set<Station> findUpStations() {
