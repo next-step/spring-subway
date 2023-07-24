@@ -42,32 +42,28 @@ public class Section {
         return this.distance.isOverDistance(distance);
     }
 
-    public SectionsRegister makeNewUpSection(Section duplicatedUpSection) {
-        validateDistance(duplicatedUpSection);
+    public Section makeNewUpSection(Section duplicatedSection) {
+        validateDistance(duplicatedSection);
 
-        Section modifySection = new Section(
-                duplicatedUpSection.id,
+        return new Section(
+                duplicatedSection.id,
                 this.downStation,
-                duplicatedUpSection.downStation,
+                duplicatedSection.downStation,
                 this.line,
-                duplicatedUpSection.distance.subtract(this.distance).getDistance()
+                duplicatedSection.distance.subtract(this.distance).getDistance()
         );
-
-        return new SectionsRegister(this, modifySection);
     }
 
-    public SectionsRegister makeNewDownSection(Section duplicatedDownSection) {
+    public Section makeNewDownSection(Section duplicatedDownSection) {
         validateDistance(duplicatedDownSection);
 
-        Section modifySection = new Section(
+        return new Section(
                 duplicatedDownSection.id,
                 duplicatedDownSection.upStation,
                 this.upStation,
                 this.line,
                 duplicatedDownSection.distance.subtract(this.distance).getDistance()
         );
-
-        return new SectionsRegister(this, modifySection);
     }
 
     private void validateDistance(Section duplicatedUpSection) {

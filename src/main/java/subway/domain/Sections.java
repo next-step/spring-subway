@@ -122,7 +122,7 @@ public class Sections {
 
     private SectionsRegister registerMiddleUpSection(Section registerSection) {
         Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation());
-        return registerSection.makeNewUpSection(duplicatedUpSection);
+        return new SectionsRegister(registerSection, registerSection.makeNewUpSection(duplicatedUpSection));
     }
 
     private SectionsRegister registerDownSection(Section registerSection) {
@@ -134,7 +134,7 @@ public class Sections {
 
     private SectionsRegister registerMiddleDownSection(Section registerSection) {
         Section duplicatedDownSection = findSectionByDownStation(registerSection.getDownStation());
-        return registerSection.makeNewDownSection(duplicatedDownSection);
+        return new SectionsRegister(registerSection, registerSection.makeNewDownSection(duplicatedDownSection));
     }
 
     private Section findSectionByDownStation(Station station) {
