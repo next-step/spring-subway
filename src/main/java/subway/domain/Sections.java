@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Sections {
+
     private final List<Section> sections;
 
     public Sections(final List<Section> sections) {
@@ -42,10 +43,10 @@ public class Sections {
 
     private boolean contains(final Station station) {
         return sections.stream()
-                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-                .distinct()
-                .collect(Collectors.toList())
-                .contains(station);
+            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+            .distinct()
+            .collect(Collectors.toList())
+            .contains(station);
     }
 
     private boolean notContains(final Station station) {
@@ -54,48 +55,46 @@ public class Sections {
 
     private Optional<Section> findMatcingOneSection(final Section section) {
         return sections.stream()
-                .filter(section::matchOneStation)
-                .findAny();
+            .filter(section::matchOneStation)
+            .findAny();
     }
 
     public Sections removeStation(final Station station) {
-        validateDownStationTerminal(station);
         validateSize();
 
-        List<Section> newSection = new ArrayList<>(this.sections);
-        Section removeSection = null;
-        for (Section section : newSection) {
+        List<Section> newSections = new ArrayList<>(this.sections);
+
+        Optional<Section> upSection = sections.stream()
+            .filter(section -> section.getUpStation().equals(station)).findAny();
+        Optional<Section> downSection = sections.stream()
+            .filter(section -> section.getDownStation().equals(station)).findAny();
+        if (upSection.isPresent() && downSection.isPresent()) {
+            Section newSection = downSection.get().add(upSection.get());
+            newSections.add(newSection);
+        }
+
+        List<Section> removeSection = new ArrayList<>();
+        for (Section section : newSections) {
             if (station.equals(section.getDownStation())) {
-                removeSection = section;
+                removeSection.add(section);
             }
         }
-        newSection.remove(removeSection);
-
-        return new Sections(newSection);
-    }
-
-    private void validateDownStationTerminal(final Station station) {
-        if (isNotTerminalDownStation(station)) {
-            throw new IllegalArgumentException("하행 종점역이 아니면 지울 수 없습니다.");
-        }
+        removeSection.stream().forEach(newSections::remove);
+        return new Sections(newSections);
     }
 
     private boolean isTerminalDownStation(final Station station) {
         Set<Station> upStations = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
+            .map(Section::getUpStation)
+            .collect(Collectors.toSet());
 
         Station terminal = sections.stream()
-                .map(Section::getDownStation)
-                .filter(downStation -> !upStations.contains(downStation))
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("하행 종점이 존재하지 않습니다."));
+            .map(Section::getDownStation)
+            .filter(downStation -> !upStations.contains(downStation))
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException("하행 종점이 존재하지 않습니다."));
 
         return station.equals(terminal);
-    }
-
-    private boolean isNotTerminalDownStation(final Station station) {
-        return !isTerminalDownStation(station);
     }
 
     private void validateSize() {
@@ -107,15 +106,16 @@ public class Sections {
     public List<Station> getSortedStations() {
         Map<Station, Station> stationMap = new HashMap<>();
 
-        sections.forEach(section -> stationMap.put(section.getUpStation(), section.getDownStation()));
+        sections.forEach(
+            section -> stationMap.put(section.getUpStation(), section.getDownStation()));
 
         Set<Station> downStations = new HashSet<>(stationMap.values());
 
         Station start = sections.stream()
-                .map(Section::getUpStation)
-                .filter(downStation -> !downStations.contains(downStation))
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("스타트 지점인 구간이 없습니다."));
+            .map(Section::getUpStation)
+            .filter(downStation -> !downStations.contains(downStation))
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException("스타트 지점인 구간이 없습니다."));
 
         return sortedStation(stationMap, start);
     }

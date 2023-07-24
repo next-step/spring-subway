@@ -3,12 +3,14 @@ package subway.domain;
 import java.util.Objects;
 
 public class Section {
+
     private final Long id;
     private final Station upStation;
     private final Station downStation;
     private final Distance distance;
 
-    public Section(final Long id, final Station upStation, final Station downStation, final Distance distance) {
+    public Section(final Long id, final Station upStation, final Station downStation,
+        final Distance distance) {
         validate(upStation, downStation);
 
         this.id = id;
@@ -65,10 +67,16 @@ public class Section {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation) && Objects.equals(downStation, section.downStation) && Objects.equals(distance, section.distance);
+        return Objects.equals(id, section.id) && Objects.equals(upStation, section.upStation)
+            && Objects.equals(downStation, section.downStation) && Objects.equals(distance,
+            section.distance);
     }
 
     @Override
@@ -77,9 +85,11 @@ public class Section {
     }
 
     public Section add(Section newSection) {
-        if (upStation.isNotEqual(newSection.downStation)) {
+        if (downStation.isNotEqual(newSection.upStation)) {
             throw new IllegalArgumentException("입력으로 들어온 section이 현재 section에 포함되지 않습니다");
         }
-        return new Section(this.upStation, newSection.downStation, distance.add(newSection.distance));
+        return new Section(this.upStation, newSection.downStation,
+            distance.add(newSection.distance));
     }
+
 }
