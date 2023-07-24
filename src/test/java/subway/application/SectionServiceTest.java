@@ -14,8 +14,6 @@ import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.domain.fixture.LineFixture;
-import subway.domain.fixture.StationFixture;
 import subway.dto.request.SectionRequest;
 
 import java.util.List;
@@ -23,6 +21,8 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static subway.domain.fixture.LineFixture.createDefaultLine;
+import static subway.domain.fixture.StationFixture.createStation;
 
 @SpringBootTest
 @Transactional
@@ -39,28 +39,34 @@ class SectionServiceTest {
 
     @Autowired
     private StationDao stationDao;
-    private LineFixture lineFixture;
-    private StationFixture stationFixture;
+
+    private Line line;
+    private Station stationA;
+    private Station stationB;
+    private Station stationC;
+    private Station stationD;
+    private Station stationE;
 
     @BeforeEach
     void setUp() {
-        lineFixture = new LineFixture();
-        stationFixture = new StationFixture();
-
-        lineFixture.init(lineDao);
-        stationFixture.init(stationDao);
+        line = lineDao.insert(createDefaultLine());
+        stationA = stationDao.insert(createStation(" 낙성대"));
+        stationB = stationDao.insert(createStation(" 사당"));
+        stationC = stationDao.insert(createStation(" 방배"));
+        stationD = stationDao.insert(createStation(" 서초"));
+        stationE = stationDao.insert(createStation(" 교대"));
     }
 
     @DisplayName("첫 번째 구간 저장에 성공")
     @Test
     void saveFirstSection() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station upStation = stationFixture.getStationA();
-        final Station downStation = stationFixture.getStationB();
+        Long lineId = line.getId();
+        Long upStationId = stationA.getId();
+        Long downStationId = stationB.getId();
 
         // when
-        sectionService.saveFirstSection(line.getId(), upStation.getId(), downStation.getId(), 10L);
+        sectionService.createFirstSection(lineId, upStationId, downStationId, 10L);
 
         // then
         assertThat(sectionDao.findAllByLineId(line.getId())).hasSize(1);
@@ -71,18 +77,13 @@ class SectionServiceTest {
     @Test
     void A_D_B_C() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
-        final Station stationD = stationFixture.getStationD();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
         final SectionRequest request = new SectionRequest(stationA.getId(), stationD.getId(), 5L);
 
         // when
-        sectionService.saveSection(line.getId(), request);
+        sectionService.createSection(line.getId(), request);
 
         // then
         final List<Section> result = sectionDao.findAllByLineId(line.getId());
@@ -99,18 +100,13 @@ class SectionServiceTest {
     @Test
     void A_B_C_D() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
-        final Station stationD = stationFixture.getStationD();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
         final SectionRequest request = new SectionRequest(stationC.getId(), stationD.getId(), 5L);
 
         // when
-        sectionService.saveSection(line.getId(), request);
+        sectionService.createSection(line.getId(), request);
 
         // then
         final List<Section> result = sectionDao.findAllByLineId(line.getId());
@@ -128,18 +124,13 @@ class SectionServiceTest {
     @Test
     void A_B_D_C() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
-        final Station stationD = stationFixture.getStationD();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
         final SectionRequest request = new SectionRequest(stationD.getId(), stationC.getId(), 5L);
 
         // when
-        sectionService.saveSection(line.getId(), request);
+        sectionService.createSection(line.getId(), request);
 
         // then
         final List<Section> result = sectionDao.findAllByLineId(line.getId());
@@ -157,18 +148,13 @@ class SectionServiceTest {
     @Test
     void D_A_B_C() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
-        final Station stationD = stationFixture.getStationD();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
         final SectionRequest request = new SectionRequest(stationD.getId(), stationA.getId(), 5L);
 
         // when
-        sectionService.saveSection(line.getId(), request);
+        sectionService.createSection(line.getId(), request);
 
         // then
         final List<Section> result = sectionDao.findAllByLineId(line.getId());
@@ -185,17 +171,13 @@ class SectionServiceTest {
     @Test
     void saveSectionStationsAlreadyExistInLineThenThrow() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
         final SectionRequest request = new SectionRequest(stationA.getId(), stationC.getId(), 5L);
 
         // when , then
-        assertThatCode(() -> sectionService.saveSection(line.getId(), request))
+        assertThatCode(() -> sectionService.createSection(line.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
     }
@@ -204,19 +186,13 @@ class SectionServiceTest {
     @Test
     void saveSectionStationsNotExistInLineThenThrow() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
-        final Station stationD = stationFixture.getStationD();
-        final Station stationE = stationFixture.getStationE();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
         final SectionRequest request = new SectionRequest(stationD.getId(), stationE.getId(), 5L);
 
         // when , then
-        assertThatCode(() -> sectionService.saveSection(line.getId(), request))
+        assertThatCode(() -> sectionService.createSection(line.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
     }
@@ -225,18 +201,13 @@ class SectionServiceTest {
     @Test
     void saveSectionTooMuchDistanceThenThrow() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
-        final Station stationD = stationFixture.getStationD();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
         final SectionRequest request = new SectionRequest(stationB.getId(), stationD.getId(), 11L);
 
         // when , then
-        assertThatCode(() -> sectionService.saveSection(line.getId(), request))
+        assertThatCode(() -> sectionService.createSection(line.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("거리는 1이상이어야 합니다.");
     }
@@ -246,10 +217,6 @@ class SectionServiceTest {
     @Test
     void deleteSectionTest() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
@@ -271,10 +238,6 @@ class SectionServiceTest {
     @Test
     void deleteSectionNotLastDownStationIdThenThrow() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
-        final Station stationC = stationFixture.getStationC();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
         sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
 
@@ -288,11 +251,7 @@ class SectionServiceTest {
     @Test
     void deleteSectionIfOneSectionThenThrow() {
         // given
-        final Line line = lineFixture.getLine();
-        final Station stationA = stationFixture.getStationA();
-        final Station stationB = stationFixture.getStationB();
         sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
-
 
         // when , then
         Assertions.assertThatCode(() -> sectionService.deleteSection(line.getId(), stationB.getId()))

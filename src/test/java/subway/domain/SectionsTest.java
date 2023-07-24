@@ -43,9 +43,9 @@ class SectionsTest {
     void givenManySectionsWhenToStationsThenOrderedStations() {
         // given
         final List<Section> sectionList = List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L)),
-                new Section(line, stationD, stationA, new Distance(10L))
+                new Section(99L, line, stationA, stationB, new Distance(10L)),
+                new Section(100L, line, stationB, stationC, new Distance(10L)),
+                new Section(101L, line, stationD, stationA, new Distance(10L))
         );
         final SortedSections sortedSections = new SortedSections(sectionList);
         // when
@@ -61,8 +61,8 @@ class SectionsTest {
     void A_D_B_C() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L))
+                new Section(99L, line, stationA, stationB, new Distance(10L)),
+                new Section(100L, line, stationB, stationC, new Distance(10L))
         ));
 
         // when
@@ -86,8 +86,8 @@ class SectionsTest {
     void A_B_C_D() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L))
+                new Section(99L, line, stationA, stationB, new Distance(10L)),
+                new Section(100L, line, stationB, stationC, new Distance(10L))
         ));
 
         // when
@@ -111,8 +111,8 @@ class SectionsTest {
     void A_B_D_C() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L))
+                new Section(99L, line, stationA, stationB, new Distance(10L)),
+                new Section(100L, line, stationB, stationC, new Distance(10L))
         ));
 
         // when
@@ -136,8 +136,8 @@ class SectionsTest {
     void D_A_B_C() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L))
+                new Section(99L, line, stationA, stationB, new Distance(10L)),
+                new Section(100L, line, stationB, stationC, new Distance(10L))
         ));
 
         // when
@@ -161,8 +161,8 @@ class SectionsTest {
     void addSectionTooMuchDistanceThenThrow() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L))
+                new Section(99L, line, stationA, stationB, new Distance(10L)),
+                new Section(100L, line, stationB, stationC, new Distance(10L))
         ));
 
         // when , then
@@ -177,8 +177,8 @@ class SectionsTest {
     void addSectionStationsAlreadyExistInLineThenThrow() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L))
+                new Section(99L, line, stationA, stationB, new Distance(10L)),
+                new Section(100L, line, stationB, stationC, new Distance(10L))
         ));
 
         // when , then
@@ -192,8 +192,8 @@ class SectionsTest {
     void addSectionStationsNotExistInLineThenThrow() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L))
+                new Section(99L, line, stationA, stationB, new Distance(10L)),
+                new Section(100L, line, stationB, stationC, new Distance(10L))
         ));
 
         // when , then

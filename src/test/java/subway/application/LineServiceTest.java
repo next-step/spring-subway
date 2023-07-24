@@ -1,6 +1,5 @@
 package subway.application;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +10,13 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Station;
-import subway.domain.fixture.StationFixture;
 import subway.dto.request.LineCreateRequest;
 import subway.dto.response.LineResponse;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.domain.fixture.StationFixture.createStation;
 
 @SpringBootTest
 @Transactional
@@ -33,21 +34,13 @@ class LineServiceTest {
     @Autowired
     private SectionDao sectionDao;
 
-    private StationFixture stationFixture;
-
-    @BeforeEach
-    void setUp() {
-        stationFixture = new StationFixture();
-        stationFixture.init(stationDao);
-    }
-
     @DisplayName("지하철 노선을 생성하면서 첫 구간도 함께 생성한다.")
     @Test
     void saveLineAndSaveFirstSection() {
         // given
-        final Line line = new Line("1호선", "그린");
-        final Station upStation = stationFixture.getStationA();
-        final Station downStation = stationFixture.getStationB();
+        final Station upStation = stationDao.insert(createStation("낙성대"));
+        final Station downStation = stationDao.insert(createStation("사당"));
+        final Line line = new Line("7호선", "청색");
         final LineCreateRequest lineCreateRequest = new LineCreateRequest(
                 line.getName(),
                 line.getColor(),
@@ -56,10 +49,12 @@ class LineServiceTest {
                 10L);
 
         // when
-        final LineResponse lineResponse = lineService.saveLine(lineCreateRequest);
+        final LineResponse lineResponse = lineService.createLineAndFirstSection(lineCreateRequest);
 
         // then
-        assertThat(lineDao.findById(lineResponse.getId()).get())
+        final Optional<Line> optionalLine = lineDao.findById(lineResponse.getId());
+        assertThat(optionalLine).isPresent();
+        assertThat(optionalLine.get())
                 .extracting(Line::getName, Line::getColor)
                 .contains(line.getName(), line.getColor());
         assertThat(sectionDao.findAllByLineId(lineResponse.getId())).hasSize(1);
