@@ -12,7 +12,6 @@ public class Sections {
     private static final String EMPTY_EXCEPTION_MESSAGE = "최소 1개 이상의 구간이 있어야 합니다.";
     private static final String AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE = "구간은 0개가 될 수 없습니다.";
     private static final String DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE = "마지막 구간만 삭제할 수 있습니다.";
-    private static final String CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE = "출발역에 해당되는 구간을 찾을 수 없습니다.";
     private static final String TWO_MORE_START_STATION_EXCEPTION_MESSAGE = "상행 종점역이 두 개 이상입니다.";
     private static final String CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE = "상행 종점역을 찾을 수 없습니다.";
     private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
@@ -22,6 +21,7 @@ public class Sections {
     private final Set<Station> downStations;
 
     public Sections(final List<Section> sections) {
+        validateEmpty(sections);
         this.upStations = sections.stream()
                 .map(Section::getUpStation)
                 .collect(Collectors.toSet());
@@ -29,15 +29,6 @@ public class Sections {
                 .map(Section::getDownStation)
                 .collect(Collectors.toSet());
         this.sections = sorted(sections);
-    }
-
-    public void validateDelete(final Station lastStation) {
-        if (this.sections.size() <= 1) {
-            throw new InternalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
-        }
-        if (!lastSection().getDownStation().equals(lastStation)) {
-            throw new IncorrectRequestException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
-        }
     }
 
     private List<Section> sorted(final List<Section> sections) {
@@ -64,9 +55,7 @@ public class Sections {
         Set<Station> endUpStations = new HashSet<>(this.upStations);
         endUpStations.removeAll(downStations);
 
-        if (endUpStations.size() > 1) {
-            throw new InternalStateException(TWO_MORE_START_STATION_EXCEPTION_MESSAGE);
-        }
+        validateDuplicatedEndStations(endUpStations);
 
         return endUpStations.stream()
                 .findFirst()
@@ -74,15 +63,7 @@ public class Sections {
     }
 
     private Section lastSection() {
-        validateEmpty();
         return this.sections.get(this.sections.size() - 1);
-    }
-
-    public boolean isInsertedMiddle(final Section newSection) {
-        boolean containsUpStation = this.upStations.contains(newSection.getUpStation());
-        boolean containsDownStation = this.downStations.contains(newSection.getDownStation());
-
-        return containsUpStation || containsDownStation;
     }
 
     public Section cut(final Section oldSection, final Section newSection) {
@@ -113,6 +94,13 @@ public class Sections {
         return stations;
     }
 
+    public boolean isInsertedMiddle(final Section newSection) {
+        boolean containsUpStation = this.upStations.contains(newSection.getUpStation());
+        boolean containsDownStation = this.downStations.contains(newSection.getDownStation());
+
+        return containsUpStation || containsDownStation;
+    }
+
     public void validateInsert(final Section newSection) {
         Set<Station> allStations = new HashSet<>(upStations);
         allStations.addAll(downStations);
@@ -123,14 +111,23 @@ public class Sections {
         validateExistOnlyOne(hasUpStation, hasDownStation);
     }
 
+    public void validateDelete(final Station lastStation) {
+        if (this.sections.size() <= 1) {
+            throw new InternalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
+        }
+        if (!lastSection().getDownStation().equals(lastStation)) {
+            throw new IncorrectRequestException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
+        }
+    }
+
     private void validateDistance(final Section oldSection, final Section newSection) {
         if (oldSection.shorterOrEqualTo(newSection)) {
             throw new IncorrectRequestException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
         }
     }
 
-    private void validateEmpty() {
-        if (this.sections.isEmpty()) {
+    private void validateEmpty(List<Section> sections) {
+        if (sections.isEmpty()) {
             throw new IncorrectRequestException(EMPTY_EXCEPTION_MESSAGE);
         }
     }
@@ -138,6 +135,12 @@ public class Sections {
     private void validateExistOnlyOne(final boolean hasUpStation, final boolean hasDownStation) {
         if (hasUpStation == hasDownStation) {
             throw new IncorrectRequestException(SAME_STATION_EXCEPTION_MESSAGE);
+        }
+    }
+
+    private void validateDuplicatedEndStations(Set<Station> endStations) {
+        if (endStations.size() > 1) {
+            throw new InternalStateException(TWO_MORE_START_STATION_EXCEPTION_MESSAGE);
         }
     }
 
