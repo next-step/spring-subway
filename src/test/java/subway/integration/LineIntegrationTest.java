@@ -73,7 +73,6 @@ class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-
     @DisplayName("지하철 노선을 생성하면서 존재하지 않는 역으로 구간 생성을 시도하고 예외가 발생한다..")
     @Test
     void createLineStationNotFound() {
@@ -87,6 +86,21 @@ class LineIntegrationTest extends IntegrationTest {
                 extract();
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @DisplayName("잘못된 입력으로 지하철 노선 생성 시 예외 발생")
+    @Test
+    void createLineValidationFail() {
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new LineRequest("", "bg-red-600", 1L, 2L, 10L))
+                .when().post("/lines")
+                .then().log().all().
+                extract();
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")

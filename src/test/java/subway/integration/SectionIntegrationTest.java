@@ -30,7 +30,7 @@ class SectionIntegrationTest extends IntegrationTest {
 
     @DisplayName("지하철 구간을 생성한다.")
     @Test
-    void createLine() {
+    void createSection() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -47,7 +47,7 @@ class SectionIntegrationTest extends IntegrationTest {
 
     @DisplayName("노선이 존재하지 않는데 지하철 구간을 생성할 시 예외 발생")
     @Test
-    void createLineLineNotFound() {
+    void createSectionLineNotFound() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -63,7 +63,7 @@ class SectionIntegrationTest extends IntegrationTest {
 
     @DisplayName("상행역이 존재하지 않는데 지하철 구간을 생성할 시 예외 발생")
     @Test
-    void createLineUpStationNotFound() {
+    void createSectionUpStationNotFound() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -79,7 +79,7 @@ class SectionIntegrationTest extends IntegrationTest {
 
     @DisplayName("하행역이 존재하지 않는데 지하철 구간을 생성할 시 예외 발생")
     @Test
-    void createLineDownStationNotFound() {
+    void createSectionDownStationNotFound() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -93,9 +93,25 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
+    @DisplayName("입력값 잘못된 상태로 지하철 구간 생성시 예외 발생")
+    @Test
+    void createSectionValidationFail() {
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new SectionRequest(1L, -1L, 10L))
+                .when().post("/lines/{lineId}/sections", 1L)
+                .then().log().all().
+                extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("지하철 노선을 제거한다.")
     @Test
-    void deleteLine() {
+    void deleteSection() {
         // given
         ExtractableResponse<Response> createResponse1 = RestAssured
                 .given().log().all()

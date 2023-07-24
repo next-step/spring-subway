@@ -1,11 +1,21 @@
 package subway.dto;
 
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 public class SectionRequest {
 
+    @NotNull(message = "상행역 아이디는 null 일 수 없습니다.")
+    @Positive(message = "상행역 아이디는 양수여야합니다.")
     private Long upStationId;
+
+    @NotNull(message = "하행역 아이디는 null 일 수 없습니다.")
+    @Positive(message = "하행역 아이디는 양수여야합니다.")
     private Long downStationId;
+
+    @NotNull(message = "거리는 null 일 수 없습니다.")
+    @Positive(message = "거리는 양수여야합니다.")
     private Long distance;
 
     public SectionRequest(Long upStationId, Long downStationId, Long distance) {
