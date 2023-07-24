@@ -24,6 +24,12 @@ public class Sections {
         this.sections = sorted(sections);
     }
 
+    public List<Section> sectionsForRemoval(final Station station) {
+        return this.sections.stream()
+                .filter(section -> section.isSameUpStation(station) || section.isSameDownStation(station))
+                .collect(Collectors.toList());
+    }
+
     public void validateDelete(final Station deleteStation) {
         if (this.sections.size() <= 1) {
             throw new IllegalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);

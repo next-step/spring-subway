@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Section;
 import subway.domain.Sections;
-import subway.domain.Station;
 
 @Repository
 public class SectionDao {
@@ -55,12 +54,6 @@ public class SectionDao {
         String sql = "select * from SECTION where line_id = ?";
 
         return new Sections(jdbcTemplate.query(sql, rowMapper, lineId));
-    }
-
-    public void deleteByStation(final Station station, final Long lineId) {
-        String sql = "delete from SECTION where down_station_id = ? and line_id = ?";
-
-        jdbcTemplate.update(sql, station.getId(), lineId);
     }
 
     public void deleteById(final Long id) {

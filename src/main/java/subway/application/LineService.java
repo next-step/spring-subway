@@ -101,13 +101,34 @@ public class LineService {
 
         sections.validateDelete(delete);
 
-        sectionDao.deleteByStation(delete, lineId);
+        List<Section> removeSections = sections.sectionsForRemoval(delete);
+
+        for (Section section : removeSections) {
+            sectionDao.deleteById(section.getId());
+        }
+
+        if (removeSections.size() == 2) {
+            sectionDao.insert(newSectionAfterRemoval(removeSections), lineId);
+        }
     }
 
-    private Section newSection(SectionRequest request) {
+    private Section newSection(final SectionRequest request) {
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
 
         return new Section(upStation, downStation, request.getDistance());
+    }
+
+    private Section newSectionAfterRemoval(final List<Section> removeSections) {
+        final Section firstSection = removeSections.get(0);
+        final Section secondSection = removeSections.get(1);
+
+        if (firstSection.isInOrder(secondSection)) {
+            return new Section(
+                    firstSection.getUpStation(), secondSection.getDownStation(), firstSection.distanceSum(secondSection));
+        }
+
+        return new Section(
+                secondSection.getUpStation(), firstSection.getDownStation(), secondSection.distanceSum(firstSection));
     }
 }
