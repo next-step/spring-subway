@@ -67,4 +67,10 @@ public class LineDaoImpl implements LineDao {
     public void deleteById(Long id) {
         jdbcTemplate.update("delete from Line where id = ?", id);
     }
+
+    @Override
+    public boolean existByName(String name) {
+        String sql = "select count(*) from LINE where name = ? ";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, name));
+    }
 }

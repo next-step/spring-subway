@@ -1,31 +1,40 @@
 package subway.ui;
 
 import java.sql.SQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import subway.dto.ErrorResponse;
 import subway.exception.SubwayBaseException;
 
 @RestControllerAdvice
 public class ExceptionHandlers {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     @ExceptionHandler(SubwayBaseException.class)
-    public ResponseEntity<Void> handleSubwayException(SubwayBaseException exception) {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<ErrorResponse> handleSubwayException(SubwayBaseException exception) {
+        log.error(exception.getLocalizedMessage());
+        return ResponseEntity.status(exception.getCode()).body(new ErrorResponse(exception));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Void> handleIllegalArgumentException(IllegalArgumentException exception) {
+        log.error(exception.getLocalizedMessage());
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<Void> handleSQLException(SQLException sqlException) {
+        log.error(sqlException.getLocalizedMessage());
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Void> handleException(Exception exception) {
+        log.error(exception.getMessage(), exception);
         return ResponseEntity.internalServerError().build();
     }
 }

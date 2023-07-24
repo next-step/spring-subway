@@ -15,6 +15,7 @@ import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
+import subway.exception.LineAlreadyExistException;
 
 @Service
 public class LineServiceImpl implements LineService {
@@ -34,6 +35,9 @@ public class LineServiceImpl implements LineService {
     @Override
     @Transactional
     public LineResponse saveLine(LineRequest request) {
+        if (lineDao.existByName(request.getName())) {
+            throw new LineAlreadyExistException(request.getName());
+        }
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()))
                 .orElseThrow();
 

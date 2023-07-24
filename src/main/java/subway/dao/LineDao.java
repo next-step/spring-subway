@@ -15,4 +15,6 @@ public interface LineDao {
     void update(Line newLine);
 
     void deleteById(Long id);
+
+    boolean existByName(String name);
 }
