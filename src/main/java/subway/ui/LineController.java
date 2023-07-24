@@ -24,6 +24,7 @@ import subway.dto.SectionRequest;
 @RequestMapping("/lines")
 public class LineController {
 
+    private static final String NOT_POSITIVE_STATION_ID_EXCEPTION_MESSAGE = "stationId는 정수만 입력받을 수 있습니다.";
     private final LineService lineService;
 
     public LineController(LineService lineService) {
@@ -70,7 +71,11 @@ public class LineController {
 
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam String stationId) {
-        lineService.deleteSectionByStationId(id, stationId);
+        if (!stationId.strip().matches("\\d+")) {
+            throw new IllegalArgumentException(NOT_POSITIVE_STATION_ID_EXCEPTION_MESSAGE);
+        }
+
+        lineService.deleteSectionByStationId(id, Long.parseLong(stationId));
 
         return ResponseEntity.noContent().build();
     }

@@ -12,11 +12,11 @@ public class Sections {
     private static final String SAME_STATION_EXCEPTION_MESSAGE = "새로운 구간의 상행역은 기존 하행 종점역과 같아야 합니다.";
     private static final String EMPTY_EXCEPTION_MESSAGE = "최소 1개 이상의 구간이 있어야 합니다.";
     private static final String AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE = "구간은 0개가 될 수 없습니다.";
-    private static final String DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE = "마지막 구간만 삭제할 수 있습니다.";
     private static final String CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE = "출발역에 해당되는 구간을 찾을 수 없습니다.";
     private static final String TWO_MORE_START_STATION_EXCEPTION_MESSAGE = "상행 종점역이 두 개 이상입니다.";
     private static final String CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE = "상행 종점역을 찾을 수 없습니다.";
     private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
+    private static final String NOT_EXIST_STATION_EXCEPTION_MESSAGE = "삭제할 역이 존재하지 않습니다.";
 
     private final List<Section> sections;
 
@@ -24,18 +24,19 @@ public class Sections {
         this.sections = sorted(sections);
     }
 
-    public void delete(final Station lastStation) {
+    public void validateDelete(final Station deleteStation) {
         if (this.sections.size() <= 1) {
             throw new IllegalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
         }
 
-        int lastIndex = this.sections.size() - 1;
-
-        if (!lastSection().getDownStation().equals(lastStation)) {
-            throw new IllegalArgumentException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
+        if (notExistStation(deleteStation)) {
+            throw new IllegalArgumentException(NOT_EXIST_STATION_EXCEPTION_MESSAGE);
         }
+    }
 
-        this.sections.remove(lastIndex);
+    private boolean notExistStation(Station deleteStation) {
+        return !createUpStations(this.sections).contains(deleteStation)
+                && !lastSection().isSameDownStation(deleteStation);
     }
 
     private List<Section> sorted(final List<Section> sections) {

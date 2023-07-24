@@ -49,8 +49,12 @@ public class Section {
         return isSameUpStation(other.upStation);
     }
 
+    public boolean isSameDownStation(final Station station) {
+        return downStation.equals(station);
+    }
+
     public boolean isSameDownStation(final Section other) {
-        return downStation.equals(other.downStation);
+        return isSameDownStation(other.downStation);
     }
 
     public boolean shorterOrEqualTo(final Section other) {
