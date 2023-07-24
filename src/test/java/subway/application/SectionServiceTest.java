@@ -1,15 +1,18 @@
 package subway.application;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -19,17 +22,17 @@ import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
 
-@SpringBootTest(classes = {SectionService.class})
+@ExtendWith(MockitoExtension.class)
 @DisplayName("SectionService 단위 테스트")
 class SectionServiceTest {
 
-    @Autowired
+    @InjectMocks
     SectionService sectionService;
-    @MockBean
+    @Mock
     LineDao lineDao;
-    @MockBean
+    @Mock
     StationDao stationDao;
-    @MockBean
+    @Mock
     SectionDao sectionDao;
 
     @Test
