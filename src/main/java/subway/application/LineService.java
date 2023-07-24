@@ -104,7 +104,6 @@ public class LineService {
         sectionDao.deleteByStation(delete, lineId);
     }
 
-    @Transactional(readOnly = true)
     private Section newSection(SectionRequest request) {
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());

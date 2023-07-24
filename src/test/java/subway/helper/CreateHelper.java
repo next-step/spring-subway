@@ -3,17 +3,15 @@ package subway.helper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.MediaType;
-import subway.domain.Line;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
-import subway.dto.StationResponse;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.http.MediaType;
+import subway.dto.LineRequest;
+import subway.dto.LineResponse;
+import subway.dto.SectionRequest;
+import subway.dto.StationResponse;
 
 public class CreateHelper {
 
