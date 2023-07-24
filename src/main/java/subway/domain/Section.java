@@ -51,10 +51,10 @@ public class Section {
 
     public Section subtract(final Section requestSection) {
         if (Objects.equals(this.upStationId, requestSection.upStationId)) {
-            return new Section(this.lineId, requestSection.upStationId, this.downStationId,
+            return new Section(this.lineId, requestSection.downStationId, this.downStationId,
                     this.distance - requestSection.distance);
         }
-        return new Section(this.lineId, this.upStationId, requestSection.downStationId,
+        return new Section(this.lineId, this.upStationId, requestSection.upStationId,
                 this.distance - requestSection.distance);
     }
 
