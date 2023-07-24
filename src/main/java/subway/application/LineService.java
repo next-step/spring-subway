@@ -10,6 +10,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.domain.response.SectionDisconnectResponse;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
@@ -101,9 +102,11 @@ public class LineService {
         Station station = getStation(stationId);
 
         Line line = getLineById(lineId);
-        line.disconnectDownSection(station);
+        SectionDisconnectResponse sectionDisconnectResponse = line.disconnectSection(station);
 
-        sectionDao.deleteByLineIdAndDownStationId(lineId, stationId);
+        sectionDao.deleteBySectionId(sectionDisconnectResponse.getDeletedSection().getId());
+        sectionDisconnectResponse.getUpdatedSections()
+                .forEach(sectionDao::update);
     }
 
     private Line getLineById(Long id) {

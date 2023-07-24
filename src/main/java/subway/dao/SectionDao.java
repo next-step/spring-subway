@@ -83,4 +83,7 @@ public class SectionDao {
         jdbcTemplate.update(sql, section.getUpStation().getId(), section.getDownStation().getId(),
                 section.getDistance(), section.getId());
     }
+
+    public void deleteBySectionId(Long id) {
+    }
 }
