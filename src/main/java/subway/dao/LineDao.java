@@ -10,13 +10,15 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class LineDao {
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
-    private RowMapper<Line> rowMapper = (rs, rowNum) ->
+    private final RowMapper<Line> lineRowMapper = (rs, rowNum) ->
             new Line(
                     rs.getLong("id"),
                     rs.getString("name"),
@@ -42,12 +44,12 @@ public class LineDao {
 
     public List<Line> findAll() {
         String sql = "select id, name, color from LINE";
-        return jdbcTemplate.query(sql, rowMapper);
+        return jdbcTemplate.query(sql, lineRowMapper);
     }
 
     public Line findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        return jdbcTemplate.queryForObject(sql, lineRowMapper, id);
     }
 
     public void update(Line newLine) {
@@ -58,4 +60,12 @@ public class LineDao {
     public void deleteById(Long id) {
         jdbcTemplate.update("delete from Line where id = ?", id);
     }
+
+    public Optional<Line> findByName(final String name) {
+        String sql = "select * from LINE WHERE name = ?";
+        return jdbcTemplate.query(sql, lineRowMapper, name)
+                .stream()
+                .findAny();
+    }
+
 }

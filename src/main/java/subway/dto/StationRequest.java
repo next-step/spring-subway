@@ -1,13 +1,26 @@
 package subway.dto;
 
-public class StationRequest {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import subway.exception.IllegalRequestException;
+
+public final class StationRequest {
+
     private String name;
 
-    public StationRequest() {
+    private StationRequest() {
     }
 
-    public StationRequest(String name) {
+    @JsonCreator
+    public StationRequest(final String name) {
+        validateName(name);
+
         this.name = name;
+    }
+
+    private void validateName(final String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalRequestException("역의 이름은 최소 한 글자 이상이어야 합니다.");
+        }
     }
 
     public String getName() {
