@@ -96,8 +96,7 @@ public class Sections {
         }
         if (!findStations().contains(section.getUpStation())
                 && !findStations().contains(section.getDownStation())
-                && !sections.isEmpty()
-        ) {
+                && !sections.isEmpty()) {
             throw new IllegalArgumentException("등록하고자 하는 구간의 2개의 역이 모두 노선에 포함되지 않아 추가할 수 없습니다.");
         }
     }
@@ -110,20 +109,8 @@ public class Sections {
     }
 
     private SectionRegisterVo registerMiddleUpSection(Section registerSection) {
-        Distance distance = registerSection.getDistance();
         Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation());
-
-        validateDistance(distance, duplicatedUpSection);
-
-        Section modifySection = new Section(
-            duplicatedUpSection.getId(),
-            registerSection.getDownStation(),
-            duplicatedUpSection.getDownStation(),
-            registerSection.getLine(),
-            duplicatedUpSection.getDistance().subtract(distance).getDistance()
-        );
-
-        return new SectionRegisterVo(registerSection, modifySection);
+        return registerSection.makeNewUpSection(duplicatedUpSection);
     }
 
     private SectionRegisterVo registerDownSection(Section registerSection) {
@@ -134,26 +121,8 @@ public class Sections {
     }
 
     private SectionRegisterVo registerMiddleDownSection(Section registerSection) {
-        Distance distance = registerSection.getDistance();
         Section duplicatedDownSection = findSectionByDownStation(registerSection.getDownStation());
-
-        validateDistance(distance, duplicatedDownSection);
-
-        Section modifySection = new Section(
-            duplicatedDownSection.getId(),
-            duplicatedDownSection.getUpStation(),
-            registerSection.getUpStation(),
-            registerSection.getLine(),
-            duplicatedDownSection.getDistance().subtract(distance).getDistance()
-        );
-
-        return new SectionRegisterVo(registerSection, modifySection);
-    }
-
-    private void validateDistance(Distance distance, Section duplicatedUpSection) {
-        if (duplicatedUpSection.isOverDistance(distance)) {
-            throw new IllegalArgumentException("기존 구간에 비해 거리가 길어 추가가 불가능 합니다.");
-        }
+        return registerSection.makeNewDownSection(duplicatedDownSection);
     }
 
     private Section findSectionByDownStation(Station station) {

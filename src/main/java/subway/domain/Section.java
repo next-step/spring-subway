@@ -1,5 +1,7 @@
 package subway.domain;
 
+import subway.domain.vo.SectionRegisterVo;
+
 import java.util.Objects;
 
 public class Section {
@@ -38,6 +40,40 @@ public class Section {
 
     public boolean isOverDistance(Distance distance) {
         return this.distance.isOverDistance(distance);
+    }
+
+    public SectionRegisterVo makeNewUpSection(Section duplicatedUpSection) {
+        validateDistance(duplicatedUpSection);
+
+        Section modifySection = new Section(
+                duplicatedUpSection.id,
+                this.downStation,
+                duplicatedUpSection.downStation,
+                this.line,
+                duplicatedUpSection.distance.subtract(this.distance).getDistance()
+        );
+
+        return new SectionRegisterVo(this, modifySection);
+    }
+
+    public SectionRegisterVo makeNewDownSection(Section duplicatedDownSection) {
+        validateDistance(duplicatedDownSection);
+
+        Section modifySection = new Section(
+                duplicatedDownSection.id,
+                duplicatedDownSection.upStation,
+                this.upStation,
+                this.line,
+                duplicatedDownSection.distance.subtract(this.distance).getDistance()
+        );
+
+        return new SectionRegisterVo(this, modifySection);
+    }
+
+    private void validateDistance(Section duplicatedUpSection) {
+        if (duplicatedUpSection.isOverDistance(this.distance)) {
+            throw new IllegalArgumentException("기존 구간에 비해 거리가 길어 추가가 불가능 합니다.");
+        }
     }
 
     public Long getId() {
