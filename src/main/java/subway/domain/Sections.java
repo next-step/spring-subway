@@ -122,7 +122,8 @@ public class Sections {
     }
 
     private boolean isMiddleAddableSection(Section section) {
-        return this.values.stream().anyMatch(value -> value.hasSameUpStationOrDownStation(section));
+        return this.values.stream()
+                .anyMatch(value -> value.hasSameUpStationOrDownStation(section));
     }
 
     private SectionAdditionResult addSectionInMiddle(Section section) {
@@ -204,11 +205,12 @@ public class Sections {
         Section matchedSection = findMatchedSectionSameDownStation(station);
         Section nextSection = findNextSectionOf(matchedSection);
 
-        Section connectedSection = matchedSection.connect(nextSection);
+        Section connectedSection = matchedSection.removeMiddleStation(nextSection);
         this.values.add(this.values.indexOf(matchedSection), connectedSection);
+        this.values.remove(matchedSection);
+        this.values.remove(nextSection);
 
         List<Section> sectionToRemove = List.of(matchedSection, nextSection);
-        this.values.removeAll(sectionToRemove);
         return new SectionRemovalResult(connectedSection, sectionToRemove);
     }
 

@@ -64,7 +64,6 @@ public class Section {
     }
 
     public List<Section> mergeSections(Section section) {
-
         validateLongerDistanceThan(section);
 
         if (isOnlyUpStationMatch(section)) {
@@ -110,9 +109,9 @@ public class Section {
         return mergedSections;
     }
 
-    public Section connect(Section section) {
+    public Section removeMiddleStation(Section section) {
         if (!this.downStation.equals(section.upStation)) {
-            throw new IllegalArgumentException("연결할 수 없는 구간입니다. 현재 구간: " + this + " 연결할 구간: " + section);
+            throw new IllegalArgumentException("이어지지 않은 구간입니다. 현재 구간: " + this + " 상대 구간: " + section);
         }
 
         return new Section(this.line, this.upStation, section.downStation, this.distance + section.distance);

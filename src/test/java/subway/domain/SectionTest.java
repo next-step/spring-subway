@@ -1,7 +1,7 @@
 package subway.domain;
 
 import java.util.List;
-import org.assertj.core.api.Assertions;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -126,6 +126,26 @@ class SectionTest {
             .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> section.mergeSections(nothingSameSection))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("구간의 하행역이 연결할 구간의 상행역과 다르면 중간역을 삭제할 수 없다.")
+    void cannotRemoveMiddleStationWithDifferentCurDownAndNextUpStation() {
+        Section sectionA = new Section(lineA, stationA, stationB, 3);
+        Section sectionC = new Section(lineA, stationC, stationD, 2);
+
+        assertThatThrownBy(() -> sectionA.removeMiddleStation(sectionC))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("현재구간과 상대구간의 중간 역을 삭제한다")
+    void removeMiddleStation() {
+        Section sectionA = new Section(lineA, stationA, stationB, 3);
+        Section sectionB = new Section(lineA, stationB, stationC, 2);
+
+        Section expectedSection = new Section(lineA, stationA, stationC, 5);
+        assertThat(sectionA.removeMiddleStation(sectionB)).isEqualTo(expectedSection);
     }
 
 }
