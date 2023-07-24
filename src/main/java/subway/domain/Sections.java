@@ -161,6 +161,25 @@ public class Sections {
         return values.remove(values.size() - 1);
     }
 
+    public Optional<Section> remove(Station station) {
+        validateSize();
+
+        if (getLast().hasDownStationSameAs(station)) {
+            values.remove(values.size() - 1);
+            return Optional.empty();
+        }
+
+        if (getFirst().hasUpStationSameAs(station)) {
+            values.remove(0);
+            return Optional.empty();
+        }
+
+        if (!getStations().contains(station)) {
+            throw new IllegalArgumentException("노선에 등록되어 있지 않은 역은 제거할 수 없습니다.");
+        }
+        return Optional.empty();
+    }
+
     private void validateFinalDownStationSameAs(Station station) {
         if (!getLast().hasDownStationSameAs(station)) {
             throw new IllegalArgumentException(

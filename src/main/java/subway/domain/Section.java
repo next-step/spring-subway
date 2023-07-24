@@ -123,6 +123,10 @@ public class Section {
         return downStation;
     }
 
+    public boolean hasUpStationSameAs(Station station) {
+        return station.equals(this.upStation);
+    }
+
     public boolean hasDownStationSameAs(Station station) {
         return station.equals(this.downStation);
     }

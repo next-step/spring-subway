@@ -33,7 +33,6 @@ class SectionsTest {
     @Test
     @DisplayName("정렬된 구간들을 생성한다.")
     void createSortedSections() {
-
         Section firstSection = new Section(1L, lineA, stationA, stationB, 1);
         Section secondSection = new Section(2L, lineA, stationB, stationC, 1);
         Section thirdSection = new Section(3L, lineA, stationC, stationD, 1);
@@ -49,8 +48,6 @@ class SectionsTest {
     @Test
     @DisplayName("순환된 구간으로 생성할 수 없다.")
     void cannotCreateWithCircularSection() {
-        Station stationA = new Station(1L, "A");
-        Station stationB = new Station(2L, "B");
         Section section = new Section(1L, lineA, stationA, stationB, 1);
         Section circularSection = new Section(2L, lineA, stationB, stationA, 1);
 
@@ -61,7 +58,6 @@ class SectionsTest {
     @Test
     @DisplayName("널이거나 비어 있는 구간 리스트로 생성할 수 없다.")
     void cannotCreateWithNullOrEmptySectionList() {
-
         assertThatThrownBy(() -> new Sections(null))
             .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new Sections(emptyList()))
@@ -87,46 +83,6 @@ class SectionsTest {
 
         assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
             .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("구간이 1개인 경우 구간을 삭제할 수 없다")
-    void cannotRemoveOneSizeSections() {
-        Station stationA = new Station(1L, "A");
-        Station stationB = new Station(2L, "B");
-        Section section = new Section(1L, lineA, stationA, stationB, 1);
-        Sections sections = new Sections(List.of(section));
-
-        assertThatThrownBy(() -> sections.removeLast(stationB))
-            .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    @DisplayName("주어진 역이 노선의 하행 종점역이 아니면 구간을 삭제할 수 없다")
-    void cannotRemoveSectionIfNotFinalDownStation() {
-        Section sectionA = new Section(1L, lineA, stationA, stationB, 1);
-        Section sectionB = new Section(2L, lineA, stationB, stationC, 1);
-        Sections sections = new Sections(List.of(sectionA, sectionB));
-
-        assertThatThrownBy(() -> sections.removeLast(stationA))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("마지막 구간을 삭제한다")
-    void removeLast() {
-        Station stationA = new Station(1L, "A");
-        Station stationB = new Station(2L, "B");
-        Station stationC = new Station(3L, "C");
-        Section sectionA = new Section(1L, lineA, stationA, stationB, 1);
-        Section sectionB = new Section(2L, lineA, stationB, stationC, 1);
-        Sections sections = new Sections(List.of(sectionA, sectionB));
-
-        Section removedSection = sections.removeLast(stationC);
-
-        Sections expectedSections = new Sections(List.of(sectionA));
-        assertThat(sections).isEqualTo(expectedSections);
-        assertThat(removedSection).isEqualTo(sectionB);
     }
 
     @Test
@@ -204,5 +160,53 @@ class SectionsTest {
         assertThat(result).isEmpty();
         assertThat(sections).isEqualTo(
             new Sections(List.of(firstSection, secondSection, targetSection)));
+    }
+    @Test
+    @DisplayName("구간이 1개인 경우 구간을 삭제할 수 없다")
+    void cannotRemoveOneSizeSections() {
+        Section section = new Section(1L, lineA, stationA, stationB, 1);
+        Sections sections = new Sections(List.of(section));
+
+        assertThatThrownBy(() -> sections.remove(stationB))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("하행 종점이 제거될 경우 다음으로 오던 역이 종점이 된다.")
+    void removeLast() {
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 1);
+        Section sectionB = new Section(2L, lineA, stationB, stationC, 1);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        Optional<Section> sectionToUpdate = sections.remove(stationC);
+
+        Sections expectedSections = new Sections(List.of(sectionA));
+        assertThat(sections).isEqualTo(expectedSections);
+        assertThat(sectionToUpdate).isEmpty();
+    }
+
+    @Test
+    @DisplayName("상행 종점이 제거될 경우 다음으로 오던 역이 종점이 된다.")
+    void removeFirst() {
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 1);
+        Section sectionB = new Section(2L, lineA, stationB, stationC, 1);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        Optional<Section> sectionToUpdate = sections.remove(stationA);
+
+        Sections expectedSections = new Sections(List.of(sectionB));
+        assertThat(sections).isEqualTo(expectedSections);
+        assertThat(sectionToUpdate).isEmpty();
+    }
+
+    @Test
+    @DisplayName("노선에 등록되어 있지 않은 역을 제거할 수 없다.")
+    void cannotRemoveUnregisteredStation() {
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 2);
+        Section sectionB = new Section(2L, lineA, stationB, stationC, 5);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        assertThatThrownBy(() -> sections.remove(stationD))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }
