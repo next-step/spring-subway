@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.Sections;
+import subway.domain.SortedSections;
 import subway.domain.Station;
 import subway.dto.request.StationRequest;
 import subway.dto.response.StationResponse;
@@ -37,7 +37,7 @@ public class StationService {
 
     public Station findStationById(final Long stationId) {
         return stationDao.findById(stationId)
-                .orElseThrow(() -> new IllegalStateException("역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("역을 찾을 수 없습니다."));
     }
 
     @Transactional(readOnly = true)
@@ -58,10 +58,9 @@ public class StationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Station> findStationByLineId(final Long lineId) {
-        Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
+    public List<Station> findStationsByLineId(final Long lineId) {
+        SortedSections sections = new SortedSections(sectionDao.findAllByLineId(lineId));
         return sections.toStations();
     }
-
 
 }

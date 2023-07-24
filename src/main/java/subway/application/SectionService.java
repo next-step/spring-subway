@@ -68,11 +68,11 @@ public class SectionService {
 
     private Station getStationById(final Long stationId) {
         return stationDao.findById(stationId)
-                .orElseThrow(() -> new IllegalStateException("역 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("역 찾을 수 없습니다."));
     }
 
     private Line getLineById(final Long lineId) {
         return lineDao.findById(lineId)
-                .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
     }
 }

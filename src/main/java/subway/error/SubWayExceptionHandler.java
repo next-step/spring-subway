@@ -16,28 +16,28 @@ public class SubWayExceptionHandler {
     @ExceptionHandler({
             SQLException.class,
     })
-    public ResponseEntity<ErrorData> handleSQLException() {
+    public ResponseEntity<ErrorResponse> handleSQLException() {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorData.of(BAD_REQUEST.value(), "처리할 수 없는 입력이 주어졌습니다."));
+                .body(ErrorResponse.of(BAD_REQUEST.value(), "처리할 수 없는 입력이 주어졌습니다."));
     }
 
     @ExceptionHandler({
             IllegalArgumentException.class
     })
-    public ResponseEntity<ErrorData> handleArgumentExceptionException(IllegalArgumentException exception) {
+    public ResponseEntity<ErrorResponse> handleArgumentExceptionException(IllegalArgumentException exception) {
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorData.of(BAD_REQUEST.value(), exception.getMessage()));
+                .body(ErrorResponse.of(BAD_REQUEST.value(), exception.getMessage()));
     }
 
     @ExceptionHandler({
             IllegalStateException.class
     })
-    public ResponseEntity<ErrorData> handleIllegalStateExceptionException() {
-        return ResponseEntity.badRequest()
+    public ResponseEntity<ErrorResponse> handleIllegalStateExceptionException(IllegalStateException exception) {
+        return ResponseEntity.internalServerError()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorData.of(INTERNAL_SERVER_ERROR.value(), "서버가 잘못 설계되었습니다. 문의 주십시오."));
+                .body(ErrorResponse.of(INTERNAL_SERVER_ERROR.value(), exception.getMessage()));
     }
 
 }

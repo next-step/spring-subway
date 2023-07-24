@@ -1,19 +1,19 @@
 package subway.error;
 
-public class ErrorData {
+public class ErrorResponse {
     private int statusCode;
     private String message;
 
-    public ErrorData(final int statusCode, final String message) {
+    public ErrorResponse(final int statusCode, final String message) {
         this.statusCode = statusCode;
         this.message = message;
     }
 
-    public ErrorData() {
+    public ErrorResponse() {
     }
 
-    public static ErrorData of(final int statusCode, final String message) {
-        return new ErrorData(statusCode, message);
+    public static ErrorResponse of(final int statusCode, final String message) {
+        return new ErrorResponse(statusCode, message);
     }
 
     public int getStatusCode() {

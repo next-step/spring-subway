@@ -31,10 +31,10 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(final LineCreateRequest request) {
+    public LineResponse createLineAndFirstSection(final LineCreateRequest request) {
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
-        sectionService.saveFirstSection(
+        sectionService.createFirstSection(
                 persistLine.getId(),
                 request.getUpStationId(),
                 request.getDownStationId(),
@@ -57,14 +57,14 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineWithStationsResponse findLineResponseById(final Long lineId) {
         final Line persistLine = findLineById(lineId);
-        final List<Station> stations = stationService.findStationByLineId(lineId);
+        final List<Station> stations = stationService.findStationsByLineId(lineId);
         return LineWithStationsResponse.of(persistLine, stations);
     }
 
     @Transactional(readOnly = true)
     public Line findLineById(final Long lineId) {
         return lineDao.findById(lineId)
-                .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
     }
 
     @Transactional
