@@ -14,19 +14,17 @@ public class SerializeTest {
     final ObjectMapper om = new ObjectMapper();
 
     @Test
-    void serializeHasNotDefaultConstructor() {
+    void serializeHasNotDefaultConstructorWithOneField() {
         final String message = "{\"value\":1}";
 
-        // 필드가 한 개인 경우, MismatchedInputException 발생
         assertThatThrownBy(() -> om.readValue(message, OneRequest.class))
                 .isInstanceOf(MismatchedInputException.class);
     }
 
     @Test
-    void serializeHasNotDefaultConstructor2() {
+    void serializeHasNotDefaultConstructorWithMoreField() {
         final String message = "{\"name\":\"hello\",\"age\":11}";
 
-        // 필드가 한 개 이상인 경우, InvalidDefinitionException 발생
         assertThatThrownBy(() -> om.readValue(message, UserResponse.class))
                 .isInstanceOf(InvalidDefinitionException.class);
     }
