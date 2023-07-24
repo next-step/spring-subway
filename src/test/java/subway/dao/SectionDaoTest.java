@@ -13,6 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class SectionDaoTest {
 
+    private static final long NEW_SECTION_ID = 6L;
+    private static final long LINE_ID = 1L;
+    private static final long UP_STATION_ID = 12L;
+    private static final long DOWN_STATION_ID = 13L;
+    private static final long DISTANCE = 777L;
+
     @Autowired
     SectionDao sectionDao;
 
@@ -20,7 +26,7 @@ class SectionDaoTest {
     @DisplayName("구간을 하나 추가한다.")
     void insert() {
         /* given */
-        final Section section = new Section(6L, 1L, 12L, 13L, 777L);
+        final Section section = new Section(NEW_SECTION_ID, LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
 
         /* when */
         final Section insert = sectionDao.insert(section);
