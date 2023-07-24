@@ -1,8 +1,7 @@
 package subway.domain;
 
-import subway.exception.SubwayException;
-
 import java.util.Objects;
+import subway.exception.SubwayException;
 
 public class Section {
 
@@ -12,8 +11,7 @@ public class Section {
     private final Long downStationId;
     private final Long distance;
 
-    public Section(final Long lineId, final Long upStationId, final Long downStationId,
-            final Long distance) {
+    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
         this(null, lineId, upStationId, downStationId, distance);
     }
 
