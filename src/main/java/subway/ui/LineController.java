@@ -7,11 +7,8 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
-import subway.exception.IncorrectRequestException;
-import subway.exception.InternalStateException;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -62,20 +59,5 @@ public class LineController {
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam String stationId) {
         lineService.deleteSectionByStationId(id, stationId);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<String> handleSQLException(SQLException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
-    @ExceptionHandler(IncorrectRequestException.class)
-    public ResponseEntity<Void> handleIncorrectRequestException() {
-        return ResponseEntity.badRequest().build();
-    }
-
-    @ExceptionHandler(InternalStateException.class)
-    public ResponseEntity<Void> handleInternalStateException() {
-        return ResponseEntity.badRequest().build();
     }
 }
