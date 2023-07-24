@@ -146,6 +146,29 @@ class SectionTest {
         assertThat(section.hasSameUpStationOrDownStation(nothingSameSection)).isFalse();
     }
 
+    @Test
+    @DisplayName("구간의 하행역과 재배치 대상 구간의 상행역이 같은 경우 재배치한다.")
+    void rearrangeSections() {
+        Section section = new Section(1L, lineA, stationA, stationB, 2);
+        Section targetSection = new Section(2L, lineA, stationB, stationC, 5);
+
+        Section rearrangedSection = section.rearrangeSections(targetSection);
+
+        Section expectedSection = new Section(1L, lineA, stationA, stationC, 7);
+
+        assertThat(rearrangedSection).isEqualTo(expectedSection);
+        assertThat(doSectionsHaveSameFields(rearrangedSection, expectedSection)).isTrue();
+    }
+
+    @Test
+    @DisplayName("구간의 하행역과 재배치 대상 구간의 상행역이 다른 경우 재배치할 수 없다.")
+    void cannotRearrangeSections() {
+        Section section = new Section(1L, lineA, stationA, stationB, 2);
+        Section targetSection = new Section(2L, lineA, stationC, stationD, 5);
+
+        assertThatThrownBy(() -> section.rearrangeSections(targetSection))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 
     static boolean doSectionsHaveSameFields(Section section, Section other) {
         return Objects.equals(section.getLine(), other.getLine())

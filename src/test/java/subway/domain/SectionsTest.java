@@ -209,4 +209,18 @@ class SectionsTest {
         assertThatThrownBy(() -> sections.remove(stationD))
             .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    @DisplayName("중간역을 삭제할 경우 재배치를 하고, 거리는 두 구간의 거리 합이 된다.")
+    void removeInMiddle() {
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 2);
+        Section sectionB = new Section(2L, lineA, stationB, stationC, 5);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        Section sectionToUpdate = sections.remove(stationB).get();
+
+        Section expectedSection = new Section(1L, lineA, stationA, stationC, 7);
+        assertThat(doSectionsHaveSameFields(sectionToUpdate, expectedSection)).isTrue();
+        assertThat(sections).isEqualTo(new Sections(List.of(expectedSection)));
+    }
 }

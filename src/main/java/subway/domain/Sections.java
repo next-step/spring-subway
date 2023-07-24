@@ -164,6 +164,10 @@ public class Sections {
     public Optional<Section> remove(Station station) {
         validateSize();
 
+        if (!getStations().contains(station)) {
+            throw new IllegalArgumentException("노선에 등록되어 있지 않은 역은 제거할 수 없습니다.");
+        }
+
         if (getLast().hasDownStationSameAs(station)) {
             values.remove(values.size() - 1);
             return Optional.empty();
@@ -174,10 +178,23 @@ public class Sections {
             return Optional.empty();
         }
 
-        if (!getStations().contains(station)) {
-            throw new IllegalArgumentException("노선에 등록되어 있지 않은 역은 제거할 수 없습니다.");
-        }
-        return Optional.empty();
+        Section upperSection = values.stream()
+            .filter(section -> section.hasDownStationSameAs(station))
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException("1111"));
+
+        Section lowerSection = values.stream()
+            .filter(section -> section.hasUpStationSameAs(station))
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException("1111"));
+
+        Section rearrangedSection = upperSection.rearrangeSections(lowerSection);
+        int insertLocation = values.indexOf(upperSection);
+        values.remove(upperSection);
+        values.remove(lowerSection);
+        values.add(insertLocation, rearrangedSection);
+
+        return Optional.of(rearrangedSection);
     }
 
     private void validateFinalDownStationSameAs(Station station) {

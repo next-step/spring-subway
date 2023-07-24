@@ -71,6 +71,17 @@ public class Section {
             "추가할 구간의 상행역 하행역이 모두 같거나 모두 다를 수 없습니다. 기존 구간: " + this + " 추가할 구간: " + section);
     }
 
+    public Section rearrangeSections(Section section) {
+        if (!this.downStation.equals(section.upStation)) {
+            throw new IllegalArgumentException(
+                "구간의 하행역이 재배치 대상 구간의 상행역과 같지 않으면 재배치할 수 없습니다. 기존 구간: " + this + ", 대상 구간: "
+                    + section);
+        }
+
+        return new Section(this.id, this.line, this.upStation, section.downStation,
+            this.distance + section.distance);
+    }
+
     private boolean isOnlyUpStationMatch(Section section) {
         return section.upStation.equals(this.upStation) && !section.downStation.equals(
             this.downStation);
