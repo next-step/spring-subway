@@ -42,7 +42,7 @@ public class Sections {
 
     private Station findEndStation() {
         return findStations().stream()
-            .filter(station -> !findStartStations().contains(station))
+            .filter(station -> !findUpStations().contains(station))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
     }
@@ -73,7 +73,7 @@ public class Sections {
 
     private Station findTopStation() {
         return findStations().stream()
-            .filter(station -> !findEndStations().contains(station))
+            .filter(station -> !findDownStations().contains(station))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
     }
@@ -102,7 +102,7 @@ public class Sections {
     }
 
     private SectionRegisterVo registerUpSection(Section registerSection) {
-        if (!findStartStations().contains(registerSection.getUpStation())) {
+        if (!findUpStations().contains(registerSection.getUpStation())) {
             return new SectionRegisterVo(registerSection);
         }
         return registerMiddleUpSection(registerSection);
@@ -114,7 +114,7 @@ public class Sections {
     }
 
     private SectionRegisterVo registerDownSection(Section registerSection) {
-        if (!findEndStations().contains(registerSection.getDownStation())) {
+        if (!findDownStations().contains(registerSection.getDownStation())) {
             return new SectionRegisterVo(registerSection);
         }
         return registerMiddleDownSection(registerSection);
@@ -141,19 +141,19 @@ public class Sections {
 
     private Set<Station> findStations() {
         return Stream.concat(
-                findStartStations().stream(),
-                findEndStations().stream()
+                findUpStations().stream(),
+                findDownStations().stream()
             )
             .collect(Collectors.toSet());
     }
 
-    private Set<Station> findStartStations() {
+    private Set<Station> findUpStations() {
         return sections.stream()
             .map(Section::getUpStation)
             .collect(Collectors.toSet());
     }
 
-    private Set<Station> findEndStations() {
+    private Set<Station> findDownStations() {
         return sections.stream()
             .map(Section::getDownStation)
             .collect(Collectors.toSet());
