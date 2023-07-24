@@ -41,17 +41,6 @@ public class SectionService {
     }
 
     @Transactional
-    public void removeLast(Long lineId, Long stationId) {
-        Line line = getLineOrElseThrow(lineId);
-        Sections sections = sectionDao.findAllByLine(line);
-        Station station = getStationOrElseThrow(stationId);
-
-        Section removedSection = sections.removeLast(station);
-
-        sectionDao.delete(removedSection);
-    }
-
-    @Transactional
     public void remove(Long lineId, Long stationId) {
         Line line = getLineOrElseThrow(lineId);
         Sections sections = sectionDao.findAllByLine(line);
