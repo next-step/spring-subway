@@ -5,6 +5,8 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -28,6 +30,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JsonProcessingException.class)
     public ErrorResponse jsonProcessingExceptionHandle() {
         return new ErrorResponse(BAD_REQUEST.value(), "입력 값이 잘못되었습니다.");
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ErrorResponse uniqueExceptionHandle() {
+        return new ErrorResponse(BAD_REQUEST.value(), "중복된 이름을 입력했습니다.");
     }
 
     @ResponseStatus(BAD_REQUEST)
