@@ -156,4 +156,29 @@ class SectionDaoTest {
             assertThat(result).isEqualTo(updatedSection);
         }
     }
+
+    @Nested
+    @DisplayName("deleteBySectionId 메소드는")
+    class DeleteBySectionId_Method {
+
+        @Test
+        @DisplayName("SECTIONS.id에 해당하는 Section을 삭제한다")
+        void Delete_Section_Equals_Sections_Id() {
+            // given
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
+
+            Station upStation = stationDao.insert(new Station("upStationName"));
+            Station downStation = stationDao.insert(new Station("downStationName"));
+
+            Section section = DomainFixture.Section.buildWithStations(upStation, downStation);
+            section = sectionDao.insert(line.getId(), section);
+
+            // when
+            sectionDao.deleteBySectionId(section.getId());
+            List<Section> result = sectionDao.findAllByLineId(line.getId());
+
+            // then
+            assertThat(result).isEmpty();
+        }
+    }
 }
