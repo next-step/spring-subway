@@ -73,12 +73,13 @@ class SectionServiceTest {
         final Sections sections = new Sections(List.of(sectionA, sectionB));
         doReturn(Optional.of(lineA)).when(lineDao).findById(lineA.getId());
         doReturn(sections).when(sectionDao).findAllByLine(lineA);
-        doReturn(Optional.of(stationC)).when(stationDao).findById(stationC.getId());
+        doReturn(Optional.of(stationB)).when(stationDao).findById(stationB.getId());
 
         //when
-        sectionService.removeLast(lineA.getId(), stationC.getId());
+        sectionService.remove(lineA.getId(), stationB.getId());
 
         //then
-        verify(sectionDao).delete(sectionB);
+        verify(sectionDao).update(any());
+        verify(sectionDao).deleteByLineAndStation(lineA, stationB);
     }
 }

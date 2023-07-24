@@ -51,6 +51,16 @@ public class SectionService {
         sectionDao.delete(removedSection);
     }
 
+    @Transactional
+    public void remove(Long lineId, Long stationId) {
+        Line line = getLineOrElseThrow(lineId);
+        Sections sections = sectionDao.findAllByLine(line);
+        Station station = getStationOrElseThrow(stationId);
+
+        sections.remove(station).ifPresent(sectionDao::update);
+        sectionDao.deleteByLineAndStation(line, station);
+    }
+
     private Line getLineOrElseThrow(Long id) {
         return lineDao.findById(id)
             .orElseThrow(
