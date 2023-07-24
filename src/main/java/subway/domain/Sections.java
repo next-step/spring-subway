@@ -28,28 +28,12 @@ public class Sections {
         }
     }
 
-    public void canDeleteStation(Long stationId) {
-        validSectionCount();
-        validStationIsEnd(stationId);
-    }
-
-    private void validSectionCount() {
+    public void validDeleteStation() {
         if (sections.size() <= MINIMUM_SIZE) {
             throw new IllegalArgumentException(
-                MessageFormat.format("구간이 {0}개 이하이므로 해당역을 삭제할 수 없습니다.", MINIMUM_SIZE)
+                    MessageFormat.format("구간이 {0}개 이하이므로 해당역을 삭제할 수 없습니다.", MINIMUM_SIZE)
             );
         }
-    }
-
-    private void validStationIsEnd(Long stationId) {
-        Station endStation = findEndStation();
-        if (isNotEndStation(stationId, endStation)) {
-            throw new IllegalArgumentException("하행 종점역이 아니면 삭제할 수 없습니다.");
-        }
-    }
-
-    private boolean isNotEndStation(Long stationId, Station endStation) {
-        return !Objects.equals(endStation.getId(), stationId);
     }
 
     private Station findEndStation() {
@@ -121,7 +105,8 @@ public class Sections {
     }
 
     private SectionsRegister registerNewSectionByUpStation(Section registerSection) {
-        Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation());
+        Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation())
+                .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
         return new SectionsRegister(registerSection, registerSection.makeNewUpSection(duplicatedUpSection));
     }
 
@@ -133,22 +118,21 @@ public class Sections {
     }
 
     private SectionsRegister registerNewSectionByDownStation(Section registerSection) {
-        Section duplicatedDownSection = findSectionByDownStation(registerSection.getDownStation());
+        Section duplicatedDownSection = findSectionByDownStation(registerSection.getDownStation())
+                .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
         return new SectionsRegister(registerSection, registerSection.makeNewDownSection(duplicatedDownSection));
     }
 
-    private Section findSectionByDownStation(Station station) {
+    public Optional<Section> findSectionByDownStation(Station station) {
         return sections.stream()
             .filter(section -> section.downStationEquals(station))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
+            .findFirst();
     }
 
-    private Section findSectionByUpStation(Station station) {
+    public Optional<Section> findSectionByUpStation(Station station) {
         return sections.stream()
             .filter(section -> section.upStationEquals(station))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
+            .findFirst();
     }
 
     private Set<Station> findStations() {

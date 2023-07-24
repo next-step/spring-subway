@@ -126,26 +126,6 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("하행 종점역은 삭제할 수 있다.")
-    void canDelete() {
-        assertThatNoException()
-            .isThrownBy(() -> sections.canDeleteStation(4L));
-    }
-
-    @Test
-    @DisplayName("하행 종점역이 아니면 삭제할 수 없다.")
-    void canNotDelete() {
-        Assertions.assertAll(
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(1L))
-                .isInstanceOf(IllegalArgumentException.class),
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(2L))
-                .isInstanceOf(IllegalArgumentException.class),
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(3L))
-                .isInstanceOf(IllegalArgumentException.class)
-        );
-    }
-
-    @Test
     @DisplayName("Line에 역이 하나도 없다면 구간이 무조건 등록된다")
     void registerSectionInEmptyLine() {
         Sections sections = new Sections(Collections.emptyList());
@@ -156,7 +136,7 @@ class SectionsTest {
     @DisplayName("구간이 1개 이하인 경우 해당역을 삭제할 수 없다")
     void canNotRemoveStation() {
         Sections sections = new Sections(List.of(section1));
-        assertThatThrownBy(() -> sections.canDeleteStation(2L))
+        assertThatThrownBy(sections::validDeleteStation)
             .isInstanceOf(IllegalArgumentException.class);
     }
 

@@ -12,6 +12,8 @@ import subway.domain.Station;
 import subway.domain.vo.SectionsRegister;
 import subway.dto.request.SectionRegisterRequest;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 public class SectionService {
@@ -51,8 +53,28 @@ public class SectionService {
     @Transactional
     public void deleteSection(Long stationId, Long lineId) {
         Sections sections = sectionDao.findAllByLineId(lineId);
-        sections.canDeleteStation(stationId);
+        Station deleteStation = stationDao.findById(stationId);
+        sections.validDeleteStation();
 
-        sectionDao.deleteByDownStationIdAndLineId(stationId, lineId);
+        Optional<Section> sectionByUpStation = sections.findSectionByUpStation(deleteStation);
+        Optional<Section> sectionByDownStation = sections.findSectionByDownStation(deleteStation);
+
+        deleteSectionsContainingDeleteStation(sectionByUpStation, sectionByDownStation);
+
+        makeCombineSection(sectionByUpStation, sectionByDownStation);
+    }
+
+    private void deleteSectionsContainingDeleteStation(Optional<Section> sectionByUpStation, Optional<Section> sectionByDownStation) {
+        sectionByUpStation.ifPresent(section -> sectionDao.deleteById(section.getId()));
+        sectionByDownStation.ifPresent(section -> sectionDao.deleteById(section.getId()));
+    }
+
+    private void makeCombineSection(Optional<Section> sectionByUpStation, Optional<Section> sectionByDownStation) {
+        if (sectionByDownStation.isPresent() && sectionByUpStation.isPresent()) {
+            Section newSectionUpStation = sectionByDownStation.get();
+            Section newSectionDownStation = sectionByUpStation.get();
+            Section newSection = newSectionUpStation.combineSection(newSectionDownStation);
+            sectionDao.insert(newSection);
+        }
     }
 }
