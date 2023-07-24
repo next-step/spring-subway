@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import subway.domain.response.SectionDisconnectResponse;
 
 @DisplayName("Section 클래스")
 class SectionTest {
@@ -398,6 +399,124 @@ class SectionTest {
                 assertThat(section.getDownStation()).isEqualTo(stations.get(stationIdx + 1));
                 section = section.getDownSection();
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("disconnectStation 메소드는")
+    class DisconnectStation_Method {
+
+        @Test
+        @DisplayName("연결된 구간의 첫번째 station을 삭제할 수 있다.")
+        void Disconnect_FirstSection() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Station downStation = new Station(2L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            upSection.connectDownSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = upSection.disconnectStation(upStation);
+
+            // then
+            assertThat(downSection.getUpSection()).isNull();
+            assertThat(result.getUpdatedSections()).containsExactly(downSection);
+            assertThat(result.getDeletedSection()).isEqualTo(upSection);
+        }
+
+        @Test
+        @DisplayName("호출되면, 마지막 Station과 연결을 해제한다")
+        void Disconnect_LastSection() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Station downStation = new Station(2L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            upSection.connectDownSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = upSection.disconnectStation(downStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isNull();
+            assertThat(result.getDeletedSection()).isEqualTo(downSection);
+            assertThat(result.getUpdatedSections()).containsExactly(upSection);
+        }
+
+        @Test
+        @DisplayName("section이 3개 이상일때, 중간 station 이라면, 연결을 해제하고 양쪽 station과 연결한다")
+        void Disconnect_Section_And_Connect_Children_Descendant() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleUpStation = new Station(2L, "middleUpStation");
+            Station middleDownStation = new Station(3L, "middleDownStation");
+            Station downStation = new Station(4L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleUpStation);
+            Section middleSection = DomainFixture.Section.buildWithStations(middleUpStation, middleDownStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleDownStation, downStation);
+
+            upSection.connectDownSection(middleSection);
+            middleSection.connectDownSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = upSection.disconnectStation(middleUpStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isEqualTo(downSection);
+            assertThat(result.getDeletedSection()).isEqualTo(middleSection);
+            assertThat(result.getUpdatedSections()).containsExactly(upSection, downSection);
+        }
+
+        @Test
+        @DisplayName("section이 2개일때, 중간 station 이라면, 연결을 해제하고 양쪽 station과 연결한다")
+        void Disconnect_Section_And_Connect_Children_Descendant_When_Section_Only_Two() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(4L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            upSection.connectDownSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = upSection.disconnectStation(middleStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isNull();
+            assertThat(result.getDeletedSection()).isEqualTo(downSection);
+            assertThat(result.getUpdatedSections()).containsExactly(upSection);
+        }
+
+        @Test
+        @DisplayName("삭제가능한 station을 찾을 수 없으면, IllegalStateException을 던진다.")
+        void Throw_IllegalStateException_Cannot_Find_Deletable_Station() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Station downStation = new Station(2L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            upSection.connectDownSection(downSection);
+
+            Station nonExistStation = new Station(4L, "nonExistStation");
+
+            // when
+            Exception exception = catchException(() -> upSection.disconnectStation(nonExistStation));
+
+            // then
+            assertThat(exception).isInstanceOf(IllegalStateException.class);
         }
     }
 }

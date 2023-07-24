@@ -1,9 +1,11 @@
 package subway.domain;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.util.Assert;
+import subway.domain.response.SectionDisconnectResponse;
 
 public class Section {
 
@@ -126,8 +128,55 @@ public class Section {
 
     public void disconnectDownSection() {
         Assert.notNull(downSection, () -> "downSection이 null 일때, \"disconnectDownSection()\" 를 호출할 수 없습니다");
-        downSection.upSection = null;
-        downSection = null;
+        if (downSection.downSection == null) {
+            downSection.upSection = null;
+            downSection = null;
+            return;
+        }
+        downSection.downSection.upSection = this;
+        downSection = downSection.downSection;
+    }
+
+    public SectionDisconnectResponse disconnectStation(Station station) {
+        if (isUpStation(station)) {
+            downSection.upSection = null;
+            return new SectionDisconnectResponse(this, List.of(downSection));
+        }
+        if (isDownStation(station)) {
+            upSection.downSection = null;
+            return new SectionDisconnectResponse(this, List.of(upSection));
+        }
+        if (isMiddleStation(station)) {
+            downStation = downSection.downStation;
+            if (downSection.downSection != null) {
+                SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection,
+                        List.of(this, downSection.downSection));
+                downSection = downSection.downSection;
+                downSection.upSection = this;
+                return sectionDisconnectResponse;
+            }
+            SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection,
+                    List.of(this));
+            downSection = null;
+            return sectionDisconnectResponse;
+        }
+        if (downSection == null) {
+            throw new IllegalStateException(
+                    MessageFormat.format("삭제 가능한 section을 찾을 수 없습니다. station \"{0}\"", station));
+        }
+        return downSection.disconnectStation(station);
+    }
+
+    private boolean isUpStation(Station station) {
+        return station == upStation && upSection == null;
+    }
+
+    private boolean isDownStation(Station station) {
+        return station == downStation && downSection == null;
+    }
+
+    private boolean isMiddleStation(Station station) {
+        return station == downStation && downSection != null;
     }
 
     public Long getId() {
