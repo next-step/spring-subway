@@ -9,7 +9,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.domain.vo.SectionRegisterVo;
+import subway.domain.vo.SectionsRegister;
 import subway.dto.request.SectionRegisterRequest;
 
 @Service
@@ -39,7 +39,7 @@ public class SectionService {
         );
 
         Sections sections = sectionDao.findAllByLineId(lineId);
-        SectionRegisterVo result = sections.registerSection(section);
+        SectionsRegister result = sections.registerSection(section);
 
         sectionDao.insert(result.getAddSection());
 

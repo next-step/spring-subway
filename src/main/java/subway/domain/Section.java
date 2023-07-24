@@ -1,6 +1,6 @@
 package subway.domain;
 
-import subway.domain.vo.SectionRegisterVo;
+import subway.domain.vo.SectionsRegister;
 
 import java.util.Objects;
 
@@ -42,7 +42,7 @@ public class Section {
         return this.distance.isOverDistance(distance);
     }
 
-    public SectionRegisterVo makeNewUpSection(Section duplicatedUpSection) {
+    public SectionsRegister makeNewUpSection(Section duplicatedUpSection) {
         validateDistance(duplicatedUpSection);
 
         Section modifySection = new Section(
@@ -53,10 +53,10 @@ public class Section {
                 duplicatedUpSection.distance.subtract(this.distance).getDistance()
         );
 
-        return new SectionRegisterVo(this, modifySection);
+        return new SectionsRegister(this, modifySection);
     }
 
-    public SectionRegisterVo makeNewDownSection(Section duplicatedDownSection) {
+    public SectionsRegister makeNewDownSection(Section duplicatedDownSection) {
         validateDistance(duplicatedDownSection);
 
         Section modifySection = new Section(
@@ -67,7 +67,7 @@ public class Section {
                 duplicatedDownSection.distance.subtract(this.distance).getDistance()
         );
 
-        return new SectionRegisterVo(this, modifySection);
+        return new SectionsRegister(this, modifySection);
     }
 
     private void validateDistance(Section duplicatedUpSection) {

@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import subway.domain.vo.SectionRegisterVo;
+import subway.domain.vo.SectionsRegister;
 
 public class Sections {
 
@@ -90,7 +90,7 @@ public class Sections {
             .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
     }
 
-    public SectionRegisterVo registerSection(Section section) {
+    public SectionsRegister registerSection(Section section) {
         validRegisterSection(section);
         if (findStations().contains(section.getUpStation())) {
             return registerUpSection(section);
@@ -98,7 +98,7 @@ public class Sections {
         if (findStations().contains(section.getDownStation())) {
             return registerDownSection(section);
         }
-        return new SectionRegisterVo(section);
+        return new SectionsRegister(section);
     }
 
     private void validRegisterSection(Section section) {
@@ -113,26 +113,26 @@ public class Sections {
         }
     }
 
-    private SectionRegisterVo registerUpSection(Section registerSection) {
+    private SectionsRegister registerUpSection(Section registerSection) {
         if (!findUpStations().contains(registerSection.getUpStation())) {
-            return new SectionRegisterVo(registerSection);
+            return new SectionsRegister(registerSection);
         }
         return registerMiddleUpSection(registerSection);
     }
 
-    private SectionRegisterVo registerMiddleUpSection(Section registerSection) {
+    private SectionsRegister registerMiddleUpSection(Section registerSection) {
         Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation());
         return registerSection.makeNewUpSection(duplicatedUpSection);
     }
 
-    private SectionRegisterVo registerDownSection(Section registerSection) {
+    private SectionsRegister registerDownSection(Section registerSection) {
         if (!findDownStations().contains(registerSection.getDownStation())) {
-            return new SectionRegisterVo(registerSection);
+            return new SectionsRegister(registerSection);
         }
         return registerMiddleDownSection(registerSection);
     }
 
-    private SectionRegisterVo registerMiddleDownSection(Section registerSection) {
+    private SectionsRegister registerMiddleDownSection(Section registerSection) {
         Section duplicatedDownSection = findSectionByDownStation(registerSection.getDownStation());
         return registerSection.makeNewDownSection(duplicatedDownSection);
     }

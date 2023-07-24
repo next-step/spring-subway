@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.domain.vo.SectionRegisterVo;
+import subway.domain.vo.SectionsRegister;
 
 class SectionsTest {
 
@@ -170,7 +170,7 @@ class SectionsTest {
             5
         );
 
-        SectionRegisterVo result = sections.registerSection(addSection);
+        SectionsRegister result = sections.registerSection(addSection);
 
         Section expectedNewSection = new Section(
             3L,
@@ -216,7 +216,7 @@ class SectionsTest {
             line1,
             5
         );
-        SectionRegisterVo result = sections.registerSection(addSection);
+        SectionsRegister result = sections.registerSection(addSection);
         Assertions.assertAll(
             () -> assertThat(result.getAddSection().equals(addSection)).isTrue(),
             () -> assertThat(result.getUpdateSection().get().equals(expectedNewSection)).isTrue()

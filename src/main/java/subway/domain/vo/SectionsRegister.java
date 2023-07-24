@@ -3,18 +3,18 @@ package subway.domain.vo;
 import java.util.Optional;
 import subway.domain.Section;
 
-public class SectionRegisterVo {
+public class SectionsRegister {
 
     private final Section addSection;
 
     private final Optional<Section> updateSection;
 
-    public SectionRegisterVo(Section addSection, Section updateSection) {
+    public SectionsRegister(Section addSection, Section updateSection) {
         this.addSection = addSection;
         this.updateSection = Optional.of(updateSection);
     }
 
-    public SectionRegisterVo(Section addSection) {
+    public SectionsRegister(Section addSection) {
         this.addSection = addSection;
         this.updateSection = Optional.empty();
     }
