@@ -4,10 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.LineService;
 import subway.application.SectionService;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
-import subway.dto.SectionResponse;
+import subway.dto.*;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -37,7 +34,7 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+    public ResponseEntity<LineWithStationsResponse> findLineById(@PathVariable Long id) {
         return ResponseEntity.ok(lineService.findLineResponseById(id));
     }
 

@@ -11,6 +11,7 @@ import subway.domain.Line;
 import subway.domain.StationPair;
 import subway.domain.Station;
 import subway.dto.LineResponse;
+import subway.dto.LineWithStationsResponse;
 import subway.dto.StationResponse;
 
 import java.util.List;
@@ -47,17 +48,17 @@ class LineServiceTest {
         ));
 
         // when
-        LineResponse lineResponse = lineService.findLineResponseById(lineId);
+        LineWithStationsResponse lineResponse = lineService.findLineResponseById(lineId);
 
         // then
         assertAll(
-                () -> assertThat(lineResponse.getStations().get(0).getId())
+                () -> assertThat(lineResponse.getStationResponses().get(0).getId())
                         .isEqualTo(StationResponse.of(station4).getId()),
-                () -> assertThat(lineResponse.getStations().get(1).getId())
+                () -> assertThat(lineResponse.getStationResponses().get(1).getId())
                         .isEqualTo(StationResponse.of(station1).getId()),
-                () -> assertThat(lineResponse.getStations().get(2).getId())
+                () -> assertThat(lineResponse.getStationResponses().get(2).getId())
                         .isEqualTo(StationResponse.of(station3).getId()),
-                () -> assertThat(lineResponse.getStations().get(3).getId())
+                () -> assertThat(lineResponse.getStationResponses().get(3).getId())
                         .isEqualTo(StationResponse.of(station2).getId())
         );
     }

@@ -7,6 +7,7 @@ import subway.dao.SectionDao;
 import subway.domain.*;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineWithStationsResponse;
 import subway.exception.IllegalLineException;
 
 import java.util.*;
@@ -56,11 +57,11 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineResponseById(Long id) {
+    public LineWithStationsResponse findLineResponseById(Long id) {
         final Line persistLine = findLineById(id);
         final List<StationPair> stationPairs = lineDao.findAllStationPair(id);
         final Stations stations = new Stations(stationPairs);
-        return LineResponse.of(persistLine, stations.getStations());
+        return LineWithStationsResponse.of(persistLine, stations.getStations());
     }
 
     public Line findLineById(Long id) {

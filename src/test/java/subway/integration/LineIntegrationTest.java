@@ -159,13 +159,13 @@ class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        LineResponse resultResponse = response.as(LineResponse.class);
-        assertThat(resultResponse.getId()).isEqualTo(lineId);
+        LineWithStationsResponse resultResponse = response.as(LineWithStationsResponse.class);
+        assertThat(resultResponse.getLineResponse().getId()).isEqualTo(lineId);
 
-        assertThat(resultResponse.getStations().get(0).getId()).isEqualTo(stationResponses.get(0).getId());
-        assertThat(resultResponse.getStations().get(1).getId()).isEqualTo(stationResponses.get(1).getId());
-        assertThat(resultResponse.getStations().get(2).getId()).isEqualTo(stationResponses.get(2).getId());
-        assertThat(resultResponse.getStations().get(3).getId()).isEqualTo(stationResponses.get(3).getId());
+        assertThat(resultResponse.getStationResponses().get(0).getId()).isEqualTo(stationResponses.get(0).getId());
+        assertThat(resultResponse.getStationResponses().get(1).getId()).isEqualTo(stationResponses.get(1).getId());
+        assertThat(resultResponse.getStationResponses().get(2).getId()).isEqualTo(stationResponses.get(2).getId());
+        assertThat(resultResponse.getStationResponses().get(3).getId()).isEqualTo(stationResponses.get(3).getId());
     }
 
     @DisplayName("지하철 노선을 수정한다.")
