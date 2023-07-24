@@ -264,4 +264,21 @@ class LineIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
+
+    @Test
+    @DisplayName("Line의 중간 Station을 제거한다")
+    void deleteMiddleStationOfLine() {
+        // given
+        Long lineId = createLineByLineRequest(lineCreateRequest1).body().as(LineResponse.class).getId();
+
+        SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(stationRequest2, stationRequest3, 5);
+
+        registerSectionToLine(lineId, sectionCreateRequest);
+
+        // when
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest2);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
 }
