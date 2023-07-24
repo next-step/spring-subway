@@ -120,8 +120,8 @@ class SectionsTest {
         Section newSection = new Section(upStation, midStation,  3);
         Section newSection2 = new Section(midStation, downStation,  3);
 
-        assertEquals(sections.oldSection(newSection), oldSection);
-        assertEquals(sections.oldSection(newSection2), oldSection);
+        assertEquals(sections.overlappedSection(newSection), oldSection);
+        assertEquals(sections.overlappedSection(newSection2), oldSection);
     }
 
     @DisplayName("새로운 구간이 삽입될 수 있도록 기존 구간을 잘라서 반환한다.")
@@ -139,8 +139,8 @@ class SectionsTest {
         Section upMidSection = new Section(upStation, midStation,  3);
         Section midDownSection = new Section(midStation, downStation, 7);
 
-        assertEquals(sections.cut(oldSection, upMidSection), midDownSection);
-        assertEquals(sections.cut(oldSection, midDownSection), upMidSection);
+        assertEquals(sections.createConnectedSection(oldSection, upMidSection), midDownSection);
+        assertEquals(sections.createConnectedSection(oldSection, midDownSection), upMidSection);
     }
 
     @DisplayName("새로운 구간을 삽입할 때 가운데에 삽입되는지 확인한다.")
@@ -186,7 +186,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, midStation,  10);
 
-        assertThrows(IncorrectRequestException.class, () -> sections.cut(oldSection, newSection));
+        assertThrows(IncorrectRequestException.class, () -> sections.createConnectedSection(oldSection, newSection));
     }
 
     @DisplayName("마지막 구간을 제거할 수 있는지 확인한다.")

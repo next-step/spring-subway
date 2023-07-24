@@ -78,9 +78,9 @@ public class LineService {
         sections.validateInsert(newSection);
 
         if (sections.isInsertedMiddle(newSection)) {
-            Section oldSection = sections.oldSection(newSection);
-            sectionDao.deleteById(oldSection.getId());
-            sectionDao.insert(sections.cut(oldSection, newSection), lineId);
+            Section overlappedSection = sections.overlappedSection(newSection);
+            sectionDao.deleteById(overlappedSection.getId());
+            sectionDao.insert(sections.createConnectedSection(overlappedSection, newSection), lineId);
         }
         sectionDao.insert(newSection, lineId);
     }

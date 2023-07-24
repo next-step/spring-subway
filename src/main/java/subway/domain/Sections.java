@@ -32,18 +32,18 @@ public class Sections {
     }
 
     private List<Section> sorted(final List<Section> sections) {
-        Map<Station, Section> stationToSection = new HashMap<>();
-        sections.forEach(section -> stationToSection.put(section.getUpStation(), section));
-        return sortSections(sections, stationToSection);
+        Map<Station, Section> nextSectionMap = new HashMap<>();
+        sections.forEach(section -> nextSectionMap.put(section.getUpStation(), section));
+        return sortSections(sections, nextSectionMap);
     }
 
-    private List<Section> sortSections(final List<Section> sections, final Map<Station, Section> stationToSection) {
+    private List<Section> sortSections(final List<Section> sections, final Map<Station, Section> nextSectionMap) {
         List<Section> sortedSection = new ArrayList<>();
-        Section nextSection = stationToSection.get(findFirstStation());
+        Section nextSection = nextSectionMap.get(findFirstStation());
         sortedSection.add(nextSection);
         for (int i = 1; i < sections.size(); i++) {
             Station lastDownStation = nextSection.getDownStation();
-            nextSection = stationToSection.get(lastDownStation);
+            nextSection = nextSectionMap.get(lastDownStation);
             sortedSection.add(nextSection);
         }
         return Collections.unmodifiableList(sortedSection);
@@ -64,19 +64,19 @@ public class Sections {
         return this.sections.get(this.sections.size() - 1);
     }
 
-    public Section cut(final Section oldSection, final Section newSection) {
-        validateDistance(oldSection, newSection);
-        Distance reducedDistance = oldSection.distanceDifference(newSection);
+    public Section createConnectedSection(final Section overlappedSection, final Section newSection) {
+        validateDistance(overlappedSection, newSection);
+        Distance reducedDistance = overlappedSection.distanceDifference(newSection);
 
-        if (oldSection.isSameUpStation(newSection)) {
-            return new Section(newSection.getDownStation(), oldSection.getDownStation(), reducedDistance);
+        if (overlappedSection.isSameUpStation(newSection)) {
+            return new Section(newSection.getDownStation(), overlappedSection.getDownStation(), reducedDistance);
         }
 
-        return new Section(oldSection.getUpStation(), newSection.getUpStation(), reducedDistance);
+        return new Section(overlappedSection.getUpStation(), newSection.getUpStation(), reducedDistance);
 
     }
 
-    public Section oldSection(final Section newSection) {
+    public Section overlappedSection(final Section newSection) {
         return sections.stream()
                 .filter(section -> section.isSameUpStation(newSection) || section.isSameDownStation(newSection))
                 .findFirst()
