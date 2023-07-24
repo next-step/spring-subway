@@ -1,17 +1,16 @@
 package subway.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.sql.DataSource;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
-
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Repository
 public class LineDaoImpl implements LineDao {
@@ -53,7 +52,8 @@ public class LineDaoImpl implements LineDao {
     @Override
     public Optional<Line> findById(Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return Optional.ofNullable(DataAccessUtils.singleResult(jdbcTemplate.query(sql, rowMapper, id)));
+        return Optional.ofNullable(
+                DataAccessUtils.singleResult(jdbcTemplate.query(sql, rowMapper, id)));
     }
 
     @Override

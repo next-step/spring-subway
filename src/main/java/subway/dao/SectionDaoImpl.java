@@ -1,5 +1,8 @@
 package subway.dao;
 
+import java.util.List;
+import java.util.Optional;
+import javax.sql.DataSource;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,10 +14,6 @@ import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-
-import javax.sql.DataSource;
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class SectionDaoImpl implements SectionDao {

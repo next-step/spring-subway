@@ -1,14 +1,14 @@
 package subway.application;
 
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
 
-import java.util.List;
-
 public interface LineService {
+
     @Transactional
     LineResponse saveLine(LineRequest request);
 

@@ -1,11 +1,11 @@
 package subway.dao;
 
-import subway.domain.Section;
-
 import java.util.List;
 import java.util.Optional;
+import subway.domain.Section;
 
 public interface SectionDao {
+
     Optional<Section> insert(Section section);
 
     List<Section> findAllByLineId(long lineId);

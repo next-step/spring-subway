@@ -1,11 +1,11 @@
 package subway.dao;
 
-import subway.domain.Station;
-
 import java.util.List;
 import java.util.Optional;
+import subway.domain.Station;
 
 public interface StationDao {
+
     Optional<Station> insert(Station station);
 
     List<Station> findAll();
