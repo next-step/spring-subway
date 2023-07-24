@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
+
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
 
@@ -37,13 +38,7 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLine() {
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        final ExtractableResponse<Response> response = LineIntegrationSupporter.createLine(lineRequest1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -54,22 +49,10 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLineWithDuplicateName() {
         // given
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        LineIntegrationSupporter.createLine(lineRequest1);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        final ExtractableResponse<Response> response = LineIntegrationSupporter.createLine(lineRequest1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -79,29 +62,11 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
-
-        ExtractableResponse<Response> createResponse2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest2)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        final ExtractableResponse<Response> createResponse1 = LineIntegrationSupporter.createLine(lineRequest1);
+        final ExtractableResponse<Response> createResponse2 = LineIntegrationSupporter.createLine(lineRequest2);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines")
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = LineIntegrationSupporter.findAllLines();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -118,44 +83,20 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        final ExtractableResponse<Response> createResponse = LineIntegrationSupporter.createLine(lineRequest1);
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest("2", "3", 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+        LineIntegrationSupporter.createSectionInLine(1L, new SectionRequest("2", "3", 10));
+        LineIntegrationSupporter.createSectionInLine(1L, new SectionRequest("3", "4", 10));
 
-        RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRequest("3", "4", 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
-
-        List<StationResponse> stationResponses = new ArrayList<>();
+        final List<StationResponse> stationResponses = new ArrayList<>();
         stationResponses.add(StationResponse.of(1L, "오이도"));
         stationResponses.add(StationResponse.of(2L, "장지"));
         stationResponses.add(StationResponse.of(3L, "용산"));
         stationResponses.add(StationResponse.of(4L, "삼각지"));
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract();
+        final Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        final ExtractableResponse<Response> response = LineIntegrationSupporter.findLine(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -172,23 +113,11 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void updateLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        final ExtractableResponse<Response> createResponse = LineIntegrationSupporter.createLine(lineRequest1);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest2)
-                .when().put("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract();
+        final Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        final ExtractableResponse<Response> response = LineIntegrationSupporter.updateLine(lineId, lineRequest2);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -198,21 +127,11 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void deleteLine() {
         // given
-        ExtractableResponse<Response> createResponse = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
-                .when().post("/lines")
-                .then().log().all().
-                extract();
+        final ExtractableResponse<Response> createResponse = LineIntegrationSupporter.createLine(lineRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete("/lines/{lineId}", lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = LineIntegrationSupporter.deleteLine(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
