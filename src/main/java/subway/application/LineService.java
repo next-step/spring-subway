@@ -17,9 +17,7 @@ public interface LineService {
     List<Line> findLines();
 
     LineWithStationsResponse findLineResponseById(Long id);
-
-    Line findLineById(Long id);
-
+    
     @Transactional
     void updateLine(Long id, LineRequest lineUpdateRequest);
 

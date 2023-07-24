@@ -76,12 +76,6 @@ public class LineServiceImpl implements LineService {
     }
 
     @Override
-    public Line findLineById(Long id) {
-        return lineDao.findById(id)
-                .orElseThrow(() -> new LineNotFoundException(id));
-    }
-
-    @Override
     @Transactional
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
