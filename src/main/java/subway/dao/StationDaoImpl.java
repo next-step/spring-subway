@@ -63,4 +63,10 @@ public class StationDaoImpl implements StationDao {
         String sql = "delete from STATION where id = ?";
         jdbcTemplate.update(sql, id);
     }
+
+    @Override
+    public boolean existByName(String name) {
+        String sql = "select count(*) from STATION where name = ? ";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, name));
+    }
 }

@@ -8,6 +8,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.StationAlreadyExistException;
 
 @Service
 public class StationServiceImpl implements StationService {
@@ -20,8 +21,15 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public StationResponse saveStation(StationRequest stationRequest) {
+        validateDuplicatedName(stationRequest);
         Station station = stationDao.insert(new Station(stationRequest.getName())).orElseThrow();
         return StationResponse.of(station);
+    }
+
+    private void validateDuplicatedName(StationRequest stationRequest) {
+        if (stationDao.existByName(stationRequest.getName())) {
+            throw new StationAlreadyExistException(stationRequest.getName());
+        }
     }
 
     @Override
