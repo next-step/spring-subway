@@ -8,7 +8,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.LineSections;
 import subway.domain.Section;
-import subway.domain.SectionRemovalResult;
+import subway.dto.SectionRemovalResult;
 import subway.domain.Station;
 import subway.dto.request.SectionAdditionRequest;
 import subway.dto.SectionAdditionResult;

@@ -78,6 +78,12 @@ public class Section {
         throw new IllegalArgumentException("추가할 구간의 상행역 하행역이 모두 같거나 모두 다를 수 없습니다. 기존 구간: " + this + " 추가할 구간: " + section);
     }
 
+    private void validateLongerDistanceThan(Section section) {
+        if (this.distance <= section.getDistance()) {
+            throw new IllegalArgumentException("기존 구간의 길이가 같거나 작습니다");
+        }
+    }
+
     private boolean isOnlyUpStationMatch(Section section) {
         return section.upStation.equals(this.upStation) && !section.downStation.equals(
             this.downStation);
@@ -104,10 +110,12 @@ public class Section {
         return mergedSections;
     }
 
-    private void validateLongerDistanceThan(Section section) {
-        if (this.distance <= section.getDistance()) {
-            throw new IllegalArgumentException("기존 구간의 길이가 같거나 작습니다");
+    public Section connect(Section section) {
+        if (!this.downStation.equals(section.upStation)) {
+            throw new IllegalArgumentException("연결할 수 없는 구간입니다. 현재 구간: " + this + " 연결할 구간: " + section);
         }
+
+        return new Section(this.line, this.upStation, section.downStation, this.distance + section.distance);
     }
 
     public boolean hasDownStationSameAs(Station station) {
@@ -169,13 +177,5 @@ public class Section {
             ", downStation=" + downStation +
             ", distance=" + distance +
             '}';
-    }
-
-    public Section connect(Section section) {
-        if (!this.downStation.equals(section.upStation)) {
-            throw new IllegalArgumentException("연결할 수 없는 구간입니다. 현재 구간: " + this + " 연결할 구간: " + section);
-        }
-
-        return new Section(this.line, this.upStation, section.downStation, this.distance + section.distance);
     }
 }

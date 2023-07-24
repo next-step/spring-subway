@@ -3,6 +3,7 @@ package subway.domain;
 import java.util.List;
 import java.util.Objects;
 import subway.dto.SectionAdditionResult;
+import subway.dto.SectionRemovalResult;
 
 public class LineSections {
 

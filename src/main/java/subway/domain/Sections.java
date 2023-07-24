@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import subway.dto.SectionAdditionResult;
+import subway.dto.SectionRemovalResult;
 
 public class Sections {
 
@@ -18,7 +19,7 @@ public class Sections {
         validateNullOrEmpty(values);
         this.values = sort(values);
 
-        validateConnectedSections(values, this.values);
+        validateConnectedSections(values);
     }
 
     private void validateNullOrEmpty(List<Section> values) {
@@ -27,36 +28,21 @@ public class Sections {
         }
     }
 
-    private void validateConnectedSections(List<Section> values, List<Section> sortedValues) {
-        if (sortedValues.size() != values.size()) {
-            throw new IllegalArgumentException("끊어진 구간을 입력했습니다.");
-        }
-    }
-
-    public boolean isSectionsAllBelongTo(Line line) {
-        return values.stream()
-            .allMatch(section -> section.belongTo(line));
-    }
-
     private List<Section> sort(List<Section> values) {
 
         Map<Station, Section> nextSectionMap = values.stream()
-            .collect(Collectors.toMap(Section::getUpStation, Function.identity()));
+                .collect(Collectors.toMap(Section::getUpStation, Function.identity()));
 
         return reorderSections(values, nextSectionMap);
     }
 
     private List<Section> reorderSections(List<Section> values,
-        Map<Station, Section> nextSectionMap) {
+                                          Map<Station, Section> nextSectionMap) {
 
         return Stream.iterate(findFirstSection(values),
-                section -> getNextSection(section, nextSectionMap))
-            .takeWhile(Objects::nonNull)
-            .collect(Collectors.toList());
-    }
-
-    private static Section getNextSection(Section section, Map<Station, Section> nextSectionMap) {
-        return nextSectionMap.get(section.getDownStation());
+                        section -> getNextSection(section, nextSectionMap))
+                .takeWhile(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private Section findFirstSection(List<Section> values) {
@@ -64,15 +50,30 @@ public class Sections {
         List<Station> downStations = extractDownStations(values);
 
         return values.stream()
-            .filter(section -> !downStations.contains(section.getUpStation()))
-            .findAny()
-            .orElseThrow(() -> new IllegalArgumentException("노선은 순환할 수 없습니다."));
+                .filter(section -> !downStations.contains(section.getUpStation()))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("노선은 순환할 수 없습니다."));
     }
 
     private List<Station> extractDownStations(List<Section> values) {
         return values.stream()
-            .map(Section::getDownStation)
-            .collect(Collectors.toList());
+                .map(Section::getDownStation)
+                .collect(Collectors.toList());
+    }
+
+    private static Section getNextSection(Section section, Map<Station, Section> nextSectionMap) {
+        return nextSectionMap.get(section.getDownStation());
+    }
+
+    private void validateConnectedSections(List<Section> initialSections) {
+        if (this.values.size() != initialSections.size()) {
+            throw new IllegalArgumentException("끊어진 구간을 입력했습니다.");
+        }
+    }
+
+    public boolean isSectionsAllBelongTo(Line line) {
+        return values.stream()
+            .allMatch(section -> section.belongTo(line));
     }
 
     public SectionAdditionResult add(Section section) {
@@ -95,10 +96,6 @@ public class Sections {
         throw new IllegalStateException("예상하지 못한 경우입니다.");
     }
 
-    private boolean isMiddleAddableSection(Section section) {
-        return this.values.stream().anyMatch(value -> value.hasSameUpStationOrDownStation(section));
-    }
-
     private void validateOnlyOneStationIncludedInSections(Section section) {
         checkBothStationsInLine(section);
         checkNoneOfStationsInLine(section);
@@ -116,8 +113,16 @@ public class Sections {
         }
     }
 
+    private void addFirst(Section section) {
+        this.values.add(0, section);
+    }
+
     private void addLast(Section section) {
         this.values.add(section);
+    }
+
+    private boolean isMiddleAddableSection(Section section) {
+        return this.values.stream().anyMatch(value -> value.hasSameUpStationOrDownStation(section));
     }
 
     private SectionAdditionResult addSectionInMiddle(Section section) {
@@ -140,10 +145,6 @@ public class Sections {
     private boolean isStationExists(Station upStation) {
         return this.values.stream()
             .anyMatch(value -> value.containsStation(upStation));
-    }
-
-    private void addFirst(Section section) {
-        this.values.add(0, section);
     }
 
     public SectionRemovalResult remove(Station station) {
@@ -171,6 +172,34 @@ public class Sections {
         }
     }
 
+    private void validateMinSectionSize() {
+        if (values.size() <= MIN_SECTION_SIZE) {
+            throw new IllegalStateException("노선의 구간이 1개인 경우 삭제할 수 없습니다.");
+        }
+    }
+
+    private boolean isFinalUpStation(Station station) {
+        return getFirst().hasUpStationSameAs(station);
+    }
+
+    private Section removeFirst() {
+        return values.remove(0);
+    }
+
+    private boolean isFinalDownStation(Station station) {
+        return getLast().hasDownStationSameAs(station);
+    }
+
+    private Section removeLast() {
+        return values.remove(values.size() - 1);
+    }
+
+    private boolean isMiddleStation(Station station) {
+        return this.values.stream()
+                .anyMatch(section -> section.hasDownStationSameAs(station)) &&
+                !getLast().hasDownStationSameAs(station);
+    }
+
     private SectionRemovalResult removeMiddleStation(Station station) {
         Section matchedSection = findMatchedSectionSameDownStation(station);
         Section nextSection = findNextSectionOf(matchedSection);
@@ -192,34 +221,6 @@ public class Sections {
 
     private Section findNextSectionOf(Section matchedSection) {
         return this.values.get(this.values.indexOf(matchedSection) + 1);
-    }
-
-    private boolean isMiddleStation(Station station) {
-        return this.values.stream()
-            .anyMatch(section -> section.hasDownStationSameAs(station)) &&
-                !getLast().hasDownStationSameAs(station);
-    }
-
-    private boolean isFinalUpStation(Station station) {
-        return getFirst().hasUpStationSameAs(station);
-    }
-
-    private boolean isFinalDownStation(Station station) {
-        return getLast().hasDownStationSameAs(station);
-    }
-
-    private Section removeFirst() {
-        return values.remove(0);
-    }
-
-    private Section removeLast() {
-        return values.remove(values.size() - 1);
-    }
-
-    private void validateMinSectionSize() {
-        if (values.size() <= MIN_SECTION_SIZE) {
-            throw new IllegalStateException("노선의 구간이 1개인 경우 삭제할 수 없습니다.");
-        }
     }
 
     public List<Station> getStations() {
