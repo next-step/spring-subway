@@ -57,6 +57,10 @@ public class Section {
         return upStationId.equals(other.upStationId);
     }
 
+    public boolean compareDownStationId(final long downStationId) {
+        return this.downStationId == downStationId;
+    }
+
     public boolean compareDownStationId(final Section other) {
         return downStationId.equals(other.downStationId);
     }
