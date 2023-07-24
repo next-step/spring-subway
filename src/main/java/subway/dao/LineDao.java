@@ -1,15 +1,16 @@
 package subway.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class LineDao {
@@ -36,13 +37,20 @@ public class LineDao {
     }
 
     public List<Line> findAll() {
-        String sql = "select id, name, color from LINE";
+        String sql = "select * from LINE";
         return jdbcTemplate.query(sql, rowMapper);
     }
 
     public Optional<Line> findById(Long id) {
-        String sql = "select id, name, color from LINE WHERE id = ?";
+        String sql = "select * from LINE WHERE id = ?";
         return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+    }
+
+    public Optional<Line> findByName(String name) {
+        String sql = "select * from LINE WHERE name = ?";
+        return jdbcTemplate.query(sql, rowMapper, name)
+                .stream()
+                .findAny();
     }
 
     public void update(Line newLine) {

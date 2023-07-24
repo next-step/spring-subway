@@ -15,10 +15,10 @@ import java.util.Map;
 public class SectionDao {
 
     private static final String FIND_ALL_BY_LINE_ID_SQL =
-            "SELECT S.*, US.id AS US_ID, US.name AS US_NAME, DS.id AS DS_ID, DS.name AS DS_NAME "
-                    + "FROM SECTIONS as S "
-                    + "JOIN STATION as US ON line_id = ? AND S.up_station_id = US.id "
-                    + "JOIN STATION as DS ON line_id = ? AND S.down_station_id = DS.id";
+            "select S.*, US.id as US_ID, US.name as US_NAME, DS.id as DS_ID, DS.name as DS_NAME "
+                    + "from SECTIONS as S "
+                    + "join STATION as US on line_id = ? and S.up_station_id = US.id "
+                    + "join STATION as DS on line_id = ? and S.down_station_id = DS.id";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
@@ -76,12 +76,12 @@ public class SectionDao {
     }
 
     public void deleteByLineIdAndDownStationId(Long lineId, Long stationId) {
-        String deleteSql = "DELETE FROM SECTIONS WHERE line_id = ? AND down_station_id = ?";
+        String deleteSql = "delete from SECTIONS where line_id = ? and down_station_id = ?";
         jdbcTemplate.update(deleteSql, lineId, stationId);
     }
 
     public void update(Section section) {
-        String sql = "UPDATE SECTIONS SET (up_station_id, down_station_id, distance) = (?, ?, ?) WHERE id = ?";
+        String sql = "update SECTIONS set (up_station_id, down_station_id, distance) = (?, ?, ?) where id = ?";
         jdbcTemplate.update(sql, section.getUpStation().getId(), section.getDownStation().getId(),
                 section.getDistance(), section.getId());
     }

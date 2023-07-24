@@ -1,6 +1,7 @@
 package subway.domain;
 
-import org.springframework.util.Assert;
+import subway.exception.LineException;
+import subway.exception.StationException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Optional;
 
 public class Line {
 
-    private static final int MIN_DELETABLE_SIZE = 1;
+    private static final int MIN_DELETABLE_SIZE = 2;
 
     private final Long id;
     private final String name;
@@ -94,31 +95,53 @@ public class Line {
     }
 
     private void validateExistStations(Station upStation, Station downStation, boolean isUpStationExists, boolean isDownStationExists) {
-        boolean isAllExist = isDownStationExists && isUpStationExists;
-        boolean isAllNotExist = !isDownStationExists && !isUpStationExists;
-
-        Assert.isTrue(!isAllExist,
-                () -> MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재합니다.", upStation,
-                        downStation, sections));
-
-        Assert.isTrue(!isAllNotExist,
-                () -> MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재하지 않습니다.", upStation,
-                        downStation, sections));
+        validateAllExistStations(upStation, downStation, isUpStationExists, isDownStationExists);
+        validateAllNotExistStations(upStation, downStation, isUpStationExists, isDownStationExists);
     }
 
+    private void validateAllNotExistStations(Station upStation, Station downStation, boolean isUpStationExists, boolean isDownStationExists) {
+        if (!isDownStationExists && !isUpStationExists) {
+            throw new StationException(
+                    MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재하지 않습니다.",
+                            upStation, downStation, sections)
+            );
+        }
+    }
+
+    private void validateAllExistStations(Station upStation, Station downStation, boolean isUpStationExists, boolean isDownStationExists) {
+        if (isDownStationExists && isUpStationExists) {
+            throw new StationException(
+                    MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재합니다.",
+                            upStation, downStation, sections)
+            );
+        }
+    }
 
     public void disconnectDownSection(Station downStation) {
-        Assert.isTrue(sections.size() > MIN_DELETABLE_SIZE, () -> "line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.");
-        Section downSection = sections.get(0).findDownSection();
+        validateLineSize();
 
-        Assert.isTrue(downSection.getDownStation().equals(downStation),
-                () -> MessageFormat.format("삭제할 station \"{0}\" 은 하행의 downStation \"{1}\" 과 일치해야 합니다.",
-                        downStation, downSection.getDownStation()));
+        Section downSection = sections.get(0).findDownSection();
+        validateSameStations(downStation, downSection);
 
         Section upSection = downSection.getUpSection();
-
         upSection.disconnectDownSection();
+
         sections.remove(downSection);
+    }
+
+    private static void validateSameStations(Station downStation, Section downSection) {
+        if (!downSection.getDownStation().equals(downStation)) {
+            throw new StationException(
+                    MessageFormat.format("삭제할 station \"{0}\" 은 하행의 downStation \"{1}\" 과 일치해야 합니다.",
+                            downStation, downSection.getDownStation())
+            );
+        }
+    }
+
+    private void validateLineSize() {
+        if (sections.size() < MIN_DELETABLE_SIZE) {
+            throw new LineException("line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.");
+        }
     }
 
     @Override

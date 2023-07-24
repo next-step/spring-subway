@@ -1,15 +1,18 @@
 package subway.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
-
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import subway.DomainFixture;
+import subway.exception.SectionException;
+import subway.exception.StationException;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchException;
 
 @DisplayName("Section 클래스")
 class SectionTest {
@@ -49,8 +52,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("하나의 Station이 Null값으로 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Null_Station() {
+        @DisplayName("하나의 Station이 Null값으로 들어오면, StationException을 던진다.")
+        void Throw_StaionException_When_Input_Null_Station() {
             // given
             Station nullStation = null;
             Integer distance = 10;
@@ -64,12 +67,12 @@ class SectionTest {
                             .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(StationException.class);
         }
 
         @Test
-        @DisplayName("distance로 0 이하의 값이 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Under_Zero() {
+        @DisplayName("distance로 0 이하의 값이 들어오면, SectionException을 던진다.")
+        void Throw_SectionException_When_Input_Under_Zero() {
             // given
             Integer zeroDistance = 0;
 
@@ -81,12 +84,12 @@ class SectionTest {
                     .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(SectionException.class);
         }
 
         @Test
-        @DisplayName("upStation과 downStation이 일치하면 IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Same_Station() {
+        @DisplayName("upStation과 downStation이 일치하면 StationException을 던진다.")
+        void Throw_StationException_When_Input_Same_Station() {
             // given
             Station sameStation = new Station(1L, "sameStation");
             Integer distance = 10;
@@ -99,7 +102,7 @@ class SectionTest {
                     .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(StationException.class);
         }
     }
 
@@ -126,8 +129,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("각 Section의 Middle Station이 다르면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Different_Middle_Station() {
+        @DisplayName("각 Section의 Middle Station이 다르면, SectionException을 던진다.")
+        void Throw_SectionException_When_Input_Different_Middle_Station() {
             // given
             Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
             Section section2 = DomainFixture.Section.buildWithStations(station3, station4);
@@ -136,12 +139,12 @@ class SectionTest {
             Exception exception = catchException(() -> section1.connectSection(section2));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(SectionException.class);
         }
 
         @Test
-        @DisplayName("Section으로 Null이 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Null_Section() {
+        @DisplayName("Section으로 Null이 들어오면, SectionException을 던진다.")
+        void Throw_SectionException_When_Input_Null_Section() {
             // given
             Section section = DomainFixture.Section.buildWithStations(station1, station2);
             Section nullSection = null;
@@ -150,7 +153,7 @@ class SectionTest {
             Exception exception = catchException(() -> section.connectSection(nullSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(SectionException.class);
         }
     }
 
@@ -197,8 +200,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("downSection이 null 이라면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Null_DownSection() {
+        @DisplayName("downSection이 null 이라면, SectionException을 던진다")
+        void Throw_SectionException_When_Null_DownSection() {
             // given
             Section section = DomainFixture.Section.buildWithStations(station1, station2);
 
@@ -206,7 +209,7 @@ class SectionTest {
             Exception exception = catchException(section::disconnectDownSection);
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(SectionException.class);
         }
     }
 
@@ -331,8 +334,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("Null값이 들어오면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Input_Null_Section() {
+        @DisplayName("Null값이 들어오면, SectionException을 던진다")
+        void Throw_SectionException_When_Input_Null_Section() {
             // given
             Section section = DomainFixture.Section.buildWithStations(station1, station2);
 
@@ -342,7 +345,7 @@ class SectionTest {
             Exception exception = catchException(() -> section.connectSection(nullSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(SectionException.class);
         }
 
         private void assertSectionConnectedStatus(Section section, List<Station> stations) {

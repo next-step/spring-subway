@@ -83,7 +83,6 @@ class SectionDaoTest {
 
             // when
             List<Section> result = sectionDao.findAllByLineId(line.getId());
-            System.out.println("result = " + result);
 
             // then
             assertThat(result).containsAll(List.of(section1, section2));

@@ -1,17 +1,19 @@
 package subway.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import subway.DomainFixture;
+import subway.exception.LineException;
+import subway.exception.StationException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchException;
 
 @DisplayName("Line 클래스")
 class LineTest {
@@ -51,8 +53,8 @@ class LineTest {
         }
 
         @Test
-        @DisplayName("입력된 Station이 line의 하행 Station과 일치 하지 않으면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Not_Equal_Station() {
+        @DisplayName("입력된 Station이 line의 하행 Station과 일치 하지 않으면, StationException을 던진다")
+        void Throw_StationException_When_Not_Equal_Station() {
             // given
             Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
             Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
@@ -63,12 +65,12 @@ class LineTest {
             Exception exception = catchException(() -> line.disconnectDownSection(station1));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(StationException.class);
         }
 
         @Test
-        @DisplayName("line에 구간이 하나만 있다면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Line_Size_1() {
+        @DisplayName("line에 구간이 하나만 있다면, LineException을 던진다")
+        void Throw_LineException_When_Line_Size_1() {
             // given
             Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
 
@@ -78,12 +80,12 @@ class LineTest {
             Exception exception = catchException(() -> line.disconnectDownSection(station2));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(LineException.class);
         }
 
         @Test
-        @DisplayName("line의 중간에 있는 section을 삭제하려고 할 경우, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Disconnect_Middle_Section() {
+        @DisplayName("line의 중간에 있는 section을 삭제하려고 할 경우, StationException을 던진다")
+        void Throw_SectionException_When_Disconnect_Middle_Section() {
             // given
             Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
             Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
@@ -98,7 +100,7 @@ class LineTest {
             Exception exception = catchException(() -> line.disconnectDownSection(station3));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(StationException.class);
         }
     }
 
@@ -126,8 +128,8 @@ class LineTest {
         }
 
         @Test
-        @DisplayName("입력으로 들어온 Section의 상행, 하행 역이 line에 모두 존재할 경우, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_UpStation_And_DownStation_All_Exists() {
+        @DisplayName("입력으로 들어온 Section의 상행, 하행 역이 line에 모두 존재할 경우, StationException을 던진다")
+        void Throw_StationException_When_UpStation_And_DownStation_All_Exists() {
             // given
             Section section = DomainFixture.Section.buildWithStations(station1, station2, 2);
 
@@ -139,12 +141,12 @@ class LineTest {
             Exception exception = catchException(() -> line.connectSection(requestSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(StationException.class);
         }
 
         @Test
-        @DisplayName("입력으로 들어온 Section의 상행, 하행 역이 line에 모두 존재하지 않을 경우, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_UpStation_And_DownStation_All_Not_Exists() {
+        @DisplayName("입력으로 들어온 Section의 상행, 하행 역이 line에 모두 존재하지 않을 경우, StationException을 던진다")
+        void Throw_StationException_When_UpStation_And_DownStation_All_Not_Exists() {
             // given
             Section section = DomainFixture.Section.buildWithStations(station1, station2, 2);
 
@@ -156,7 +158,7 @@ class LineTest {
             Exception exception = catchException(() -> line.connectSection(requestSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(StationException.class);
         }
     }
 

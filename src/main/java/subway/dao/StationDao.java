@@ -27,7 +27,6 @@ public class StationDao {
     }
 
     public Station insert(Station station) {
-        System.out.println("station = " + station);
         SqlParameterSource params = new BeanPropertySqlParameterSource(station);
         Long id = insertAction.executeAndReturnKey(params).longValue();
         return new Station(id, station.getName());
@@ -43,6 +42,13 @@ public class StationDao {
         return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
     }
 
+    public Optional<Station> findByName(String name) {
+        String sql = "select * from STATION where name = ?";
+        return jdbcTemplate.query(sql, rowMapper, name)
+                .stream()
+                .findAny();
+    }
+
     public void update(Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
         jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
@@ -54,8 +60,8 @@ public class StationDao {
     }
 
     public List<Station> findAllByLineId(Long lineId) {
-        String sql = "SELECT DISTINCT S.* FROM STATION as S "
-                + "JOIN SECTIONS as SE ON SE.line_id = ? AND (SE.up_station_id = S.id OR SE.down_station_id = S.id)";
+        String sql = "select distinct S.* from STATION as S "
+                + "join SECTIONS as SE on SE.line_id = ? and (SE.up_station_id = S.id or SE.down_station_id = S.id)";
 
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }

@@ -5,6 +5,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.StationException;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -19,12 +20,23 @@ public class StationService {
     }
 
     public StationResponse saveStation(StationRequest stationRequest) {
+        validateDuplicateName(stationRequest.getName());
+
         Station station = stationDao.insert(new Station(stationRequest.getName()));
         return StationResponse.of(station);
     }
 
+    private void validateDuplicateName(String name) {
+        stationDao.findByName(name)
+                .ifPresent(station -> {
+                    throw new StationException(
+                            MessageFormat.format("station name \"{0}\"에 해당하는 station이 이미 존재합니다.", station.getName())
+                    );
+                });
+    }
+
     public StationResponse findStationById(Long id) {
-        Station station = stationDao.findById(id).orElseThrow(() -> new IllegalStateException(
+        Station station = stationDao.findById(id).orElseThrow(() -> new StationException(
                 MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id)));
         
         return StationResponse.of(station);

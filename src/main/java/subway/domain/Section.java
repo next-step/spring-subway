@@ -1,15 +1,18 @@
 package subway.domain;
 
+import subway.exception.SectionException;
+import subway.exception.StationException;
+
 import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.util.Assert;
 
 public class Section {
 
-    private static final int MIN_DISTANCE_SIZE = 0;
+    private static final int MIN_DISTANCE_SIZE = 1;
 
     private final Long id;
+
     private Integer distance;
     private Station upStation;
     private Station downStation;
@@ -19,10 +22,10 @@ public class Section {
     private Section(Builder builder) {
         validate(builder);
 
+        this.id = builder.id;
+        this.distance = builder.distance;
         this.upStation = builder.upStation;
         this.downStation = builder.downStation;
-        this.distance = builder.distance;
-        this.id = builder.id;
         this.upSection = builder.upSection;
         this.downSection = builder.downSection;
     }
@@ -32,16 +35,42 @@ public class Section {
     }
 
     private void validate(Builder builder) {
-        Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.");
-        Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.");
-        Assert.isTrue(builder.distance > MIN_DISTANCE_SIZE,
-                () -> MessageFormat.format("distance \"{0}\"는 0 이하가 될 수 없습니다.", builder.distance));
-        Assert.isTrue(!builder.upStation.equals(builder.downStation),
-                () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation));
+        validateNullStations(builder);
+        validateSameStations(builder);
+        validateDistance(builder);
+    }
+
+    private void validateNullStations(Builder builder) {
+        if (builder.upStation == null) {
+            throw new StationException("station이 존재하지 않습니다.");
+        }
+
+        if (builder.downStation == null) {
+            throw new StationException("downStation이 존재하지 않습니다.");
+        }
+    }
+
+    private void validateSameStations(Builder builder) {
+        if (builder.upStation.equals(builder.downStation)) {
+            throw new StationException(
+                    MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", builder.upStation, builder.downStation)
+            );
+        }
+    }
+
+    private void validateDistance(Builder builder) {
+        if (builder.distance < MIN_DISTANCE_SIZE) {
+            throw new SectionException(
+                    MessageFormat.format("distance \"{0}\"는 0 이하가 될 수 없습니다.", builder.distance)
+            );
+        }
     }
 
     Section connectSection(Section requestSection) {
-        Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다");
+        if (requestSection == null) {
+            throw new SectionException("requestSection이 존재하지 않습니다.");
+        }
+
         Optional<SectionConnector> sectionConnectorOptional = SectionConnector
                 .findSectionConnector(this, requestSection);
         if (sectionConnectorOptional.isEmpty()) {
@@ -51,10 +80,12 @@ public class Section {
         return sectionConnectorOptional.get().connectSection(this, requestSection);
     }
 
-
     private Section connectSectionIfDownSectionPresent(Section requestSection) {
-        Assert.notNull(downSection,
-                () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection));
+        if (downSection == null) {
+            throw new SectionException(
+                    MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection)
+            );
+        }
 
         return downSection.connectSection(requestSection);
     }
@@ -122,7 +153,10 @@ public class Section {
     }
 
     public void disconnectDownSection() {
-        Assert.notNull(downSection, () -> "downSection이 null 일때, \"disconnectDownSection()\" 를 호출할 수 없습니다");
+        if (downSection == null) {
+            throw new SectionException("downSection이 존재하지 않습니다.");
+        }
+
         downSection.upSection = null;
         downSection = null;
     }
