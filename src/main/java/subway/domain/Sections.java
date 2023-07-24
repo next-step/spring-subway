@@ -88,6 +88,7 @@ public class Sections {
             return new SectionAdditionResult(null, List.of(getLast()));
         }
 
+        //Todo: 방어적 코드 짜기
         return addSectionInMiddle(section);
     }
 
@@ -138,8 +139,65 @@ public class Sections {
         this.values.add(0, section);
     }
 
-    public Section removeLast(Station station) {
+    public SectionRemovalResult remove(Station station) {
         validateMinSectionSize();
+
+        if (isFinalUpStation(station)) {
+            return new SectionRemovalResult(null, List.of(removeFirst()));
+        }
+
+        if (isFinalDownStation(station)) {
+            return new SectionRemovalResult(null, List.of(removeLast2()));
+        }
+
+        if (isMiddleStation(station)) {
+            Section matchedSection = findMatchedSectionSameDownStation(station);
+            Section nextSection = this.values.get(this.values.indexOf(matchedSection) + 1);
+
+            Section connectedSection = matchedSection.connect(nextSection);
+
+            this.values.add(this.values.indexOf(matchedSection), connectedSection);
+            List<Section> sectionToRemove = List.of(matchedSection, nextSection);
+            this.values.removeAll(sectionToRemove);
+
+            return new SectionRemovalResult(connectedSection, sectionToRemove);
+        }
+
+        throw new IllegalStateException("여기 오면 안되는데? ^^");
+    }
+
+    private boolean isMiddleStation(Station station) {
+        return this.values.stream()
+            .anyMatch(section -> section.hasDownStationSameAs(station)) &&
+                !getLast().hasDownStationSameAs(station);
+    }
+
+    //Todo:네이밍 고려
+    private Section findMatchedSectionSameDownStation(Station station) {
+        return this.values.stream()
+            .filter(section -> section.hasDownStationSameAs(station))
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다"));
+    }
+
+    private boolean isFinalUpStation(Station station) {
+        return getFirst().hasUpStationSameAs(station);
+    }
+
+    private boolean isFinalDownStation(Station station) {
+        return getLast().hasDownStationSameAs(station);
+    }
+
+    private Section removeFirst() {
+        return values.remove(0);
+    }
+
+    private Section removeLast2() {
+        return values.remove(values.size() - 1);
+    }
+
+    @Deprecated
+    public Section removeLast(Station station) {
         validateFinalDownStationSameAs(station);
 
         return values.remove(values.size() - 1);

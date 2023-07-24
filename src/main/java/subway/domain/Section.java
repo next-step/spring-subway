@@ -54,6 +54,7 @@ public class Section {
             station);
     }
 
+    //Todo: 네이밍 다시 볼것
     public boolean containsDownStationOf(Section section) {
         return this.upStation.equals(section.downStation) || this.downStation.equals(
             section.downStation);
@@ -114,6 +115,10 @@ public class Section {
         return station.equals(this.downStation);
     }
 
+    public boolean hasUpStationSameAs(Station station) {
+        return station.equals(this.upStation);
+    }
+
     public boolean belongTo(Line line) {
         return this.line.equals(line);
     }
@@ -165,5 +170,13 @@ public class Section {
             ", downStation=" + downStation +
             ", distance=" + distance +
             '}';
+    }
+
+    public Section connect(Section section) {
+        if (!this.downStation.equals(section.upStation)) {
+            throw new IllegalArgumentException("연결할 수 없는 구간입니다. 현재 구간: " + this + " 연결할 구간: " + section);
+        }
+
+        return new Section(this.line, this.upStation, section.downStation, this.distance + section.distance);
     }
 }

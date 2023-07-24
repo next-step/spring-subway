@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,19 +83,40 @@ class SectionsTest {
         Section section = new Section(lineA, stationA, stationB, 1);
         Sections sections = new Sections(List.of(section));
 
-        assertThatThrownBy(() -> sections.removeLast(stationB))
+        assertThatThrownBy(() -> sections.remove(stationB))
             .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    @DisplayName("주어진 역이 노선의 하행 종점역이 아니면 구간을 삭제할 수 없다")
-    void cannotRemoveSectionIfNotFinalDownStation() {
+    @DisplayName("첫 구간을 삭제한다")
+    void removeFirst() {
         Section sectionA = new Section(lineA, stationA, stationB, 1);
         Section sectionB = new Section(lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
-        assertThatThrownBy(() -> sections.removeLast(stationA))
-            .isInstanceOf(IllegalArgumentException.class);
+         SectionRemovalResult sectionRemovalResult = sections.remove(stationA);
+
+        Sections expectedSections = new Sections(List.of(sectionB));
+        assertThat(sections).isEqualTo(expectedSections);
+        assertThat(sectionRemovalResult.getSectionToAdd()).isEmpty();
+        assertThat(sectionRemovalResult.getSectionToRemove()).containsExactly(sectionA);
+    }
+
+    @Test
+    @DisplayName("중간 구간을 삭제한다")
+    void removeMiddle() {
+        Section sectionA = new Section(lineA, stationA, stationB, 1);
+        Section sectionB = new Section(lineA, stationB, stationC, 2);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        SectionRemovalResult sectionRemovalResult = sections.remove(stationB);
+
+        int sumOfDistances = sectionA.getDistance() + sectionB.getDistance();
+        Section expectedSectionToAdd = new Section(lineA, stationA, stationC, sumOfDistances);
+        Sections expectedSections = new Sections(List.of(expectedSectionToAdd));
+        assertThat(sections).isEqualTo(expectedSections);
+        assertThat(sectionRemovalResult.getSectionToRemove()).containsExactly(sectionA, sectionB);
+        assertThat(sectionRemovalResult.getSectionToAdd()).isEqualTo(Optional.of(expectedSectionToAdd));
     }
 
     @Test
@@ -104,11 +126,12 @@ class SectionsTest {
         Section sectionB = new Section(lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
-        Section removedSection = sections.removeLast(stationC);
+        SectionRemovalResult sectionRemovalResult = sections.remove(stationC);
 
         Sections expectedSections = new Sections(List.of(sectionA));
         assertThat(sections).isEqualTo(expectedSections);
-        assertThat(removedSection).isEqualTo(sectionB);
+        assertThat(sectionRemovalResult.getSectionToRemove()).containsExactly(sectionB);
+        assertThat(sectionRemovalResult.getSectionToAdd()).isEmpty();
     }
 
     @Test
