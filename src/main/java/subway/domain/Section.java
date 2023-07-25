@@ -161,6 +161,9 @@ public class Section {
         downSection = null;
     }
 
+    public void disconnectUpSection() {
+    }
+
     public Long getId() {
         return id;
     }

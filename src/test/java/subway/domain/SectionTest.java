@@ -213,6 +213,42 @@ class SectionTest {
         }
     }
 
+
+    @Nested
+    @DisplayName("disconnectUpSection 메소드는")
+    class DisconnectUpSection_Method {
+
+        @Test
+        @DisplayName("호출되면, UpSection과 연결을 해제한다")
+        void Disconnect_UpSection() {
+            // given
+            Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
+            Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
+
+            section1.connectDownSection(section2);
+
+            // when
+            section2.disconnectUpSection();
+
+            // then
+            assertThat(section1.getDownSection()).isNull();
+            assertThat(section2.getUpSection()).isNull();
+        }
+
+        @Test
+        @DisplayName("upSection이 null 이라면, SectionException을 던진다")
+        void Throw_SectionException_When_Null_UpSection() {
+            // given
+            Section section = DomainFixture.Section.buildWithStations(station1, station2);
+
+            // when
+            Exception exception = catchException(section::disconnectUpSection);
+
+            // then
+            assertThat(exception).isInstanceOf(SectionException.class);
+        }
+    }
+
     @Nested
     @DisplayName("findUpSection 메소드는")
     class FindUpSection_Method {
