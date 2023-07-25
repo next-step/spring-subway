@@ -20,11 +20,11 @@ public class SectionController {
     }
 
     @PostMapping("/lines/{lineId}/sections")
-    public ResponseEntity<Void> registSection(
+    public ResponseEntity<Void> registerSection(
         @RequestBody SectionRegistRequest sectionRegistRequest,
         @PathVariable Long lineId
     ) {
-        sectionService.registSection(sectionRegistRequest, lineId);
+        sectionService.registerSection(sectionRegistRequest, lineId);
 
         return ResponseEntity.ok().build();
     }

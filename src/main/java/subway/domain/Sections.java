@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import subway.domain.vo.SectionRegistVo;
 
 public class Sections {
 
@@ -45,15 +44,15 @@ public class Sections {
         }
     }
 
-    public Optional<Section> findUpSection(Station deleteStation) {
+    public Optional<Section> findUpSectionFrom(Station station) {
         return sections.stream()
-            .filter(section -> section.getDownStation().equals(deleteStation))
+            .filter(section -> section.getDownStation().equals(station))
             .findFirst();
     }
 
-    public Optional<Section> findDownSection(Station deleteStation) {
+    public Optional<Section> findDownSectionFrom(Station station) {
         return sections.stream()
-            .filter(section -> section.getUpStation().equals(deleteStation))
+            .filter(section -> section.getUpStation().equals(station))
             .findFirst();
     }
 
@@ -61,7 +60,7 @@ public class Sections {
         List<Station> sortedStations = new ArrayList<>();
         Map<Station, Section> stationLayerMap = initLayerMap();
 
-        Station nowStation = findUpPointStation();
+        Station nowStation = findUpTerminusStation();
         sortedStations.add(nowStation);
 
         while (stationLayerMap.containsKey(nowStation)) {
@@ -81,64 +80,57 @@ public class Sections {
             ));
     }
 
-    public SectionRegistVo registSection(Section newSection) {
+    public Optional<Section> findModifiedSection(Section section) {
         if (sections.isEmpty()) {
-            return new SectionRegistVo(newSection);
+            return Optional.empty();
         }
-        validRegistSection(newSection);
-
-        Optional<Section> targetSection = findTargetSection(newSection);
+        validExistedStation(section);
+        validDuplicatedStation(section);
+        Optional<Section> targetSection = findDuplicatedSection(section);
         if (targetSection.isEmpty()) {
-            return new SectionRegistVo(newSection);
+            return Optional.empty();
         }
-        return registMiddleSection(newSection, targetSection.get());
+        return divideSection(section, targetSection);
     }
 
-    private void validRegistSection(Section newSection) {
-        validDuplicatedStation(newSection);
-        validExistedStation(newSection);
-    }
-
-    private void validExistedStation(Section newSection) {
-        if (!isMatchUpStation(newSection) && !isMatchDownStation(newSection)) {
+    private void validExistedStation(Section section) {
+        if (!matchUpStation(section) && !matchDownStation(section)) {
             throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
         }
     }
 
-    private void validDuplicatedStation(Section newSection) {
-        if (isMatchUpStation(newSection) && isMatchDownStation(newSection)) {
+    private void validDuplicatedStation(Section section) {
+        if (matchUpStation(section) && matchDownStation(section)) {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
     }
 
-
-    private SectionRegistVo registMiddleSection(Section newSection, Section targetSection) {
-        if (isMatchUpStation(newSection)) {
-            return new SectionRegistVo(newSection, newSection.findMiddleUpSection(targetSection));
-        }
-        if (isMatchDownStation(newSection)) {
-            return new SectionRegistVo(newSection, newSection.findMiddleDownSection(targetSection));
-        }
-
-        throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
-    }
-
-    private Optional<Section> findTargetSection(Section newSection) {
+    private Optional<Section> findDuplicatedSection(Section section) {
         return sections.stream()
-            .map(newSection::targetSection)
+            .map(section::findDuplicatedSection)
             .filter(Objects::nonNull)
             .findFirst();
     }
 
-    private boolean isMatchUpStation(Section newSection) {
-        return findStations().contains(newSection.getUpStation());
+    private Optional<Section> divideSection(Section section, Optional<Section> targetSection) {
+        if (matchUpStation(section)) {
+            return Optional.of(section.findUpSection(targetSection.get()));
+        }
+        if (matchDownStation(section)) {
+            return Optional.of(section.findDownSection(targetSection.get()));
+        }
+        return Optional.empty();
     }
 
-    private boolean isMatchDownStation(Section newSection) {
-        return findStations().contains(newSection.getDownStation());
+    private boolean matchUpStation(Section section) {
+        return findStations().contains(section.getUpStation());
     }
 
-    private Station findUpPointStation() {
+    private boolean matchDownStation(Section section) {
+        return findStations().contains(section.getDownStation());
+    }
+
+    private Station findUpTerminusStation() {
         return findStations().stream()
             .filter(station -> !findDownStations().contains(station))
             .findFirst()

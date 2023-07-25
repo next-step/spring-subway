@@ -27,7 +27,7 @@ public class Section {
         return (this.distance.compareDistance(distance) <= POSSIBLE_DISTANCE);
     }
 
-    public Section findMiddleUpSection(Section targetSection) {
+    public Section findUpSection(Section targetSection) {
         validateDistance(targetSection);
 
         return new Section(
@@ -39,7 +39,7 @@ public class Section {
         );
     }
 
-    public Section findMiddleDownSection(Section targetSection) {
+    public Section findDownSection(Section targetSection) {
         validateDistance(targetSection);
 
         return new Section(
@@ -57,7 +57,7 @@ public class Section {
         }
     }
 
-    public Section targetSection(Section otherSection) {
+    public Section findDuplicatedSection(Section otherSection) {
         if (upStation.equals(otherSection.getUpStation())
             || downStation.equals(otherSection.getDownStation())) {
             return otherSection;
@@ -65,7 +65,7 @@ public class Section {
         return null;
     }
 
-    public Section combineUpSectionToDownSection(Section downSection) {
+    public Section combineToDownSection(Section downSection) {
         return new Section(
             upStation,
             downSection.getDownStation(),

@@ -10,7 +10,6 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.domain.vo.SectionRegistVo;
 import subway.dto.request.SectionRegistRequest;
 
 @Service
@@ -28,25 +27,27 @@ public class SectionService {
     }
 
     @Transactional
-    public void registSection(SectionRegistRequest sectionRegistRequest, Long lineId) {
+    public void registerSection(SectionRegistRequest sectionRegistRequest, Long lineId) {
+        Section section = convertRegistSection(sectionRegistRequest, lineId);
+        Sections sections = sectionDao.findAllByLineId(lineId);
+
+        Optional<Section> modifiedSection = sections.findModifiedSection(section);
+        sectionDao.insert(section);
+        if (modifiedSection.isPresent()) {
+            sectionDao.update(modifiedSection.get());
+        }
+    }
+
+    private Section convertRegistSection(SectionRegistRequest sectionRegistRequest, Long lineId) {
         Station upStation = stationDao.findById(sectionRegistRequest.getUpStationId());
         Station downStation = stationDao.findById(sectionRegistRequest.getDownStationId());
         Line line = lineDao.findById(lineId);
-        Section section = new Section(
+        return new Section(
             upStation,
             downStation,
             line,
             sectionRegistRequest.getDistance()
         );
-
-        Sections sections = sectionDao.findAllByLineId(lineId);
-        SectionRegistVo result = sections.registSection(section);
-
-        sectionDao.insert(result.getAddSection());
-
-        if (result.getUpdateSection().isPresent()) {
-            sectionDao.update(result.getUpdateSection().get());
-        }
     }
 
     @Transactional
@@ -55,8 +56,8 @@ public class SectionService {
         Station deleteStation = stationDao.findById(stationId);
         sections.canDeleteStation(deleteStation);
 
-        Optional<Section> upSection = sections.findUpSection(deleteStation);
-        Optional<Section> downSection = sections.findDownSection(deleteStation);
+        Optional<Section> upSection = sections.findUpSectionFrom(deleteStation);
+        Optional<Section> downSection = sections.findDownSectionFrom(deleteStation);
         deleteExistedSection(upSection, downSection);
         connectExistedStations(upSection, downSection);
     }
@@ -76,7 +77,7 @@ public class SectionService {
 
     private void connectExistedStations(Optional<Section> upSection, Optional<Section> downSection) {
         if (upSection.isPresent() && downSection.isPresent()) {
-            Section newSection = upSection.get().combineUpSectionToDownSection(downSection.get());
+            Section newSection = upSection.get().combineToDownSection(downSection.get());
             sectionDao.insert(newSection);
         }
     }
