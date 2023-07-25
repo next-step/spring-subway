@@ -18,18 +18,7 @@ public class Distance {
             throw new IllegalArgumentException("거리는 " + MIN_DISTANCE + "이상이어야 합니다.");
         }
     }
-
-    public Distance subtract(Distance distance) {
-        if (this.value < distance.getValue()) {
-            throw new IllegalArgumentException("");
-        }
-        return new Distance(this.value - distance.getValue());
-    }
-
-    public Distance add(Distance distance) {
-        return new Distance(this.value + distance.getValue());
-    }
-
+    
     public long getValue() {
         return value;
     }

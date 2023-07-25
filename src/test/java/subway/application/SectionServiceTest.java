@@ -209,7 +209,7 @@ class SectionServiceTest {
         // when , then
         assertThatCode(() -> sectionService.createSection(line.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("기존 구간 길이보다 새로운 구간 길이가 더 클수는 없습니다.");
+                .hasMessage("기존 구간 길이보다 새로운 구간 길이가 같거나 더 클수는 없습니다.");
     }
 
 

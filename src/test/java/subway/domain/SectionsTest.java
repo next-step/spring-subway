@@ -35,7 +35,7 @@ class SectionsTest {
     void SectionsSizeValidation() {
         assertThatCode(() -> new Sections(List.of()))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("노선에 등록된 구간은 반드시 한개 이상이어야합니다.");
+                .hasMessage("노선에 등록된 구간은 반드시 한 개 이상이어야합니다.");
     }
 
     @DisplayName("여러 개의 Section 정보가 있을 때 역들을 반환 한다.")
@@ -168,7 +168,7 @@ class SectionsTest {
         // when , then
         assertThatCode(() -> sections.addSection(new Section(line, stationA, stationD, new Distance(100L))))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("기존 구간 길이보다 새로운 구간 길이가 더 클수는 없습니다.");
+                .hasMessage("기존 구간 길이보다 새로운 구간 길이가 같거나 더 클수는 없습니다.");
 
     }
 

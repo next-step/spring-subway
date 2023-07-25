@@ -7,6 +7,7 @@ import subway.application.SectionService;
 import subway.dto.request.SectionRequest;
 
 @RestController
+@RequestMapping("/lines/{lineId}/sections")
 public class SectionController {
 
     private final SectionService sectionService;
@@ -15,7 +16,7 @@ public class SectionController {
         this.sectionService = sectionService;
     }
 
-    @PostMapping("/lines/{lineId}/sections")
+    @PostMapping
     public ResponseEntity<Void> createSection(
             @PathVariable final Long lineId,
             @RequestBody final SectionRequest sectionRequest) {
@@ -23,7 +24,7 @@ public class SectionController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/lines/{lineId}/sections")
+    @DeleteMapping
     public ResponseEntity<Void> deleteSection(
             @PathVariable final Long lineId,
             @RequestParam final Long stationId) {

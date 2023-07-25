@@ -37,8 +37,8 @@ class SortedSectionsTest {
                 new Section(line, stationD, stationA, new Distance(10L))
         );
         final SortedSections sortedSections = new SortedSections(sectionList);
-        // when
 
+        // when
         final List<Station> stations = sortedSections.toStations();
 
         // then

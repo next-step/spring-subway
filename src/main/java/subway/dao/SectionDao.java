@@ -32,7 +32,7 @@ public class SectionDao {
                     + " INNER JOIN STATION as d ON d.id = s.down_station_id ";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-    private RowMapper<Section> rowMapper = (rs, rowNum) -> {
+    private final RowMapper<Section> rowMapper = (rs, rowNum) -> {
         final Line line = new Line(
                 rs.getLong("line_id"),
                 rs.getString("line_name"),
@@ -85,11 +85,11 @@ public class SectionDao {
         jdbcTemplate.update(sql, sectionId);
     }
 
-    public void updateSections(Long lineId, Sections sections) {
+    public void updateSections(final Long lineId, final Sections sections) {
         dirtyChecking(findAllByLineId(lineId), sections.getSections());
     }
 
-    private void dirtyChecking(List<Section> beforeSection, List<Section> afterSection) {
+    private void dirtyChecking(final List<Section> beforeSection, final List<Section> afterSection) {
         deleteChecking(beforeSection, afterSection);
         insertChecking(beforeSection, afterSection);
     }

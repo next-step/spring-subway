@@ -43,8 +43,8 @@ public class Section {
     }
 
     public Distance subtractDistance(Section section) {
-        if (getDistance() < section.getDistance()) {
-            throw new IllegalArgumentException("기존 구간 길이보다 새로운 구간 길이가 더 클수는 없습니다.");
+        if (getDistance() <= section.getDistance()) {
+            throw new IllegalArgumentException("기존 구간 길이보다 새로운 구간 길이가 같거나 더 클수는 없습니다.");
         }
         return new Distance(this.getDistance() - section.getDistance());
     }

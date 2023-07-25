@@ -8,10 +8,10 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 class SectionTest {
 
-    Line line;
-    Station upStation;
-    Station downStation;
-    Distance distance;
+    private Line line;
+    private Station upStation;
+    private Station downStation;
+    private Distance distance;
 
     @BeforeEach
     void setUp() {

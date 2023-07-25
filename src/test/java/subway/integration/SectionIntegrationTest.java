@@ -87,7 +87,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final ErrorResponse errorResponse = response.body().as(ErrorResponse.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorResponse.getMessage()).isEqualTo("기존 구간 길이보다 새로운 구간 길이가 더 클수는 없습니다.");
+        assertThat(errorResponse.getMessage()).isEqualTo("기존 구간 길이보다 새로운 구간 길이가 같거나 더 클수는 없습니다.");
     }
 
     @DisplayName("상행역과 하행역이 이미 노선에 모두 등록되어 있다면 추가할 수 없음")

@@ -32,8 +32,7 @@ public class SectionService {
     }
 
     @Transactional
-    public void createSection(final Long lineId,
-                              final SectionRequest request) {
+    public void createSection(final Long lineId, final SectionRequest request) {
         final Section newSection = createSection(
                 lineId,
                 request.getUpStationId(),
@@ -44,27 +43,30 @@ public class SectionService {
         sectionDao.updateSections(lineId, sections);
     }
 
-    private Section createSection(Long lineId, Long upStationId, Long downStationId, Long distance) {
-        final Line line = getLineById(lineId);
-        final Station upStation = getStationById(upStationId);
-        final Station downStation = getStationById(downStationId);
+    private Section createSection(final Long lineId,
+                                  final Long upStationId,
+                                  final Long downStationId,
+                                  final Long distance) {
+        final Line line = findLineById(lineId);
+        final Station upStation = findStationById(upStationId);
+        final Station downStation = findStationById(downStationId);
         return new Section(line, upStation, downStation, new Distance(distance));
     }
 
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
-        final Station station = getStationById(stationId);
+        final Station station = findStationById(stationId);
         final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         sections.deleteSection(station);
         sectionDao.updateSections(lineId, sections);
     }
 
-    private Station getStationById(final Long stationId) {
+    private Station findStationById(final Long stationId) {
         return stationDao.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("역 찾을 수 없습니다."));
     }
 
-    private Line getLineById(final Long lineId) {
+    private Line findLineById(final Long lineId) {
         return lineDao.findById(lineId)
                 .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
     }
