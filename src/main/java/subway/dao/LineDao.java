@@ -1,5 +1,12 @@
 package subway.dao;
 
+import static subway.exception.ErrorCode.DUPLICATED_LINE_NAME;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.sql.DataSource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -11,13 +18,6 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 @Repository
@@ -73,7 +73,7 @@ public class LineDao {
         try {
             lineId = insertAction.executeAndReturnKey(params).longValue();
         } catch (DuplicateKeyException e) {
-            throw new SubwayException(ErrorCode.DUPLICATED_LINE_NAME, e);
+            throw new SubwayException(DUPLICATED_LINE_NAME, e);
         }
 
         return new Line(lineId, line.getName(), line.getColor());

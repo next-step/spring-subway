@@ -1,7 +1,9 @@
 package subway.domain;
 
+import static subway.exception.ErrorCode.INVALID_COLOR_NAME_BLANK;
+import static subway.exception.ErrorCode.INVALID_LINE_NAME_BLANK;
+
 import java.util.List;
-import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 public class Line {
@@ -34,13 +36,13 @@ public class Line {
 
     private void validateName(final String name) {
         if (name == null || name.isBlank()) {
-            throw new SubwayException(ErrorCode.INVALID_LINE_NAME);
+            throw new SubwayException(INVALID_LINE_NAME_BLANK);
         }
     }
 
     private void validateColor(final String color) {
         if (color == null || color.isBlank()) {
-            throw new SubwayException(ErrorCode.INVALID_COLOR_NAME);
+            throw new SubwayException(INVALID_COLOR_NAME_BLANK);
         }
     }
 

@@ -4,7 +4,7 @@ public class SubwayException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public SubwayException(final ErrorCode errorCode, Throwable cause) {
+    public SubwayException(final ErrorCode errorCode, final Throwable cause) {
         super(errorCode.getMessage(), cause);
         this.errorCode = errorCode;
     }

@@ -3,8 +3,8 @@ package subway.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static subway.exception.ErrorCode.INVALID_COLOR_NAME;
-import static subway.exception.ErrorCode.INVALID_LINE_NAME;
+import static subway.exception.ErrorCode.INVALID_COLOR_NAME_BLANK;
+import static subway.exception.ErrorCode.INVALID_LINE_NAME_BLANK;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -67,10 +67,10 @@ public class LineTest {
         assertAll(
             () -> assertThatCode(() -> new Line(null, "green"))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage(INVALID_LINE_NAME.getMessage()),
+                .hasMessage(INVALID_LINE_NAME_BLANK.getMessage()),
             () -> assertThatCode(() -> new Line("", "green"))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage(INVALID_LINE_NAME.getMessage())
+                .hasMessage(INVALID_LINE_NAME_BLANK.getMessage())
         );
     }
 
@@ -80,10 +80,11 @@ public class LineTest {
         assertAll(
             () -> assertThatCode(() -> new Line("2호선", null))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage(INVALID_COLOR_NAME.getMessage()),
+                .hasMessage(INVALID_COLOR_NAME_BLANK.getMessage()),
             () -> assertThatCode(() -> new Line("2호선", ""))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage(INVALID_COLOR_NAME.getMessage())
+                .hasMessage(INVALID_COLOR_NAME_BLANK.getMessage())
         );
     }
+
 }

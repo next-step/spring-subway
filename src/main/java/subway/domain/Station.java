@@ -1,6 +1,6 @@
 package subway.domain;
 
-import static subway.exception.ErrorCode.INVALID_STATION_NAME;
+import static subway.exception.ErrorCode.INVALID_STATION_NAME_BLANK;
 
 import java.util.Objects;
 import subway.exception.SubwayException;
@@ -16,14 +16,22 @@ public class Station {
         this.name = name;
     }
 
+    public Station(final String name) {
+        this(null, name);
+    }
+
     private static void validate(final String name) {
         if (name == null || name.isBlank()) {
-            throw new SubwayException(INVALID_STATION_NAME);
+            throw new SubwayException(INVALID_STATION_NAME_BLANK);
         }
     }
 
-    public Station(final String name) {
-        this(null, name);
+    public boolean match(final Station other) {
+        return this.equals(other);
+    }
+
+    public boolean isNotEqual(final Station other) {
+        return !match(other);
     }
 
     public Long getId() {
@@ -51,7 +59,4 @@ public class Station {
         return Objects.hash(id, name);
     }
 
-    public boolean isNotEqual(final Station other) {
-        return !this.equals(other);
-    }
 }

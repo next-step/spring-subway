@@ -1,9 +1,22 @@
 package subway.domain;
 
-import java.util.*;
+import static subway.exception.ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE;
+import static subway.exception.ErrorCode.INVALID_SECTION_ALREADY_EXISTS;
+import static subway.exception.ErrorCode.INVALID_SECTION_NO_EXISTS;
+import static subway.exception.ErrorCode.NOT_FOUND_REMOVE_STATION;
+import static subway.exception.ErrorCode.NOT_FOUND_START;
+import static subway.exception.ErrorCode.NOT_FOUND_STATION;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 public class Sections {
@@ -27,22 +40,20 @@ public class Sections {
 
         List<Section> newSections = new ArrayList<>(this.sections);
 
-        Optional<Section> oneMatcingStation = findMatcingOneSection(section);
-        if (oneMatcingStation.isPresent()) {
-            newSections.remove(oneMatcingStation);
-            newSections.add(oneMatcingStation.get().subtract(section));
-        }
-
+        findMatchingOneSection(section).ifPresent(oneMatchingStation -> {
+            newSections.remove(oneMatchingStation);
+            newSections.add(oneMatchingStation.subtract(section));
+        });
         newSections.add(section);
         return new Sections(newSections);
     }
 
     private void validateNotAlreadyExist(final Section section) {
         if (contains(section.getUpStation()) && contains(section.getDownStation())) {
-            throw new SubwayException(ErrorCode.INVALID_SECTION_ALREADY_EXISTS);
+            throw new SubwayException(INVALID_SECTION_ALREADY_EXISTS);
         }
         if (notContains(section.getUpStation()) && notContains(section.getDownStation())) {
-            throw new SubwayException(ErrorCode.INVALID_SECTION_NO_EXISTS);
+            throw new SubwayException(INVALID_SECTION_NO_EXISTS);
         }
     }
 
@@ -54,7 +65,7 @@ public class Sections {
         return !contains(station);
     }
 
-    private Optional<Section> findMatcingOneSection(final Section section) {
+    private Optional<Section> findMatchingOneSection(final Section section) {
         return sections.stream()
             .filter(section::matchOneStation)
             .findAny();
@@ -74,9 +85,15 @@ public class Sections {
         return new Sections(newSections);
     }
 
+    private void validateSize() {
+        if (sections.size() < 2) {
+            throw new SubwayException(CAN_NOT_DELETE_WHEN_SECTION_IS_ONE);
+        }
+    }
+
     private void validateContainStation(Station station) {
         if (notContains(station)) {
-            throw new SubwayException(ErrorCode.NOT_FOUND_REMOVE_STATION);
+            throw new SubwayException(NOT_FOUND_REMOVE_STATION);
         }
     }
 
@@ -85,11 +102,11 @@ public class Sections {
         Section upSection = sections.stream()
             .filter(section -> section.getUpStation().equals(station))
             .findAny()
-            .orElseThrow(() -> new IllegalStateException(""));
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
         Section downSection = sections.stream()
             .filter(section -> section.getDownStation().equals(station))
             .findAny()
-            .orElseThrow(() -> new IllegalStateException(""));
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
         return downSection.add(upSection);
     }
 
@@ -112,12 +129,6 @@ public class Sections {
         return removeSection;
     }
 
-    private void validateSize() {
-        if (sections.size() < 2) {
-            throw new SubwayException(ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE);
-        }
-    }
-
     public List<Station> getSortedStations() {
         Map<Station, Station> stationMap = new HashMap<>();
 
@@ -130,7 +141,7 @@ public class Sections {
             .map(Section::getUpStation)
             .filter(downStation -> !downStations.contains(downStation))
             .findAny()
-            .orElseThrow(() -> new IllegalStateException("스타트 지점인 구간이 없습니다."));
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_START));
 
         return sortedStation(stationMap, start);
     }

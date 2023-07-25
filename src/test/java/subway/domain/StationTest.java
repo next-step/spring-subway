@@ -1,7 +1,7 @@
 package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static subway.exception.ErrorCode.INVALID_STATION_NAME;
+import static subway.exception.ErrorCode.INVALID_STATION_NAME_BLANK;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ public class StationTest {
     void 이름_null_오류_반환(){
         assertThatCode(()-> new Station(null))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(INVALID_STATION_NAME.getMessage());
+            .hasMessage(INVALID_STATION_NAME_BLANK.getMessage());
     }
 
     @Test
@@ -21,7 +21,7 @@ public class StationTest {
     void 이름_빈칸_오류_반환(){
         assertThatCode(()-> new Station(""))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(INVALID_STATION_NAME.getMessage());
+            .hasMessage(INVALID_STATION_NAME_BLANK.getMessage());
     }
 
     @Test

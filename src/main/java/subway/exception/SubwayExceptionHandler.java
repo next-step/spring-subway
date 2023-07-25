@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class SubwayExceptionHandler {
 
     @ExceptionHandler(SQLException.class)
-    protected ResponseEntity<ErrorResponse> handleSQLException(SQLException e) {
+    protected ResponseEntity<ErrorResponse> handleSQLException(final SQLException e) {
         return ResponseEntity.internalServerError()
             .contentType(MediaType.APPLICATION_JSON)
             .body(ErrorResponse.of(INTERNAL_SERVER_ERROR.value(), e.getMessage()));
     }
 
     @ExceptionHandler(SubwayException.class)
-    protected ResponseEntity<ErrorResponse> handleSubwayException(SubwayException e) {
+    protected ResponseEntity<ErrorResponse> handleSubwayException(final SubwayException e) {
         ErrorCode errorCode = e.getErrorCode();
         ErrorResponse errorResponse = ErrorResponse.of(errorCode);
         return new ResponseEntity<>(

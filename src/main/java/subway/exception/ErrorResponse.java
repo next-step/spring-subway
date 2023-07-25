@@ -2,8 +2,8 @@ package subway.exception;
 
 public class ErrorResponse {
 
-    private int statusCode;
-    private String message;
+    private final int statusCode;
+    private final String message;
 
     public ErrorResponse(final int statusCode, final String message) {
         this.statusCode = statusCode;

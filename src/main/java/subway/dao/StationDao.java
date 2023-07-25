@@ -1,5 +1,9 @@
 package subway.dao;
 
+import static subway.exception.ErrorCode.DUPLICATED_STATION_NAME;
+
+import java.util.List;
+import javax.sql.DataSource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -8,10 +12,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Station;
-
-import javax.sql.DataSource;
-import java.util.List;
-import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 @Repository
@@ -41,7 +41,7 @@ public class StationDao {
         try {
             id = insertAction.executeAndReturnKey(params).longValue();
         } catch (DuplicateKeyException e) {
-            throw new SubwayException(ErrorCode.DUPLICATED_STATION_NAME);
+            throw new SubwayException(DUPLICATED_STATION_NAME);
         }
         return new Station(id, station.getName());
     }

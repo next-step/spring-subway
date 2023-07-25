@@ -1,7 +1,9 @@
 package subway.domain;
 
+import static subway.exception.ErrorCode.SAME_UP_AND_DOWN_STATION;
+import static subway.exception.ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION;
+
 import java.util.Objects;
-import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 public class Section {
@@ -30,8 +32,8 @@ public class Section {
     }
 
     private void validate(final Station upStation, final Station downStation) {
-        if (upStation.equals (downStation)){
-            throw new SubwayException(ErrorCode.SAME_UP_AND_DOWN_STATION);
+        if (upStation.equals(downStation)) {
+            throw new SubwayException(SAME_UP_AND_DOWN_STATION);
         }
     }
 
@@ -44,12 +46,25 @@ public class Section {
             return new Section(upStation, other.upStation, distance.subtract(other.distance));
         }
 
-        throw new SubwayException(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION);
+        throw new SubwayException(SECTION_DOES_NOT_CONTAIN_SECTION);
     }
 
     public boolean matchOneStation(final Section other) {
         return downStation.equals(other.downStation) || upStation.equals(other.upStation);
     }
+
+    public boolean matchOneStation(final Station station) {
+        return upStation.equals(station) || downStation.equals(station);
+    }
+
+    public Section add(final Section newSection) {
+        if (downStation.isNotEqual(newSection.upStation)) {
+            throw new SubwayException(SECTION_DOES_NOT_CONTAIN_SECTION);
+        }
+        return new Section(this.upStation, newSection.downStation,
+            distance.add(newSection.distance));
+    }
+
 
     public Long getId() {
         return id;
@@ -86,15 +101,4 @@ public class Section {
         return Objects.hash(id, upStation, downStation, distance);
     }
 
-    public Section add(final Section newSection) {
-        if (downStation.isNotEqual(newSection.upStation)) {
-            throw new SubwayException(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION);
-        }
-        return new Section(this.upStation, newSection.downStation,
-            distance.add(newSection.distance));
-    }
-
-    public boolean matchOneStation(final Station station) {
-        return upStation.equals(station) || downStation.equals(station);
-    }
 }
