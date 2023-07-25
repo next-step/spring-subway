@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 public class Sections {
 
-    public static final int MIN_SECTION_COUNT = 1;
     private final List<Section> values;
 
     public Sections(List<Section> candidateValues) {

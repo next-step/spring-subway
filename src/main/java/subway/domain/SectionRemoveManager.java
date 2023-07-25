@@ -4,8 +4,9 @@ import java.util.Optional;
 
 public class SectionRemoveManager {
 
-    private final Sections sections;
     private static final int MIN_SECTION_COUNT = 1;
+
+    private final Sections sections;
 
     public SectionRemoveManager(final Sections sections) {
         this.sections = sections;
