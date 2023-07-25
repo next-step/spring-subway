@@ -1,15 +1,12 @@
 package subway.domain;
 
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
+import subway.exception.InternalStateException;
 
 import java.util.Objects;
 
 public class Section {
-
-    private static final String SAME_STATION_EXCEPTION_MESSAGE = "상행역과 하행역은 다른 역이어야 합니다.";
-    private static final String SECTION_NOT_OVERLAP_EXCEPTION_MESSAGE = "구간이 서로 겹치지 않습니다.";
-    private static final String SECTION_NOT_CONNECT_EXCEPTION_MESSAGE = "서로 연결되어 있지 않은 구간을 합칠 수 없습니다.";
-    private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
 
     private Long id;
     private Station upStation;
@@ -64,25 +61,37 @@ public class Section {
 
     private void validateConnected(Section other) {
         if (!isUpConnected(other) && !isDownConnected(other)) {
-            throw new IncorrectRequestException(SECTION_NOT_CONNECT_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(
+                    ErrorCode.NOT_CONNECTED_SECTION,
+                    String.format("구간1 상행역: %s 하행역: %s, 구간2 상행역: %s 하행역: %s", this.upStation.getName(), this.downStation.getName(), other.upStation.getName(), other.downStation.getName())
+            );
         }
     }
 
     private void validateLongerThan(final Section other) {
         if (this.distance.shorterOrEqualTo(other.distance)) {
-            throw new IncorrectRequestException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(
+                    ErrorCode.LONGER_THAN_ORIGIN_SECTION,
+                    String.format("기존 구간 길이: %d, 신설 구간 길이: %d", this.distance.getValue(), other.distance.getValue())
+            );
         }
     }
 
     private void validateOverlapped(Section other) {
         if (!isSameUpStation(other) && !isSameDownStation(other)) {
-            throw new IncorrectRequestException(SECTION_NOT_OVERLAP_EXCEPTION_MESSAGE);
+            throw new InternalStateException(
+                    ErrorCode.NOT_OVERLAPPED_SECTION,
+                    String.format("기존 구간 상행역: %s 하행역: %s, 신설 구간 상행역: %s 하행역: %s", this.upStation.getName(), this.downStation.getName(), other.upStation.getName(), other.downStation.getName())
+            );
         }
     }
 
     private void validateDifferent(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new IncorrectRequestException(SAME_STATION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(
+                    ErrorCode.SAME_STATION_SECTION,
+                    String.format("상행역: %s, 하행역 %s", upStation.getName(), downStation.getName())
+            );
         }
     }
 

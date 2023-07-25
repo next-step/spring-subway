@@ -7,6 +7,7 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
 import java.net.URI;
@@ -66,7 +67,7 @@ public class LineController {
         try {
             return Long.parseLong(stationId);
         } catch (NumberFormatException e) {
-            throw new IncorrectRequestException(stationId + "는 올바른 역 id가 아닙니다.");
+            throw new IncorrectRequestException(ErrorCode.INVALID_STATION_ID, stationId);
         }
     }
 }

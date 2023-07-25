@@ -1,5 +1,6 @@
 package subway.domain;
 
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 import subway.exception.InternalStateException;
 
@@ -7,15 +8,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Sections {
-
-    private static final String SHOULD_ONLY_ONE_OVERLAP_EXCEPTION_MESSAGE = "새로운 구간은 기존 구간과 1개 역만 겹쳐야 합니다.";
-    private static final String AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE = "최소 1개 이상의 구간이 있어야 합니다.";
-    private static final String CANNOT_CLOSE_LAST_SECTION_EXCEPTION_MESSAGE = "현재 노선의 마지막 구간은 삭제할 수 없습니다.";
-    private static final String CLOSE_NOT_EXIST_STATION_EXCEPTION_MESSAGE = "폐역할 역이 노선에 존재하지 않습니다.";
-    private static final String TWO_MORE_TERMINAL_STATION_EXCEPTION_MESSAGE = "같은 방향의 종점역이 두 개 이상입니다.";
-    private static final String CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE = "상행 종점역을 찾을 수 없습니다.";
-    private static final String NOT_OVERLAPPED_SECTION_EXCEPTION_MESSAGE = "구간이 겹치지 않아 중간에 삽입할 수 없습니다.";
-    private static final String CANNOT_CONSTRUCTED_IN_MIDDLE_EXCEPTION_MESSAGE = "중간에 삽입될 수 없는 구간입니다.";
 
     private final List<Section> sections;
     private final Set<Station> upStations;
@@ -58,7 +50,7 @@ public class Sections {
 
         return terminalUpStation.stream()
                 .findFirst()
-                .orElseThrow(() -> new InternalStateException(CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new InternalStateException(ErrorCode.CANNOT_FIND_TERMINAL_UP_STATION, ""));
     }
 
     private Section lastSection() {
@@ -70,12 +62,12 @@ public class Sections {
         return sections.stream()
                 .filter(section -> section.isSameUpStation(newSection) || section.isSameDownStation(newSection))
                 .findFirst()
-                .orElseThrow(() -> new InternalStateException(NOT_OVERLAPPED_SECTION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new InternalStateException(ErrorCode.NOT_OVERLAPPED_SECTION, ""));
     }
 
     private void validateConstructedInMiddle(Section newSection) {
         if (!isConstructedInMiddle(newSection)) {
-            throw new InternalStateException(CANNOT_CONSTRUCTED_IN_MIDDLE_EXCEPTION_MESSAGE);
+            throw new InternalStateException(ErrorCode.CANNOT_CONSTRUCTED_IN_MIDDLE, String.format("신설 구간 상행역: %s, 하행역: %s", newSection.getUpStation().getName(), newSection.getDownStation().getName()));
         }
     }
 
@@ -84,12 +76,12 @@ public class Sections {
         Section upSection = sections.stream()
                 .filter(section -> section.getDownStation().equals(station))
                 .findFirst()
-                .orElseThrow(() -> new InternalStateException(CLOSE_NOT_EXIST_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new InternalStateException(ErrorCode.NOT_FOUND_STATION_IN_SECTION, station.getName()));
 
         Section downSection = sections.stream()
                 .filter(section -> section.getUpStation().equals(station))
                 .findFirst()
-                .orElseThrow(() -> new InternalStateException(CLOSE_NOT_EXIST_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new InternalStateException(ErrorCode.NOT_FOUND_STATION_IN_SECTION, station.getName()));
 
         return upSection.connectWith(downSection);
     }
@@ -136,31 +128,36 @@ public class Sections {
 
         Set<Station> allStations = gatherAllStations();
         if (!allStations.contains(station)) {
-            throw new IncorrectRequestException(CLOSE_NOT_EXIST_STATION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(ErrorCode.NOT_EXIST_STATION_IN_LINE, station.getName());
         }
     }
 
     private void validateAtLeastOneSection() {
         if (this.sections.size() <= 1) {
-            throw new IncorrectRequestException(CANNOT_CLOSE_LAST_SECTION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(ErrorCode.CANNOT_CLOSE_LAST_SECTION, "");
         }
     }
 
     private void validateNotEmpty(List<Section> sections) {
         if (sections.isEmpty()) {
-            throw new IncorrectRequestException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(ErrorCode.AT_LEAST_ONE_SECTION, "");
         }
     }
 
     private void validateExistOnlyOne(final boolean hasUpStation, final boolean hasDownStation) {
         if (hasUpStation == hasDownStation) {
-            throw new IncorrectRequestException(SHOULD_ONLY_ONE_OVERLAP_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(ErrorCode.ONLY_ONE_OVERLAPPED_STATION, "");
         }
     }
 
     private void validateOnlyOneTerminal(Set<Station> terminalStations) {
         if (terminalStations.size() > 1) {
-            throw new InternalStateException(TWO_MORE_TERMINAL_STATION_EXCEPTION_MESSAGE);
+            throw new InternalStateException(
+                    ErrorCode.TWO_MORE_TERMINAL_STATION,
+                    terminalStations.stream()
+                            .map(Station::getName)
+                            .collect(Collectors.joining())
+            );
         }
     }
 }

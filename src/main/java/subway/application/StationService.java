@@ -6,6 +6,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class StationService {
         String name = stationRequest.getName();
         stationDao.findByName(name)
                 .ifPresent(station -> {
-                    throw new IncorrectRequestException("역 이름은 중복될 수 없습니다. 입력값: " + name);
+                    throw new IncorrectRequestException(ErrorCode.DUPLICATED_STATION_NAME, name);
                 });
         Station station = stationDao.insert(new Station(name));
         return StationResponse.of(station);

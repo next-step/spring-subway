@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.SectionRequest;
-import subway.dto.StationRequest;
 import subway.helper.CreateHelper;
 import subway.helper.GetHelper;
 

@@ -10,9 +10,7 @@ import org.springframework.http.MediaType;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
