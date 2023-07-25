@@ -49,20 +49,6 @@ public class SectionDao {
             .findAny();
     }
 
-    public void deleteLastSection(final long lineId, final long stationId) {
-        String sql = "delete from SECTION where line_id = ? and down_station_id = ?";
-        jdbcTemplate.update(sql, lineId, stationId);
-    }
-
-    public void delete(long sectionId) {
-    }
-
-    public long count(final long lineId) {
-        String sql = "select * from section where line_id = ?";
-        return jdbcTemplate.query(sql, rowMapper, lineId)
-            .size();
-    }
-
     public List<Section> findAll(final long lineId) {
         String sql = "select * from SECTION where line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId);
@@ -79,7 +65,24 @@ public class SectionDao {
         );
     }
 
+    public void deleteLastSection(final long lineId, final long stationId) {
+        String sql = "delete from SECTION where line_id = ? and down_station_id = ?";
+        jdbcTemplate.update(sql, lineId, stationId);
+    }
+
+    public void delete(long id) {
+        String sql = "delete from SECTION where id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    public long count(final long lineId) {
+        String sql = "select * from section where line_id = ?";
+        return jdbcTemplate.query(sql, rowMapper, lineId)
+            .size();
+    }
+
     public boolean existByLineIdAndStationId(long lineId, long stationId) {
-        return false;
+        String sql = "select * from section where line_id = ? and (up_station_id = ? or down_station_id = ?)";
+        return !jdbcTemplate.query(sql, rowMapper, lineId, stationId, stationId).isEmpty();
     }
 }
