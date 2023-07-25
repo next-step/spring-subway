@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -132,7 +133,7 @@ public class Sections {
 
     private Section findMatchedSection(Section section) {
         return this.values.stream()
-            .filter(value -> value.hasSameUpStationOrDownStation(section))
+            .filter(value -> value.matchEitherStation(section))
             .findAny()
             .orElseThrow(() -> new IllegalStateException("구간 추가 도중 문제가 발생했습니다."));
     }
@@ -142,9 +143,9 @@ public class Sections {
         Station downStation = section.getDownStation();
 
         boolean upStationExists = this.values.stream()
-            .anyMatch(value -> value.containsStation(upStation));
+            .anyMatch(value -> value.hasStation(upStation));
         boolean downStationExists = this.values.stream()
-            .anyMatch(value -> value.containsStation(downStation));
+            .anyMatch(value -> value.hasStation(downStation));
 
         validateBothStationsInLine(upStationExists, downStationExists);
         validateBothStationsNotInLine(upStationExists, downStationExists);
@@ -241,6 +242,24 @@ public class Sections {
             .collect(Collectors.toList());
         stations.add(getLast().getDownStation());
         return stations;
+    }
+
+    public boolean hasStation(Station station) {
+        return getStations().contains(station);
+    }
+
+    public boolean isFirst(Station station) {
+        return getFirst().isUpStation(station);
+    }
+
+    public boolean isLast(Station station) {
+        return getLast().isDownStation(station);
+    }
+
+    public Optional<Section> filter(Predicate<Section> condition) {
+        return values.stream()
+            .filter(condition)
+            .findAny();
     }
 
     private Section getFirst() {
