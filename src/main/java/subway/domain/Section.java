@@ -9,10 +9,8 @@ import subway.domain.response.SectionDisconnectResponse;
 
 public class Section {
 
-    private static final int MIN_DISTANCE_SIZE = 0;
-
     private final Long id;
-    private int distance;
+    private Distance distance;
     private Station upStation;
     private Station downStation;
     private Section upSection;
@@ -23,7 +21,7 @@ public class Section {
 
         this.upStation = builder.upStation;
         this.downStation = builder.downStation;
-        this.distance = builder.distance;
+        this.distance = new Distance(builder.distance);
         this.id = builder.id;
         this.upSection = builder.upSection;
         this.downSection = builder.downSection;
@@ -36,8 +34,6 @@ public class Section {
     private void validate(Builder builder) {
         Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.");
         Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.");
-        Assert.isTrue(builder.distance > MIN_DISTANCE_SIZE,
-                () -> MessageFormat.format("distance \"{0}\"는 0 이하가 될 수 없습니다.", builder.distance));
         Assert.isTrue(!builder.upStation.equals(builder.downStation),
                 () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation));
     }
@@ -94,7 +90,7 @@ public class Section {
                 .downSection(this.downSection)
                 .upStation(requestSection.downStation)
                 .downStation(this.downStation)
-                .distance(this.distance - requestSection.getDistance())
+                .distance(this.distance.value - requestSection.getDistance())
                 .build();
 
         this.downStation = requestSection.downStation;
@@ -102,7 +98,7 @@ public class Section {
             this.downSection.upSection = newDownSection;
         }
         this.downSection = newDownSection;
-        this.distance = requestSection.getDistance();
+        this.distance = new Distance(requestSection.getDistance());
         return newDownSection;
     }
 
@@ -113,7 +109,7 @@ public class Section {
                 .downSection(this)
                 .upStation(this.upStation)
                 .downStation(requestSection.upStation)
-                .distance(this.distance - requestSection.getDistance())
+                .distance(this.distance.value - requestSection.getDistance())
                 .build();
 
         this.upStation = requestSection.upStation;
@@ -121,7 +117,7 @@ public class Section {
             this.upSection.downSection = newUpSection;
         }
         this.upSection = newUpSection;
-        this.distance = requestSection.getDistance();
+        this.distance = new Distance(requestSection.getDistance());
         return newUpSection;
     }
 
@@ -172,7 +168,7 @@ public class Section {
     }
 
     private SectionDisconnectResponse disconnectMiddleSection() {
-        distance += downSection.distance;
+        distance = new Distance(distance.value + downSection.getDistance());
         downStation = downSection.downStation;
         if (isSectionHasDescendant()) {
             SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection,
@@ -216,7 +212,7 @@ public class Section {
     }
 
     public int getDistance() {
-        return distance;
+        return distance.value;
     }
 
     @Override

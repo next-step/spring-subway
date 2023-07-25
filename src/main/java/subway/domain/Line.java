@@ -14,29 +14,29 @@ public class Line {
     private static final int MIN_DELETABLE_SIZE = 1;
 
     private final Long id;
-    private final String name;
-    private final String color;
+    private final Name name;
+    private final Color color;
     private final List<Section> sections;
 
     public Line(Long id, String name, String color, List<Section> sections) {
         this.id = id;
-        this.name = name;
-        this.color = color;
+        this.name = new Name(name);
+        this.color = new Color(color);
         this.sections = sections;
         initSectionConnection(this.sections);
     }
 
     public Line(Long id, String name, String color) {
         this.id = id;
-        this.name = name;
-        this.color = color;
+        this.name = new Name(name);
+        this.color = new Color(color);
         this.sections = new ArrayList<>();
     }
 
     public Line(String name, String color, List<Section> sections) {
         this.id = null;
-        this.name = name;
-        this.color = color;
+        this.name = new Name(name);
+        this.color = new Color(color);
         this.sections = sections;
         initSectionConnection(this.sections);
     }
@@ -114,11 +114,11 @@ public class Line {
     }
 
     public String getName() {
-        return name;
+        return name.value;
     }
 
     public String getColor() {
-        return color;
+        return color.value;
     }
 
     public List<Section> getSections() {
