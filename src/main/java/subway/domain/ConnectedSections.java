@@ -39,12 +39,22 @@ public class ConnectedSections {
     public SectionEditResult remove(final Long targetStationId) {
         validateRemoveSectionCondition(targetStationId);
 
-        final Section removed = connectedSections.remove(connectedSections.size() - 1);
+        if (getFirstSection().getUpStationId().equals(targetStationId)) {
+            final Section removed = connectedSections.remove(0);
+            return new SectionEditResult(
+                    Collections.emptyList(),
+                    List.of(removed)
+            );
+        }
+        if (getLastSection().getDownStationId().equals(targetStationId)) {
+            final Section removed = connectedSections.remove(connectedSections.size() - 1);
+            return new SectionEditResult(
+                    Collections.emptyList(),
+                    List.of(removed)
+            );
+        }
 
-        return new SectionEditResult(
-                Collections.emptyList(),
-                List.of(removed)
-        );
+        throw new RuntimeException();
     }
 
     public List<Long> getSortedStationIds() {

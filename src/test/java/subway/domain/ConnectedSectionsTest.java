@@ -231,6 +231,24 @@ class ConnectedSectionsTest {
     }
 
     @Test
+    @DisplayName("상행 종점역이 포함된 구간을 삭제할 수 있다.")
+    void removeFirstStationSection() {
+        /* given */
+        final Long stationId = 11L;
+
+        /* when */
+        SectionEditResult sectionEditResult = connectedSections.remove(stationId);
+
+        /* then */
+        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Collections.emptyList());
+        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
+                List.of(
+                        new Section(11L, 1L, 11L, 12L, 777L)
+                )
+        );
+    }
+
+    @Test
     @DisplayName("하행 종점역이 포함된 구간을 삭제할 수 있다.")
     void removeLastStationSection() {
         /* given */
@@ -247,7 +265,6 @@ class ConnectedSectionsTest {
                 )
         );
     }
-
 
     @Test
     @DisplayName("노선에 구간이 하나만 존재하는 경우 삭제 시 SubwayIllegalArgumentException을 던진다.")
