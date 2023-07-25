@@ -3,7 +3,6 @@ package subway.domain;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import org.springframework.util.Assert;
 import subway.domain.response.SectionDisconnectResponse;
 
@@ -40,35 +39,42 @@ public class Section {
 
     public Section connectSection(Section requestSection) {
         Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다");
-        Optional<SectionConnector> sectionConnectorOptional = SectionConnector
-                .findSectionConnector(this, requestSection);
-
-        if (sectionConnectorOptional.isEmpty()) {
-            return connectToNextSection(requestSection);
+        if (isConnectUpSection(requestSection)) {
+            return connectUpSection(requestSection);
         }
-
-        return connectToCurrentSection(sectionConnectorOptional.get(), requestSection);
+        if (isConnectMiddleUpSection(requestSection)) {
+            return connectMiddleUpSection(requestSection);
+        }
+        if (isConnectMiddleDownSection(requestSection)) {
+            return connectMiddleDownSection(requestSection);
+        }
+        if (isConnectDownSection(requestSection)) {
+            return connectDownSection(requestSection);
+        }
+        return connectToNextSection(requestSection);
     }
 
+    private boolean isConnectUpSection(Section requestSection) {
+        return upSection == null && upStation.equals(requestSection.getDownStation());
+    }
+
+    private boolean isConnectMiddleUpSection(Section requestSection) {
+        return upStation.equals(requestSection.getUpStation());
+    }
+
+    private boolean isConnectMiddleDownSection(Section requestSection) {
+        return downStation.equals(requestSection.getDownStation());
+    }
+
+    private boolean isConnectDownSection(Section requestSection) {
+        return downSection == null && downStation.equals(requestSection.getUpStation());
+    }
 
     private Section connectToNextSection(Section requestSection) {
         Assert.notNull(downSection,
                 () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection));
 
         return downSection.connectSection(requestSection);
-    }
-
-    private Section connectToCurrentSection(SectionConnector sectionConnector, Section requestSection) {
-        if (sectionConnector == SectionConnector.UP) {
-            return connectUpSection(requestSection);
-        }
-        if (sectionConnector == SectionConnector.MIDDLE_UP) {
-            return connectMiddleUpSection(requestSection);
-        }
-        if (sectionConnector == SectionConnector.MIDDLE_DOWN) {
-            return connectMiddleDownSection(requestSection);
-        }
-        return connectDownSection(requestSection);
     }
 
     private Section connectDownSection(Section requestSection) {
@@ -135,13 +141,29 @@ public class Section {
         return upSection.findUpSection();
     }
 
-    public SectionDisconnectResponse disconnectStation(Station station) {
-        Optional<SectionDisconnector> sectionDisconnectorOptional = SectionDisconnector.findSectionDisConnector(this,
-                station);
+    public SectionDisconnectResponse disconnectStation(Station requestStation) {
+        if (isDisconnectUpStation(requestStation)) {
+            return disconnectUpSection();
+        }
+        if (isDisconnectMiddleStation(requestStation)) {
+            return disconnectMiddleSection();
+        }
+        if (isDisconnectDownStation(requestStation)) {
+            return disconnectDownSection();
+        }
+        return disconnectToNextSection(requestStation);
+    }
 
-        return sectionDisconnectorOptional.map(this::disconnectToCurrentSection)
-                .orElseGet(() -> disconnectToNextSection(station));
+    private boolean isDisconnectUpStation(Station requestStation) {
+        return upStation.equals(requestStation) && upSection == null;
+    }
 
+    private boolean isDisconnectMiddleStation(Station requestStation) {
+        return downStation.equals(requestStation) && downSection != null;
+    }
+
+    private boolean isDisconnectDownStation(Station requestStation) {
+        return downStation.equals(requestStation) && downSection == null;
     }
 
     private SectionDisconnectResponse disconnectToNextSection(Station station) {
@@ -150,16 +172,6 @@ public class Section {
                     MessageFormat.format("삭제 가능한 section을 찾을 수 없습니다. station \"{0}\"", station));
         }
         return downSection.disconnectStation(station);
-    }
-
-    private SectionDisconnectResponse disconnectToCurrentSection(SectionDisconnector sectionDisconnector) {
-        if (sectionDisconnector == SectionDisconnector.UP) {
-            return disconnectUpSection();
-        }
-        if (sectionDisconnector == SectionDisconnector.MIDDLE) {
-            return disconnectMiddleSection();
-        }
-        return disconnectDownSection();
     }
 
     private SectionDisconnectResponse disconnectUpSection() {
