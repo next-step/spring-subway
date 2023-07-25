@@ -1,12 +1,9 @@
 package subway.ui;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +15,6 @@ import subway.application.StationService;
 import subway.dto.StationCreateRequest;
 import subway.dto.StationResponse;
 import subway.dto.StationUpdateRequest;
-import subway.util.ErrorTemplate;
 
 @RestController
 @RequestMapping("/stations")
@@ -56,10 +52,5 @@ public class StationController {
     public ResponseEntity<Void> deleteStation(@PathVariable long id) {
         stationService.deleteStationById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<ErrorTemplate> handleSQLException(SQLException sqlException) {
-        return new ResponseEntity<>(ErrorTemplate.of("SQL fail"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
