@@ -83,24 +83,6 @@ public class Sections {
         return this.stationIds;
     }
 
-    private Optional<Section> findFirstSectionInNotSortedSections(final List<Section> values) {
-        final Set<Long> upStationIds = toSetWithMapper(values, Section::getUpStationId);
-        final Set<Long> downStationIds = toSetWithMapper(values, Section::getDownStationId);
-
-        upStationIds.removeAll(intersection(upStationIds, downStationIds));
-
-        return find(values, section -> upStationIds.contains(section.getUpStationId()));
-    }
-
-    private List<Long> sortedStationIds() {
-        final List<Long> result = new ArrayList<>(List.of(this.values.get(0).getUpStationId()));
-        for (Section section : this.values) {
-            result.add(section.getDownStationId());
-        }
-
-        return result;
-    }
-
     private List<Section> getSortedSections(final List<Section> values) {
         final Map<Long, Section> upStationKeyMap = values.stream()
                 .collect(Collectors.toMap(Section::getUpStationId, section -> section));
@@ -114,6 +96,24 @@ public class Sections {
         while (next != null) {
             result.add(next);
             next = upStationKeyMap.get(next.getDownStationId());
+        }
+
+        return result;
+    }
+
+    private Optional<Section> findFirstSectionInNotSortedSections(final List<Section> values) {
+        final Set<Long> upStationIds = toSetWithMapper(values, Section::getUpStationId);
+        final Set<Long> downStationIds = toSetWithMapper(values, Section::getDownStationId);
+
+        upStationIds.removeAll(intersection(upStationIds, downStationIds));
+
+        return find(values, section -> upStationIds.contains(section.getUpStationId()));
+    }
+
+    private List<Long> sortedStationIds() {
+        final List<Long> result = new ArrayList<>(List.of(this.values.get(0).getUpStationId()));
+        for (Section section : this.values) {
+            result.add(section.getDownStationId());
         }
 
         return result;
