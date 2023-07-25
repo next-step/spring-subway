@@ -2,6 +2,8 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -16,8 +18,8 @@ class SectionTest {
 
         // when, then
         assertThatCode(() -> new Section(station, station, 10))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("상행역과 하행역이 같을 수 없습니다");
+            .isInstanceOf(SubwayException.class)
+            .hasMessage(ErrorCode.SAME_UP_AND_DOWN_STATION.getMessage());
     }
 
     @Test
@@ -72,8 +74,8 @@ class SectionTest {
             );
         // when & then
         assertThatCode(() -> section.subtract(newSection))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("입력으로 들어온 section이 현재 section에 포함되지 않습니다");
+            .isInstanceOf(SubwayException.class)
+            .hasMessage(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION.getMessage());
     }
 
     @Test
@@ -113,7 +115,7 @@ class SectionTest {
         );
         // when & then
         assertThatCode(() -> section.add(newSection))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("입력으로 들어온 section이 현재 section에 포함되지 않습니다");
+            .isInstanceOf(SubwayException.class)
+            .hasMessage(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION.getMessage());
     }
 }

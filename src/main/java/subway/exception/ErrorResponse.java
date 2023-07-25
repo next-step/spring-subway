@@ -14,6 +14,10 @@ public class ErrorResponse {
         return new ErrorResponse(statusCode, message);
     }
 
+    public static ErrorResponse of(ErrorCode errorCode) {
+        return new ErrorResponse(errorCode.getHttpStatus().value(), errorCode.getMessage());
+    }
+
     public int getStatusCode() {
         return statusCode;
     }

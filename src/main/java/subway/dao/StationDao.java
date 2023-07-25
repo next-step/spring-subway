@@ -1,5 +1,6 @@
 package subway.dao;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -10,29 +11,38 @@ import subway.domain.Station;
 
 import javax.sql.DataSource;
 import java.util.List;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 @Repository
 public class StationDao {
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
     private final RowMapper<Station> rowMapper = (rs, rowNum) ->
-            new Station(
-                    rs.getLong("id"),
-                    rs.getString("name")
-            );
+        new Station(
+            rs.getLong("id"),
+            rs.getString("name")
+        );
 
 
     public StationDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("station")
-                .usingGeneratedKeyColumns("id");
+            .withTableName("station")
+            .usingGeneratedKeyColumns("id");
     }
 
     public Station insert(final Station station) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(station);
-        Long id = insertAction.executeAndReturnKey(params).longValue();
+        Long id;
+
+        try {
+            id = insertAction.executeAndReturnKey(params).longValue();
+        } catch (DuplicateKeyException e) {
+            throw new SubwayException(ErrorCode.DUPLICATED_STATION_NAME);
+        }
         return new Station(id, station.getName());
     }
 

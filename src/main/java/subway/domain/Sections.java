@@ -3,6 +3,8 @@ package subway.domain;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 public class Sections {
 
@@ -22,7 +24,6 @@ public class Sections {
         List<Section> newSections = new ArrayList<>(this.sections);
 
         Optional<Section> oneMatcingStation = findMatcingOneSection(section);
-
         if (oneMatcingStation.isPresent()) {
             newSections.remove(oneMatcingStation);
             newSections.add(oneMatcingStation.get().subtract(section));
@@ -34,10 +35,10 @@ public class Sections {
 
     private void validateNotAlreadyExist(final Section section) {
         if (contains(section.getUpStation()) && contains(section.getDownStation())) {
-            throw new IllegalArgumentException("두 역 모두 기존 노선에 포함될 수 없습니다.");
+            throw new SubwayException(ErrorCode.INVALID_SECTION_ALREADY_EXISTS);
         }
         if (notContains(section.getUpStation()) && notContains(section.getDownStation())) {
-            throw new IllegalArgumentException("두 역 중 하나는 기존 노선에 포함되어야 합니다");
+            throw new SubwayException(ErrorCode.INVALID_SECTION_NO_EXISTS);
         }
     }
 
@@ -103,7 +104,7 @@ public class Sections {
 
     private void validateSize() {
         if (sections.size() < 2) {
-            throw new IllegalArgumentException("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
+            throw new SubwayException(ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE);
         }
     }
 

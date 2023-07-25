@@ -1,5 +1,6 @@
 package subway.dao;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,20 +17,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 @Repository
 public class LineDao {
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
     private final RowMapper<Line> lineRowMapper = (rs, rowNum) ->
-            new Line(
-                    rs.getLong("id"),
-                    rs.getString("name"),
-                    rs.getString("color")
-            );
-    private final RowMapper<Long> lineIdMapper = (rs, rowNum) -> rs.getLong("id");
+        new Line(
+            rs.getLong("id"),
+            rs.getString("name"),
+            rs.getString("color")
+        );
+
     private final ResultSetExtractor<Line> extractor = rs -> {
         List<Section> sections = new ArrayList<>();
         boolean isNext = rs.next();
@@ -40,12 +43,12 @@ public class LineDao {
 
         while (isNext) {
             sections.add(
-                    new Section(
-                            rs.getLong("section_id"),
-                            new Station(rs.getLong("up_station_id"), rs.getString("up_station_name")),
-                            new Station(rs.getLong("down_station_id"), rs.getString("down_station_name")),
-                            new Distance(rs.getInt("section_distance"))
-                    )
+                new Section(
+                    rs.getLong("section_id"),
+                    new Station(rs.getLong("up_station_id"), rs.getString("up_station_name")),
+                    new Station(rs.getLong("down_station_id"), rs.getString("down_station_name")),
+                    new Distance(rs.getInt("section_distance"))
+                )
             );
             isNext = rs.next();
         }
@@ -56,8 +59,8 @@ public class LineDao {
     public LineDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("line")
-                .usingGeneratedKeyColumns("id");
+            .withTableName("line")
+            .usingGeneratedKeyColumns("id");
     }
 
     public Line insert(final Line line) {
@@ -65,35 +68,38 @@ public class LineDao {
         params.put("id", line.getId());
         params.put("name", line.getName());
         params.put("color", line.getColor());
+        Long lineId;
 
-        Long lineId = insertAction.executeAndReturnKey(params).longValue();
+        try {
+            lineId = insertAction.executeAndReturnKey(params).longValue();
+        } catch (DuplicateKeyException e) {
+            throw new SubwayException(ErrorCode.DUPLICATED_LINE_NAME, e);
+        }
+
         return new Line(lineId, line.getName(), line.getColor());
     }
 
     public List<Line> findAll() {
-        String sql = "select id from LINE";
+        String sql = "select id , name, color from LINE";
 
-        List<Long> lineId = jdbcTemplate.query(sql, lineIdMapper);
-        return lineId.stream()
-                .map(line -> findById(line))
-                .collect(Collectors.toList());
+        return jdbcTemplate.query(sql, lineRowMapper);
     }
 
     public Line findById(final Long id) {
         String sql = "select section.id as section_id, " +
-                "up_station.id as up_station_id, " +
-                "up_station.name as up_station_name, " +
-                "down_station.id as down_station_id, " +
-                "down_station.name as down_station_name, " +
-                "line.id as line_id, " +
-                "line.name as line_name, " +
-                "line.color as line_color," +
-                "section.distance as section_distance " +
-                "from SECTION section " +
-                "left join LINE line on section.line_id=line.id " +
-                "left join STATION up_station on section.up_station_id = up_station.id " +
-                "left join STATION down_station on section.down_station_id = down_station.id " +
-                "where section.line_id = ?";
+            "up_station.id as up_station_id, " +
+            "up_station.name as up_station_name, " +
+            "down_station.id as down_station_id, " +
+            "down_station.name as down_station_name, " +
+            "line.id as line_id, " +
+            "line.name as line_name, " +
+            "line.color as line_color," +
+            "section.distance as section_distance " +
+            "from SECTION section " +
+            "left join LINE line on section.line_id=line.id " +
+            "left join STATION up_station on section.up_station_id = up_station.id " +
+            "left join STATION down_station on section.down_station_id = down_station.id " +
+            "where section.line_id = ?";
 
         Line line = jdbcTemplate.query(sql, extractor, id);
 

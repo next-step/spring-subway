@@ -1,6 +1,8 @@
 package subway.domain;
 
 import java.util.Objects;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 public class Section {
 
@@ -28,8 +30,8 @@ public class Section {
     }
 
     private void validate(final Station upStation, final Station downStation) {
-        if (upStation == downStation) {
-            throw new IllegalArgumentException("상행역과 하행역이 같을 수 없습니다");
+        if (upStation.equals (downStation)){
+            throw new SubwayException(ErrorCode.SAME_UP_AND_DOWN_STATION);
         }
     }
 
@@ -42,7 +44,7 @@ public class Section {
             return new Section(upStation, other.upStation, distance.subtract(other.distance));
         }
 
-        throw new IllegalArgumentException("입력으로 들어온 section이 현재 section에 포함되지 않습니다");
+        throw new SubwayException(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION);
     }
 
     public boolean matchOneStation(final Section other) {
@@ -86,7 +88,7 @@ public class Section {
 
     public Section add(Section newSection) {
         if (downStation.isNotEqual(newSection.upStation)) {
-            throw new IllegalArgumentException("입력으로 들어온 section이 현재 section에 포함되지 않습니다");
+            throw new SubwayException(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION);
         }
         return new Section(this.upStation, newSection.downStation,
             distance.add(newSection.distance));
