@@ -54,16 +54,9 @@ public class SectionService {
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
         final Station station = getStationById(stationId);
-        final SortedSections sortedSections = new SortedSections(sectionDao.findAllByLineId(lineId));
-        validateDeleteConstraint(station, sortedSections);
-        final Section lastSection = sortedSections.deleteLastSection();
-        sectionDao.deleteById(lastSection.getId());
-    }
-
-    private void validateDeleteConstraint(final Station station, final SortedSections sections) {
-        if (!sections.isLastDownStation(station)) {
-            throw new IllegalArgumentException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
-        }
+        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
+        sections.deleteSection(station);
+        sectionDao.updateSections(lineId, sections);
     }
 
     private Station getStationById(final Long stationId) {

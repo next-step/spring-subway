@@ -19,6 +19,17 @@ public class Distance {
         }
     }
 
+    public Distance subtract(Distance distance) {
+        if (this.value < distance.getValue()) {
+            throw new IllegalArgumentException("");
+        }
+        return new Distance(this.value - distance.getValue());
+    }
+
+    public Distance add(Distance distance) {
+        return new Distance(this.value + distance.getValue());
+    }
+
     public long getValue() {
         return value;
     }

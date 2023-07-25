@@ -71,19 +71,6 @@ public class SortedSections extends Sections {
         return result;
     }
 
-    public Section deleteLastSection() {
-        if (sectionLength() <= MINIMUM_SIZE) {
-            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
-        }
-        final Section lastSection = findLastSection();
-        sections.remove(lastSection);
-        return lastSection;
-    }
-
-    public boolean isLastDownStation(final Station station) {
-        return findLastSection().getDownStation().equals(station);
-    }
-
     private Section findLastSection() {
         return sections.get(sectionLength() - 1);
     }

@@ -11,6 +11,8 @@ import subway.domain.*;
 import javax.sql.DataSource;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Repository
 public class SectionDao {
 
@@ -83,25 +85,34 @@ public class SectionDao {
         jdbcTemplate.update(sql, sectionId);
     }
 
-    public void update(final Section section) {
-        final String sql = "update section set up_station_id = ? , down_station_id = ? , distance = ? where id = ? ";
-        jdbcTemplate.update(sql, section.getUpStationId(), section.getDownStationId(), section.getDistance(), section.getId());
-    }
-
     public void updateSections(Long lineId, Sections sections) {
         dirtyChecking(findAllByLineId(lineId), sections.getSections());
     }
 
     private void dirtyChecking(List<Section> beforeSection, List<Section> afterSection) {
-        afterSection.stream()
-                .filter(section -> !beforeSection.contains(section))
-                .filter(section -> !section.isNew())
-                .findAny()
-                .ifPresent(this::update);
-        insert(afterSection.stream()
+        deleteChecking(beforeSection, afterSection);
+        insertChecking(beforeSection, afterSection);
+    }
+
+    private void insertChecking(final List<Section> beforeSection, final List<Section> afterSection) {
+        final List<Section> insertingSections = afterSection.stream()
                 .filter(section -> !beforeSection.contains(section))
                 .filter(Section::isNew)
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("새로운 구간을 추가하는 것을 실패하였습니다.")));
+                .collect(toList());
+
+        for (Section section : insertingSections) {
+            insert(section);
+        }
     }
+
+    private void deleteChecking(final List<Section> beforeSection, final List<Section> afterSection) {
+        final List<Section> deletingSections = beforeSection.stream()
+                .filter(section -> !afterSection.contains(section))
+                .collect(toList());
+
+        for (Section section : deletingSections) {
+            deleteById(section.getId());
+        }
+    }
+
 }

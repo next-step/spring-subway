@@ -38,6 +38,20 @@ public class Section {
         this.id = id;
     }
 
+    public Distance addDistance(Section section) {
+        return new Distance(this.getDistance() + section.getDistance());
+    }
+
+    public Distance subtractDistance(Section section) {
+        if (getDistance() < section.getDistance()) {
+            throw new IllegalArgumentException("기존 구간 길이보다 새로운 구간 길이가 더 클수는 없습니다.");
+        }
+        return new Distance(this.getDistance() - section.getDistance());
+    }
+
+    public boolean isNew() {
+        return id == null;
+    }
 
     public Long getId() {
         return id;
@@ -69,10 +83,6 @@ public class Section {
 
     public long getDistance() {
         return distance.getValue();
-    }
-
-    public boolean isNew() {
-        return id == null;
     }
 
     @Override
