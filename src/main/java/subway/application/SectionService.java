@@ -21,14 +21,13 @@ public class SectionService {
     @Transactional
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
         final Sections sections = new Sections(sectionDao.findAll(lineId));
-        final Section searchParams = sectionRequest.to(lineId);
+        final Section newSection = sectionRequest.to(lineId);
 
-        if (sections.hasConnectedSection(searchParams)) {
-            Section update = sections.findConnectedSection(searchParams);
-            sectionDao.update(update);
+        if (sections.isOverlapped(newSection)) {
+            updateOverlappedSection(newSection, sections);
         }
 
-        return SectionResponse.of(sectionDao.insert(searchParams));
+        return SectionResponse.of(sectionDao.insert(newSection));
     }
 
     public void deleteSection(final long lineId, final long stationId) {
@@ -42,10 +41,15 @@ public class SectionService {
             return;
         }
 
-        deleteInnerStation(stationId, sections);
+        deleteInnerSection(stationId, sections);
     }
 
-    private void deleteInnerStation(long stationId, Sections sections) {
+    private void updateOverlappedSection(final Section searchParams, final Sections sections) {
+        Section updateResult = sections.updateOverlappedSection(searchParams);
+        sectionDao.update(updateResult);
+    }
+
+    private void deleteInnerSection(long stationId, Sections sections) {
         final Section upDirection = sections.findUpDirectionSection(stationId);
         final Section downDirection = sections.findDownDirectionSection(stationId);
         final Section extendedSection = downDirection.extendToUpDirection(upDirection);

@@ -21,15 +21,15 @@ public class Sections {
         });
     }
 
-    public Section findConnectedSection(final Section newSection) {
+    public Section updateOverlappedSection(final Section newSection) {
         validateSection(newSection);
 
         if (upStationMap.containsKey(newSection.getUpStationId())) {
-            return findConnectedDownDirectionSection(newSection);
+            return updateOverlappedDownDirectionSection(newSection);
         }
 
         if (downStationMap.containsKey(newSection.getDownStationId())) {
-            return findConnectedUpDirectionSection(newSection);
+            return updateOverlappedUpDirectionSection(newSection);
         }
 
         throw new IllegalSectionException("연결된 구간이 존재하지 않습니다.");
@@ -39,7 +39,7 @@ public class Sections {
         return isStartStation(stationId) || isEndStation(stationId);
     }
 
-    public boolean hasConnectedSection(final Section section) {
+    public boolean isOverlapped(final Section section) {
         validateSection(section);
         return !isLastStation(section.getUpStationId()) && !isLastStation(section.getDownStationId());
     }
@@ -72,13 +72,13 @@ public class Sections {
         return !upStationMap.containsKey(stationId) && downStationMap.containsKey(stationId);
     }
 
-    private Section findConnectedDownDirectionSection(Section base) {
+    private Section updateOverlappedDownDirectionSection(Section base) {
         final Section downDirectionSection = findDownDirectionSection(base.getUpStationId());
         validateDistance(downDirectionSection, base);
         return downDirectionSection.narrowToUpDirection(base);
     }
 
-    private Section findConnectedUpDirectionSection(Section base) {
+    private Section updateOverlappedUpDirectionSection(Section base) {
         final Section upDirectionSection = findUpDirectionSection(base.getDownStationId());
         validateDistance(upDirectionSection, base);
         return upDirectionSection.narrowToDownDirection(base);

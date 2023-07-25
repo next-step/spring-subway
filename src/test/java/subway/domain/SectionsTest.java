@@ -36,8 +36,8 @@ class SectionsTest {
         Section notConnected = new Section(6L, 1L, 5L, 8L, 2);
 
         // when & then
-        assertThat(sections.hasConnectedSection(connected)).isTrue();
-        assertThat(sections.hasConnectedSection(notConnected)).isFalse();
+        assertThat(sections.isOverlapped(connected)).isTrue();
+        assertThat(sections.isOverlapped(notConnected)).isFalse();
     }
 
     @DisplayName("해당 구간이 추가 가능한 구간인지 검증에 성공한다.")
@@ -51,7 +51,7 @@ class SectionsTest {
 
         // when & then
         assertThatNoException()
-                .isThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)));
+                .isThrownBy(() -> sections.updateOverlappedSection(sectionRequest.to(1L)));
     }
 
     @DisplayName("두 역이 모두 노선에 존재하는 경우 검증에 실패한다.")
@@ -67,7 +67,7 @@ class SectionsTest {
         );
 
         // when & then
-        assertThatThrownBy(() -> sections.findConnectedSection(duplicateRequest.to(1L)))
+        assertThatThrownBy(() -> sections.updateOverlappedSection(duplicateRequest.to(1L)))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
@@ -83,7 +83,7 @@ class SectionsTest {
         SectionRequest request = new SectionRequest(notExistUpStationId, notExistDownStationId, 5);
 
         // when & then
-        assertThatThrownBy(() -> sections.findConnectedSection(request.to(1L)))
+        assertThatThrownBy(() -> sections.updateOverlappedSection(request.to(1L)))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
@@ -98,7 +98,7 @@ class SectionsTest {
         SectionRequest sectionRequest = new SectionRequest("1", "6", invalidDistance);
 
         // when & then
-        assertThatThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)))
+        assertThatThrownBy(() -> sections.updateOverlappedSection(sectionRequest.to(1L)))
                 .isInstanceOf(IllegalSectionException.class)
                 .hasMessage("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
     }
@@ -114,7 +114,7 @@ class SectionsTest {
 
         // when & then
         assertThatNoException()
-                .isThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)));
+                .isThrownBy(() -> sections.updateOverlappedSection(sectionRequest.to(1L)));
     }
 
     @DisplayName("역 식별자로 해당 역이 종점역인지 반환한다.")
