@@ -4,19 +4,14 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
-
-import java.util.HashMap;
-import java.util.Map;
+import subway.dto.*;
 
 public class CreateHelper {
 
-    public static void createSection(Long upStationId, Long downStationId, Long lineId) {
-        SectionRequest params = new SectionRequest(upStationId, downStationId, 10);
+    public static void createSection(Long upStationId, Long downStationId, int distance, Long lineId) {
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
         RestAssured.given()
-                .body(params)
+                .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/{id}/sections", lineId)
@@ -24,10 +19,8 @@ public class CreateHelper {
                 .extract();
     }
 
-    public static Long createLine(String name, String color, String upStationName, String downStationName) {
-        createStation(upStationName);
-        createStation(downStationName);
-        LineRequest lineRequest = new LineRequest(name, color, 1L, 2L, 10);
+    public static Long createLine(String name, String color, Long upStationId, Long downStationId, int distance) {
+        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
         ExtractableResponse<Response> lineResponse = RestAssured.given()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -38,15 +31,15 @@ public class CreateHelper {
         return lineResponse.as(LineResponse.class).getId();
     }
 
-    public static void createStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        RestAssured.given()
-                .body(params)
+    public static Long createStation(String name) {
+        StationRequest stationRequest = new StationRequest(name);
+        ExtractableResponse<Response> stationResponse = RestAssured.given()
+                .body(stationRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/stations")
                 .then()
                 .extract();
+        return stationResponse.as(StationResponse.class).getId();
     }
 }
