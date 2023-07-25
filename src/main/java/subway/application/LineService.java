@@ -102,14 +102,19 @@ public class LineService {
         sections.validateDelete(delete);
 
         List<Section> removeSections = sections.sectionsForRemoval(delete);
+        List<Long> removeIds = removeSections.stream()
+                .map(Section::getId)
+                .collect(Collectors.toList());
 
-        for (Section section : removeSections) {
-            sectionDao.deleteById(section.getId());
-        }
+        sectionDao.deleteAllIn(removeIds);
 
-        if (removeSections.size() == 2) {
+        if (isMidRemoved(removeSections)) {
             sectionDao.insert(newSectionAfterRemoval(removeSections), lineId);
         }
+    }
+
+    private boolean isMidRemoved(final List<Section> removeSections) {
+        return removeSections.size() == 2;
     }
 
     private Section newSection(final SectionRequest request) {
