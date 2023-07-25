@@ -105,8 +105,8 @@ class SectionServiceTest {
 
         // when & then
         assertThatThrownBy(() -> sectionService.deleteSection(lineId, stationId))
-            .hasMessage("해당 노선은 생성되지 않았습니다.")
-            .isInstanceOf(IllegalLineException.class);
+            .hasMessage("해당 역은 노선에 존재하지 않습니다.")
+            .isInstanceOf(IllegalSectionException.class);
 
     }
 
@@ -132,9 +132,11 @@ class SectionServiceTest {
         // given
         final long lineId = 1L;
         final long lastStationId = 1L;
+        final long sectionId = 3L;
 
         given(sectionDao.existByLineIdAndStationId(lineId, lastStationId)).willReturn(true);
         given(sectionDao.count(lineId)).willReturn(3L);
+        doNothing().when(sectionDao).delete(sectionId);
 
         // when & then
         assertThatNoException()
