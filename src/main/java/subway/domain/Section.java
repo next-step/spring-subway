@@ -44,7 +44,7 @@ public class Section {
             return new Section(upStation, other.upStation, distance.subtract(other.distance));
         }
 
-        return this;
+        throw new IllegalArgumentException("상행 종점역끼리 일치하거나, 하행 종점역끼리 일치해야합니다");
     }
 
     public boolean matchOneStation(final Section other) {
