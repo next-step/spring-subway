@@ -66,7 +66,7 @@ public class Section {
         }
     }
 
-    Section connectSection(Section requestSection) {
+    Section connectSection(final Section requestSection) {
         if (requestSection == null) {
             throw new SectionException("requestSection이 존재하지 않습니다.");
         }
@@ -80,7 +80,7 @@ public class Section {
         return sectionConnectorOptional.get().connectSection(this, requestSection);
     }
 
-    private Section connectSectionIfDownSectionPresent(Section requestSection) {
+    private Section connectSectionIfDownSectionPresent(final Section requestSection) {
         if (downSection == null) {
             throw new SectionException(
                     MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection)
@@ -90,20 +90,20 @@ public class Section {
         return downSection.connectSection(requestSection);
     }
 
-    public Section connectDownSection(Section requestSection) {
+    public Section connectDownSection(final Section requestSection) {
         this.downSection = requestSection;
         requestSection.upSection = this;
         return downSection;
     }
 
-    Section connectUpSection(Section requestSection) {
+    Section connectUpSection(final Section requestSection) {
         this.upSection = requestSection;
         requestSection.downSection = this;
         return requestSection;
     }
 
-    Section connectMiddleUpSection(Section requestSection) {
-        Section newDownSection = Section.builder()
+    Section connectMiddleUpSection(final Section requestSection) {
+        final Section newDownSection = Section.builder()
                 .upSection(this)
                 .downSection(this.downSection)
                 .upStation(requestSection.downStation)
@@ -120,8 +120,8 @@ public class Section {
         return newDownSection;
     }
 
-    Section connectMiddleDownSection(Section requestSection) {
-        Section newUpSection = Section.builder()
+    Section connectMiddleDownSection(final Section requestSection) {
+        final Section newUpSection = Section.builder()
                 .upSection(this.upSection)
                 .downSection(this)
                 .upStation(this.upStation)

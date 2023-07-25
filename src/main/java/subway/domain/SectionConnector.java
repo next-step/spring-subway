@@ -39,11 +39,11 @@ enum SectionConnector {
         this.biPredicate = biPredicate;
     }
 
-    static Optional<SectionConnector> findSectionConnector(Section baseSection, Section requestSection) {
+    static Optional<SectionConnector> findSectionConnector(final Section baseSection, final Section requestSection) {
         return Arrays.stream(SectionConnector.values())
                 .filter(sectionConnector -> sectionConnector.biPredicate.test(baseSection, requestSection))
                 .findFirst();
     }
 
-    abstract Section connectSection(Section baseSection, Section requestSection);
+    abstract Section connectSection(final Section baseSection, final Section requestSection);
 }

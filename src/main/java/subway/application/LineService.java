@@ -25,19 +25,19 @@ public class LineService {
     private final SectionDao sectionDao;
     private final StationDao stationDao;
 
-    public LineService(LineDao lineDao, SectionDao sectionDao, StationDao stationDao) {
+    public LineService(final LineDao lineDao, final SectionDao sectionDao, final StationDao stationDao) {
         this.lineDao = lineDao;
         this.sectionDao = sectionDao;
         this.stationDao = stationDao;
     }
 
-    public LineResponse saveLine(CreateLineRequest createLineRequest) {
+    public LineResponse saveLine(final CreateLineRequest createLineRequest) {
         validateDuplicateName(createLineRequest.getName());
 
-        Line persistLine = lineDao.insert(new Line(createLineRequest.getName(), createLineRequest.getColor()));
-        Station upStation = getStation(createLineRequest.getUpStationId());
-        Station downStation = getStation(createLineRequest.getDownStationId());
-        Section section = Section.builder()
+        final Line persistLine = lineDao.insert(new Line(createLineRequest.getName(), createLineRequest.getColor()));
+        final Station upStation = getStation(createLineRequest.getUpStationId());
+        final Station downStation = getStation(createLineRequest.getDownStationId());
+        final Section section = Section.builder()
                 .distance(createLineRequest.getDistance())
                 .upStation(upStation)
                 .downStation(downStation)
@@ -47,7 +47,7 @@ public class LineService {
         return LineResponse.from(persistLine, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
     }
 
-    private void validateDuplicateName(String name) {
+    private void validateDuplicateName(final String name) {
         lineDao.findByName(name)
                 .ifPresent(line -> {
                     throw new LineException(
@@ -57,7 +57,7 @@ public class LineService {
     }
 
     public List<LineResponse> findAllLines() {
-        List<Line> persistLines = findLines();
+        final List<Line> persistLines = findLines();
 
         return persistLines.stream()
                 .map(line -> LineResponse.from(line,
@@ -69,10 +69,10 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineById(Long id) {
-        Line persistLine = getLineById(id);
-        List<Section> sections = sectionDao.findAllByLineId(persistLine.getId());
-        Line line = new Line(persistLine.getId(),
+    public LineResponse findLineById(final Long id) {
+        final Line persistLine = getLineById(id);
+        final List<Section> sections = sectionDao.findAllByLineId(persistLine.getId());
+        final Line line = new Line(persistLine.getId(),
                             persistLine.getName(),
                             persistLine.getColor(),
                             sections);
@@ -80,65 +80,63 @@ public class LineService {
         return LineResponse.from(persistLine, stationsToStationResponses(line.getSortedStations()));
     }
 
-    private List<StationResponse> stationsToStationResponses(List<Station> stations) {
+    private List<StationResponse> stationsToStationResponses(final List<Station> stations) {
         return stations.stream()
                 .map(StationResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public void connectSectionByStationId(Long lineId, CreateSectionRequest sectionRequest) {
-        Line persistLine = getLineById(lineId);
-        List<Section> sections = sectionDao.findAllByLineId(persistLine.getId());
+    public void connectSectionByStationId(final Long lineId, final CreateSectionRequest sectionRequest) {
+        final Line persistLine = getLineById(lineId);
+        final List<Section> sections = sectionDao.findAllByLineId(persistLine.getId());
+        final Line line = toLine(persistLine, sections);
 
-        Line line = toLine(persistLine, sections);
-
-        Section newSection = getNewSection(sectionRequest.getUpStationId(),
+        final Section section = getNewSection(sectionRequest.getUpStationId(),
                 sectionRequest.getDownStationId(),
                 sectionRequest.getDistance());
-
-        newSection = line.connectSection(newSection);
+        final Section newSection = line.connectSection(section);
 
         sectionDao.insert(newSection, line.getId());
         updateSectionIfNotNull(newSection.getUpSection());
         updateSectionIfNotNull(newSection.getDownSection());
     }
 
-    public void updateSectionIfNotNull(Section section) {
+    public void updateSectionIfNotNull(final Section section) {
         if (section == null) {
             return;
         }
         sectionDao.update(section);
     }
 
-    public void disconnectSectionByStationId(Long lineId, Long stationId) {
-        Line persistLine = getLineById(lineId);
-        List<Section> sections = sectionDao.findAllByLineId(lineId);
-        Station station = getStation(stationId);
-        Line line = toLine(persistLine, sections);
+    public void disconnectSectionByStationId(final Long lineId, final Long stationId) {
+        final Line persistLine = getLineById(lineId);
+        final List<Section> sections = sectionDao.findAllByLineId(lineId);
+        final Station station = getStation(stationId);
+        final Line line = toLine(persistLine, sections);
 
         line.disconnectDownSection(station);
 
         sectionDao.deleteByLineIdAndDownStationId(lineId, stationId);
     }
 
-    private Line getLineById(Long id) {
+    private Line getLineById(final Long id) {
         return lineDao.findById(id)
                 .orElseThrow(() -> new LineException(
                         MessageFormat.format("lineId \"{0}\"에 해당하는 line이 존재하지 않습니다.", id)
                 ));
     }
 
-    public void updateLine(Long id, UpdateLineRequest updateLineRequest) {
+    public void updateLine(final Long id, final UpdateLineRequest updateLineRequest) {
         lineDao.update(new Line(id, updateLineRequest.getName(), updateLineRequest.getColor()));
     }
 
-    public void deleteLineById(Long id) {
+    public void deleteLineById(final Long id) {
         lineDao.deleteById(id);
     }
 
-    private Section getNewSection(Long upStationId, Long downStationId, Integer distance) {
-        Station upStation = getStation(upStationId);
-        Station downStation = getStation(downStationId);
+    private Section getNewSection(final Long upStationId, final Long downStationId, final Integer distance) {
+        final Station upStation = getStation(upStationId);
+        final Station downStation = getStation(downStationId);
 
         return Section.builder()
                 .upStation(upStation)
@@ -147,14 +145,14 @@ public class LineService {
                 .build();
     }
 
-    private Station getStation(Long stationId) {
+    private Station getStation(final Long stationId) {
         return stationDao.findById(stationId).orElseThrow(() -> new StationException(
                         MessageFormat.format("stationId \"{0}\"에 해당하는 station이 존재하지 않습니다.", stationId)
                 )
         );
     }
 
-    private Line toLine(Line persistLine, List<Section> sections) {
+    private Line toLine(final Line persistLine, final List<Section> sections) {
         return new Line(persistLine.getId(),
                 persistLine.getName(),
                 persistLine.getColor(),
