@@ -27,7 +27,7 @@ public class Section {
         return (this.distance.compareDistance(distance) <= POSSIBLE_DISTANCE);
     }
 
-    public Section findUpSection(Section targetSection) {
+    public Section divideDownSection(Section targetSection) {
         validateDistance(targetSection);
 
         return new Section(
@@ -39,7 +39,7 @@ public class Section {
         );
     }
 
-    public Section findDownSection(Section targetSection) {
+    public Section divideUpSection(Section targetSection) {
         validateDistance(targetSection);
 
         return new Section(
@@ -57,20 +57,20 @@ public class Section {
         }
     }
 
-    public Section findDuplicatedSection(Section otherSection) {
-        if (upStation.equals(otherSection.getUpStation())
-            || downStation.equals(otherSection.getDownStation())) {
-            return otherSection;
+    public Section findDuplicatedSection(Section section) {
+        if (upStation.equals(section.getUpStation())
+            || downStation.equals(section.getDownStation())) {
+            return section;
         }
         return null;
     }
 
-    public Section combineToDownSection(Section downSection) {
+    public Section linkToDown(Section section) {
         return new Section(
             upStation,
-            downSection.getDownStation(),
+            section.getDownStation(),
             line,
-            distance.getDistance() + downSection.getDistance().getDistance()
+            distance.getDistance() + section.getDistance().getDistance()
         );
     }
 

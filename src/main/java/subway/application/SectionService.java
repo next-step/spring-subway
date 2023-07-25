@@ -77,7 +77,7 @@ public class SectionService {
 
     private void connectExistedStations(Optional<Section> upSection, Optional<Section> downSection) {
         if (upSection.isPresent() && downSection.isPresent()) {
-            Section newSection = upSection.get().combineToDownSection(downSection.get());
+            Section newSection = upSection.get().linkToDown(downSection.get());
             sectionDao.insert(newSection);
         }
     }

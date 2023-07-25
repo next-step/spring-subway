@@ -114,10 +114,10 @@ public class Sections {
 
     private Optional<Section> divideSection(Section section, Optional<Section> targetSection) {
         if (matchUpStation(section)) {
-            return Optional.of(section.findUpSection(targetSection.get()));
+            return Optional.of(section.divideDownSection(targetSection.get()));
         }
         if (matchDownStation(section)) {
-            return Optional.of(section.findDownSection(targetSection.get()));
+            return Optional.of(section.divideUpSection(targetSection.get()));
         }
         return Optional.empty();
     }
