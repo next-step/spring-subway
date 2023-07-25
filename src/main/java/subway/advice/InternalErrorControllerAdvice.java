@@ -27,4 +27,10 @@ class InternalErrorControllerAdvice {
         logger.error(illegalStateException.getMessage());
         return new ResponseEntity<>(ErrorTemplate.of("Illegal State Fail"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<ErrorTemplate> catchUnknownException(Exception exception) {
+        logger.error(exception.getMessage());
+        return new ResponseEntity<>(ErrorTemplate.of("Unhandled exception"), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
