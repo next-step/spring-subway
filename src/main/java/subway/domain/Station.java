@@ -1,14 +1,25 @@
 package subway.domain;
 
+import static subway.exception.ErrorCode.INVALID_STATION_NAME;
+
 import java.util.Objects;
+import subway.exception.SubwayException;
 
 public class Station {
+
     private final Long id;
     private final String name;
 
     public Station(final Long id, final String name) {
+        validate(name);
         this.id = id;
         this.name = name;
+    }
+
+    private static void validate(final String name) {
+        if (name == null || name.isBlank()) {
+            throw new SubwayException(INVALID_STATION_NAME);
+        }
     }
 
     public Station(final String name) {
@@ -25,8 +36,12 @@ public class Station {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Station station = (Station) o;
         return Objects.equals(id, station.id) && Objects.equals(name, station.name);
     }
@@ -36,7 +51,7 @@ public class Station {
         return Objects.hash(id, name);
     }
 
-    public boolean isNotEqual(Station other) {
+    public boolean isNotEqual(final Station other) {
         return !this.equals(other);
     }
 }
