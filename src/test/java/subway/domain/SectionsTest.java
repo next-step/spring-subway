@@ -101,7 +101,21 @@ class SectionsTest {
                 .isThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)));
     }
 
-    @DisplayName("식별자와 일치하는 종점역을 반환한다.")
+    @DisplayName("역 식별자로 해당 역이 종점역인지 반환한다.")
+    @Test
+    void isLastSectionTest() {
+        // given
+        List<Section> sectionList = createSections();
+        Sections sections = new Sections(createSections());
+        long startStationId = sectionList.get(0).getUpStationId();
+        long innerStationId = sectionList.get(1).getDownStationId();
+
+        // when & then
+        assertThat(sections.isLastStation(startStationId)).isTrue();
+        assertThat(sections.isLastStation(innerStationId)).isFalse();
+    }
+
+    @DisplayName("역 식별자와 일치하는 종점역을 반환한다.")
     @Test
     void getLastSectionTest() {
         // given
