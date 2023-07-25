@@ -22,18 +22,13 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest = new SectionRequest(24L, 26L, 66L);
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getCreateSectionAPIResponse(sectionRequest, lineId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
+
 
     @Test
     @DisplayName("요청의 하행역과 노선에 속한 구간의 하행역이 같은 구간을 등록할 수 있다.")
@@ -43,13 +38,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest = new SectionRequest(26L, 24L, 66L);
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getCreateSectionAPIResponse(sectionRequest, lineId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -65,21 +54,9 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest2 = new SectionRequest(24L, 26L, 888L);
 
         /* when */
-        final ExtractableResponse<Response> response1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest1)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response1 = getCreateSectionAPIResponse(sectionRequest1, lineId);
 
-        final ExtractableResponse<Response> response2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest2)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response2 = getCreateSectionAPIResponse(sectionRequest2, lineId);
 
         /* then */
         assertThat(response1.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -98,13 +75,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest = new SectionRequest(10L, 11L, 777L);
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getCreateSectionAPIResponse(sectionRequest, lineId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -119,13 +90,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest sectionRequest = new SectionRequest(12L, 13L, 777L);
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getCreateSectionAPIResponse(sectionRequest, lineId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -142,13 +107,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long lineId = 2L;
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getCreateSectionAPIResponse(sectionRequest, lineId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -166,13 +125,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long lineId = 2L;
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getCreateSectionAPIResponse(sectionRequest, lineId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -188,11 +141,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long lastStationId = 25L;
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", lastStationId)
-                .when().delete("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getDeleteSectionAPIResponse(lineId, lastStationId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -206,11 +155,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long firstStationId = 35L;
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", firstStationId)
-                .when().delete("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getDeleteSectionAPIResponse(lineId, firstStationId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -224,11 +169,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long betweenStationId = 37L;
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", betweenStationId)
-                .when().delete("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getDeleteSectionAPIResponse(lineId, betweenStationId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -242,11 +183,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long stationId = 12L;
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", stationId)
-                .when().delete("/lines/{lineId}/sections", lineIdIsSectionsSizeOne)
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response = getDeleteSectionAPIResponse(lineIdIsSectionsSizeOne, stationId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -262,15 +199,36 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long notContainsStationId = 30L;
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", notContainsStationId)
-                .when().delete("/lines/{lineId}/sections", lineId)
-                .then().log().all()
-                .extract();
+
+        final ExtractableResponse<Response> response = getDeleteSectionAPIResponse(lineId, notContainsStationId);
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().jsonPath().getString("message"))
                 .isEqualTo("해당 구간에는 해당 역이 존재하지 않아서 제거할 수 없습니다. 역 ID : " + notContainsStationId);
+    }
+
+    private ExtractableResponse<Response> getCreateSectionAPIResponse(
+            final SectionRequest sectionRequest,
+            final Long lineId
+    ) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+    }
+
+    private ExtractableResponse<Response> getDeleteSectionAPIResponse(
+            final Long lineId,
+            final Long stationId
+    ) {
+        return RestAssured
+                .given().log().all().queryParam("stationId", stationId)
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
     }
 }
