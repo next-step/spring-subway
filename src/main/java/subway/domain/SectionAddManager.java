@@ -14,13 +14,17 @@ public class SectionAddManager {
     public void validate(final Station upStation, final Station downStation, final int distance) {
         validateLineHasOneOf(upStation, downStation);
 
-        if (sections.isFirst(downStation) || sections.isLast(upStation)) {
+        if (canAddToLineEnd(upStation, downStation)) {
             return;
         }
 
         sections.filter(hasOneOf(upStation, downStation))
             .filter(isLongerThan(distance))
             .orElseThrow(() -> new IllegalArgumentException("추가할 구간의 크기가 너무 큽니다."));
+    }
+
+    private boolean canAddToLineEnd(final Station upStation, final Station downStation) {
+        return sections.isFirst(downStation) || sections.isLast(upStation);
     }
 
     public Optional<Section> lookForChange(Section newSection) {

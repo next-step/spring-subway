@@ -17,19 +17,27 @@ public class SectionRemoveManager {
     }
 
     public Optional<Section> lookForChange(final Station station) {
-        if (sections.isLast(station)) {
+        if (isAtEndOfLine(station)) {
             return Optional.empty();
         }
 
-        if (sections.isFirst(station)) {
-            return Optional.empty();
-        }
-
-        Section upperSection = sections.filter(section -> section.isDownStation(station))
-            .orElseThrow(() -> new IllegalStateException());
-        Section lowerSection = sections.filter(section -> section.isUpStation(station))
-            .orElseThrow(() -> new IllegalStateException());
+        Section upperSection = getUpperSection(station);
+        Section lowerSection = getLowerSection(station);
         return Optional.of(upperSection.extendBy(lowerSection));
+    }
+
+    private boolean isAtEndOfLine(final Station station) {
+        return sections.isLast(station) || sections.isFirst(station);
+    }
+
+    private Section getUpperSection(final Station station) {
+        return sections.filter(section -> section.isDownStation(station))
+            .orElseThrow(() -> new IllegalStateException("역의 위 구간을 찾을 수 없습니다."));
+    }
+
+    private Section getLowerSection(final Station station) {
+        return sections.filter(section -> section.isUpStation(station))
+            .orElseThrow(() -> new IllegalStateException("역의 아래 구간을 찾을 수 없습니다."));
     }
 
     private void validateSize() {
