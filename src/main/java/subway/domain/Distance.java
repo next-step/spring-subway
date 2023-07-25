@@ -15,7 +15,7 @@ public class Distance {
         this.distance = distance;
     }
 
-    public Distance subtract(Distance other) {
+    public Distance subtract(final Distance other) {
         if (distance <= other.distance) {
             throw new SubwayException(ErrorCode.INVALID_DISTANCE_COMPARE);
         }
@@ -28,7 +28,7 @@ public class Distance {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
