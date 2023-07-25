@@ -203,8 +203,8 @@ public class ConnectedSections {
         if (connectedSections.size() == 1) {
             throw new SubwayIllegalArgumentException("해당 노선에 구간이 하나여서 제거할 수 없습니다.");
         }
-        if (getLastSection().doesNotContainsDownStation(targetStationId)) {
-            throw new SubwayIllegalArgumentException("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다.");
+        if (!getStationIds().contains(targetStationId)) {
+            throw new SubwayIllegalArgumentException("삭제하려는 역이 전체 구간에 존재하지 않습니다. 삭제하려는 역: " + targetStationId);
         }
     }
 

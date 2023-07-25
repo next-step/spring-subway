@@ -231,8 +231,8 @@ class ConnectedSectionsTest {
     }
 
     @Test
-    @DisplayName("구간을 삭제할 수 있다.")
-    void remove() {
+    @DisplayName("하행 종점역이 포함된 구간을 삭제할 수 있다.")
+    void removeLastStationSection() {
         /* given */
         final Long stationId = 14L;
 
@@ -248,17 +248,6 @@ class ConnectedSectionsTest {
         );
     }
 
-    @Test
-    @DisplayName("삭제할 역이 하행 종점역이 아닌 경우 삭제 시 SubwayIllegalException을 던진다.")
-    void removeFailWithNotLastStation() {
-        /* given */
-        final Long stationId = 12L;
-
-
-        /* when & then */
-        assertThatThrownBy(() -> connectedSections.remove(stationId)).isInstanceOf(SubwayIllegalArgumentException.class)
-                .hasMessage("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다.");
-    }
 
     @Test
     @DisplayName("노선에 구간이 하나만 존재하는 경우 삭제 시 SubwayIllegalArgumentException을 던진다.")
@@ -269,5 +258,16 @@ class ConnectedSectionsTest {
         /* when & then */
         assertThatThrownBy(() -> sections.remove(11L)).isInstanceOf(SubwayIllegalArgumentException.class)
                 .hasMessage("해당 노선에 구간이 하나여서 제거할 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("삭제하려는 역이 전체 구간에 존재하지 않는 역인 경우 삭제 시 SubwayIllegalException을 던진다.")
+    void removeFailWithDoesNotExistStationInConnectedSections() {
+        /* given */
+        final Long stationId = 999L;
+
+        /* when & then */
+        assertThatThrownBy(() -> connectedSections.remove(stationId)).isInstanceOf(SubwayIllegalArgumentException.class)
+                .hasMessage("삭제하려는 역이 전체 구간에 존재하지 않습니다. 삭제하려는 역: 999");
     }
 }
