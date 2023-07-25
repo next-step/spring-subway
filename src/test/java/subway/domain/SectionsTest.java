@@ -12,10 +12,10 @@ import subway.exception.SubwayException;
 
 class SectionsTest {
 
-    final static Long LINE_ID = 1L;
-    final static Section FIRST_SECTION = new Section(1L, LINE_ID, 1L, 2L, 1L);
-    final static Section LAST_SECTION = new Section(4L, LINE_ID, 4L, 5L, 4L);
-    final static Sections SECTIONS = new Sections(List.of(
+    private final static Long LINE_ID = 1L;
+    private final static Section FIRST_SECTION = new Section(1L, LINE_ID, 1L, 2L, 1L);
+    private final static Section LAST_SECTION = new Section(4L, LINE_ID, 4L, 5L, 4L);
+    private final static Sections SECTIONS = new Sections(List.of(
             FIRST_SECTION,
             new Section(2L, LINE_ID, 2L, 3L, 2L),
             new Section(3L, LINE_ID, 3L, 4L, 3L),
@@ -27,9 +27,9 @@ class SectionsTest {
     void create() {
         /* given */
         final List<Section> sections = List.of(
-                new Section(1L, 1L, 2L, 1L),
-                new Section(2L, 2L, 3L, 2L),
-                new Section(3L, 3L, 4L, 3L)
+                new Section(LINE_ID, 1L, 2L, 1L),
+                new Section(LINE_ID, 2L, 3L, 2L),
+                new Section(LINE_ID, 3L, 4L, 3L)
         );
 
         /* when & then */
@@ -39,7 +39,9 @@ class SectionsTest {
     @Test
     @DisplayName("Sections를 빈 리스트로 생성하려는 경우 SubwayException을 던진다.")
     void createWithEmptySectionsThrowException() {
-        assertThatThrownBy(() -> new Sections(Collections.emptyList()))
+        List<Section> sections = Collections.emptyList();
+
+        assertThatThrownBy(() -> new Sections(sections))
                 .isInstanceOf(SubwayException.class);
     }
 
@@ -93,14 +95,14 @@ class SectionsTest {
     @Test
     @DisplayName("현재 구간들 중 상행 종점역인지 확인한다.")
     void isFirstStation() {
-        assertThat(SECTIONS.isFirstStation(1L)).isTrue();
+        assertThat(SECTIONS.isFirstStation(FIRST_SECTION.getUpStationId())).isTrue();
         assertThat(SECTIONS.isFirstStation(5L)).isFalse();
     }
 
     @Test
     @DisplayName("현재 구간들 중 하행 종점역인지 확인한다.")
     void isLastStation() {
-        assertThat(SECTIONS.isLastStation(5L)).isTrue();
+        assertThat(SECTIONS.isLastStation(LAST_SECTION.getDownStationId())).isTrue();
         assertThat(SECTIONS.isLastStation(1L)).isFalse();
     }
 

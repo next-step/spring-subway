@@ -49,9 +49,11 @@ class LineWithSectionsTest {
     @Test
     @DisplayName("다른 노선의 구간이 포함된 경우 SubwayException을 던진다.")
     void validatesSectionHasSameLine() {
-        assertThatThrownBy(() -> new LineWithSections(List.of(
+        final List<LineWithSection> lineWithSectionList = List.of(
                 new LineWithSection(LINE, new Section(1L, LINE_ID, 1L, 2L, 1L)),
                 new LineWithSection(DIFF_LINE, new Section(2L, DIFF_LINE_ID, 2L, 3L, 1L))
-        ))).isInstanceOf(SubwayException.class);
+        );
+
+        assertThatThrownBy(() -> new LineWithSections(lineWithSectionList)).isInstanceOf(SubwayException.class);
     }
 }

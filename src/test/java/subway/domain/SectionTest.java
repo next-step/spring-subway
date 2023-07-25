@@ -12,10 +12,10 @@ import subway.exception.SubwayException;
 
 class SectionTest {
 
-    public static final Long LINE_ID = 1L;
-    public static final Long UP_STATION_ID = 1L;
-    public static final Long DOWN_STATION_ID = 2L;
-    public static final Long DISTANCE = 10L;
+    private static final Long LINE_ID = 1L;
+    private static final Long UP_STATION_ID = 1L;
+    private static final Long DOWN_STATION_ID = 2L;
+    private static final Long DISTANCE = 10L;
 
     @Test
     @DisplayName("구간을 정상적으로 생성한다.")
