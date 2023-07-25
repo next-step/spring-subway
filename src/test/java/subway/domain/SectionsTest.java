@@ -1,6 +1,7 @@
 package subway.domain;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.dto.SectionRequest;
 import subway.exception.IllegalSectionException;
+import subway.exception.IllegalStationsException;
 
 class SectionsTest {
 
@@ -99,6 +101,68 @@ class SectionsTest {
                 .isThrownBy(() -> sections.findConnectedSection(sectionRequest.to(1L)));
     }
 
+    @DisplayName("식별자와 일치하는 종점역을 반환한다.")
+    @Test
+    void getLastSectionTest() {
+        // given
+        List<Section> sectionList = createSections();
+        Sections sections = new Sections(createSections());
+        long startStationId = sectionList.get(0).getUpStationId();
+
+        // when
+        Section startSection = sections.getLastSection(startStationId);
+
+        // then
+        assertThat(startSection.getUpStationId()).isEqualTo(startStationId);
+    }
+
+    @DisplayName("식별자와 일치하는 종점역이 없으면 예외를 던진다.")
+    @Test
+    void getLastSectionNotExistExceptionTest() {
+        // given
+        List<Section> sectionList = createSections();
+        Sections sections = new Sections(createSections());
+        long innerStationId = sectionList.get(2).getUpStationId();
+
+        // when & then
+        assertThatThrownBy(() -> sections.getLastSection(innerStationId))
+            .hasMessage("종점 구간이 포함된 역이 아닙니다.")
+            .isInstanceOf(IllegalStationsException.class);
+    }
+
+    @DisplayName("역과 상행 방향으로 연결된 구간을 반환한다.")
+    @Test
+    void findUpDirectionSectionTest() {
+        // given
+        List<Section> sectionList = createSections();
+        Sections sections = new Sections(createSections());
+
+        Section upDirection = sectionList.get(2);
+        long stationId = upDirection.getDownStationId();
+
+        // when
+        Section result = sections.findUpDirectionSection(stationId);
+
+        // then
+        assertThat(result).isEqualTo(upDirection);
+    }
+
+    @DisplayName("역과 하행 방향으로 연결된 구간을 반환한다.")
+    @Test
+    void findDownDirectionSectionTest() {
+        // given
+        List<Section> sectionList = createSections();
+        Sections sections = new Sections(createSections());
+
+        Section downDirection = sectionList.get(2);
+        long stationId = downDirection.getUpStationId();
+
+        // when
+        Section result = sections.findDownDirectionSection(stationId);
+
+        // then
+        assertThat(result).isEqualTo(downDirection);
+    }
 
     private List<Section> createSections() {
         List<Section> sections = new ArrayList<>();
