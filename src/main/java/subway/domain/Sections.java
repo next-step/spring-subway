@@ -46,11 +46,15 @@ public class Sections {
     }
 
     public Optional<Section> findUpSection(Station deleteStation) {
-        return Optional.of(sections.get(0));
+        return sections.stream()
+            .filter(section -> section.getUpStation().equals(deleteStation))
+            .findFirst();
     }
 
     public Optional<Section> findDownSection(Station deleteStation) {
-        return Optional.empty();
+        return sections.stream()
+            .filter(section -> section.getDownStation().equals(deleteStation))
+            .findFirst();
     }
 
     public List<Station> sortStations() {
@@ -107,7 +111,6 @@ public class Sections {
         }
     }
 
-
     private SectionRegistVo registMiddleSection(Section newSection, Section targetSection) {
         if (isMatchUpStation(newSection)) {
             return new SectionRegistVo(newSection, newSection.findMiddleUpSection(targetSection));
@@ -142,23 +145,15 @@ public class Sections {
     }
 
     private Set<Station> findStations() {
-        return Stream.concat(
-                findUpStations().stream(),
-                findDownStations().stream()
-            )
-            .collect(Collectors.toSet());
-    }
-
-    private Set<Station> findUpStations() {
         return sections.stream()
-            .map(Section::getUpStation)
-            .collect(Collectors.toSet());
+            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+            .collect(Collectors.toUnmodifiableSet());
     }
 
     private Set<Station> findDownStations() {
         return sections.stream()
             .map(Section::getDownStation)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override

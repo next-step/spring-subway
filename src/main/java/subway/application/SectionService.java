@@ -81,20 +81,4 @@ public class SectionService {
         }
     }
 
-//    private void deleteAndAddSection(Sections sections, Station deleteStation) {
-//        Optional<Section> upSection = sections.findUpSection(deleteStation);
-//        Optional<Section> downSection = sections.findDownSection(deleteStation);
-//        if (upSection.isPresent() && downSection.isPresent()) {
-//            sectionDao.deleteById(upSection.get().getId());
-//            sectionDao.deleteById(downSection.get().getId());
-//            Section newSection = upSection.get().combineUpSectionToDownSection(downSection.get());
-//            sectionDao.insert(newSection);
-//        }
-//        if (upSection.isPresent()) {
-//            sectionDao.deleteById(upSection.get().getId());
-//        }
-//        if (downSection.isPresent()) {
-//            sectionDao.deleteById(downSection.get().getId());
-//        }
-//    }
 }
