@@ -38,11 +38,6 @@ public class Section {
         return new Section(id, lineId, upDirection.getDownStationId(), downStationId, narrowedDistance);
     }
 
-    public Section extendToDownDirection(final Section downDirection) {
-        int extendedDistance = distance + downDirection.distance;
-        return new Section(id, lineId, upStationId, downDirection.getDownStationId(), extendedDistance);
-    }
-
     public Section extendToUpDirection(final Section upDirection) {
         int extendedDistance = upDirection.distance + distance;
         return new Section(id, lineId, upDirection.getUpStationId(), downStationId, extendedDistance);

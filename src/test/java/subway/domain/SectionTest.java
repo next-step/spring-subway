@@ -100,25 +100,4 @@ class SectionTest {
         assertThat(extended.getDistance())
             .isEqualTo(upDirection.getDistance() + base.getDistance());
     }
-
-    @DisplayName("현재구간을 하행 방향으로 확장한다.")
-    @Test
-    void extendToDownDirectionTest() {
-        // given
-        long lineId = 1L;
-        long overlapStationId = 2L;
-        Section base = new Section(1L, lineId, 1L, overlapStationId, 10);
-        Section downDirection = new Section(1L, lineId, overlapStationId, 3L, 5);
-
-        // when
-        Section extended = base.extendToDownDirection(downDirection);
-
-        // then
-        assertThat(extended.getId()).isEqualTo(base.getId());
-        assertThat(extended.getLineId()).isEqualTo(lineId);
-        assertThat(extended.getUpStationId()).isEqualTo(base.getUpStationId());
-        assertThat(extended.getDownStationId()).isEqualTo(downDirection.getDownStationId());
-        assertThat(extended.getDistance())
-            .isEqualTo(base.getDistance() + downDirection.getDistance());
-    }
 }

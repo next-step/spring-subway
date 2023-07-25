@@ -22,15 +22,15 @@ public class Sections {
         });
     }
 
-    public Optional<Section> findConnectedSection(final Section base) {
-        validateStations(base.getUpStationId(), base.getDownStationId());
+    public Optional<Section> findConnectedSection(final Section newSection) {
+        validateStations(newSection.getUpStationId(), newSection.getDownStationId());
 
-        if (upStationMap.containsKey(base.getUpStationId())) {
-            return findConnectedDownStation(base);
+        if (upStationMap.containsKey(newSection.getUpStationId())) {
+            return findConnectedDownStation(newSection);
         }
 
-        if (downStationMap.containsKey(base.getDownStationId())) {
-            return findConnectedUpStation(base);
+        if (downStationMap.containsKey(newSection.getDownStationId())) {
+            return findConnectedUpStation(newSection);
         }
 
         return Optional.empty();
