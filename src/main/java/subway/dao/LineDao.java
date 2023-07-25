@@ -42,34 +42,32 @@ public class LineDao {
 
     public List<Line> findAll() {
         String sql = "select * from LINE";
-        List<Line> lines = jdbcTemplate.query(sql, rowMapper);
 
-        return lines.stream()
-                .map(line -> setSections(line))
+        return jdbcTemplate.query(sql, rowMapper)
+                .stream()
+                .map(this::getLineWithSections)
                 .collect(Collectors.toList());
     }
 
     public Optional<Line> findById(Long id) {
         String sql = "select * from LINE WHERE id = ?";
-        Optional<Line> lineOptional = Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
 
-        lineOptional.ifPresent(line -> setSections(line));
-
-        return lineOptional;
+        return jdbcTemplate.query(sql, rowMapper, id)
+                .stream()
+                .findAny()
+                .map(this::getLineWithSections);
     }
 
     public Optional<Line> findByName(String name) {
         String sql = "select * from LINE WHERE name = ?";
-        Optional<Line> lineOptional = jdbcTemplate.query(sql, rowMapper, name)
+
+        return jdbcTemplate.query(sql, rowMapper, name)
                 .stream()
-                .findAny();
-
-        lineOptional.ifPresent(line -> setSections(line));
-
-        return lineOptional;
+                .findAny()
+                .map(this::getLineWithSections);
     }
 
-    private Line setSections(Line line) {
+    private Line getLineWithSections(Line line) {
         return new Line(line.getId(), line.getName(), line.getColor(), findSectionsByLineId(line.getId()));
     }
 
