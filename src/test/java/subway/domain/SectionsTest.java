@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.domain.vo.SectionsRegister;
 
 class SectionsTest {
 
@@ -80,7 +79,7 @@ class SectionsTest {
     @Test
     @DisplayName("새로운 구간의 상행과 하행이 기존 섹션에 있을 경우 예외가 발생한다.")
     void validNewSectionDownStation() {
-        assertThatThrownBy(() -> sections.registerSection(section1))
+        assertThatThrownBy(() -> sections.makeUpdateSection(section1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -95,7 +94,7 @@ class SectionsTest {
                 10
         );
         assertThatNoException()
-                .isThrownBy(() -> sections.registerSection(section4));
+                .isThrownBy(() -> sections.makeUpdateSection(section4));
     }
 
     @Test
@@ -108,7 +107,7 @@ class SectionsTest {
                 line1,
                 10
         );
-        assertThatThrownBy(() -> sections.registerSection(section4))
+        assertThatThrownBy(() -> sections.makeUpdateSection(section4))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -122,7 +121,7 @@ class SectionsTest {
                 line1,
                 10
         );
-        assertThatThrownBy(() -> sections.registerSection(section4))
+        assertThatThrownBy(() -> sections.validRegisterSection(section4))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -130,7 +129,7 @@ class SectionsTest {
     @DisplayName("Line에 역이 하나도 없다면 구간이 무조건 등록된다")
     void registerSectionInEmptyLine() {
         Sections sections = new Sections(Collections.emptyList());
-        assertThatNoException().isThrownBy(() -> sections.registerSection(section1));
+        assertThatNoException().isThrownBy(() -> sections.makeUpdateSection(section1));
     }
 
     @Test
@@ -151,7 +150,9 @@ class SectionsTest {
                 5
         );
 
-        SectionsRegister result = sections.registerSection(addSection);
+        sections.validRegisterSection(addSection);
+
+        Section modifySection = sections.makeUpdateSection(addSection).get();
 
         Section expectedNewSection = new Section(
                 3L,
@@ -162,8 +163,8 @@ class SectionsTest {
         );
 
         Assertions.assertAll(
-                () -> assertThat(result.getAddSection().equals(addSection)).isTrue(),
-                () -> assertThat(result.getUpdateSection().get().equals(expectedNewSection)).isTrue()
+                () -> assertThat(addSection.equals(addSection)).isTrue(),
+                () -> assertThat(modifySection.equals(expectedNewSection)).isTrue()
         );
     }
 
@@ -177,7 +178,7 @@ class SectionsTest {
                 15
         );
 
-        assertThatThrownBy(() -> sections.registerSection(newSection))
+        assertThatThrownBy(() -> sections.makeUpdateSection(newSection))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -197,10 +198,10 @@ class SectionsTest {
                 line1,
                 5
         );
-        SectionsRegister result = sections.registerSection(addSection);
+        Section modifySection = sections.makeUpdateSection(addSection).get();
         Assertions.assertAll(
-                () -> assertThat(result.getAddSection().equals(addSection)).isTrue(),
-                () -> assertThat(result.getUpdateSection().get().equals(expectedNewSection)).isTrue()
+                () -> assertThat(addSection.equals(addSection)).isTrue(),
+                () -> assertThat(modifySection.equals(expectedNewSection)).isTrue()
         );
     }
 
@@ -214,7 +215,7 @@ class SectionsTest {
                 15
         );
 
-        assertThatThrownBy(() -> sections.registerSection(newSection))
+        assertThatThrownBy(() -> sections.makeUpdateSection(newSection))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

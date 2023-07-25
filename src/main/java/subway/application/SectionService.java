@@ -9,7 +9,6 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.domain.vo.SectionsRegister;
 import subway.dto.request.SectionRegisterRequest;
 
 import java.util.Optional;
@@ -30,24 +29,25 @@ public class SectionService {
 
     @Transactional
     public void registerSection(SectionRegisterRequest sectionRegisterRequest, Long lineId) {
+        Section section = makeSection(sectionRegisterRequest, lineId);
+        Sections sections = sectionDao.findAllByLineId(lineId);
+
+        sections.validRegisterSection(section);
+
+        sectionDao.insert(section);
+        sections.makeUpdateSection(section).ifPresent(sectionDao::update);
+    }
+
+    private Section makeSection(SectionRegisterRequest sectionRegisterRequest, Long lineId) {
         Station upStation = stationDao.findById(sectionRegisterRequest.getUpStationId());
         Station downStation = stationDao.findById(sectionRegisterRequest.getDownStationId());
         Line line = lineDao.findById(lineId);
-        Section section = new Section(
+        return new Section(
                 upStation,
                 downStation,
                 line,
                 sectionRegisterRequest.getDistance()
         );
-
-        Sections sections = sectionDao.findAllByLineId(lineId);
-        SectionsRegister result = sections.registerSection(section);
-
-        sectionDao.insert(result.getAddSection());
-
-        if (result.getUpdateSection().isPresent()) {
-            sectionDao.update(result.getUpdateSection().get());
-        }
     }
 
     @Transactional
