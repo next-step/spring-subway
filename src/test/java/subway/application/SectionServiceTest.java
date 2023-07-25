@@ -123,13 +123,23 @@ class SectionServiceTest {
 
     @Test
     @DisplayName("구간 삭제 예외 테스트: 구간이 하나인 노선에서 마지막 구간을 제거할 때")
-    void deleteException() {
+    void deleteException1() {
         when(sectionDao.findAllByLineId(1L)).thenReturn(new Sections(List.of(section1)));
         when(stationDao.findById(2L)).thenReturn(station2);
 
         Assertions.assertThatThrownBy(() -> sectionService.deleteSection(2L, 1L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("구간이 1개 이하이므로 해당역을 삭제할 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("구간 삭제 예외 테스트: 구간에 없는 역을 제거하려고 할 때")
+    void deleteException2() {
+        when(stationDao.findById(5L)).thenReturn(station5);
+
+        Assertions.assertThatThrownBy(() -> sectionService.deleteSection(5L, 1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("등록되지 않은 역을 제거할 수 없습니다.");
     }
 
     @Test

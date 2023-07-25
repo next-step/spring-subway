@@ -136,7 +136,7 @@ class SectionsTest {
     @DisplayName("구간이 1개 이하인 경우 해당역을 삭제할 수 없다")
     void canNotRemoveStation() {
         Sections sections = new Sections(List.of(section1));
-        assertThatThrownBy(sections::validDeleteStation)
+        assertThatThrownBy(() -> sections.validDeleteStation(station1))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
