@@ -1,18 +1,22 @@
 package subway.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 class LineWithSectionsTest {
 
     private static final Long LINE_ID = 1L;
+    private static final Long DIFF_LINE_ID = 2L;
     private static final String LINE_NAME = "2호선";
     private static final String LINE_COLOR = "#00FF00";
     private static final Line LINE = new Line(LINE_ID, LINE_NAME, LINE_COLOR);
+    private static final Line DIFF_LINE = new Line(DIFF_LINE_ID, LINE_NAME, LINE_COLOR);
 
     private static final List<LineWithSection> LINE_WITH_SECTIONS_LIST = List.of(
             new LineWithSection(LINE, new Section(1L, LINE_ID, 1L, 2L, 1L)),
@@ -40,5 +44,14 @@ class LineWithSectionsTest {
         final LineWithSections lineWithSections = new LineWithSections(LINE_WITH_SECTIONS_LIST);
 
         assertThat(lineWithSections.getSortedStationIds()).containsExactly(1L, 2L, 3L, 4L);
+    }
+
+    @Test
+    @DisplayName("다른 노선의 구간이 포함된 경우 SubwayException을 던진다.")
+    void validatesSectionHasSameLine() {
+        assertThatThrownBy(() -> new LineWithSections(List.of(
+                new LineWithSection(LINE, new Section(1L, LINE_ID, 1L, 2L, 1L)),
+                new LineWithSection(DIFF_LINE, new Section(2L, DIFF_LINE_ID, 2L, 3L, 1L))
+        ))).isInstanceOf(SubwayException.class);
     }
 }
