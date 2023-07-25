@@ -60,13 +60,13 @@ public class Sections {
         List<Station> sortedStations = new ArrayList<>();
         Map<Station, Section> stationLayerMap = initLayerMap();
 
-        Station nowStation = findUpTerminusStation();
-        sortedStations.add(nowStation);
+        Station upStationInSection = findUpTerminusStation();
+        sortedStations.add(upStationInSection);
 
-        while (stationLayerMap.containsKey(nowStation)) {
-            Section section = stationLayerMap.get(nowStation);
+        while (stationLayerMap.containsKey(upStationInSection)) {
+            Section section = stationLayerMap.get(upStationInSection);
             sortedStations.add(section.getDownStation());
-            nowStation = section.getDownStation();
+            upStationInSection = section.getDownStation();
         }
 
         return sortedStations;
