@@ -68,7 +68,7 @@ public class Section {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -86,7 +86,7 @@ public class Section {
         return Objects.hash(id, upStation, downStation, distance);
     }
 
-    public Section add(Section newSection) {
+    public Section add(final Section newSection) {
         if (downStation.isNotEqual(newSection.upStation)) {
             throw new SubwayException(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION);
         }
@@ -94,7 +94,7 @@ public class Section {
             distance.add(newSection.distance));
     }
 
-    public boolean matchOneStation(Station station) {
+    public boolean matchOneStation(final Station station) {
         return upStation.equals(station) || downStation.equals(station);
     }
 }

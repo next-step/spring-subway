@@ -9,9 +9,13 @@ import subway.exception.SubwayException;
 public class Sections {
 
     private final List<Section> sections;
+    private final Set<Station> cache;
 
     public Sections(final List<Section> sections) {
         this.sections = Collections.unmodifiableList(sections);
+        cache = sections.stream()
+            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+            .collect(Collectors.toUnmodifiableSet());
     }
 
     public Sections() {
@@ -43,11 +47,7 @@ public class Sections {
     }
 
     private boolean contains(final Station station) {
-        return sections.stream()
-            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-            .distinct()
-            .collect(Collectors.toList())
-            .contains(station);
+        return cache.contains(station);
     }
 
     private boolean notContains(final Station station) {
