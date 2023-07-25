@@ -2,14 +2,11 @@ package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.RestApi;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
@@ -35,6 +32,7 @@ class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+
         ExtractableResponse<Response> responseForCheck = RestApi.get("/lines/1");
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
@@ -91,6 +89,22 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    @DisplayName("노선에 존재하지 않는 역을 삭제한다.")
+    @Test
+    void deleteNotExistSectionInLine() {
+        // given
+        final long notExistSectionId = 999;
+        createInitialLine();
+        extendSectionsInLine();
+
+        // when
+        ExtractableResponse<Response> response = RestApi.delete(
+            "/lines/1/sections?stationId=" + notExistSectionId);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("지하철 중간 구간을 삭제한다.")
     @Test
     void deleteMiddleSection() {
@@ -105,6 +119,9 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> responseForCheck = RestApi.get("/lines/1");
+        assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철 종점 구간을 삭제한다.")
@@ -121,6 +138,9 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+
+        ExtractableResponse<Response> responseForCheck = RestApi.get("/lines/1");
+        assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철 노선에 구간이 1개일 때 구간 제거 실패")
