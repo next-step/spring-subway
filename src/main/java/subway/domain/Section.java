@@ -11,7 +11,8 @@ public class Section {
     private final Long downStationId;
     private final Integer distance;
 
-    public Section(final Long id, final Long lineId, final Long upStationId, final Long downStationId, final Integer distance) {
+    public Section(final Long id, final Long lineId, final Long upStationId,
+        final Long downStationId, final Integer distance) {
         validateStations(upStationId, downStationId);
         validateDistance(distance);
 
@@ -22,17 +23,29 @@ public class Section {
         this.distance = distance;
     }
 
-    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Integer distance) {
+    public Section(final Long lineId, final Long upStationId, final Long downStationId,
+        final Integer distance) {
         this(null, lineId, upStationId, downStationId, distance);
     }
 
-    public Section narrowToDownDirection(final Section downDirectionSection) {
-        return connectToDownDirection(downDirectionSection)
-            .updateDistance(distance - downDirectionSection.distance);
+    public Section narrowToDownDirection(final Section downDirection) {
+        int narrowedDistance = distance - downDirection.distance;
+        return new Section(id, lineId, upStationId, downDirection.getUpStationId(), narrowedDistance);
     }
-    public Section narrowToUpDirection(final Section upDirectionSection) {
-        return connectToUpDirection(upDirectionSection)
-            .updateDistance(distance - upDirectionSection.distance);
+
+    public Section narrowToUpDirection(final Section upDirection) {
+        int narrowedDistance = distance - upDirection.distance;
+        return new Section(id, lineId, upDirection.getDownStationId(), downStationId, narrowedDistance);
+    }
+
+    public Section extendToDownDirection(final Section downDirection) {
+        int extendedDistance = distance + downDirection.distance;
+        return new Section(id, lineId, upStationId, downDirection.getDownStationId(), extendedDistance);
+    }
+
+    public Section extendToUpDirection(final Section upDirection) {
+        int extendedDistance = upDirection.distance + distance;
+        return new Section(id, lineId, upDirection.getUpStationId(), downStationId, extendedDistance);
     }
 
     public boolean isDistanceLessThanOrEqualTo(final Section other) {
@@ -49,18 +62,6 @@ public class Section {
         if (distance <= 0) {
             throw new IllegalSectionException("구간 길이는 0보다 커야한다.");
         }
-    }
-
-    private Section updateDistance(int distance) {
-        return new Section(id, lineId, upStationId, downStationId, distance);
-    }
-
-    private Section connectToDownDirection(final Section newSection) {
-        return new Section(id, lineId, upStationId, newSection.upStationId, distance);
-    }
-
-    private Section connectToUpDirection(final Section newSection) {
-        return new Section(id, lineId, newSection.downStationId, downStationId, distance);
     }
 
     public Long getId() {
