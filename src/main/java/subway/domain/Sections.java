@@ -23,14 +23,14 @@ public class Sections {
     }
 
     public Optional<Section> findConnectedSection(final Section newSection) {
-        validateStations(newSection.getUpStationId(), newSection.getDownStationId());
+        validateSection(newSection);
 
         if (upStationMap.containsKey(newSection.getUpStationId())) {
-            return findConnectedDownStation(newSection);
+            return findConnectedDownDirectionSection(newSection);
         }
 
         if (downStationMap.containsKey(newSection.getDownStationId())) {
-            return findConnectedUpStation(newSection);
+            return findConnectedUpDirectionSection(newSection);
         }
 
         return Optional.empty();
@@ -40,21 +40,21 @@ public class Sections {
         return isStartStation(stationId) || isEndStation(stationId);
     }
 
-    public Section findLeftSection(long stationId) {
+    public Section findUpDirectionSection(long stationId) {
         return downStationMap.get(stationId);
     }
 
-    public Section findRightStation(long stationId) {
+    public Section findDownDirectionSection(long stationId) {
         return upStationMap.get(stationId);
     }
 
     public Section getLastSection(long stationId) {
         if (isStartStation(stationId)) {
-            return upStationMap.get(stationId);
+            return findDownDirectionSection(stationId);
         }
 
         if (isEndStation(stationId)) {
-            return downStationMap.get(stationId);
+            return findUpDirectionSection(stationId);
         }
 
         throw new IllegalStationsException("종점 구간이 포함된 역이 아닙니다.");
@@ -68,21 +68,21 @@ public class Sections {
         return !upStationMap.containsKey(stationId) && downStationMap.containsKey(stationId);
     }
 
-    private Optional<Section> findConnectedDownStation(Section base) {
-        Section downDirectionSection = upStationMap.get(base.getUpStationId());
+    private Optional<Section> findConnectedDownDirectionSection(Section base) {
+        final Section downDirectionSection = findDownDirectionSection(base.getUpStationId());
         validateDistance(downDirectionSection, base);
         return Optional.of(downDirectionSection.narrowToUpDirection(base));
     }
 
-    private Optional<Section> findConnectedUpStation(Section base) {
-        Section upDirectionSection = downStationMap.get(base.getDownStationId());
+    private Optional<Section> findConnectedUpDirectionSection(Section base) {
+        final Section upDirectionSection = findUpDirectionSection(base.getDownStationId());
         validateDistance(upDirectionSection, base);
         return Optional.of(upDirectionSection.narrowToDownDirection(base));
     }
 
-    private void validateStations(long upStationId, long downStationId) {
-        boolean upStationExist = isStationExist(upStationId);
-        boolean downStationExist = isStationExist(downStationId);
+    private void validateSection(final Section section) {
+        boolean upStationExist = isStationExist(section.getUpStationId());
+        boolean downStationExist = isStationExist(section.getDownStationId());
         if (upStationExist == downStationExist) {
             throw new IllegalSectionException("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
         }
