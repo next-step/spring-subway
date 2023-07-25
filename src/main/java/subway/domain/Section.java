@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Section {
 
-    private Long id;
+    private final Long id;
     private final Long lineId;
     private final Long upStationId;
     private final Long downStationId;
@@ -14,6 +14,10 @@ public class Section {
 
     public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
         this(null, lineId, upStationId, downStationId, distance);
+    }
+
+    public Section(final Long id, final Section section) {
+        this(id, section.lineId, section.upStationId, section.downStationId, section.distance);
     }
 
     public Section(
@@ -97,10 +101,6 @@ public class Section {
 
     public boolean isHead(final Section target) {
         return Objects.equals(this.downStationId, target.upStationId);
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
     }
 
     @Override
