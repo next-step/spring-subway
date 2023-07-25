@@ -2,7 +2,6 @@ package subway.application;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -48,7 +47,7 @@ class SectionServiceTest {
         final SectionAdditionRequest request = new SectionAdditionRequest(
             stationA.getId(), stationC.getId(), 3);
         doReturn(Optional.of(lineA)).when(lineDao).findById(lineA.getId());
-        doReturn(sections).when(sectionDao).findAllByLine(lineA);
+        doReturn(sections).when(sectionDao).findAllBy(lineA);
         doReturn(Optional.of(stationA)).when(stationDao).findById(stationA.getId());
         doReturn(Optional.of(stationC)).when(stationDao).findById(stationC.getId());
 
@@ -72,7 +71,7 @@ class SectionServiceTest {
         final Section sectionB = new Section(2L, lineA, stationB, stationC, 5);
         final Sections sections = new Sections(List.of(sectionA, sectionB));
         doReturn(Optional.of(lineA)).when(lineDao).findById(lineA.getId());
-        doReturn(sections).when(sectionDao).findAllByLine(lineA);
+        doReturn(sections).when(sectionDao).findAllBy(lineA);
         doReturn(Optional.of(stationB)).when(stationDao).findById(stationB.getId());
 
         //when

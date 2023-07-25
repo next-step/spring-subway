@@ -188,6 +188,12 @@ public class Section {
         return this.distance > distance;
     }
 
+    public Section extendBy(final Section other) {
+        validateConnection(other);
+        return new Section(this.id, this.line, this.upStation, other.downStation,
+            this.distance + other.distance);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {

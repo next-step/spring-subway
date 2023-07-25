@@ -54,7 +54,7 @@ public class SectionDao {
             .usingGeneratedKeyColumns("id");
     }
 
-    public Sections findAllByLine(Line line) {
+    public Sections findAllBy(Line line) {
         String sql =
             "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
                 + "l.name AS line_name, color AS line_color, "

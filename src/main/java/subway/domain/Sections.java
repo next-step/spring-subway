@@ -262,6 +262,10 @@ public class Sections {
             .findAny();
     }
 
+    public int getSize() {
+        return values.size();
+    }
+
     private Section getFirst() {
         return this.values.get(0);
     }

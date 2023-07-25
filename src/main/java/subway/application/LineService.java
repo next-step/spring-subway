@@ -56,7 +56,7 @@ public class LineService {
     @Transactional
     public LineResponse findLineResponseById(Long id) {
         final Line line = getLineOrElseThrow(id);
-        Sections sections = sectionDao.findAllByLine(line);
+        Sections sections = sectionDao.findAllBy(line);
         return LineResponse.of(line, sections);
     }
 
