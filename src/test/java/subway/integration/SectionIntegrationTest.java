@@ -241,12 +241,63 @@ public class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("종점역이 아닌 경우에도 삭제할 수 있다.")
+    void middleStationRemoveTest() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station2Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
     @DisplayName("노선에서 구간이 하나인 경우 역을 삭제할 수 없다.")
     void removeOnlyOneSectionBadRequest() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station2Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("노선에서 역이 포함되지 않은 경우 역을 삭제할 수 없다.")
+    void noStationRemoveBadRequest() {
+        // given
+        ExtractableResponse<Response> station4Response = createStation(new StationRequest("몽촌토성역"));
+        Long station4Id = Long.parseLong(station4Response.header("Location").split("/")[2]);
+
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station4Id)
                 .then().log().all()
                 .extract();
 
