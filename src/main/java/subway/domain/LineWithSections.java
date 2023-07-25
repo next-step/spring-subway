@@ -26,8 +26,12 @@ public class LineWithSections {
 
     private void validatesSectionHasSameLine(final List<LineWithSection> values) {
         final Line line = values.get(0).getLine();
-        if (values.stream().anyMatch(value -> !value.getLine().equals(line))) {
+        if (hasNotSameLine(values, line)) {
             throw new SubwayException("해당 구간 정보에 다른 노선의 구간이 포함되어 있습니다.");
         }
+    }
+
+    private boolean hasNotSameLine(final List<LineWithSection> values, final Line line) {
+        return values.stream().anyMatch(value -> !value.getLine().equals(line));
     }
 }
