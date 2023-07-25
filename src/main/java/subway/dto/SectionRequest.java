@@ -1,16 +1,9 @@
 package subway.dto;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-public class LineRequest {
-
-    @NotBlank(message = "노선 이름을 입력해주세요.")
-    private String name;
-
-    @NotBlank(message = "노선 색을 선택해주세요.")
-    private String color;
+public class SectionRequest {
 
     @NotNull(message = "상행역을 선택해주세요.")
     private Long upStationId;
@@ -22,23 +15,13 @@ public class LineRequest {
     @Positive(message = "거리는 양수여야합니다.")
     private Integer distance;
 
-    public LineRequest() {
+    public SectionRequest() {
     }
 
-    public LineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
-        this.name = name;
-        this.color = color;
+    public SectionRequest(Long upStationId, Long downStationId, Integer distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
     }
 
     public Long getUpStationId() {
@@ -55,10 +38,8 @@ public class LineRequest {
 
     @Override
     public String toString() {
-        return "LineRequest{" +
-                "name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", upStationId='" + upStationId + '\'' +
+        return "SectionRequest{" +
+                "upStationId='" + upStationId + '\'' +
                 ", downStationId='" + downStationId + '\'' +
                 ", distance=" + distance +
                 '}';
