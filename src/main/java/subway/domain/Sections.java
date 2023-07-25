@@ -62,10 +62,11 @@ public class Sections {
 
     public Sections removeStation(final Station station) {
         validateSize();
-
+        validateContainStation(station);
         List<Section> newSections = new ArrayList<>(this.sections);
         List<Section> removeSection = findRemoveSections(station, newSections);
-        removeSection.stream().forEach(newSections::remove);
+
+        newSections.removeAll(removeSection);
 
         if (isMiddleStation(station)) {
             newSections.add(reArrangeSection(station));
@@ -73,14 +74,23 @@ public class Sections {
         return new Sections(newSections);
     }
 
+    private void validateContainStation(Station station) {
+        if (notContains(station)) {
+            throw new SubwayException(ErrorCode.NOT_FOUND_REMOVE_STATION);
+        }
+    }
+
+
     private Section reArrangeSection(final Station station) {
-        Optional<Section> upSection = sections.stream()
+        Section upSection = sections.stream()
             .filter(section -> section.getUpStation().equals(station))
-            .findAny();
-        Optional<Section> downSection = sections.stream()
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException(""));
+        Section downSection = sections.stream()
             .filter(section -> section.getDownStation().equals(station))
-            .findAny();
-        return downSection.get().add(upSection.get());
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException(""));
+        return downSection.add(upSection);
     }
 
     private boolean isMiddleStation(final Station station) {
@@ -95,7 +105,7 @@ public class Sections {
     ) {
         List<Section> removeSection = new ArrayList<>();
         for (Section section : newSections) {
-            if (station.equals(section.getDownStation())) {
+            if (section.matchOneStation(station)) {
                 removeSection.add(section);
             }
         }

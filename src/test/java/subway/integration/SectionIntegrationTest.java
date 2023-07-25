@@ -3,6 +3,7 @@ package subway.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static subway.exception.ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
+import subway.exception.ErrorCode;
 import subway.exception.ErrorResponse;
 
 @DisplayName("구간 관련 기능")
@@ -229,7 +231,7 @@ public class SectionIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("노선에서 중간역을 삭제 할 수 있다")
-    void removeNotDownStationBadRequest() {
+    void removeMiddleStation() {
         // given
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         RestAssured
@@ -250,6 +252,34 @@ public class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
     }
+
+    @Test
+    @DisplayName("노선에서 삭제할 역이 없으면 오류 반환")
+    void 노선_존재_하지않는_역_오류_반환() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
+        RestAssured
+            .given().log().all()
+            .contentType(APPLICATION_JSON_VALUE)
+            .body(sectionRequest)
+            .when().post("/lines/{lineId}/sections", lineId)
+            .then().log().all()
+            .extract();
+        ExtractableResponse<Response> createStation4Response = createStation(new StationRequest("신림역"));
+        Long station4Id = Long.parseLong(createStation4Response.header("Location").split("/")[2]);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station4Id)
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(NOT_FOUND.value());
+        assertThat(response.body().as(ErrorResponse.class).getMessage()).isEqualTo(ErrorCode.NOT_FOUND_REMOVE_STATION.getMessage());
+    }
+
 
     @Test
     @DisplayName("노선에서 상행 종점역을 삭제할 수 있다.")

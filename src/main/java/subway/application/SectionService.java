@@ -46,5 +46,6 @@ public class SectionService {
         SectionsChange changes = SectionsChange.of(line, newLine);
 
         sectionDao.deleteSections(changes.getDeletes());
+        sectionDao.insertSections(changes.getInserts(), lineId);
     }
 }
