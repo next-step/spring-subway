@@ -18,6 +18,7 @@ import subway.dto.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
 public class StationIntegrationTest extends IntegrationTest {
+
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {

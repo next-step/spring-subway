@@ -20,6 +20,7 @@ import subway.helper.CreateHelper;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
+
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
 

@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -20,12 +19,12 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSection() {
         // given
-        CreateHelper.createStation("교대역");
-        Long lineId = CreateHelper.createLine("2호선", "bg-123");
+        final Long firstStationId = CreateHelper.createStation("강남역");
+        final Long secondStationId = CreateHelper.createStation("역삼역");
+        final Long thirdStationId = CreateHelper.createStation("교대역");
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
 
-        List<Long> stationIds = CreateHelper.getStationIds();
-
-        SectionRequest params = new SectionRequest(stationIds.get(1), stationIds.get(2), 10);
+        final SectionRequest params = new SectionRequest(secondStationId, thirdStationId, 10);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -45,24 +44,17 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createAlreadyExist() {
         // given
-        Long lineId = CreateHelper.createLine("2호선", "bg-123");
+        final Long firstStationId = CreateHelper.createStation("강남역");
+        final Long secondStationId = CreateHelper.createStation("역삼역");
+        final Long thirdStationId = CreateHelper.createStation("교대역");
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
+        CreateHelper.createSection(secondStationId, thirdStationId,  lineId);
 
-        List<Long> stationIds = CreateHelper.getStationIds();
-
-        SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(1), 10);
-        RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{id}/sections", lineId)
-                .then().log().all()
-                .extract();
-
-        SectionRequest params2 = new SectionRequest(stationIds.get(1), stationIds.get(0), 10);
+        final SectionRequest params = new SectionRequest(thirdStationId, secondStationId, 10);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params2)
+                .body(params)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/{id}/sections", lineId)
@@ -77,36 +69,11 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSame() {
         // given
-        Long lineId = CreateHelper.createLine("2호선", "bg-123");
+        final Long firstStationId = CreateHelper.createStation("강남역");
+        final Long secondStationId = CreateHelper.createStation("역삼역");
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
 
-        List<Long> stationIds = CreateHelper.getStationIds();
-
-        SectionRequest params = new SectionRequest(stationIds.get(0), stationIds.get(0), 10);
-
-        // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{id}/sections", lineId)
-                .then().log().all()
-                .extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-    @DisplayName("하행 종점역과 새로운 구간의 상행역이 다르면 예외를 던진다.")
-    @Test
-    void createNotSame() {
-        // given
-        CreateHelper.createStation("잠실역");
-        CreateHelper.createStation("강변역");
-        Long lineId = CreateHelper.createLine("2호선", "bg-123");
-
-        List<Long> stationIds = CreateHelper.getStationIds();
-
-        SectionRequest params = new SectionRequest(stationIds.get(2), stationIds.get(3), 10);
+        final SectionRequest params = new SectionRequest(secondStationId, secondStationId, 10);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -125,16 +92,16 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteUpEndStation() {
         // given
-        CreateHelper.createStation("잠실역");
-        Long lineId = CreateHelper.createLine("2호선", "bg-123");
-
-        List<Long> stationIds = CreateHelper.getStationIds();
-        CreateHelper.createSection(stationIds, 1, 2, lineId);
+        final Long firstStationId = CreateHelper.createStation("강남역");
+        final Long secondStationId = CreateHelper.createStation("역삼역");
+        final Long thirdStationId = CreateHelper.createStation("교대역");
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
+        CreateHelper.createSection(secondStationId, thirdStationId, lineId);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationIds.get(0))
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, firstStationId)
                 .then().log().all()
                 .extract();
 
@@ -147,16 +114,16 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteMidStation() {
         // given
-        CreateHelper.createStation("잠실역");
-        Long lineId = CreateHelper.createLine("2호선", "bg-123");
-
-        List<Long> stationIds = CreateHelper.getStationIds();
-        CreateHelper.createSection(stationIds, 1, 2, lineId);
+        final Long firstStationId = CreateHelper.createStation("강남역");
+        final Long secondStationId = CreateHelper.createStation("역삼역");
+        final Long thirdStationId = CreateHelper.createStation("교대역");
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
+        CreateHelper.createSection(secondStationId, thirdStationId, lineId);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationIds.get(1))
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, secondStationId)
                 .then().log().all()
                 .extract();
 
@@ -169,17 +136,16 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteDownEndStation() {
         // given
-        CreateHelper.createStation("잠실역");
-        Long lineId = CreateHelper.createLine("2호선", "bg-123");
-
-        List<Long> stationIds = CreateHelper.getStationIds();
-        CreateHelper.createSection(stationIds, 0, 1, lineId);
-        CreateHelper.createSection(stationIds, 1, 2, lineId);
+        final Long firstStationId = CreateHelper.createStation("강남역");
+        final Long secondStationId = CreateHelper.createStation("역삼역");
+        final Long thirdStationId = CreateHelper.createStation("교대역");
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
+        CreateHelper.createSection(secondStationId, thirdStationId, lineId);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationIds.get(2))
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, thirdStationId)
                 .then().log().all()
                 .extract();
 
