@@ -1,7 +1,6 @@
 package subway.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -16,13 +15,19 @@ import subway.exception.SubwayException;
 public class Sections {
 
     private final List<Section> values;
+    private final List<Long> stationIds;
 
     public Sections(final List<Section> values) {
         this.values = Collections.unmodifiableList(getSortedSections(values));
+        this.stationIds = sortedStationIds();
     }
 
     public boolean containsBoth(final Long upStationId, final Long downStationId) {
-        return countByStationIds(upStationId, downStationId) == 2;
+        return containsStation(upStationId) && containsStation(downStationId);
+    }
+
+    public boolean containsStation(final Long stationId) {
+        return this.stationIds.contains(stationId);
     }
 
     public Section getFirstSection() {
@@ -39,30 +44,20 @@ public class Sections {
         return this.values.get(this.values.size() - 1);
     }
 
-    public List<Long> getSortedStationIds() {
-        final List<Long> result = new ArrayList<>(List.of(this.values.get(0).getUpStationId()));
-
-        for (Section section : this.values) {
-            result.add(section.getDownStationId());
-        }
-
-        return result;
-    }
-
     public boolean isEqualSizeToOne() {
         return this.values.size() == 1;
     }
 
-    public boolean isFirstStation(final Long downStationId) {
+    public boolean isFirstStation(final Long staionId) {
         final Long firstUpStationId = this.values.get(0).getUpStationId();
 
-        return firstUpStationId.equals(downStationId);
+        return firstUpStationId.equals(staionId);
     }
 
-    public boolean isLastStation(final Long upStationId) {
+    public boolean isLastStation(final Long stationId) {
         final Long lastDownStationId = this.values.get(this.values.size() - 1).getDownStationId();
 
-        return lastDownStationId.equals(upStationId);
+        return lastDownStationId.equals(stationId);
     }
 
     public Optional<Section> findContainStationSection(
@@ -72,6 +67,10 @@ public class Sections {
         return find(this.values, section -> section.containsStations(upStationId, downStationId));
     }
 
+    public List<Long> getStationIds() {
+        return this.stationIds;
+    }
+
     private Optional<Section> findFirstSectionInNotSortedSections(final List<Section> values) {
         final Set<Long> upStationIds = toSetWithMapper(values, Section::getUpStationId);
         final Set<Long> downStationIds = toSetWithMapper(values, Section::getDownStationId);
@@ -79,6 +78,15 @@ public class Sections {
         upStationIds.removeAll(intersection(upStationIds, downStationIds));
 
         return find(values, section -> upStationIds.contains(section.getUpStationId()));
+    }
+
+    private List<Long> sortedStationIds() {
+        final List<Long> result = new ArrayList<>(List.of(this.values.get(0).getUpStationId()));
+        for (Section section : this.values) {
+            result.add(section.getDownStationId());
+        }
+
+        return result;
     }
 
     private List<Section> getSortedSections(final List<Section> values) {
@@ -116,16 +124,5 @@ public class Sections {
         return values.stream()
                 .map(mapper)
                 .collect(Collectors.toSet());
-    }
-
-    private int countByStationIds(final Long... targetStationIds) {
-        final Set<Long> stationIds = new HashSet<>();
-        for (Section section : values) {
-            stationIds.add(section.getUpStationId());
-            stationIds.add(section.getDownStationId());
-        }
-        stationIds.retainAll(Arrays.asList(targetStationIds));
-
-        return stationIds.size();
     }
 }

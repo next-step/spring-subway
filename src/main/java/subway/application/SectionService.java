@@ -51,6 +51,7 @@ public class SectionService {
     public void deleteSection(final Long lineId, final Long stationId) {
         final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         validateSectionsSizeIsNotOne(sections);
+        validateSectionsHasNotStation(sections, stationId);
 
         if (sections.isFirstStation(stationId)) {
             final Section firstSection = sections.getFirstSection();
@@ -59,6 +60,7 @@ public class SectionService {
             final Section lastSection = sections.getLastSection();
             sectionDao.delete(lastSection.getId());
         }
+
     }
 
     private void validateDistance(final Long distance) {
@@ -79,6 +81,12 @@ public class SectionService {
         if (sections.containsBoth(upStationId, downStationId)) {
             throw new SubwayException(
                     "상행 역과 하행 역이 이미 노선에 모두 등록되어 있습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId);
+        }
+    }
+
+    private void validateSectionsHasNotStation(final Sections sections, final Long stationId) {
+        if (!sections.containsStation(stationId)) {
+            throw new SubwayException("해당 구간에는 해당 역이 존재하지 않아서 제거할 수 없습니다. 역 ID : " + stationId);
         }
     }
 }

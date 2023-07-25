@@ -21,7 +21,7 @@ public class LineWithSections {
         return new Sections(values.stream()
                 .map(LineWithSection::getSection)
                 .collect(Collectors.toList()))
-                .getSortedStationIds();
+                .getStationIds();
     }
 
     private void validatesSectionHasSameLine(final List<LineWithSection> values) {

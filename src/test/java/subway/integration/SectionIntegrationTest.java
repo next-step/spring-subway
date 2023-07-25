@@ -181,14 +181,15 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("지하철 구간을 제거한다.")
-    void deleteSection() {
+    @DisplayName("지하철 하행 종점역을 포함한 구간(마지막 구간)을 제거한다.")
+    void deleteLastSection() {
         /* given */
         final Long lineId = 2L;
+        final Long stationId = 25L;
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", "25")
+                .given().log().all().queryParam("stationId", stationId)
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
@@ -198,7 +199,7 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("지하철 상행 구간역을 포함한 구간을 제거한다.")
+    @DisplayName("지하철 상행 종점역을 포함한 구간(처음 구간)을 제거한다.")
     void deleteFirstSection() {
         /* given */
         final Long lineId = 3L;
@@ -219,12 +220,13 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("지하철 노선에 구간이 하나인 경우 삭제 시 400 Bad Request로 응답한다.")
     void badRequestWithOnlyOneSection() {
         /* given */
-        final Long lineId = 1L;
+        final Long lineIdIsSectionsSizeOne = 1L;
+        final Long stationId = 12L;
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", "12")
-                .when().delete("/lines/{lineId}/sections", lineId)
+                .given().log().all().queryParam("stationId", stationId)
+                .when().delete("/lines/{lineId}/sections", lineIdIsSectionsSizeOne)
                 .then().log().all()
                 .extract();
 
@@ -232,5 +234,25 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().jsonPath().getString("message"))
                 .isEqualTo("해당 노선에 구간이 하나여서 제거할 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("제거하려는 역이 해당 구간에 없는 경우 400 Bad Request로 응답한다.")
+    void badRequestWithSectionsHasNotStation() {
+        /* given */
+        final Long lineId = 3L;
+        final Long notContainsStationId = 30L;
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all().queryParam("stationId", notContainsStationId)
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().jsonPath().getString("message"))
+                .isEqualTo("해당 구간에는 해당 역이 존재하지 않아서 제거할 수 없습니다. 역 ID : " + notContainsStationId);
     }
 }
