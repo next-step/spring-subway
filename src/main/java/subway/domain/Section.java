@@ -65,6 +65,15 @@ public class Section {
         return null;
     }
 
+    public Section combineUpSectionToDownSection(Section downSection) {
+        return new Section(
+            upStation,
+            downSection.getDownStation(),
+            line,
+            distance.getDistance() + downSection.getDistance().getDistance()
+        );
+    }
+
     public Long getId() {
         return id;
     }
@@ -113,7 +122,4 @@ public class Section {
             '}';
     }
 
-    public Section combineUpSectionToDownSection(Section section) {
-        return null;
-    }
 }
