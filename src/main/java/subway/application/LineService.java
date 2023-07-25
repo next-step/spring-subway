@@ -13,6 +13,7 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.exception.IncorrectRequestException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,10 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(final LineRequest request) {
+        lineDao.findByName(request.getName())
+                .ifPresent(line -> {
+                    throw new IncorrectRequestException("노선 이름은 중복될 수 없습니다. 입력값: " + request.getName());
+                });
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Section section = newSection(SectionRequest.of(request));
         sectionDao.insert(section, persistLine.getId());

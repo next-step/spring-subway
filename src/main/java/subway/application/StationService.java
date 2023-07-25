@@ -6,6 +6,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.IncorrectRequestException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +23,12 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(final StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
+        String name = stationRequest.getName();
+        stationDao.findByName(name)
+                .ifPresent(station -> {
+                    throw new IncorrectRequestException("역 이름은 중복될 수 없습니다. 입력값: " + name);
+                });
+        Station station = stationDao.insert(new Station(name));
         return StationResponse.of(station);
     }
 
