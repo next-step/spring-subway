@@ -7,10 +7,11 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.LineRequest;
+import subway.dto.CreateLineRequest;
 import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
+import subway.dto.CreateSectionRequest;
 import subway.dto.StationResponse;
+import subway.dto.UpdateLineRequest;
 import subway.exception.LineException;
 import subway.exception.StationException;
 
@@ -30,14 +31,14 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
-    public LineResponse saveLine(LineRequest request) {
-        validateDuplicateName(request.getName());
+    public LineResponse saveLine(CreateLineRequest createLineRequest) {
+        validateDuplicateName(createLineRequest.getName());
 
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = getStation(request.getUpStationId());
-        Station downStation = getStation(request.getDownStationId());
+        Line persistLine = lineDao.insert(new Line(createLineRequest.getName(), createLineRequest.getColor()));
+        Station upStation = getStation(createLineRequest.getUpStationId());
+        Station downStation = getStation(createLineRequest.getDownStationId());
         Section section = Section.builder()
-                .distance(request.getDistance())
+                .distance(createLineRequest.getDistance())
                 .upStation(upStation)
                 .downStation(downStation)
                 .build();
@@ -85,7 +86,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public void connectSectionByStationId(Long lineId, SectionRequest sectionRequest) {
+    public void connectSectionByStationId(Long lineId, CreateSectionRequest sectionRequest) {
         Line persistLine = getLineById(lineId);
         List<Section> sections = sectionDao.findAllByLineId(persistLine.getId());
 
@@ -127,8 +128,8 @@ public class LineService {
                 ));
     }
 
-    public void updateLine(Long id, LineRequest lineUpdateRequest) {
-        lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
+    public void updateLine(Long id, UpdateLineRequest updateLineRequest) {
+        lineDao.update(new Line(id, updateLineRequest.getName(), updateLineRequest.getColor()));
     }
 
     public void deleteLineById(Long id) {

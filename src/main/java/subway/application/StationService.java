@@ -3,8 +3,9 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.StationDao;
 import subway.domain.Station;
-import subway.dto.StationRequest;
+import subway.dto.CreateStationRequest;
 import subway.dto.StationResponse;
+import subway.dto.UpdateStationRequest;
 import subway.exception.StationException;
 
 import java.text.MessageFormat;
@@ -19,10 +20,10 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        validateDuplicateName(stationRequest.getName());
+    public StationResponse saveStation(CreateStationRequest createStationRequest) {
+        validateDuplicateName(createStationRequest.getName());
 
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
+        Station station = stationDao.insert(new Station(createStationRequest.getName()));
         return StationResponse.of(station);
     }
 
@@ -50,8 +51,8 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public void updateStation(Long id, StationRequest stationRequest) {
-        stationDao.update(new Station(id, stationRequest.getName()));
+    public void updateStation(Long id, UpdateStationRequest updateStationRequest) {
+        stationDao.update(new Station(id, updateStationRequest.getName()));
     }
 
     public void deleteStationById(Long id) {

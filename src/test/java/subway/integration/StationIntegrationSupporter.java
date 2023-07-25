@@ -3,13 +3,13 @@ package subway.integration;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.dto.StationRequest;
+import subway.dto.UpdateStationRequest;
 
 import static io.restassured.RestAssured.given;
 
 class StationIntegrationSupporter {
 
-    static ExtractableResponse<Response> createStation(StationRequest stationRequest) {
+    static ExtractableResponse<Response> createStation(UpdateStationRequest stationRequest) {
         return given().log().all()
                 .body(stationRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -35,7 +35,7 @@ class StationIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> updateStation(String uri, StationRequest stationRequest) {
+    static ExtractableResponse<Response> updateStation(String uri, UpdateStationRequest stationRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(stationRequest)

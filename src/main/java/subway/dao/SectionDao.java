@@ -14,11 +14,12 @@ import java.util.Map;
 @Repository
 public class SectionDao {
 
-    private static final String FIND_ALL_BY_LINE_ID_SQL =
+        private static final String FIND_ALL_BY_LINE_ID_SQL =
             "select S.*, US.id as US_ID, US.name as US_NAME, DS.id as DS_ID, DS.name as DS_NAME "
                     + "from SECTIONS as S "
-                    + "join STATION as US on line_id = ? and S.up_station_id = US.id "
-                    + "join STATION as DS on line_id = ? and S.down_station_id = DS.id";
+                    + "join STATION as US on S.up_station_id = US.id "
+                    + "join STATION as DS on S.down_station_id = DS.id "
+                    + "where line_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
@@ -61,7 +62,7 @@ public class SectionDao {
     }
 
     public List<Section> findAllByLineId(Long lineId) {
-        return jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId, lineId);
+        return jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId);
     }
 
     private Section buildSection(Long sectionId, Section section) {

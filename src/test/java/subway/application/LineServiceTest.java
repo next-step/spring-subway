@@ -24,7 +24,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.SectionRequest;
+import subway.dto.CreateSectionRequest;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = LineService.class)
@@ -68,7 +68,7 @@ class LineServiceTest {
             Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
             Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
 
-            SectionRequest sectionRequest = new SectionRequest(station2.getId(),
+            CreateSectionRequest sectionRequest = new CreateSectionRequest(station2.getId(),
                     station3.getId(),
                     section2.getDistance());
 

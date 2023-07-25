@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.StationService;
-import subway.dto.StationRequest;
+import subway.dto.CreateStationRequest;
 import subway.dto.StationResponse;
+import subway.dto.UpdateStationRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -27,8 +28,8 @@ public class StationController {
     }
 
     @PostMapping
-    public ResponseEntity<StationResponse> createStation(@RequestBody @Validated StationRequest stationRequest) {
-        StationResponse station = stationService.saveStation(stationRequest);
+    public ResponseEntity<StationResponse> createStation(@RequestBody @Validated CreateStationRequest createStationRequest) {
+        StationResponse station = stationService.saveStation(createStationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
@@ -43,8 +44,8 @@ public class StationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateStation(@PathVariable Long id, @RequestBody @Validated StationRequest stationRequest) {
-        stationService.updateStation(id, stationRequest);
+    public ResponseEntity<Void> updateStation(@PathVariable Long id, @RequestBody @Validated UpdateStationRequest updateStationRequest) {
+        stationService.updateStation(id, updateStationRequest);
         return ResponseEntity.ok().build();
     }
 

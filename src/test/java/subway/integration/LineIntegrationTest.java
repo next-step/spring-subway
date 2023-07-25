@@ -1,5 +1,21 @@
 package subway.integration;
 
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import subway.dto.CreateSectionRequest;
+import subway.dto.LineResponse;
+import subway.dto.StationResponse;
+import subway.dto.UpdateLineRequest;
+import subway.dto.UpdateStationRequest;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.integration.LineIntegrationSupporter.createLineByLineRequest;
 import static subway.integration.LineIntegrationSupporter.deleteLineByLineId;
@@ -10,21 +26,6 @@ import static subway.integration.LineIntegrationSupporter.registerSectionToLine;
 import static subway.integration.LineIntegrationSupporter.updateLineByLineId;
 import static subway.integration.StationIntegrationSupporter.createStation;
 
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
-
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
 
@@ -33,21 +34,21 @@ class LineIntegrationTest extends IntegrationTest {
     private Long stationRequest3;
     private Long stationRequest4;
 
-    private LineRequest lineRequest1;
-    private LineRequest lineRequest2;
+    private UpdateLineRequest lineRequest1;
+    private UpdateLineRequest lineRequest2;
 
     @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
 
-        stationRequest1 = createStation(new StationRequest("역1")).body().as(StationResponse.class).getId();
-        stationRequest2 = createStation(new StationRequest("역2")).body().as(StationResponse.class).getId();
-        stationRequest3 = createStation(new StationRequest("역3")).body().as(StationResponse.class).getId();
-        stationRequest4 = createStation(new StationRequest("역4")).body().as(StationResponse.class).getId();
+        stationRequest1 = createStation(new UpdateStationRequest("역1")).body().as(StationResponse.class).getId();
+        stationRequest2 = createStation(new UpdateStationRequest("역2")).body().as(StationResponse.class).getId();
+        stationRequest3 = createStation(new UpdateStationRequest("역3")).body().as(StationResponse.class).getId();
+        stationRequest4 = createStation(new UpdateStationRequest("역4")).body().as(StationResponse.class).getId();
 
-        lineRequest1 = new LineRequest("노선1", "bg-red-600", stationRequest1, stationRequest2, 10);
-        lineRequest2 = new LineRequest("노선2", "bg-green-600", stationRequest2, stationRequest3, 5);
+        lineRequest1 = new UpdateLineRequest("노선1", "bg-red-600", stationRequest1, stationRequest2, 10);
+        lineRequest2 = new UpdateLineRequest("노선2", "bg-green-600", stationRequest2, stationRequest3, 5);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
@@ -147,7 +148,7 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
-        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest3, 5);
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest2, stationRequest3, 5);
 
         // when
         ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest);
@@ -162,7 +163,7 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         Long lineId = createLineByLineRequest(lineRequest2).body().as(LineResponse.class).getId();
 
-        SectionRequest sectionRequest = new SectionRequest(stationRequest1, stationRequest2, 100);
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest1, stationRequest2, 100);
 
         // when
         ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest);
@@ -177,10 +178,10 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
-        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 10);
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest2, stationRequest4, 10);
         registerSectionToLine(lineId, sectionRequest);
 
-        SectionRequest middleSectionRequest = new SectionRequest(stationRequest2, stationRequest3, 2);
+        CreateSectionRequest middleSectionRequest = new CreateSectionRequest(stationRequest2, stationRequest3, 2);
 
         // when
         ExtractableResponse<Response> response = registerSectionToLine(lineId, middleSectionRequest);
@@ -195,10 +196,10 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
-        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 10);
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest2, stationRequest4, 10);
         registerSectionToLine(lineId, sectionRequest);
 
-        SectionRequest middleSectionRequest = new SectionRequest(stationRequest3, stationRequest4, 2);
+        CreateSectionRequest middleSectionRequest = new CreateSectionRequest(stationRequest3, stationRequest4, 2);
 
         // when
         ExtractableResponse<Response> response = registerSectionToLine(lineId, middleSectionRequest);
@@ -213,10 +214,10 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
-        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest4, 5);
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest2, stationRequest4, 5);
         registerSectionToLine(lineId, sectionRequest);
 
-        SectionRequest middleSectionRequest = new SectionRequest(stationRequest3, stationRequest4, 5);
+        CreateSectionRequest middleSectionRequest = new CreateSectionRequest(stationRequest3, stationRequest4, 5);
 
         // when
         ExtractableResponse<Response> response = registerSectionToLine(lineId, middleSectionRequest);
@@ -231,13 +232,13 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
-        SectionRequest sectionRequest1 = new SectionRequest(stationRequest2, stationRequest3, 100);
+        CreateSectionRequest sectionRequest1 = new CreateSectionRequest(stationRequest2, stationRequest3, 100);
         registerSectionToLine(lineId, sectionRequest1);
 
-        SectionRequest sectionRequest2 = new SectionRequest(stationRequest3, stationRequest4, 100);
+        CreateSectionRequest sectionRequest2 = new CreateSectionRequest(stationRequest3, stationRequest4, 100);
         registerSectionToLine(lineId, sectionRequest2);
 
-        SectionRequest sectionRequest3 = new SectionRequest(stationRequest2, stationRequest4, 1);
+        CreateSectionRequest sectionRequest3 = new CreateSectionRequest(stationRequest2, stationRequest4, 1);
 
         // when
         ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest3);
@@ -252,7 +253,7 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
 
-        SectionRequest sectionRequest = new SectionRequest(stationRequest2, stationRequest3, 5);
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest2, stationRequest3, 5);
 
         registerSectionToLine(lineId, sectionRequest);
 

@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
-import subway.dto.LineRequest;
+import subway.dto.CreateLineRequest;
+import subway.dto.UpdateLineRequest;
 import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
+import subway.dto.CreateSectionRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -31,8 +32,8 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody @Validated LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<LineResponse> createLine(@RequestBody @Validated CreateLineRequest createLineRequest) {
+        LineResponse line = lineService.saveLine(createLineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -47,8 +48,8 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody @Validated LineRequest lineUpdateRequest) {
-        lineService.updateLine(id, lineUpdateRequest);
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody @Validated UpdateLineRequest updateLineRequest) {
+        lineService.updateLine(id, updateLineRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -60,9 +61,9 @@ public class LineController {
 
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<Void> createSection(@PathVariable("lineId") Long lineId,
-            @RequestBody @Validated SectionRequest sectionRequest) {
+            @RequestBody @Validated CreateSectionRequest createSectionRequest) {
 
-        lineService.connectSectionByStationId(lineId, sectionRequest);
+        lineService.connectSectionByStationId(lineId, createSectionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
