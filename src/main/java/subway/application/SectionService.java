@@ -7,6 +7,7 @@ import subway.domain.Section;
 import subway.domain.Sections;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
 
 @Service
@@ -38,7 +39,7 @@ public class SectionService {
 
     private void validateLineAndLastStation(final long lineId, final long stationId) {
         final Section lastSection = sectionDao.findLastSection(lineId)
-                .orElseThrow(() -> new IllegalSectionException("해당 노선은 생성되지 않았습니다."));
+                .orElseThrow(() -> new IllegalLineException("해당 노선은 생성되지 않았습니다."));
 
         if (!lastSection.matchDownStationId(stationId)) {
             throw new IllegalSectionException("해당 역은 노선의 하행 종점역이 아닙니다.");

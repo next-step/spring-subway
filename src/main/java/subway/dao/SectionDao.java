@@ -53,6 +53,9 @@ public class SectionDao {
         jdbcTemplate.update(sql, lineId, stationId);
     }
 
+    public void delete(long sectionId) {
+    }
+
     public long count(final long lineId) {
         String sql = "select * from section where line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId)
@@ -73,5 +76,9 @@ public class SectionDao {
                 newSection.getDistance(),
                 newSection.getId()
         );
+    }
+
+    public boolean existByLineIdAndStationId(long lineId, long stationid) {
+        return false;
     }
 }
