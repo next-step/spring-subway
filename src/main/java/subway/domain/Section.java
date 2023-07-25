@@ -26,7 +26,7 @@ public class Section {
     }
 
     private void validate(final Station upStation, final Station downStation) {
-        if (upStation == downStation) {
+        if (upStation.equals(downStation)) {
             throw new IllegalArgumentException("상행역과 하행역이 같을 수 없습니다");
         }
     }

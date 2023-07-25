@@ -44,6 +44,7 @@ public class LineIntegrationTest extends IntegrationTest {
     void createLineTest() {
         // given
         LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -83,7 +84,6 @@ public class LineIntegrationTest extends IntegrationTest {
     void createLineWithDuplicateStation() {
         // given
         LineRequest lineRequest = new LineRequest("2호선", "green", station2Id, station2Id, 14);
-        createLine(lineRequest);
 
         // when
         ExtractableResponse<Response> response = RestAssured
