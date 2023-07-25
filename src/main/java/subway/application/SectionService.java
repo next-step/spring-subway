@@ -33,30 +33,28 @@ public class SectionService {
         validateLineInStation(lineId, stationId);
         validateSectionInLine(lineId);
 
-        // 노선의 모든 구간 조회 -> 종점역도 포함해서 가져와야하므로 역과 연결된 노선만 가져오기 X
         final Sections sections = new Sections(sectionDao.findAll(lineId));
 
-        // 종점역일 경우
         if (sections.isLastStation(stationId)) {
-            // 종점역이 연결된 구간 삭제
-            final Section connectedSection = sections.getLastSection(stationId);
-            sectionDao.delete(connectedSection.getId());
+            deleteLastSection(stationId, sections);
+            return;
         }
-        // 종점역이 아닐 경우
-        else {
-            Section leftSection = sections.findLeftSection(stationId);
-            Section rightSection = sections.findRightStation(stationId);
 
-            // 구간 한 개 삭제
-            sectionDao.delete(leftSection.getId());
+        deleteInnerStation(stationId, sections);
+    }
 
-            // 나머지 구간은 갱신
-            Section newSection = new Section(rightSection.getId(), rightSection.getLineId(),
-                // 상행역을 leftSection 의 상행역과 연결
-                leftSection.getUpStationId(), rightSection.getDownStationId(),
-                leftSection.getDistance()+ rightSection.getDistance());
-            sectionDao.update(newSection);
-        }
+    private void deleteInnerStation(long stationId, Sections sections) {
+        final Section upDirection = sections.findUpDirectionSection(stationId);
+        final Section downDirection = sections.findDownDirectionSection(stationId);
+        final Section extendedSection = downDirection.extendToUpDirection(upDirection);
+
+        sectionDao.delete(upDirection.getId());
+        sectionDao.update(extendedSection);
+    }
+
+    private void deleteLastSection(long stationId, Sections sections) {
+        final Section connectedSection = sections.getLastSection(stationId);
+        sectionDao.delete(connectedSection.getId());
     }
 
     private void validateLineInStation(final long lineId, final long stationId) {
