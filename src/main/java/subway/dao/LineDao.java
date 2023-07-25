@@ -36,7 +36,7 @@ public class LineDao {
         params.put("name", line.getName());
         params.put("color", line.getColor());
 
-        Long lineId = insertAction.executeAndReturnKey(params).longValue();
+        long lineId = insertAction.executeAndReturnKey(params).longValue();
         return new Line(lineId, line.getName(), line.getColor());
     }
 
@@ -51,7 +51,7 @@ public class LineDao {
         return linesWithSections;
     }
 
-    public Optional<Line> findById(Long id) {
+    public Optional<Line> findById(long id) {
         String sql = "SELECT * FROM LINE AS L WHERE L.id = ?";
         try {
             Line line = jdbcTemplate.queryForObject(sql, lineRowMapper, id);
@@ -67,7 +67,7 @@ public class LineDao {
         jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         jdbcTemplate.update("DELETE FROM LINE WHERE id = ?", id);
     }
 

@@ -18,14 +18,11 @@ public class SectionRowMapper implements RowMapper<Section> {
 
     @Override
     public Section mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Long id = rs.getLong("id");
-        Integer distance = rs.getInt("distance");
+        long id = rs.getLong("id");
+        int distance = rs.getInt("distance");
 
-        Long upStationId = rs.getLong("up_station_id");
-        Station upStation = stationRowMapper.mapRow(rs, "US", upStationId);
-
-        Long downStationId = rs.getLong("down_station_id");
-        Station downStation = stationRowMapper.mapRow(rs, "DS", downStationId);
+        Station upStation = stationRowMapper.mapRow(rs, "US");
+        Station downStation = stationRowMapper.mapRow(rs, "DS");
 
         return Section.builder()
                 .id(id)

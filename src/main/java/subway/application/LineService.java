@@ -68,7 +68,7 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    public LineResponse findLineResponseById(Long id) {
+    public LineResponse findLineResponseById(long id) {
         Line line = getLineById(id);
 
         return LineResponse.from(line, stationsToStationResponses(line.getSortedStations()));
@@ -80,7 +80,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public void connectSectionByStationId(Long lineId, SectionCreateRequest sectionCreateRequest) {
+    public void connectSectionByStationId(long lineId, SectionCreateRequest sectionCreateRequest) {
         Line line = getLineById(lineId);
 
         Section newSection = getNewSection(sectionCreateRequest);
@@ -98,7 +98,7 @@ public class LineService {
         sectionDao.update(section);
     }
 
-    public void disconnectSectionByStationId(Long lineId, Long stationId) {
+    public void disconnectSectionByStationId(long lineId, long stationId) {
         Station station = getStation(stationId);
 
         Line line = getLineById(lineId);
@@ -109,18 +109,18 @@ public class LineService {
                 .forEach(sectionDao::update);
     }
 
-    private Line getLineById(Long id) {
+    private Line getLineById(long id) {
         return lineDao.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
                         MessageFormat.format("lineId \"{0}\"에 해당하는 line이 존재하지 않습니다", id)
                 ));
     }
 
-    public void updateLine(Long id, LineUpdateRequest lineUpdateRequest) {
+    public void updateLine(long id, LineUpdateRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
-    public void deleteLineById(Long id) {
+    public void deleteLineById(long id) {
         lineDao.deleteById(id);
     }
 
@@ -135,7 +135,7 @@ public class LineService {
                 .build();
     }
 
-    private Station getStation(Long stationId) {
+    private Station getStation(long stationId) {
         return stationDao.findById(stationId).orElseThrow(() -> new IllegalArgumentException(
                         MessageFormat.format("stationId \"{0}\"에 해당하는 station이 존재하지 않습니다", stationId)
                 )

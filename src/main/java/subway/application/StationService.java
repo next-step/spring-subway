@@ -29,7 +29,7 @@ public class StationService {
         return StationResponse.of(station);
     }
 
-    public StationResponse findStationResponseById(Long id) {
+    public StationResponse findStationResponseById(long id) {
         Station station = stationDao.findById(id).orElseThrow(() -> new IllegalArgumentException(
                 MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id)));
 
@@ -44,11 +44,11 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public void updateStation(Long id, StationUpdateRequest stationUpdateRequest) {
+    public void updateStation(long id, StationUpdateRequest stationUpdateRequest) {
         stationDao.update(new Station(id, stationUpdateRequest.getName()));
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteStationById(long id) {
         stationDao.deleteById(id);
     }
 }

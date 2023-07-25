@@ -81,7 +81,7 @@ class StationIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(
                 new StationCreateRequest(stationName));
 
-        Long stationId = Long.valueOf(createResponse.header("Location").split("/")[2]);
+        long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.getStationByStationId(stationId);

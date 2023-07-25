@@ -28,7 +28,7 @@ public class StationDao {
 
     public Station insert(Station station) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(station);
-        Long id = insertAction.executeAndReturnKey(params).longValue();
+        long id = insertAction.executeAndReturnKey(params).longValue();
         return new Station(id, station.getName());
     }
 
@@ -37,7 +37,7 @@ public class StationDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Optional<Station> findById(Long id) {
+    public Optional<Station> findById(long id) {
         String sql = "SELECT * FROM STATION WHERE id = ?";
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
@@ -51,7 +51,7 @@ public class StationDao {
         jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         String sql = "DELETE FROM STATION WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }

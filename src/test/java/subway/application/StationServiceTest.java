@@ -57,7 +57,7 @@ class StationServiceTest {
         @DisplayName("stationId에 해당하는 Station이 없다면, IllegalArgumentException을 던진다.")
         void Throw_IllegalArgumentException_If_Cannot_Find_Station() {
             // given
-            Long stationId = 1L;
+            long stationId = 1L;
 
             when(stationDao.findById(stationId)).thenReturn(Optional.empty());
 

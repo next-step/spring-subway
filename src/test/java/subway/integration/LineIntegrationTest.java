@@ -29,10 +29,10 @@ import subway.dto.StationResponse;
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
 
-    private Long stationRequest1;
-    private Long stationRequest2;
-    private Long stationRequest3;
-    private Long stationRequest4;
+    private long stationRequest1;
+    private long stationRequest2;
+    private long stationRequest3;
+    private long stationRequest4;
     private LineCreateRequest lineCreateRequest1;
     private LineCreateRequest lineCreateRequest2;
 

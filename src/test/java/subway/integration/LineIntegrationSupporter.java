@@ -28,7 +28,7 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> getLineByLineId(Long lineId) {
+    static ExtractableResponse<Response> getLineByLineId(long lineId) {
         return given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/lines/{lineId}", lineId)
@@ -36,7 +36,7 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> updateLineByLineId(Long lineId, LineUpdateRequest lineUpdateRequest) {
+    static ExtractableResponse<Response> updateLineByLineId(long lineId, LineUpdateRequest lineUpdateRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineUpdateRequest)
@@ -45,14 +45,14 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> deleteLineByLineId(Long lineId) {
+    static ExtractableResponse<Response> deleteLineByLineId(long lineId) {
         return given().log().all()
                 .when().delete("/lines/{lineId}", lineId)
                 .then().log().all()
                 .extract();
     }
 
-    static ExtractableResponse<Response> registerSectionToLine(Long lineId, SectionCreateRequest sectionCreateRequest) {
+    static ExtractableResponse<Response> registerSectionToLine(long lineId, SectionCreateRequest sectionCreateRequest) {
         return given().log().all()
                 .body(sectionCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -61,7 +61,7 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> deleteSectionByLineIdAndStationId(Long lineId, Long stationId) {
+    static ExtractableResponse<Response> deleteSectionByLineIdAndStationId(long lineId, long stationId) {
         return given().log().all()
                 .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, stationId)
                 .then().log().all()

@@ -41,19 +41,19 @@ public class StationController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
+    public ResponseEntity<StationResponse> showStation(@PathVariable long id) {
         return ResponseEntity.ok().body(stationService.findStationResponseById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateStation(@PathVariable Long id,
+    public ResponseEntity<Void> updateStation(@PathVariable long id,
             @RequestBody StationUpdateRequest stationUpdateRequest) {
         stationService.updateStation(id, stationUpdateRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteStation(@PathVariable long id) {
         stationService.deleteStationById(id);
         return ResponseEntity.noContent().build();
     }

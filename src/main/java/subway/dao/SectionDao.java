@@ -30,7 +30,7 @@ public class SectionDao {
         this.sectionRowMapper = sectionRowMapper;
     }
 
-    public Section insert(Long lineId, Section section) {
+    public Section insert(long lineId, Section section) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
         params.put("line_id", lineId);
@@ -40,7 +40,7 @@ public class SectionDao {
         params.put("down_station_id", section.getDownStation().getId());
         params.put("distance", section.getDistance());
 
-        Long id = insertAction.executeAndReturnKey(params).longValue();
+        long id = insertAction.executeAndReturnKey(params).longValue();
         return buildSection(id, section);
     }
 
@@ -58,11 +58,11 @@ public class SectionDao {
         return null;
     }
 
-    List<Section> findAllByLineId(Long lineId) {
+    List<Section> findAllByLineId(long lineId) {
         return jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId, lineId);
     }
 
-    private Section buildSection(Long sectionId, Section section) {
+    private Section buildSection(long sectionId, Section section) {
         return Section.builder()
                 .id(sectionId)
                 .upStation(section.getUpStation())

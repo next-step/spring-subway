@@ -51,7 +51,7 @@ class LineServiceTest {
         @DisplayName("lineId에 해당하는 line을 찾을 수 없으면, IllegalArgumentException 던진다")
         void Throw_IllegalArgumentException_If_CannotFind_Line() {
             // given
-            Long lineId = 1L;
+            long lineId = 1L;
             SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(2L, 3L, 10);
 
             when(lineDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
@@ -133,8 +133,8 @@ class LineServiceTest {
         @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
         void Throw_IllegalArgumentException_Cannot_Find_StationId() {
             // given
-            Long lineId = 1L;
-            Long stationId = 2L;
+            long lineId = 1L;
+            long stationId = 2L;
 
             when(stationDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
@@ -149,8 +149,8 @@ class LineServiceTest {
         @DisplayName("lineId에 해당하는 line을 찾을 수 없ㅇ면, IllegalArgumentException을 던진다.")
         void Throw_IllegalArgumentException_Cannot_Find_Any_Line_By_LineId() {
             // given
-            Long lineId = 1L;
-            Long stationId = 2L;
+            long lineId = 1L;
+            long stationId = 2L;
 
             when(lineDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 

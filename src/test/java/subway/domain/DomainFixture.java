@@ -11,7 +11,7 @@ public class DomainFixture {
         }
 
         public static subway.domain.Section buildWithStations(Station upStation, Station downStation,
-                Integer distance) {
+                int distance) {
             return buildWithStations(1L, upStation, downStation, distance);
         }
 
@@ -20,7 +20,7 @@ public class DomainFixture {
         }
 
         public static subway.domain.Section buildWithStations(Long id, Station upStation, Station downStation,
-                Integer distance) {
+                int distance) {
             return subway.domain.Section.builder()
                     .id(id)
                     .upStation(upStation)

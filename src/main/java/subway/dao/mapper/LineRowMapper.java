@@ -10,7 +10,7 @@ import subway.domain.Line;
 public class LineRowMapper implements RowMapper<Line> {
     @Override
     public Line mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Long id = rs.getLong("id");
+        long id = rs.getLong("id");
         String name = rs.getString("name");
         String color = rs.getString("color");
 

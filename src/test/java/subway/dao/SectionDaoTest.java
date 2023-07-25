@@ -87,7 +87,7 @@ class SectionDaoTest {
         @DisplayName("어떠한 값도 찾을 수 없다면, Empty List를 반환한다.")
         void Return_Empty_List_Cannot_Find_Any_Sections() {
             // given
-            Long lineId = 1L;
+            long lineId = 1L;
 
             // when
             List<Section> result = sectionDao.findAllByLineId(lineId);
