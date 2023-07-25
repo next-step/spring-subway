@@ -194,7 +194,7 @@ public class SectionIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("노선에서 하행 종점역을 삭제할 수 있다.")
-    void removeDownStation() {
+    void removeDownTerminalStation() {
         // given
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         RestAssured
@@ -217,8 +217,8 @@ public class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("노선의 하행 종점역이 아니면 삭제할 수 없다.")
-    void removeNotDownStationBadRequest() {
+    @DisplayName("노선에서 상행 종점역을 삭제할 수 있다.")
+    void removeUpTerminalStationBadRequest() {
         // given
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         RestAssured
@@ -232,12 +232,12 @@ public class SectionIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station2Id)
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station1Id)
                 .then().log().all()
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @Test

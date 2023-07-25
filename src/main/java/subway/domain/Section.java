@@ -31,6 +31,10 @@ public class Section {
         }
     }
 
+    public Section union(final Section other) {
+        return new Section(upStation, other.downStation, distance.add(other.distance));
+    }
+
     public Section subtract(final Section other) {
         if (upStation.equals(other.upStation)) {
             return new Section(other.downStation, downStation, distance.subtract(other.distance));

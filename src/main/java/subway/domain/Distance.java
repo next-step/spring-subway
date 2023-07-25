@@ -12,6 +12,10 @@ public class Distance {
         this.distance = distance;
     }
 
+    public Distance add(Distance other) {
+        return new Distance(distance + other.distance);
+    }
+    
     public Distance subtract(Distance other) {
         if (distance <= other.distance) {
             throw new IllegalArgumentException("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");

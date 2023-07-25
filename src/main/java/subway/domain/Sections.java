@@ -70,34 +70,33 @@ public class Sections {
     }
 
     public Sections removeStation(final Station station) {
-        validateDownStationTerminal(station);
         validateSize();
+        validateContainStation(station);
+        List<Section> newSections = new ArrayList<>(this.sections);
 
-        return new Sections(
-                sections.stream()
-                        .filter(s -> !station.equals(s.getDownStation()))
-                        .collect(Collectors.toList())
-        );
-    }
+        Optional<Section> upMatchSection = sections.stream()
+                .filter(section -> section.getUpStation().equals(station))
+                .peek(newSections::remove)
+                .findAny();
 
-    private void validateDownStationTerminal(final Station station) {
-        if (!isTerminalDownStation(station)) {
-            throw new IllegalArgumentException("하행 종점역이 아니면 지울 수 없습니다.");
+        Optional<Section> downMatchSection = sections.stream()
+                .filter(section -> section.getDownStation().equals(station))
+                .peek(newSections::remove)
+                .findAny();
+
+        if (upMatchSection.isPresent() && downMatchSection.isPresent()) {
+            Section upSection = upMatchSection.get();
+            Section downSection = downMatchSection.get();
+            newSections.add(downSection.union(upSection));
         }
+
+        return new Sections(newSections);
     }
 
-    private boolean isTerminalDownStation(final Station station) {
-        Station terminal = findTerminalDownStation();
-
-        return station.equals(terminal);
-    }
-
-    private Station findTerminalDownStation() {
-        return sections.stream()
-                .map(Section::getDownStation)
-                .filter(downStation -> !upStationsCache.contains(downStation))
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("하행 종점이 존재하지 않습니다."));
+    private void validateContainStation(Station station) {
+        if (notContains(station)) {
+            throw new IllegalArgumentException("노선에 역이 포함되지 않을 때는 삭제할 수 없습니다.");
+        }
     }
 
     private void validateSize() {

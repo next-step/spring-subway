@@ -10,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 class SectionsTest {
     @Test
-    @DisplayName("한개 구간 삭제 테스트")
-    void removeSectionTest() {
+    @DisplayName("하행 종점역을 삭제할 수 있다.")
+    void removeDownTerminalStationTest() {
         // given
         Station deleteStation = new Station("상도역");
         Section deleteSection = new Section(
@@ -36,8 +36,34 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("하행 종점역이 아닌 역을 삭제 할 수 없다.")
-    void validateDownStationTerminalRemoveSectionTest() {
+    @DisplayName("상행 종점역을 삭제할 수 있다.")
+    void removeUpTerminalStationTest() {
+        // given
+        Station deleteStation = new Station("서울대입구역");
+        Section deleteSection = new Section(
+                deleteStation,
+                new Station("신대방역"),
+                4
+        );
+        Sections sections = new Sections(List.of(
+                deleteSection,
+                new Section(
+                        new Station("신대방역"),
+                        new Station("잠실역"),
+                        10
+                )
+        ));
+
+        // when
+        Sections newSections = sections.removeStation(deleteStation);
+
+        // then
+        assertThat(newSections.getSections()).doesNotContain(deleteSection);
+    }
+
+    @Test
+    @DisplayName("중간 역을 삭제하면 앞뒤 역을 이어준다.")
+    void removeMiddleStationTest() {
         // given
         Station deleteStation = new Station("신대방역");
         Sections sections = new Sections(List.of(
@@ -53,10 +79,38 @@ class SectionsTest {
                 )
         ));
 
+        // when
+        Sections newSections = sections.removeStation(deleteStation);
+
+        // then
+        assertThat(newSections.getSections()).hasSize(1);
+        assertThat(newSections.getSections()).contains(
+                new Section(new Station("서울대입구역"), new Station("상도역"), 14)
+        );
+    }
+
+    @Test
+    @DisplayName("노선에 역이 포함되지 않을 때는 삭제할 수 없다.")
+    void stationNotInSectionsTest() {
+        // given
+        Station deleteStation = new Station("신대방역");
+        Sections sections = new Sections(List.of(
+                new Section(
+                        new Station("서울대입구역"),
+                        new Station("잠실역"),
+                        10
+                ),
+                new Section(
+                        new Station("잠실역"),
+                        new Station("상도역"),
+                        10
+                )
+        ));
+
         // when, then
         assertThatCode(() -> sections.removeStation(deleteStation))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("하행 종점역이 아니면 지울 수 없습니다.");
+                .hasMessage("노선에 역이 포함되지 않을 때는 삭제할 수 없습니다.");
     }
 
     @Test
