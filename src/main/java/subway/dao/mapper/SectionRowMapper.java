@@ -1,19 +1,19 @@
 package subway.dao.mapper;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Component
 public class SectionRowMapper implements RowMapper<Section> {
 
     private final StationRowMapper stationRowMapper;
 
-    public SectionRowMapper(LineRowMapper lineRowMapper, StationRowMapper stationRowMapper) {
+    public SectionRowMapper(StationRowMapper stationRowMapper) {
         this.stationRowMapper = stationRowMapper;
     }
 
