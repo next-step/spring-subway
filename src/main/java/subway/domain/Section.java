@@ -146,7 +146,7 @@ public class Section {
 
     private SectionDisconnectResponse disconnectToNextSection(Station station) {
         if (downSection == null) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     MessageFormat.format("삭제 가능한 section을 찾을 수 없습니다. station \"{0}\"", station));
         }
         return downSection.disconnectStation(station);

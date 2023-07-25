@@ -456,8 +456,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("삭제가능한 station을 찾을 수 없으면, IllegalStateException을 던진다.")
-        void Throw_IllegalStateException_Cannot_Find_Deletable_Station() {
+        @DisplayName("삭제가능한 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
+        void Throw_IllegalArgument_Cannot_Find_Deletable_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
@@ -474,7 +474,7 @@ class SectionTest {
             Exception exception = catchException(() -> upSection.disconnectStation(nonExistStation));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalStateException.class);
+            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

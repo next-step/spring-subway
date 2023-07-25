@@ -283,4 +283,38 @@ class LineIntegrationTest extends IntegrationTest {
         // then
         assertIsOk(response);
     }
+
+    @Test
+    @DisplayName("Line의 상행 Station을 제거한다")
+    void deleteFirstStationOfLine() {
+        // given
+        long lineId = createLineByLineRequest(lineCreateRequest1).body().as(LineResponse.class).getId();
+
+        SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(stationRequest2, stationRequest3, 5);
+
+        registerSectionToLine(lineId, sectionCreateRequest);
+
+        // when
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest1);
+
+        // then
+        assertIsOk(response);
+    }
+
+    @Test
+    @DisplayName("Line에 등록되어 있지 않은 Station을 제거하려고 하면, 400 에러가 응답된다")
+    void deleteNotRegisteredStation() {
+        // given
+        long lineId = createLineByLineRequest(lineCreateRequest1).body().as(LineResponse.class).getId();
+
+        SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(stationRequest2, stationRequest3, 5);
+
+        registerSectionToLine(lineId, sectionCreateRequest);
+
+        // when
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest4);
+
+        // then
+        assertIsBadRequest(response);
+    }
 }
