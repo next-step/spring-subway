@@ -185,11 +185,11 @@ class SectionIntegrationTest extends IntegrationTest {
     void deleteLastSection() {
         /* given */
         final Long lineId = 2L;
-        final Long stationId = 25L;
+        final Long lastStationId = 25L;
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", stationId)
+                .given().log().all().queryParam("stationId", lastStationId)
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
@@ -203,11 +203,11 @@ class SectionIntegrationTest extends IntegrationTest {
     void deleteFirstSection() {
         /* given */
         final Long lineId = 3L;
-        final Long stationId = 35L;
+        final Long firstStationId = 35L;
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", stationId)
+                .given().log().all().queryParam("stationId", firstStationId)
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
