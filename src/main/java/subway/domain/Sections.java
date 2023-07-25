@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class Sections {
 
-    private static final String SAME_STATION_EXCEPTION_MESSAGE = "새로운 구간의 상행역은 기존 하행 종점역과 같아야 합니다.";
+    private static final String INVALID_STATIONS_EXCEPTION_MESSAGE = "삽입 시 기준역은 한 개의 역이어야 합니다.";
     private static final String EMPTY_EXCEPTION_MESSAGE = "최소 1개 이상의 구간이 있어야 합니다.";
     private static final String AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE = "구간은 0개가 될 수 없습니다.";
     private static final String CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE = "출발역에 해당되는 구간을 찾을 수 없습니다.";
@@ -169,7 +169,7 @@ public class Sections {
 
     private void validateExistOnlyOne(final boolean hasUpStation, final boolean hasDownStation) {
         if (hasUpStation == hasDownStation) {
-            throw new IllegalArgumentException(SAME_STATION_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(INVALID_STATIONS_EXCEPTION_MESSAGE);
         }
     }
 
