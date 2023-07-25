@@ -26,11 +26,11 @@ public class Sections {
         validateStations(base.getUpStationId(), base.getDownStationId());
 
         if (upStationMap.containsKey(base.getUpStationId())) {
-            return findConnectedUpStation(base);
+            return findConnectedDownStation(base);
         }
 
         if (downStationMap.containsKey(base.getDownStationId())) {
-            return findConnectedDownStation(base);
+            return findConnectedUpStation(base);
         }
 
         return Optional.empty();
@@ -38,6 +38,26 @@ public class Sections {
 
     public boolean isLastStation(final long stationId) {
         return isStartStation(stationId) || isEndStation(stationId);
+    }
+
+    public Section findLeftSection(long stationId) {
+        return downStationMap.get(stationId);
+    }
+
+    public Section findRightStation(long stationId) {
+        return upStationMap.get(stationId);
+    }
+
+    public Section getLastSection(long stationId) {
+        if (isStartStation(stationId)) {
+            return upStationMap.get(stationId);
+        }
+
+        if (isEndStation(stationId)) {
+            return downStationMap.get(stationId);
+        }
+
+        throw new IllegalStationsException("종점 구간이 포함된 역이 아닙니다.");
     }
 
     private boolean isStartStation(final long stationId) {
@@ -48,16 +68,16 @@ public class Sections {
         return !upStationMap.containsKey(stationId) && downStationMap.containsKey(stationId);
     }
 
-    private Optional<Section> findConnectedUpStation(Section base) {
-        Section conectedSection = upStationMap.get(base.getUpStationId());
-        validateDistance(conectedSection, base);
-        return Optional.of(conectedSection.upStationId(base));
+    private Optional<Section> findConnectedDownStation(Section base) {
+        Section downDirectionSection = upStationMap.get(base.getUpStationId());
+        validateDistance(downDirectionSection, base);
+        return Optional.of(downDirectionSection.narrowToUpDirection(base));
     }
 
-    private Optional<Section> findConnectedDownStation(Section base) {
-        Section connectedSection = downStationMap.get(base.getDownStationId());
-        validateDistance(connectedSection, base);
-        return Optional.of(connectedSection.downStationId(base));
+    private Optional<Section> findConnectedUpStation(Section base) {
+        Section upDirectionSection = downStationMap.get(base.getDownStationId());
+        validateDistance(upDirectionSection, base);
+        return Optional.of(upDirectionSection.narrowToDownDirection(base));
     }
 
     private void validateStations(long upStationId, long downStationId) {
@@ -108,25 +128,5 @@ public class Sections {
             "upStationMap=" + upStationMap +
             ", downStationMap=" + downStationMap +
             '}';
-    }
-
-    public Section findLeftSection(long stationId) {
-        return downStationMap.get(stationId);
-    }
-
-    public Section findRightStation(long stationId) {
-        return upStationMap.get(stationId);
-    }
-
-    public Section getLastSection(long stationId) {
-        if (isStartStation(stationId)) {
-            return upStationMap.get(stationId);
-        }
-
-        if (isEndStation(stationId)) {
-            return downStationMap.get(stationId);
-        }
-
-        throw new IllegalStationsException("종점 구간이 포함된 역이 아닙니다.");
     }
 }

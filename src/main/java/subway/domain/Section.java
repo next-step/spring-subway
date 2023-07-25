@@ -26,6 +26,19 @@ public class Section {
         this(null, lineId, upStationId, downStationId, distance);
     }
 
+    public Section narrowToDownDirection(final Section downDirectionSection) {
+        return connectToDownDirection(downDirectionSection)
+            .updateDistance(distance - downDirectionSection.distance);
+    }
+    public Section narrowToUpDirection(final Section upDirectionSection) {
+        return connectToUpDirection(upDirectionSection)
+            .updateDistance(distance - upDirectionSection.distance);
+    }
+
+    public boolean isDistanceLessThanOrEqualTo(final Section other) {
+        return this.distance <= other.distance;
+    }
+
     private void validateStations(final Long upStationId, final Long downStationId) {
         if (upStationId.equals(downStationId)) {
             throw new IllegalSectionException("상행역과 하행역은 달라야 합니다.");
@@ -38,20 +51,16 @@ public class Section {
         }
     }
 
-    public Section downStationId(final Section newSection) {
-        return new Section(id, lineId, upStationId, newSection.upStationId, distance - newSection.distance);
+    private Section updateDistance(int distance) {
+        return new Section(id, lineId, upStationId, downStationId, distance);
     }
 
-    public Section upStationId(final Section newSection) {
-        return new Section(id, lineId, newSection.downStationId, downStationId, distance - newSection.distance);
+    private Section connectToDownDirection(final Section newSection) {
+        return new Section(id, lineId, upStationId, newSection.upStationId, distance);
     }
 
-    public boolean isDistanceLessThanOrEqualTo(final Section other) {
-        return this.distance <= other.distance;
-    }
-
-    public boolean matchDownStationId(final long other) {
-        return downStationId == other;
+    private Section connectToUpDirection(final Section newSection) {
+        return new Section(id, lineId, newSection.downStationId, downStationId, distance);
     }
 
     public Long getId() {
