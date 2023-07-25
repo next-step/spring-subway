@@ -67,12 +67,12 @@ public class ConnectedSections {
     }
 
     private List<Section> generateConnectedSections(final List<Section> sections, final Long firstStationId) {
-        final Map<Long, Section> upStationToSection = sections.stream()
+        final Map<Long, Section> sectionByUpStationId = sections.stream()
                 .collect(Collectors.toMap(Section::getUpStationId, Function.identity()));
 
-        return Stream.iterate(upStationToSection.get(firstStationId),
+        return Stream.iterate(sectionByUpStationId.get(firstStationId),
                         Objects::nonNull,
-                        section -> upStationToSection.get(section.getDownStationId()))
+                        section -> sectionByUpStationId.get(section.getDownStationId()))
                 .collect(Collectors.toList());
     }
 

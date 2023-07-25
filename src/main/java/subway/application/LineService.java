@@ -50,12 +50,12 @@ public class LineService {
     }
 
     public LineResponse findLineResponse(final Long lineId) {
-        final Map<Long, Station> stationMap = stationDao.findAllByLineId(lineId).stream()
+        final Map<Long, Station> stationById = stationDao.findAllByLineId(lineId).stream()
                 .collect(Collectors.toMap(Station::getId, Function.identity()));
 
         final ConnectedSections connectedSections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
         final List<Station> stations = connectedSections.getSortedStationIds().stream()
-                .map(stationMap::get)
+                .map(stationById::get)
                 .collect(Collectors.toList());
 
         return LineResponse.of(lineDao.findById(lineId), stations);
