@@ -147,8 +147,7 @@ class LineTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
-            line.connectSection(downSection);
+            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection, downSection)));
 
             // when
             SectionDisconnectResponse result = line.disconnectSection(downStation);
@@ -188,8 +187,7 @@ class LineTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
-            line.connectSection(downSection);
+            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection, downSection)));
 
             // when
             SectionDisconnectResponse result = line.disconnectSection(upStation);
@@ -211,8 +209,7 @@ class LineTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection)));
-            line.connectSection(downSection);
+            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection, downSection)));
 
             // when
             SectionDisconnectResponse result = line.disconnectSection(middleStation);
