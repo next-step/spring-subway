@@ -162,6 +162,12 @@ public class Section {
     }
 
     public void disconnectUpSection() {
+        if (upSection == null) {
+            throw new SectionException("upSection이 존재하지 않습니다");
+        }
+
+        upSection.downSection = null;
+        upSection = null;
     }
 
     public Long getId() {
