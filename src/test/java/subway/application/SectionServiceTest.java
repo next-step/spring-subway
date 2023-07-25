@@ -4,9 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,14 +32,15 @@ class SectionServiceTest {
     @InjectMocks
     private SectionService sectionService;
 
-    @Mock private SectionDao sectionDao;
+    @Mock
+    private SectionDao sectionDao;
 
     @DisplayName("구간 생성 성공")
     @Test
-    void createSection() {
+    void createSectionTest() {
         // given
-        final SectionRequest sectionRequest = new SectionRequest( "2", "3",10);
-        final Section newSection = new Section(2L, 1L,  2L, 3L,10);
+        final SectionRequest sectionRequest = new SectionRequest("2", "3", 10);
+        final Section newSection = new Section(2L, 1L, 2L, 3L, 10);
         final Section oldSection = new Section(1L, 1L, 1L, 2L, 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
@@ -52,51 +57,51 @@ class SectionServiceTest {
 
     @DisplayName("존재하지 않는 노선으로 인한 구간 생성 실패")
     @Test
-    void createSectionWithUnmatchedLineId() {
+    void createSectionWithUnmatchedLineIdTest() {
         // given
         final long lineId = 3L;
-        final SectionRequest sectionRequest = new SectionRequest( "1", "2",10);
+        final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
-                .hasMessage("해당 노선은 생성되지 않았습니다.")
-                .isInstanceOf(IllegalLineException.class);
+            .hasMessage("해당 노선은 생성되지 않았습니다.")
+            .isInstanceOf(IllegalLineException.class);
 
     }
 
     @DisplayName("새로운 구간의 상행 및 하행 역이 모두 해당 노선에 등록되어있는 역이어서 구간 생성 실패")
     @Test
-    void createSectionWithBothExistInLine() {
+    void createSectionWithBothExistInLineTest() {
         // given
-        final Section oldSection = new Section(1L, 1L, 1L, 2L,  10);
-        final SectionRequest sectionRequest = new SectionRequest( "1", "2",10);
+        final Section oldSection = new Section(1L, 1L, 1L, 2L, 10);
+        final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
-                .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
-                .isInstanceOf(IllegalSectionException.class);
+            .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
+            .isInstanceOf(IllegalSectionException.class);
     }
 
     @DisplayName("새로운 구간의 상행 및 하행 역이 모두 해당 노선에 등록되지 않아서 구간 생성 실패")
     @Test
-    void createSectionWithBothNotExistInLine() {
+    void createSectionWithBothNotExistInLineTest() {
         // given
-        final Section oldSection = new Section(1L, 1L, 1L, 2L,  10);
-        final SectionRequest sectionRequest = new SectionRequest( "3", "4",10);
+        final Section oldSection = new Section(1L, 1L, 1L, 2L, 10);
+        final SectionRequest sectionRequest = new SectionRequest("3", "4", 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
-                .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
-                .isInstanceOf(IllegalSectionException.class);
+            .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
+            .isInstanceOf(IllegalSectionException.class);
     }
 
     @DisplayName("존재하지 않는 노선으로 인한 구간 삭제 실패")
     @Test
-    void deleteSectionWithUnmatchedLineId() {
+    void deleteSectionWithUnmatchedLineIdTest() {
         // given
         final long lineId = 3L;
         final long stationId = 2L;
@@ -112,7 +117,7 @@ class SectionServiceTest {
 
     @DisplayName("지하철 노선에 구간이 1개일 때 구간 제거 실패")
     @Test
-    void deleteSectionAtLineHasOneSection() {
+    void deleteSectionAtLineHasOneSectionTest() {
         // given
         final long lineId = 1L;
         final long stationId = 2L;
@@ -126,39 +131,59 @@ class SectionServiceTest {
             .isInstanceOf(IllegalSectionException.class);
     }
 
-    @DisplayName("지하철 노선의 하행 종점역 제거 성공")
+    @DisplayName("지하철 노선의 상행 종점역 제거 성공")
     @Test
-    void deleteEndSection() {
+    void deleteEndSectionTest() {
         // given
-        final long lineId = 1L;
-        final long lastStationId = 1L;
-        final long sectionId = 3L;
+        final List<Section> sections = createSections();
+        final long lineId = sections.get(0).getLineId();
+        final long sectionId = sections.get(0).getId();
+        final long startStationId = sections.get(0).getUpStationId();
 
-        given(sectionDao.existByLineIdAndStationId(lineId, lastStationId)).willReturn(true);
+        given(sectionDao.existByLineIdAndStationId(lineId, startStationId)).willReturn(true);
         given(sectionDao.count(lineId)).willReturn(3L);
+        given(sectionDao.findAll(lineId)).willReturn(sections);
         doNothing().when(sectionDao).delete(sectionId);
 
         // when & then
         assertThatNoException()
-            .isThrownBy(() -> sectionService.deleteSection(lineId, lastStationId));
+            .isThrownBy(() -> sectionService.deleteSection(lineId, startStationId));
+
+        verify(sectionDao, never()).update(any());
+        verify(sectionDao).delete(anyLong());
     }
 
     @DisplayName("지하철 노선의 중간 역 삭제 성공")
     @Test
-    void deleteMiddleSection() {
+    void deleteMiddleSectionTest() {
         // given
-        final long lineId = 1L;
-        final long downStationId = 1L;
-        final long sectionId = 3L;
+        final List<Section> sections = createSections();
+        final long lineId = sections.get(0).getLineId();
+        final long sectionId = sections.get(0).getId();
+        final long middleStationId = sections.get(0).getDownStationId();
 
-        given(sectionDao.existByLineIdAndStationId(lineId, downStationId)).willReturn(true);
-        given(sectionDao.count(lineId)).willReturn(3L);
+        given(sectionDao.existByLineIdAndStationId(lineId, middleStationId)).willReturn(true);
+        given(sectionDao.count(lineId)).willReturn((long) sections.size());
+        given(sectionDao.findAll(lineId)).willReturn(sections);
         doNothing().when(sectionDao).delete(sectionId);
+        doNothing().when(sectionDao).update(any(Section.class));
 
         // when & then
+
         // 1. 거리 갱신
         // 2. 왼쪽, 오른쪽 구간 삭제 (혹은 하나의 구간 갱신, 나머지 구간은 삭제)
         assertThatNoException()
-            .isThrownBy(() -> sectionService.deleteSection(lineId, downStationId));
+            .isThrownBy(() -> sectionService.deleteSection(lineId, middleStationId));
+
+        verify(sectionDao).update(any());
+        verify(sectionDao).delete(sectionId);
+    }
+
+    private List<Section> createSections() {
+        final long lineId = 1L;
+        final Section firstSection = new Section(1L, lineId, 1L, 2L, 10);
+        final Section secondSection = new Section(2L, lineId, 2L, 3L, 10);
+        final Section thirdSection = new Section(3L, lineId, 3L, 4L, 10);
+        return Arrays.asList(firstSection, secondSection, thirdSection);
     }
 }
