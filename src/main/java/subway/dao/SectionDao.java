@@ -2,75 +2,86 @@ package subway.dao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Section;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
 public class SectionDao {
 
+    private static final String SELECT_ALL_FROM_SECTION_QUERY
+            = "SELECT s.*, " +
+            "up_station.name AS up_station_name, down_station.name AS down_station_name, " +
+            "line.id AS line_id, line.name AS line_name, line.color AS line_color " +
+            "FROM section s " +
+            "JOIN station AS up_station " +
+            "ON s.up_station_id = up_station.id " +
+            "JOIN station AS down_station " +
+            "ON s.down_station_id = down_station.id " +
+            "JOIN line " +
+            "ON s.line_id = line.id ";
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
+    private final RowMapper<Section> rowMapper;
 
-    private RowMapper<Section> rowMapper = (rs, rowNum) ->
-            new Section(
-                    rs.getLong("id"),
-                    rs.getLong("line_id"),
-                    rs.getLong("up_station_id"),
-                    rs.getLong("down_station_id"),
-                    rs.getInt("distance")
-            );
-
-    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource, final RowMapper<Section> rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("section")
                 .usingGeneratedKeyColumns("id");
+        this.rowMapper = rowMapper;
     }
 
     public Section insert(final Section section) {
-        SqlParameterSource params = new BeanPropertySqlParameterSource(section);
+        final Map<String, Object> params = new HashMap<>();
+        params.put("id", section.getId());
+        params.put("line_id", section.getLine().getId());
+        params.put("up_station_id", section.getUpStation().getId());
+        params.put("down_station_id", section.getDownStation().getId());
+        params.put("distance", section.getDistance());
+
         Long id = insertAction.executeAndReturnKey(params).longValue();
-        return new Section(id, section.getLineId(), section.getUpStationId(), section.getDownStationId(), section.getDistance());
+        return new Section(id, section.getLine(), section.getUpStation(), section.getDownStation(), section.getDistance());
     }
 
     public Optional<Section> findLastSection(final Long lineId) {
-        String sql = "select * from SECTION S1 " +
-                "where S1.line_id = ? " +
-                "and not exists(select * from section S2 where S1.down_station_id = S2.up_station_id)";
+        String sql = SELECT_ALL_FROM_SECTION_QUERY +
+                "WHERE s.line_id = ? " +
+                "AND NOT EXISTS(SELECT s1.id FROM section AS s1 WHERE s.down_station_id = s1.up_station_id) ";
         return jdbcTemplate.query(sql, rowMapper, lineId)
                 .stream()
                 .findAny();
     }
 
     public void deleteLastSection(final long lineId, final long stationId) {
-        String sql = "delete from SECTION where line_id = ? and down_station_id = ?";
+        String sql = "DELETE FROM section WHERE line_id = ? AND down_station_id = ?";
         jdbcTemplate.update(sql, lineId, stationId);
     }
 
     public long count(final long lineId) {
-        String sql = "select * from section where line_id = ?";
+        String sql = SELECT_ALL_FROM_SECTION_QUERY + "WHERE line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId)
                 .size();
     }
 
     public List<Section> findAll(final long lineId) {
-        String sql = "select * from SECTION where line_id = ?";
+        String sql = SELECT_ALL_FROM_SECTION_QUERY + "WHERE line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
     public void update(final Section newSection) {
-        String sql = "update SECTION set up_station_id = ?, down_station_id = ?, distance = ? where id = ?";
+        String sql = "UPDATE section SET up_station_id = ?, down_station_id = ?, distance = ? WHERE id = ?";
         jdbcTemplate.update(
                 sql,
-                newSection.getUpStationId(),
-                newSection.getDownStationId(),
+                newSection.getUpStation().getId(),
+                newSection.getDownStation().getId(),
                 newSection.getDistance(),
                 newSection.getId()
         );

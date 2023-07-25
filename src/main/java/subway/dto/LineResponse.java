@@ -2,14 +2,11 @@ package subway.dto;
 
 import subway.domain.Line;
 
-public class LineResponse {
+public final class LineResponse {
 
-    private long id;
-    private String name;
-    private String color;
-
-    public LineResponse() {
-    }
+    private final long id;
+    private final String name;
+    private final String color;
 
     public LineResponse(long id, String name, String color) {
         this.id = id;

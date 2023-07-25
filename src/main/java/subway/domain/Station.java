@@ -2,7 +2,7 @@ package subway.domain;
 
 import java.util.Objects;
 
-public class Station {
+public final class Station {
     private Long id;
     private String name;
 

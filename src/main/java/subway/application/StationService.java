@@ -5,12 +5,14 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.IllegalStationsException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class StationService {
+
     private final StationDao stationDao;
 
     public StationService(StationDao stationDao) {
@@ -22,12 +24,19 @@ public class StationService {
         return StationResponse.of(station);
     }
 
-    public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+    public StationResponse findStationById(Long id) {
+        return StationResponse.of(findStation(id));
     }
 
-    public List<StationResponse> findAllStationResponses() {
-        List<Station> stations = stationDao.findAll();
+    private Station findStation(final long id) {
+        return stationDao.findById(id)
+                .orElseThrow(() ->
+                        new IllegalStationsException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
+                );
+    }
+
+    public List<StationResponse> findAllStations() {
+        final List<Station> stations = stationDao.findAll();
 
         return stations.stream()
                 .map(StationResponse::of)

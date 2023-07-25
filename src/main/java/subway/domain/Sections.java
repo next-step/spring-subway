@@ -5,6 +5,7 @@ import subway.exception.IllegalSectionException;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public final class Sections {
 
@@ -12,10 +13,58 @@ public final class Sections {
 
     public Sections(final List<Section> sections) {
         validateLine(sections);
-        this.sections = sections;
+        this.sections = sort(sections);
     }
 
-    private static void validateLine(final List<Section> sections) {
+    private List<Section> sort(final List<Section> sections) {
+        final Map<Station, Section> upStationWithSection = convert(sections);
+        final Section startSection = findStartSectionByStation(sections, findStartStation(upStationWithSection));
+        return connectInOrder(upStationWithSection, startSection);
+    }
+
+    private Map<Station, Section> convert(final List<Section> sections) {
+        return sections.stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        Section::getUpStation,
+                        section -> section)
+                );
+    }
+
+    private Section findStartSectionByStation(final List<Section> sections, final Station startStation) {
+        return sections.stream()
+                .filter(section -> section.equalsUpStation(startStation))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 해당 노선의 시작 역이 올바르지 않습니다."));
+    }
+
+    private Station findStartStation(final Map<Station, Section> upToDownStations) {
+        final Set<Station> upStations = new HashSet<>(upToDownStations.keySet());
+        final Set<Station> downStations = collectDownStations(upToDownStations);
+
+        upStations.removeAll(downStations);
+        return upStations.stream()
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 역들이 제대로 연결되지 않았습니다."));
+    }
+
+    private static Set<Station> collectDownStations(final Map<Station, Section> upToDownStations) {
+        return upToDownStations.values()
+                .stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    private List<Section> connectInOrder(final Map<Station, Section> upToDownStations, final Section startStation) {
+        final List<Section> sections = new ArrayList<>();
+        Section currentSection = startStation;
+        while(currentSection != null) {
+            sections.add(currentSection);
+            currentSection = upToDownStations.get(currentSection.getDownStation());
+        }
+        return sections;
+    }
+
+    private void validateLine(final List<Section> sections) {
         if (sections.isEmpty()) {
             throw new IllegalLineException("해당 노선은 생성되지 않았습니다.");
         }
@@ -36,14 +85,14 @@ public final class Sections {
         validateDistance(existSection, section.getDistance());
 
         if (isUpStation) {
-            return Optional.of(existSection.upStationId(section));
+            return Optional.of(existSection.updateUpStation(section));
         }
-        return Optional.of(existSection.downStationId(section));
+        return Optional.of(existSection.updateDownStation(section));
     }
 
     private boolean checkConnection(final Section section) {
-        final boolean isUpStationExists = checkStationExist(section.getUpStationId());
-        final boolean isDownStationExists = checkStationExist(section.getDownStationId());
+        final boolean isUpStationExists = checkStationExist(section.getUpStation());
+        final boolean isDownStationExists = checkStationExist(section.getDownStation());
         validateStations(isUpStationExists, isDownStationExists);
         return isUpStationExists;
     }
@@ -58,7 +107,7 @@ public final class Sections {
         if (isUpStation) {
             return connectedSection(section::compareUpStationId);
         }
-        return connectedSection(section::compareDownStationId);
+        return connectedSection(section::equalsDownStation);
     }
 
     private Optional<Section> connectedSection(final Predicate<Section> compareStationId) {
@@ -67,14 +116,21 @@ public final class Sections {
                 .findAny();
     }
 
-    private boolean checkStationExist(final long stationId) {
+    private boolean checkStationExist(final Station station) {
         return sections.stream()
-                .anyMatch(section -> section.containsStation(stationId));
+                .anyMatch(section -> section.hasStation(station));
     }
 
     private void validateDistance(final Section existSection, final int distance) {
         if (!existSection.isDistanceGreaterThan(distance)) {
             throw new IllegalSectionException("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
         }
+    }
+
+    public List<Station> getStations() {
+        final List<Station> stations = new ArrayList<>();
+        stations.add(sections.get(0).getUpStation());
+        sections.forEach(section -> stations.add(section.getDownStation()));
+        return Collections.unmodifiableList(stations);
     }
 }

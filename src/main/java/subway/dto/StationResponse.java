@@ -2,10 +2,10 @@ package subway.dto;
 
 import subway.domain.Station;
 
-public class StationResponse {
+public final class StationResponse {
 
-    private long id;
-    private String name;
+    private final long id;
+    private final String name;
 
     private StationResponse(final long id, final String name) {
         this.id = id;

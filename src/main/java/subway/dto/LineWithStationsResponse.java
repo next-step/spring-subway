@@ -8,13 +8,17 @@ import java.util.stream.Collectors;
 
 public final class LineWithStationsResponse {
 
-    private final LineResponse lineResponse;
-    private final List<StationResponse> stationResponses;
+    private final long id;
+    private final String name;
+    private final String color;
+    private final List<StationResponse> stations;
 
     private LineWithStationsResponse(final LineResponse lineResponse,
-                                     final List<StationResponse> stationResponses) {
-        this.lineResponse = lineResponse;
-        this.stationResponses = stationResponses;
+                                     final List<StationResponse> stations) {
+        this.id = lineResponse.getId();
+        this.name = lineResponse.getName();
+        this.color = lineResponse.getColor();
+        this.stations = stations;
     }
 
     public static LineWithStationsResponse of(final Line line, List<Station> stations) {
@@ -24,11 +28,19 @@ public final class LineWithStationsResponse {
         return new LineWithStationsResponse(LineResponse.of(line), stationResponses);
     }
 
-    public LineResponse getLineResponse() {
-        return lineResponse;
+    public long getId() {
+        return id;
     }
 
-    public List<StationResponse> getStationResponses() {
-        return stationResponses;
+    public String getName() {
+        return name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public List<StationResponse> getStations() {
+        return stations;
     }
 }

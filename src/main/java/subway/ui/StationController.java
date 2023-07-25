@@ -7,7 +7,6 @@ import subway.dto.StationResponse;
 import subway.application.StationService;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -27,12 +26,12 @@ public class StationController {
 
     @GetMapping
     public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationService.findAllStationResponses());
+        return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
-        return ResponseEntity.ok().body(stationService.findStationResponseById(id));
+        return ResponseEntity.ok().body(stationService.findStationById(id));
     }
 
     @PutMapping("/{id}")
@@ -45,10 +44,5 @@ public class StationController {
     public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         stationService.deleteStationById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
     }
 }

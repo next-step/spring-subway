@@ -2,7 +2,7 @@ package subway.dto;
 
 import subway.domain.Section;
 
-public class SectionResponse {
+public final class SectionResponse {
 
     private final long id;
     private final long lineId;
@@ -25,9 +25,9 @@ public class SectionResponse {
     public static SectionResponse of(final Section section) {
         return new SectionResponse(
                 section.getId(),
-                section.getLineId(),
-                section.getUpStationId(),
-                section.getDownStationId(),
+                section.getLine().getId(),
+                section.getUpStation().getId(),
+                section.getDownStation().getId(),
                 section.getDistance()
         );
     }

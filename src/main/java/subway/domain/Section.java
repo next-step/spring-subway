@@ -2,55 +2,55 @@ package subway.domain;
 
 import subway.exception.IllegalSectionException;
 
-public class Section {
+public final class Section {
 
     private final Long id;
-    private final Long lineId;
-    private final Long upStationId;
-    private final Long downStationId;
+    private final Line line;
+    private final Station upStation;
+    private final Station downStation;
     private final Integer distance;
 
     public Section(final Long id,
-                   final Long lineId,
-                   final Long upStationId,
-                   final Long downStationId,
+                   final Line line,
+                   final Station upStation,
+                   final Station downStation,
                    final Integer distance) {
-        validateStations(upStationId, downStationId);
+        validateStations(upStation, downStation);
         validateDistance(distance);
 
         this.id = id;
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Integer distance) {
-        this(null, lineId, upStationId, downStationId, distance);
+    public Section(final Line line, final Station upStation, final Station downStation, final Integer distance) {
+        this(null, line, upStation, downStation, distance);
     }
 
-    private void validateStations(final Long upStationId, final Long downStationId) {
-        if (upStationId.equals(downStationId)) {
-            throw new IllegalSectionException("상행역과 하행역은 달라야 합니다.");
+    private void validateStations(final Station upStation, final Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new IllegalSectionException("상행역과 하행역은 같을 수 없습니다.");
         }
     }
 
     private void validateDistance(final int distance) {
         if (distance <= 0) {
-            throw new IllegalSectionException("구간 길이는 0보다 커야한다.");
+            throw new IllegalSectionException("구간 길이는 0보다 커야합니다.");
         }
     }
 
-    public Section downStationId(final Section newSection) {
-        return new Section(id, lineId, upStationId, newSection.upStationId, distance - newSection.distance);
+    public Section updateDownStation(final Section newSection) {
+        return new Section(id, line, upStation, newSection.upStation, distance - newSection.distance);
     }
 
-    public Section upStationId(final Section newSection) {
-        return new Section(id, lineId, newSection.downStationId, downStationId, distance - newSection.distance);
+    public Section updateUpStation(final Section newSection) {
+        return new Section(id, line, newSection.downStation, downStation, distance - newSection.distance);
     }
 
-    public boolean containsStation(final long stationId) {
-        return upStationId == stationId || downStationId == stationId;
+    public boolean hasStation(final Station station) {
+        return station.equals(upStation) || station.equals(downStation);
     }
 
     public boolean isDistanceGreaterThan(final int other) {
@@ -58,31 +58,35 @@ public class Section {
     }
 
     public boolean compareUpStationId(final Section other) {
-        return upStationId.equals(other.upStationId);
+        return upStation.equals(other.upStation);
     }
 
-    public boolean compareDownStationId(final long downStationId) {
-        return this.downStationId == downStationId;
+    public boolean equalsUpStation(final Station upStation) {
+        return upStation.equals(this.upStation);
     }
 
-    public boolean compareDownStationId(final Section other) {
-        return downStationId.equals(other.downStationId);
+    public boolean equalsDownStation(final Station downStation) {
+        return downStation.equals(this.downStation);
+    }
+
+    public boolean equalsDownStation(final Section other) {
+        return other.downStation.equals(this.downStation);
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Integer getDistance() {

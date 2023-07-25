@@ -1,7 +1,6 @@
 package subway.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import subway.domain.Section;
 import subway.exception.IllegalRequestException;
 
 public final class SectionRequest {
@@ -48,10 +47,6 @@ public final class SectionRequest {
         if (distance <= 0) {
             throw new IllegalRequestException("거리는 0 이하의 수가 될 수 없습니다.");
         }
-    }
-
-    public Section to(final long lineId) {
-        return new Section(lineId, upStationId, downStationId, distance);
     }
 
     public long getUpStationId() {
