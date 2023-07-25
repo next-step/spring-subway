@@ -1,6 +1,9 @@
 package subway.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +34,7 @@ class SectionDaoTest {
 
     @Test
     @DisplayName("삽입에 성공하면 식별자가 포함된 Section 을 반환한다.")
-    void insert() {
+    void insertTest() {
         // given & when
         Section section = initializeSection();
 
@@ -41,7 +44,7 @@ class SectionDaoTest {
 
     @Test
     @DisplayName("노선의 하행 종점역이 연결된 구간을 반환한다.")
-    void findLastSection() {
+    void findLastSectionTest() {
         // given
         Section section = initializeSection();
         Section lastSection = extendSection(section.getLineId(), section.getDownStationId());
@@ -50,13 +53,48 @@ class SectionDaoTest {
         Optional<Section> result = sectionDao.findLastSection(section.getLineId());
 
         // then
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(lastSection);
+        assertThat(result)
+            .isPresent()
+            .hasValue(lastSection);
+    }
+
+    @Test
+    @DisplayName("노선의 모든 구간을 반환한다.")
+    void findAllTest() {
+        // given
+        Section section1 = initializeSection();
+        Section section2 = extendSection(section1.getLineId(), section1.getDownStationId());
+
+        // when
+        List<Section> result = sectionDao.findAll(section1.getLineId());
+
+        // then
+        assertThat(result)
+            .hasSize(2)
+            .contains(section1, section2);
+    }
+
+    @Test
+    @DisplayName("식별자가 일치하는 구간을 갱신한다.")
+    void updateTest() {
+        // given
+        Section section = initializeSection();
+        Section update = new Section(section.getId(), section.getLineId(), section.getUpStationId(),
+            section.getDownStationId(), 20);
+
+        // when
+        sectionDao.update(update);
+
+        // then
+        Optional<Section> result = sectionDao.findLastSection(section.getLineId());
+        assertThat(result)
+            .isPresent()
+            .hasValue(update);
     }
 
     @Test
     @DisplayName("입력으로 들어온 역을 하행역으로 하는 구간을 삭제한다.")
-    void deleteLastSection() {
+    void deleteLastSectionTest() {
         // given
         Section section = initializeSection();
 
@@ -65,12 +103,26 @@ class SectionDaoTest {
 
         // then
         long totalCount = sectionDao.count(section.getLineId());
-        assertThat(totalCount).isEqualTo(0L);
+        assertThat(totalCount).isZero();
+    }
+
+    @Test
+    @DisplayName("입력으로 들어온 식별자를 갖는 구간을 삭제한다.")
+    void deleteSectionTest() {
+        // given
+        Section section = initializeSection();
+
+        // when
+        sectionDao.delete(section.getId());
+
+        // then
+        long totalCount = sectionDao.count(section.getLineId());
+        assertThat(totalCount).isZero();
     }
 
     @Test
     @DisplayName("역에 속한 구간의 개수를 반환한다.")
-    void count() {
+    void countTest() {
         // given
         Section section = initializeSection();
         extendSection(section.getLineId(), section.getDownStationId());
@@ -83,35 +135,20 @@ class SectionDaoTest {
     }
 
     @Test
-    @DisplayName("노선의 모든 구간을 반환한다.")
-    void findAll() {
+    @DisplayName("노선에 stationId 를 식별자로 갖는 역이 존재하는지 반환한다. ")
+    void existByLineIdAndStationIdTest() {
         // given
-        Section section1 = initializeSection();
-        Section section2 = extendSection(section1.getLineId(), section1.getDownStationId());
-
-        // when
-        List<Section> result = sectionDao.findAll(section1.getLineId());
-
-        // then
-        assertThat(result).hasSize(2);
-        assertThat(result).contains(section1, section2);
-    }
-
-    @Test
-    @DisplayName("식별자가 일치하는 구간을 갱신한다.")
-    void update() {
-        // given
+        long notExistStationId = 999L;
         Section section = initializeSection();
-        Section update = new Section(section.getId(), section.getLineId(), section.getUpStationId(),
-            section.getDownStationId(), 20);
 
-        // when
-        sectionDao.update(update);
-
-        // then
-        Optional<Section> result = sectionDao.findLastSection(section.getLineId());
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(update);
+        // when & then
+        assertAll(
+            "노선에 역 존재하는지 여부 테스트",
+            () -> assertTrue(sectionDao.existByLineIdAndStationId(section.getLineId(),
+                section.getDownStationId())),
+            () -> assertFalse(
+                sectionDao.existByLineIdAndStationId(section.getLineId(), notExistStationId))
+        );
     }
 
     private Section initializeSection() {
