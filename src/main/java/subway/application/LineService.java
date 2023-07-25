@@ -43,7 +43,7 @@ public class LineService {
         return LineResponse.of(persistLine);
     }
 
-    public List<LineResponse> findLineResponses() {
+    public List<LineResponse> findLines() {
         List<Line> persistLines = lineDao.findAll();
         return persistLines.stream()
             .map(LineResponse::of)
