@@ -93,5 +93,48 @@ class SectionTest {
         /* when & then */
         assertThat(section.isSameDownStationId(DOWN_STATION_ID)).isTrue();
         assertThat(section.isSameDownStationId(UP_STATION_ID)).isFalse();
+        assertThat(section.isSameUpStationId(DOWN_STATION_ID)).isFalse();
+        assertThat(section.isSameUpStationId(UP_STATION_ID)).isTrue();
+    }
+
+    @Test
+    @DisplayName("구간에 역이 중간에 추가 되는 경우 잘리는 구간을 반환한다.(추가되는 구간의 상행역이 같은 경우)")
+    void subtractWithSameUpStationId() {
+        final Long newDistance = 6L;
+        final Long newDownStationId = 3L;
+        final Section section = new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
+        final Section requestSection = new Section(LINE_ID, UP_STATION_ID, newDownStationId, newDistance);
+
+        final Section subtract = section.subtract(requestSection);
+        assertThat(subtract.getDistance()).isEqualTo(DISTANCE - newDistance);
+        assertThat(subtract.getUpStationId()).isEqualTo(newDownStationId);
+        assertThat(subtract.getDownStationId()).isEqualTo(DOWN_STATION_ID);
+    }
+
+    @Test
+    @DisplayName("구간에 역이 중간에 추가 되는 경우 잘리는 구간을 반환한다.(추가되는 구간의 하행역이 같은 경우)")
+    void subtractWithSameDownStationId() {
+        final Long newDistance = 6L;
+        final Long newUpStationId = 3L;
+        final Section section = new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
+        final Section requestSection = new Section(LINE_ID, newUpStationId, DOWN_STATION_ID, newDistance);
+
+        final Section subtract = section.subtract(requestSection);
+        assertThat(subtract.getDistance()).isEqualTo(DISTANCE - newDistance);
+        assertThat(subtract.getUpStationId()).isEqualTo(UP_STATION_ID);
+        assertThat(subtract.getDownStationId()).isEqualTo(newUpStationId);
+    }
+
+    @Test
+    @DisplayName("구간에 역이 중간에 삭제 되는 경우 합쳐지는 구간을 반환한다.")
+    void merge() {
+        final Long newDownStationId = 3L;
+        final Section nextSection = new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
+        final Section prevSection = new Section(LINE_ID, DOWN_STATION_ID, newDownStationId, DISTANCE);
+
+        final Section merge = nextSection.merge(prevSection);
+        assertThat(merge.getDistance()).isEqualTo(DISTANCE + DISTANCE);
+        assertThat(merge.getUpStationId()).isEqualTo(UP_STATION_ID);
+        assertThat(merge.getDownStationId()).isEqualTo(newDownStationId);
     }
 }

@@ -217,6 +217,24 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("지하철 노선의 중간 역을 포함하는 구간(중간 구간)을 제거한다.")
+    void deleteBetweenSection() {
+        /* given */
+        final Long lineId = 3L;
+        final Long betweenStationId = 37L;
+
+        /* when */
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all().queryParam("stationId", betweenStationId)
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
     @DisplayName("지하철 노선에 구간이 하나인 경우 삭제 시 400 Bad Request로 응답한다.")
     void badRequestWithOnlyOneSection() {
         /* given */

@@ -44,14 +44,24 @@ public class Sections {
         return this.values.get(this.values.size() - 1);
     }
 
+    public Section getBetweenSectionToNext(final Long stationId) {
+        return find(this.values, section -> section.isSameDownStationId(stationId))
+                .orElseThrow(() -> new SubwayException("해당 역을 하행역으로 가지는 구간이 존재하지 않습니다. 역 ID : " + stationId));
+    }
+
+    public Section getBetweenSectionToPrev(final Long stationId) {
+        return find(this.values, section -> section.isSameUpStationId(stationId))
+                .orElseThrow(() -> new SubwayException("해당 역을 상행역으로 가지는 구간이 존재하지 않습니다. 역 ID : " + stationId));
+    }
+
     public boolean isEqualSizeToOne() {
         return this.values.size() == 1;
     }
 
-    public boolean isFirstStation(final Long staionId) {
+    public boolean isFirstStation(final Long stationId) {
         final Long firstUpStationId = this.values.get(0).getUpStationId();
 
-        return firstUpStationId.equals(staionId);
+        return firstUpStationId.equals(stationId);
     }
 
     public boolean isLastStation(final Long stationId) {
@@ -60,11 +70,13 @@ public class Sections {
         return lastDownStationId.equals(stationId);
     }
 
-    public Optional<Section> findContainStationSection(
+    public Section getContainStationSection(
             final Long upStationId,
             final Long downStationId
     ) {
-        return find(this.values, section -> section.containsStations(upStationId, downStationId));
+        return find(this.values, section -> section.containsStations(upStationId, downStationId)).orElseThrow(
+                () -> new SubwayException(
+                        "상행 역과 하행 역이 모두 노선에 없습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId));
     }
 
     public List<Long> getStationIds() {
@@ -93,8 +105,8 @@ public class Sections {
         final Map<Long, Section> upStationKeyMap = values.stream()
                 .collect(Collectors.toMap(Section::getUpStationId, section -> section));
 
-        final Section firstSection = findFirstSectionInNotSortedSections(values).orElseThrow(
-                () -> new SubwayException("노선에 구간이 존재하지 않습니다."));
+        final Section firstSection = findFirstSectionInNotSortedSections(values)
+                .orElseThrow(() -> new SubwayException("노선에 구간이 존재하지 않습니다."));
 
         final List<Section> result = new ArrayList<>(List.of(firstSection));
         Section next = upStationKeyMap.get(firstSection.getDownStationId());

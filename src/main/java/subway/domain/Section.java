@@ -36,8 +36,12 @@ public class Section {
                 stationId);
     }
 
-    public boolean isSameDownStationId(final Long stationId) {
+    boolean isSameDownStationId(final Long stationId) {
         return this.downStationId.equals(stationId);
+    }
+
+    boolean isSameUpStationId(final Long stationId) {
+        return this.upStationId.equals(stationId);
     }
 
     public Long subtractDistance(final Long distance) {
@@ -45,8 +49,7 @@ public class Section {
     }
 
     public boolean containsStations(final Long upStationId, final Long downStationId) {
-        return Objects.equals(this.upStationId, upStationId) || Objects.equals(this.downStationId,
-                downStationId);
+        return isSameUpStationId(upStationId) || isSameDownStationId(downStationId);
     }
 
     public Section subtract(final Section requestSection) {
@@ -56,6 +59,10 @@ public class Section {
         }
         return new Section(this.lineId, this.upStationId, requestSection.upStationId,
                 this.distance - requestSection.distance);
+    }
+
+    public Section merge(final Section section) {
+        return new Section(this.lineId, this.upStationId, section.downStationId, this.distance + section.distance);
     }
 
     public Long getId() {
@@ -103,8 +110,7 @@ public class Section {
         }
     }
 
-    private void validateContainsUpStationAndDownStation(final Long upStationId,
-            final Long downStationId) {
+    private void validateContainsUpStationAndDownStation(final Long upStationId, final Long downStationId) {
         if (upStationId == null || downStationId == null) {
             throw new SubwayException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
         }

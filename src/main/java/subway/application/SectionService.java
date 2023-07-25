@@ -33,9 +33,7 @@ public class SectionService {
     private Section insertBetween(final Sections sections, final SectionRequest sectionRequest) {
         final Long upStationId = sectionRequest.getUpStationId();
         final Long downStationId = sectionRequest.getDownStationId();
-        final Section targetSection = sections.findContainStationSection(upStationId, downStationId)
-                .orElseThrow(() -> new SubwayException(
-                        "상행 역과 하행 역이 모두 노선에 없습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId));
+        final Section targetSection = sections.getContainStationSection(upStationId, downStationId);
 
         validateDistance(targetSection.subtractDistance(sectionRequest.getDistance()));
         final Section requestSection = sectionRequest.toSection(targetSection.getLineId());
@@ -56,11 +54,19 @@ public class SectionService {
         if (sections.isFirstStation(stationId)) {
             final Section firstSection = sections.getFirstSection();
             sectionDao.delete(firstSection.getId());
+            return;
         } else if (sections.isLastStation(stationId)) {
             final Section lastSection = sections.getLastSection();
             sectionDao.delete(lastSection.getId());
+            return;
         }
 
+        final Section nextBetweenSection = sections.getBetweenSectionToNext(stationId);
+        final Section prevBetweenSection = sections.getBetweenSectionToPrev(stationId);
+
+        sectionDao.delete(nextBetweenSection.getId());
+        sectionDao.delete(prevBetweenSection.getId());
+        sectionDao.insert(nextBetweenSection.merge(prevBetweenSection));
     }
 
     private void validateDistance(final Long distance) {

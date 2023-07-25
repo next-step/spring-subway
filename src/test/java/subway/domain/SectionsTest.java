@@ -103,4 +103,34 @@ class SectionsTest {
         assertThat(SECTIONS.isLastStation(5L)).isTrue();
         assertThat(SECTIONS.isLastStation(1L)).isFalse();
     }
+
+    @Test
+    @DisplayName("하행 역이 같은 구간을 반환한다.")
+    void getBetweenSectionToNext() {
+        assertThat(SECTIONS.getBetweenSectionToNext(2L)).isEqualTo(FIRST_SECTION);
+    }
+
+    @Test
+    @DisplayName("하행 역이 같은 구간이 없는 경우 SubwayException을 던진다.")
+    void getBetweenSectionToNextWithException() {
+        final Long isNotValidSectionId = 1234L;
+
+        assertThatThrownBy(() -> SECTIONS.getBetweenSectionToNext(isNotValidSectionId))
+                .isInstanceOf(SubwayException.class);
+    }
+
+    @Test
+    @DisplayName("상행 역이 같은 구간을 반환한다.")
+    void getBetweenSectionToPrev() {
+        assertThat(SECTIONS.getBetweenSectionToPrev(4L)).isEqualTo(LAST_SECTION);
+    }
+
+    @Test
+    @DisplayName("상행 역이 같은 구간이 없는 경우 SubwayException을 던진다.")
+    void getBetweenSectionToPrevWithException() {
+        final Long isNotValidSectionId = 1234L;
+
+        assertThatThrownBy(() -> SECTIONS.getBetweenSectionToPrev(isNotValidSectionId))
+                .isInstanceOf(SubwayException.class);
+    }
 }
