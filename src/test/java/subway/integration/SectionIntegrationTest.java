@@ -210,6 +210,22 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
+    @Test
+    @DisplayName("지하철 노선의 중간역을 포함하는 구간을 제거한다.")
+    void deleteSection() {
+        /* given */
+        final Long lineId = 2L;
+
+        /* when */
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all().queryParam("stationId", "24")
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 
     @Test
     @DisplayName("지하철 노선에 구간이 하나인 경우 삭제 시 400 Bad Request로 응답한다.")

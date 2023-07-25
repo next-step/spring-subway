@@ -5,6 +5,7 @@ import subway.utils.SetUtils;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -23,6 +24,15 @@ public class ConnectedSections {
         return Collections.unmodifiableList(this.connectedSections);
     }
 
+    public List<Long> getSortedStationIds() {
+        final List<Long> sortedStationIds = connectedSections.stream()
+                .map(Section::getUpStationId)
+                .collect(Collectors.toList());
+        sortedStationIds.add(getLastSection().getDownStationId());
+
+        return sortedStationIds;
+    }
+
     public SectionEditResult add(final Section target) {
         validateAddSectionCondition(target);
 
@@ -39,31 +49,20 @@ public class ConnectedSections {
     public SectionEditResult remove(final Long targetStationId) {
         validateRemoveSectionCondition(targetStationId);
 
-        if (getFirstSection().getUpStationId().equals(targetStationId)) {
-            final Section removed = connectedSections.remove(0);
+        if (isRemovableFirstSection(targetStationId)) {
             return new SectionEditResult(
                     Collections.emptyList(),
-                    List.of(removed)
+                    List.of(removeFirstSection())
             );
         }
-        if (getLastSection().getDownStationId().equals(targetStationId)) {
-            final Section removed = connectedSections.remove(connectedSections.size() - 1);
+        if (isRemovableLastSection(targetStationId)) {
             return new SectionEditResult(
                     Collections.emptyList(),
-                    List.of(removed)
+                    List.of(removeLastSection())
             );
         }
 
-        throw new RuntimeException();
-    }
-
-    public List<Long> getSortedStationIds() {
-        final List<Long> sortedStationIds = connectedSections.stream()
-                .map(Section::getUpStationId)
-                .collect(Collectors.toList());
-        sortedStationIds.add(getLastSection().getDownStationId());
-
-        return sortedStationIds;
+        return removeBetween(targetStationId);
     }
 
     private List<Section> convertToConnectedSections(final List<Section> sections) {
@@ -120,14 +119,52 @@ public class ConnectedSections {
 
     private OptionalInt findUpStationAddIndex(final Section target) {
         return IntStream.range(0, connectedSections.size())
-                .filter(i -> getSection(i).isSameUpStationId(target))
+                .filter(i -> getSection(i).isSameUpStation(target))
                 .findAny();
     }
 
     private OptionalInt findDownStationAddIndex(final Section target) {
         return IntStream.range(0, connectedSections.size())
-                .filter(i -> getSection(i).isSameDownStationId(target))
+                .filter(i -> getSection(i).isSameDownStation(target))
                 .findAny();
+    }
+
+    private SectionEditResult removeBetween(final Long targetStationId) {
+        final Section upSection = removeWithMapper(index -> getSection(index).isSameDownStationId(targetStationId));
+        final Section downSection = removeWithMapper(index -> getSection(index).isSameUpStationId(targetStationId));
+
+        final Section mergedSection = upSection.merge(downSection);
+
+        return new SectionEditResult(
+                List.of(mergedSection),
+                List.of(upSection, downSection)
+        );
+    }
+
+    private Section removeWithMapper(final IntPredicate mapper) {
+        return IntStream.range(0, connectedSections.size())
+                .filter(mapper)
+                .mapToObj(connectedSections::remove)
+                .findAny()
+                .orElseThrow(() ->
+                        new SubwayIllegalArgumentException("삭제할 역의 구간을 찾지 못하였습니다.")
+                );
+    }
+
+    private Section removeFirstSection() {
+        return connectedSections.remove(0);
+    }
+
+    private Section removeLastSection() {
+        return connectedSections.remove(connectedSections.size() - 1);
+    }
+
+    private boolean isRemovableFirstSection(final Long targetStationId) {
+        return getFirstSection().getUpStationId().equals(targetStationId);
+    }
+
+    private boolean isRemovableLastSection(final Long targetStationId) {
+        return getLastSection().getDownStationId().equals(targetStationId);
     }
 
     /**

@@ -237,7 +237,7 @@ class ConnectedSectionsTest {
         final Long stationId = 11L;
 
         /* when */
-        SectionEditResult sectionEditResult = connectedSections.remove(stationId);
+        final SectionEditResult sectionEditResult = connectedSections.remove(stationId);
 
         /* then */
         assertThat(sectionEditResult.getAddedSections()).isEqualTo(Collections.emptyList());
@@ -255,12 +255,35 @@ class ConnectedSectionsTest {
         final Long stationId = 14L;
 
         /* when */
-        SectionEditResult sectionEditResult = connectedSections.remove(stationId);
+        final SectionEditResult sectionEditResult = connectedSections.remove(stationId);
 
         /* then */
         assertThat(sectionEditResult.getAddedSections()).isEqualTo(Collections.emptyList());
         assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
                 List.of(
+                        new Section(13L, 1L, 13L, 14L, 777L)
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("서로 다른 역 사이에 있는 중간역을 포함하는 구간을 삭제할 수 있다.")
+    void removeBetweenStationSection() {
+        /* given */
+        final Long stationId = 13L;
+
+        /* when */
+        final SectionEditResult editResult = connectedSections.remove(stationId);
+
+        /* then */
+        assertThat(editResult.getAddedSections()).isEqualTo(
+                List.of(
+                        new Section(1L, 12L, 14L, 777L * 2)
+                )
+        );
+        assertThat(editResult.getRemovedSections()).isEqualTo(
+                List.of(
+                        new Section(12L, 1L, 12L, 13L, 777L),
                         new Section(13L, 1L, 13L, 14L, 777L)
                 )
         );
