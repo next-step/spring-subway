@@ -33,9 +33,7 @@ public class SectionService {
 
         Optional<Section> modifiedSection = sections.findModifiedSection(section);
         sectionDao.insert(section);
-        if (modifiedSection.isPresent()) {
-            sectionDao.update(modifiedSection.get());
-        }
+        modifiedSection.ifPresent(sectionDao::update);
     }
 
     private Section convertRegistSection(SectionRegistRequest sectionRegistRequest, Long lineId) {

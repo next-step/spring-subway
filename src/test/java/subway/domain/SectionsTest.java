@@ -190,10 +190,7 @@ class SectionsTest {
             5
         );
 
-        Assertions.assertAll(
-            () -> assertThat(addSection.equals(addSection)).isTrue(),
-            () -> assertThat(modifiedSection.get().equals(expectedNewSection)).isTrue()
-        );
+        assertThat(modifiedSection.get().equals(expectedNewSection)).isTrue();
     }
 
     @Test
@@ -227,10 +224,7 @@ class SectionsTest {
             5
         );
         Optional<Section> modifiedSection = sections.findModifiedSection(addSection);
-        Assertions.assertAll(
-            () -> assertThat(addSection.equals(addSection)).isTrue(),
-            () -> assertThat(modifiedSection.get().equals(expectedNewSection)).isTrue()
-        );
+        assertThat(modifiedSection.get().equals(expectedNewSection)).isTrue();
     }
 
     @Test

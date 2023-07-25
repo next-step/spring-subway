@@ -90,7 +90,7 @@ public class Sections {
         if (targetSection.isEmpty()) {
             return Optional.empty();
         }
-        return divideSection(section, targetSection);
+        return divideSection(section, targetSection.get());
     }
 
     private void validExistedStation(Section section) {
@@ -112,12 +112,12 @@ public class Sections {
             .findFirst();
     }
 
-    private Optional<Section> divideSection(Section section, Optional<Section> targetSection) {
+    private Optional<Section> divideSection(Section section, Section targetSection) {
         if (matchUpStation(section)) {
-            return Optional.of(section.divideDownSection(targetSection.get()));
+            return Optional.of(section.divideDownSection(targetSection));
         }
         if (matchDownStation(section)) {
-            return Optional.of(section.divideUpSection(targetSection.get()));
+            return Optional.of(section.divideUpSection(targetSection));
         }
         return Optional.empty();
     }
