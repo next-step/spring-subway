@@ -77,9 +77,9 @@ class SectionIntegrationTest extends IntegrationTest {
         return response;
     }
 
-    @DisplayName("지하철 노선의 구간을 제거한다.")
+    @DisplayName("지하철 노선의 첫 역을 제거한다.")
     @Test
-    void removeSectionOfLine() {
+    void removeFirstStationOfLine() {
         // given
         StationIntegrationTest.createInitialStations();
         LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
@@ -89,16 +89,56 @@ class SectionIntegrationTest extends IntegrationTest {
         addSectionToLine(sectionAdditionRequest);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .pathParam("id", lineA.getId())
-            .param("stationId", stationC.getId())
-            .when().delete("/lines/{id}/sections")
-            .then().log().all().
-            extract();
+        ExtractableResponse<Response> response = removeStationOfLine(stationA);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 노선의 중간 역을 제거한다.")
+    @Test
+    void removeMiddleStationOfLine() {
+        // given
+        StationIntegrationTest.createInitialStations();
+        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        LineIntegrationTest.createLine(lineCreationRequest);
+        SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
+            stationC.getId(), 3);
+        addSectionToLine(sectionAdditionRequest);
+
+        // when
+        ExtractableResponse<Response> response = removeStationOfLine(stationB);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 노선의 마지막 역을 제거한다.")
+    @Test
+    void removeLastStationOfLine() {
+        // given
+        StationIntegrationTest.createInitialStations();
+        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
+        LineIntegrationTest.createLine(lineCreationRequest);
+        SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
+            stationC.getId(), 3);
+        addSectionToLine(sectionAdditionRequest);
+
+        // when
+        ExtractableResponse<Response> response = removeStationOfLine(stationC);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private ExtractableResponse<Response> removeStationOfLine(Station station) {
+        return RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", lineA.getId())
+            .param("stationId", station.getId())
+            .when().delete("/lines/{id}/sections")
+            .then().log().all().
+            extract();
     }
 }
