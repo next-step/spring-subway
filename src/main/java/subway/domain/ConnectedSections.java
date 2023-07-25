@@ -42,8 +42,8 @@ public class ConnectedSections {
         final Section removed = connectedSections.remove(connectedSections.size() - 1);
 
         return new SectionEditResult(
-                Collections.emptySet(),
-                Set.of(removed)
+                Collections.emptyList(),
+                List.of(removed)
         );
     }
 
@@ -84,12 +84,12 @@ public class ConnectedSections {
 
     private SectionEditResult addOnLastSection(final Section target) {
         connectedSections.add(target);
-        return new SectionEditResult(Set.of(target), Collections.emptySet());
+        return new SectionEditResult(List.of(target), Collections.emptyList());
     }
 
     private SectionEditResult addOnFirstSection(final Section target) {
         connectedSections.add(0, target);
-        return new SectionEditResult(Set.of(target), Collections.emptySet());
+        return new SectionEditResult(List.of(target), Collections.emptyList());
     }
 
     private SectionEditResult addOnBetween(final Section target) {
@@ -133,8 +133,8 @@ public class ConnectedSections {
         connectedSections.add(index, target);
 
         return new SectionEditResult(
-                Set.of(subtracted, target),
-                Set.of(removed)
+                List.of(target, subtracted),
+                List.of(removed)
         );
     }
 
@@ -151,8 +151,8 @@ public class ConnectedSections {
         connectedSections.add(index, subtracted);
 
         return new SectionEditResult(
-                Set.of(target, subtracted),
-                Set.of(removed)
+                List.of(subtracted, target),
+                List.of(removed)
         );
     }
 

@@ -7,7 +7,6 @@ import subway.exception.SubwayIllegalArgumentException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -120,8 +119,8 @@ class ConnectedSectionsTest {
         SectionEditResult sectionEditResult = connectedSections.add(target);
 
         /* then */
-        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Set.of(target));
-        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(Collections.emptySet());
+        assertThat(sectionEditResult.getAddedSections()).isEqualTo(List.of(target));
+        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(Collections.emptyList());
         assertIterableEquals(
                 List.of(
                         new Section(14L, 1L, 10L, 11L, 777L),
@@ -143,8 +142,8 @@ class ConnectedSectionsTest {
         SectionEditResult sectionEditResult = connectedSections.add(target);
 
         /* then */
-        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Set.of(target));
-        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(Collections.emptySet());
+        assertThat(sectionEditResult.getAddedSections()).isEqualTo(List.of(target));
+        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(Collections.emptyList());
         assertIterableEquals(
                 List.of(
                         section1,
@@ -178,13 +177,13 @@ class ConnectedSectionsTest {
 
         /* then */
         assertThat(sectionEditResult.getAddedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         target,
                         new Section(null, 1L, 17L, 12L, 700L)
                 )
         );
         assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         new Section(11L, 1L, 11L, 12L, 777L)
                 )
         );
@@ -210,13 +209,13 @@ class ConnectedSectionsTest {
 
         /* then */
         assertThat(sectionEditResult.getAddedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         new Section(null, 1L, 11L, 17L, 700L),
                         target
                 )
         );
         assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         new Section(11L, 1L, 11L, 12L, 777L)
                 )
         );
@@ -241,9 +240,9 @@ class ConnectedSectionsTest {
         SectionEditResult sectionEditResult = connectedSections.remove(stationId);
 
         /* then */
-        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Collections.emptySet());
+        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Collections.emptyList());
         assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         new Section(13L, 1L, 13L, 14L, 777L)
                 )
         );

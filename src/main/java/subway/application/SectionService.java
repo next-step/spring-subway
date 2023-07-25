@@ -8,6 +8,8 @@ import subway.domain.SectionEditResult;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 
+import java.util.stream.Collectors;
+
 @Service
 public class SectionService {
 
@@ -23,7 +25,7 @@ public class SectionService {
         final Section section = sectionRequest.toSection(lineId);
         final SectionEditResult editResult = sections.add(section);
 
-        editResult.getAddedSections().forEach(sectionDao::insert);
+        dirtyChecking(editResult);
 
         return SectionResponse.of(section);
     }
@@ -32,6 +34,13 @@ public class SectionService {
         final ConnectedSections sections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
         final SectionEditResult editResult = sections.remove(downStationId);
 
-        editResult.getRemovedSections().forEach(section -> sectionDao.delete(section.getId()));
+        dirtyChecking(editResult);
+    }
+
+    private void dirtyChecking(final SectionEditResult sectionEditResult) {
+        sectionDao.insertAll(sectionEditResult.getAddedSections());
+        sectionDao.deleteAll(sectionEditResult.getRemovedSections().stream()
+                .map(Section::getId)
+                .collect(Collectors.toList()));
     }
 }
