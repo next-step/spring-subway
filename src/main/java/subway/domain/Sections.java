@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
+import subway.exception.IllegalStationsException;
 
 public class Sections {
 
@@ -33,6 +34,18 @@ public class Sections {
         }
 
         return Optional.empty();
+    }
+
+    public boolean isLastStation(final long stationId) {
+        return isStartStation(stationId) || isEndStation(stationId);
+    }
+
+    private boolean isStartStation(final long stationId) {
+        return upStationMap.containsKey(stationId) && !downStationMap.containsKey(stationId);
+    }
+
+    private boolean isEndStation(final long stationId) {
+        return !upStationMap.containsKey(stationId) && downStationMap.containsKey(stationId);
     }
 
     private Optional<Section> findConnectedUpStation(Section base) {
@@ -95,5 +108,25 @@ public class Sections {
             "upStationMap=" + upStationMap +
             ", downStationMap=" + downStationMap +
             '}';
+    }
+
+    public Section findLeftSection(long stationId) {
+        return downStationMap.get(stationId);
+    }
+
+    public Section findRightStation(long stationId) {
+        return upStationMap.get(stationId);
+    }
+
+    public Section getLastSection(long stationId) {
+        if (isStartStation(stationId)) {
+            return upStationMap.get(stationId);
+        }
+
+        if (isEndStation(stationId)) {
+            return downStationMap.get(stationId);
+        }
+
+        throw new IllegalStationsException("종점 구간이 포함된 역이 아닙니다.");
     }
 }

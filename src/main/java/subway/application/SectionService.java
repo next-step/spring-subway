@@ -7,7 +7,6 @@ import subway.domain.Section;
 import subway.domain.Sections;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
-import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
 
 @Service
@@ -31,18 +30,38 @@ public class SectionService {
     }
 
     public void deleteSection(final long lineId, final long stationId) {
-        validateLineAndLastStation(lineId, stationId);
+        validateLineInStation(lineId, stationId);
         validateSectionInLine(lineId);
 
-        sectionDao.deleteLastSection(lineId, stationId);
+        // 노선의 모든 구간 조회 -> 종점역도 포함해서 가져와야하므로 역과 연결된 노선만 가져오기 X
+        final Sections sections = new Sections(sectionDao.findAll(lineId));
+
+        // 종점역일 경우
+        if (sections.isLastStation(stationId)) {
+            // 종점역이 연결된 구간 삭제
+            final Section connectedSection = sections.getLastSection(stationId);
+            sectionDao.delete(connectedSection.getId());
+        }
+        // 종점역이 아닐 경우
+        else {
+            Section leftSection = sections.findLeftSection(stationId);
+            Section rightSection = sections.findRightStation(stationId);
+
+            // 구간 한 개 삭제
+            sectionDao.delete(leftSection.getId());
+
+            // 나머지 구간은 갱신
+            Section newSection = new Section(rightSection.getId(), rightSection.getLineId(),
+                // 상행역을 leftSection 의 상행역과 연결
+                leftSection.getUpStationId(), rightSection.getDownStationId(),
+                leftSection.getDistance()+ rightSection.getDistance());
+            sectionDao.update(newSection);
+        }
     }
 
-    private void validateLineAndLastStation(final long lineId, final long stationId) {
-        final Section lastSection = sectionDao.findLastSection(lineId)
-                .orElseThrow(() -> new IllegalLineException("해당 노선은 생성되지 않았습니다."));
-
-        if (!lastSection.matchDownStationId(stationId)) {
-            throw new IllegalSectionException("해당 역은 노선의 하행 종점역이 아닙니다.");
+    private void validateLineInStation(final long lineId, final long stationId) {
+        if (!sectionDao.existByLineIdAndStationId(lineId, stationId)) {
+            throw new IllegalSectionException("해당 역은 노선에 존재하지 않습니다.");
         }
     }
 
