@@ -14,7 +14,10 @@ public enum ErrorCode {
     SAME_UP_AND_DOWN_STATION(BAD_REQUEST, "상행역과 하행역이 같을 수 없습니다"),
     SECTION_DOES_NOT_CONTAIN_SECTION(BAD_REQUEST, "입력으로 들어온 구간이 현재 구간에 포함되지 않습니다"),
     DUPLICATED_STATION_NAME(BAD_REQUEST, "역 이름이 중복됩니다."),
-    DUPLICATED_LINE_NAME(BAD_REQUEST, "노선 이름이 중복됩니다.");
+    DUPLICATED_LINE_NAME(BAD_REQUEST, "노선 이름이 중복됩니다."),
+    INVALID_LINE_NAME(BAD_REQUEST, "라인 이름이 유효하지 않습니다."),
+    INVALID_COLOR_NAME(BAD_REQUEST, "색깔 이름이 유효하지 않습니다");
+
     private final HttpStatus httpStatus;
     private final String message;
 

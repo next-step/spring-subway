@@ -5,16 +5,16 @@ public class ErrorResponse {
     private int statusCode;
     private String message;
 
-    public ErrorResponse(int statusCode, String message) {
+    public ErrorResponse(final int statusCode, final String message) {
         this.statusCode = statusCode;
         this.message = message;
     }
 
-    public static ErrorResponse of(int statusCode, String message) {
+    public static ErrorResponse of(final int statusCode, final String message) {
         return new ErrorResponse(statusCode, message);
     }
 
-    public static ErrorResponse of(ErrorCode errorCode) {
+    public static ErrorResponse of(final ErrorCode errorCode) {
         return new ErrorResponse(errorCode.getHttpStatus().value(), errorCode.getMessage());
     }
 

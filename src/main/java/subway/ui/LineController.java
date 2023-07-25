@@ -1,8 +1,9 @@
 package subway.ui;
 
+import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,11 +16,8 @@ import subway.application.LineService;
 import subway.application.SectionService;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineWithStationsResponse;
 import subway.dto.SectionRequest;
-
-import java.net.URI;
-import java.sql.SQLException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/lines")
@@ -34,9 +32,9 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody final LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
-
+    public ResponseEntity<LineWithStationsResponse> createLine(
+        @RequestBody final LineRequest lineRequest) {
+        LineWithStationsResponse line = lineService.saveLine(lineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
@@ -46,12 +44,13 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable final Long id) {
+    public ResponseEntity<LineWithStationsResponse> findLineById(@PathVariable final Long id) {
         return ResponseEntity.ok(lineService.findLineResponseById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable final Long id, @RequestBody final LineRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable final Long id,
+        @RequestBody final LineRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
@@ -63,13 +62,15 @@ public class LineController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> createSection(@PathVariable final Long id, @RequestBody final SectionRequest sectionRequest) {
+    public ResponseEntity<Void> createSection(@PathVariable final Long id,
+        @RequestBody final SectionRequest sectionRequest) {
         sectionService.saveSection(id, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
+        return ResponseEntity.created(URI.create("/lines/" + id)).build();
     }
 
     @DeleteMapping("/{lineId}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable final Long lineId, @RequestParam final Long stationId) {
+    public ResponseEntity<Void> deleteSection(@PathVariable final Long lineId,
+        @RequestParam final Long stationId) {
         sectionService.deleteStation(lineId, stationId);
         return ResponseEntity.noContent().build();
     }

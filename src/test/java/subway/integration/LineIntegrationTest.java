@@ -1,8 +1,15 @@
 package subway.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static subway.integration.TestRequestUtil.createLine;
+import static subway.integration.TestRequestUtil.createStation;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,16 +19,8 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
 import subway.dto.StationRequest;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import subway.exception.ErrorCode;
 import subway.exception.ErrorResponse;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static subway.integration.TestRequestUtil.createLine;
-import static subway.integration.TestRequestUtil.createStation;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineIntegrationTest extends IntegrationTest {
@@ -79,8 +78,10 @@ public class LineIntegrationTest extends IntegrationTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        System.out.println(response.body());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ErrorResponse.class)
+            .getMessage())
+            .isEqualTo(ErrorCode.DUPLICATED_LINE_NAME.getMessage());
     }
 
     @Test
@@ -102,9 +103,6 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().as(ErrorResponse.class).getMessage()).isEqualTo(
             ErrorCode.SAME_UP_AND_DOWN_STATION.getMessage());
-        assertThat(response.body().as(ErrorResponse.class).getStatusCode()).isEqualTo(
-            ErrorCode.SAME_UP_AND_DOWN_STATION.getMessage());
-
     }
 
     @Test
