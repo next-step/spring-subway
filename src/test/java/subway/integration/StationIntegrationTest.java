@@ -1,7 +1,9 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.integration.TestRequestUtil.createStation;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static subway.exception.ErrorCode.DUPLICATED_STATION_NAME;
+import static subway.fixture.TestFixture.createStation;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -12,10 +14,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-import subway.exception.ErrorCode;
 import subway.exception.ErrorResponse;
 
 @DisplayName("지하철역 관련 기능")
@@ -30,7 +30,7 @@ public class StationIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
             .body(stationRequest)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(APPLICATION_JSON_VALUE)
             .when()
             .post("/stations")
             .then().log().all()
@@ -51,7 +51,7 @@ public class StationIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
             .body(stationRequest)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(APPLICATION_JSON_VALUE)
             .when()
             .post("/stations")
             .then()
@@ -62,7 +62,7 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().as(ErrorResponse.class)
             .getMessage())
-            .isEqualTo(ErrorCode.DUPLICATED_STATION_NAME.getMessage());
+            .isEqualTo(DUPLICATED_STATION_NAME.getMessage());
     }
 
     @Test
@@ -127,7 +127,7 @@ public class StationIntegrationTest extends IntegrationTest {
         StationRequest updateRequest = new StationRequest("역삼역");
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(APPLICATION_JSON_VALUE)
             .body(updateRequest)
             .when()
             .put(uri)

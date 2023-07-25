@@ -1,12 +1,13 @@
 package subway.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import subway.exception.ErrorCode;
-import subway.exception.SubwayException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static subway.exception.ErrorCode.SAME_UP_AND_DOWN_STATION;
+import static subway.exception.ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 class SectionTest {
 
@@ -19,7 +20,7 @@ class SectionTest {
         // when, then
         assertThatCode(() -> new Section(station, station, 10))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(ErrorCode.SAME_UP_AND_DOWN_STATION.getMessage());
+            .hasMessage(SAME_UP_AND_DOWN_STATION.getMessage());
     }
 
     @Test
@@ -75,7 +76,7 @@ class SectionTest {
         // when & then
         assertThatCode(() -> section.subtract(newSection))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION.getMessage());
+            .hasMessage(SECTION_DOES_NOT_CONTAIN_SECTION.getMessage());
     }
 
     @Test
@@ -116,6 +117,6 @@ class SectionTest {
         // when & then
         assertThatCode(() -> section.add(newSection))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION.getMessage());
+            .hasMessage(SECTION_DOES_NOT_CONTAIN_SECTION.getMessage());
     }
 }

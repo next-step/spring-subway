@@ -1,14 +1,16 @@
 package subway.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import subway.exception.ErrorCode;
-import subway.exception.SubwayException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static subway.exception.ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE;
+import static subway.exception.ErrorCode.INVALID_DISTANCE_COMPARE;
+import static subway.exception.ErrorCode.INVALID_SECTION_ALREADY_EXISTS;
+import static subway.exception.ErrorCode.INVALID_SECTION_NO_EXISTS;
+
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 class SectionsTest {
 
@@ -146,7 +148,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections.removeStation(deleteStation))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE.getMessage());
+            .hasMessage(CAN_NOT_DELETE_WHEN_SECTION_IS_ONE.getMessage());
     }
 
     @Test
@@ -161,7 +163,7 @@ class SectionsTest {
 
         assertThatCode(() -> sections.addSection(section))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(ErrorCode.INVALID_SECTION_ALREADY_EXISTS.getMessage());
+            .hasMessage(INVALID_SECTION_ALREADY_EXISTS.getMessage());
     }
 
     @Test
@@ -183,7 +185,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections.addSection(section2))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(ErrorCode.INVALID_SECTION_NO_EXISTS.getMessage());
+            .hasMessage(INVALID_SECTION_NO_EXISTS.getMessage());
     }
 
     @Test
@@ -304,7 +306,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections.addSection(newSection))
             .isInstanceOf(SubwayException.class)
-            .hasMessage(ErrorCode.INVALID_DISTANCE_COMPARE.getMessage());
+            .hasMessage(INVALID_DISTANCE_COMPARE.getMessage());
     }
 
     @Test

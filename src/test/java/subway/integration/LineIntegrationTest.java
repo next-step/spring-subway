@@ -1,8 +1,17 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.integration.TestRequestUtil.createLine;
-import static subway.integration.TestRequestUtil.createStation;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static subway.exception.ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE;
+import static subway.exception.ErrorCode.DUPLICATED_LINE_NAME;
+import static subway.exception.ErrorCode.SAME_UP_AND_DOWN_STATION;
+
+import static subway.fixture.TestFixture.createLine;
+import static subway.fixture.TestFixture.createStation;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -13,13 +22,10 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
 import subway.dto.StationRequest;
-import subway.exception.ErrorCode;
 import subway.exception.ErrorResponse;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -50,14 +56,14 @@ public class LineIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(APPLICATION_JSON_VALUE)
             .body(lineRequest)
             .when().post("/lines")
             .then().log().all()
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
     }
 
@@ -71,17 +77,17 @@ public class LineIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(APPLICATION_JSON_VALUE)
             .body(lineRequest)
             .when().post("/lines")
             .then().log().all()
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
         assertThat(response.body().as(ErrorResponse.class)
             .getMessage())
-            .isEqualTo(ErrorCode.DUPLICATED_LINE_NAME.getMessage());
+            .isEqualTo(DUPLICATED_LINE_NAME.getMessage());
     }
 
     @Test
@@ -93,16 +99,16 @@ public class LineIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(APPLICATION_JSON_VALUE)
             .body(lineRequest)
             .when().post("/lines")
             .then().log().all()
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(ErrorResponse.class).getMessage()).isEqualTo(
-            ErrorCode.SAME_UP_AND_DOWN_STATION.getMessage());
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+        assertThat(response.body().as(ErrorResponse.class).getMessage())
+            .isEqualTo(SAME_UP_AND_DOWN_STATION.getMessage());
     }
 
     @Test
@@ -118,13 +124,13 @@ public class LineIntegrationTest extends IntegrationTest {
         // when
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .accept(APPLICATION_JSON_VALUE)
             .when().get("/lines")
             .then().log().all()
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(OK.value());
         List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
             .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
             .collect(Collectors.toList());
@@ -145,13 +151,13 @@ public class LineIntegrationTest extends IntegrationTest {
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .accept(APPLICATION_JSON_VALUE)
             .when().get("/lines/{lineId}", lineId)
             .then().log().all()
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(OK.value());
         LineWithStationsResponse resultResponse = response.as(LineWithStationsResponse.class);
         assertThat(resultResponse.getId()).isEqualTo(lineId);
     }
@@ -169,14 +175,14 @@ public class LineIntegrationTest extends IntegrationTest {
         LineRequest updateRequest = new LineRequest("구신분당선", "bg-red-600");
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(APPLICATION_JSON_VALUE)
             .body(updateRequest)
             .when().put("/lines/{lineId}", lineId)
             .then().log().all()
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(OK.value());
     }
 
     @Test
@@ -195,6 +201,27 @@ public class LineIntegrationTest extends IntegrationTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(response.statusCode()).isEqualTo(NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("구간이 하나면, 지하철 역을 제거할 수 없다")
+    void 지하철_역_제거() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+
+        // when
+        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station1Id)
+            .then().log().all()
+            .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
+        assertThat(response.body().as(ErrorResponse.class).getMessage())
+            .isEqualTo(CAN_NOT_DELETE_WHEN_SECTION_IS_ONE.getMessage());
     }
 }
