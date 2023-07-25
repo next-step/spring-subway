@@ -1,25 +1,25 @@
 package subway.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import subway.dto.StationResponse;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import subway.dto.ErrorResponse;
+import subway.dto.StationResponse;
 
-import static org.assertj.core.api.Assertions.assertThat;
+@DisplayName("지하철역 관련 기능 인수테스트")
+class StationIntegrationTest extends IntegrationTest {
 
-@DisplayName("지하철역 관련 기능")
-public class StationIntegrationTest extends IntegrationTest {
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
@@ -39,6 +39,26 @@ public class StationIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
+    }
+
+    @DisplayName("잘못된 이름으로 지하철역 생성 시 예외발생")
+    @Test
+    void createStationValidationFail() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
@@ -105,7 +125,8 @@ public class StationIntegrationTest extends IntegrationTest {
         List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
                 .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
-        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
+        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class)
+                .stream()
                 .map(StationResponse::getId)
                 .collect(Collectors.toList());
         assertThat(resultStationIds).containsAll(expectedStationIds);
@@ -139,6 +160,25 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(stationResponse.getId()).isEqualTo(stationId);
     }
 
+    @DisplayName("없는 지하철역을 조회 후 예외 발생")
+    @Test
+    void getStationNotFound() {
+        /// given
+        Long stationId = 99999L;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/stations/{stationId}", stationId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        ErrorResponse resultResponse = response.as(ErrorResponse.class);
+        assertThat(resultResponse.getMessage()).isEqualTo("해당하는 아이디의 역이 없습니다. 입력값 : 99999");
+    }
+
     @DisplayName("지하철역을 수정한다.")
     @Test
     void updateStation() {
@@ -169,6 +209,27 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
+    @DisplayName("없는 지하철역을 수정할 시 예외발생")
+    @Test
+    void updateStationNotFound() {
+        // given
+        String uri = "/stations/99999";
+        Map<String, String> otherParams = new HashMap<>();
+        otherParams.put("name", "삼성역");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(otherParams)
+                .when()
+                .put(uri)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
@@ -193,5 +254,22 @@ public class StationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("없는 지하철역을 제거 시 예외 발생")
+    @Test
+    void deleteStationNotFound() {
+        // given
+        String uri = "/stations/99999";
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .delete(uri)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 }
