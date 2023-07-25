@@ -28,7 +28,7 @@ public class SectionsService {
 
     @Transactional
     public void addSection(Long id, SectionAdditionRequest request) {
-        Line line = getLineOrElseThrow(id);
+        Line line = getLineById(id);
         LineSections lineSections = sectionDao.findAllByLine(line);
         Section section = createNewSectionBy(line, request);
 
@@ -39,16 +39,16 @@ public class SectionsService {
     }
 
     private Section createNewSectionBy(Line line, SectionAdditionRequest request) {
-        Station upStation = getStationOrElseThrow(request.getUpStationId());
-        Station downStation = getStationOrElseThrow(request.getDownStationId());
+        Station upStation = getStationById(request.getUpStationId());
+        Station downStation = getStationById(request.getDownStationId());
         return new Section(line, upStation, downStation, request.getDistance());
     }
 
     @Transactional
     public void removeLast(Long lineId, Long stationId) {
-        Line line = getLineOrElseThrow(lineId);
+        Line line = getLineById(lineId);
         LineSections lineSections = sectionDao.findAllByLine(line);
-        Station station = getStationOrElseThrow(stationId);
+        Station station = getStationById(stationId);
 
         SectionRemovalResult sectionRemovalResult = lineSections.remove(station);
 
@@ -56,12 +56,12 @@ public class SectionsService {
         sectionRemovalResult.getSectionToAdd().ifPresent(sectionDao::save);
     }
 
-    private Line getLineOrElseThrow(Long id) {
+    private Line getLineById(Long id) {
         return lineDao.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 
-    private Station getStationOrElseThrow(Long id) {
+    private Station getStationById(Long id) {
         return stationDao.findById(id)
             .orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\""));
