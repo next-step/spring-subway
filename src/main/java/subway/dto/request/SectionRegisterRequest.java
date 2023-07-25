@@ -1,7 +1,5 @@
 package subway.dto.request;
 
-import java.util.Objects;
-
 public final class SectionRegisterRequest {
 
     private Long upStationId;
