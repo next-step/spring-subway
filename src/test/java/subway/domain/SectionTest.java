@@ -110,7 +110,7 @@ class SectionTest {
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
             // when
-            section.connectDownSection(downSection);
+            section.connectSection(downSection);
 
             Section result = section.getDownSection();
             Section resultUpSection = result.getUpSection();
@@ -173,7 +173,7 @@ class SectionTest {
             Section section = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            section.connectDownSection(downSection);
+            section.connectSection(downSection);
 
             // when
             Section result = section.findDownSection();
@@ -198,7 +198,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             // when
             Section result = downSection.findUpSection();
@@ -220,8 +220,8 @@ class SectionTest {
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation);
 
-            upSection.connectDownSection(middleSection);
-            middleSection.connectDownSection(downSection);
+            upSection.connectSection(middleSection);
+            middleSection.connectSection(downSection);
 
             // when
             Section result = downSection.findUpSection();
@@ -249,7 +249,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 10);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation1, downStation, 10);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 9);
 
@@ -273,7 +273,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation2, 10);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 10);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 9);
 
@@ -297,7 +297,7 @@ class SectionTest {
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 10);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 10);
 
-            middleSection.connectDownSection(downSection);
+            middleSection.connectSection(downSection);
 
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 100);
 
@@ -321,7 +321,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 10);
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 10);
 
-            upSection.connectDownSection(middleSection);
+            upSection.connectSection(middleSection);
 
             Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 100);
 
@@ -375,7 +375,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             // when
             SectionDisconnectResponse result = upSection.disconnectStation(upStation);
@@ -397,7 +397,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             // when
             SectionDisconnectResponse result = upSection.disconnectStation(downStation);
@@ -421,8 +421,8 @@ class SectionTest {
             Section middleSection = DomainFixture.Section.buildWithStations(middleUpStation, middleDownStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleDownStation, downStation);
 
-            upSection.connectDownSection(middleSection);
-            middleSection.connectDownSection(downSection);
+            upSection.connectSection(middleSection);
+            middleSection.connectSection(downSection);
 
             // when
             SectionDisconnectResponse result = upSection.disconnectStation(middleUpStation);
@@ -444,7 +444,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             // when
             SectionDisconnectResponse result = upSection.disconnectStation(middleStation);
@@ -466,7 +466,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             Station nonExistStation = new Station(4L, "nonExistStation");
 

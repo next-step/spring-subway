@@ -42,39 +42,52 @@ public class Section {
                 () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation));
     }
 
-    Section connectSection(Section requestSection) {
+    public Section connectSection(Section requestSection) {
         Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다");
         Optional<SectionConnector> sectionConnectorOptional = SectionConnector
                 .findSectionConnector(this, requestSection);
 
         if (sectionConnectorOptional.isEmpty()) {
-            return connectSectionIfDownSectionPresent(requestSection);
+            return connectToNextSection(requestSection);
         }
 
-        return sectionConnectorOptional.get().connectSection(this, requestSection);
+        return connectToCurrentSection(sectionConnectorOptional.get(), requestSection);
     }
 
 
-    private Section connectSectionIfDownSectionPresent(Section requestSection) {
+    private Section connectToNextSection(Section requestSection) {
         Assert.notNull(downSection,
                 () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection));
 
         return downSection.connectSection(requestSection);
     }
 
-    public Section connectDownSection(Section requestSection) {
+    private Section connectToCurrentSection(SectionConnector sectionConnector, Section requestSection) {
+        if (sectionConnector == SectionConnector.UP) {
+            return connectUpSection(requestSection);
+        }
+        if (sectionConnector == SectionConnector.MIDDLE_UP) {
+            return connectMiddleUpSection(requestSection);
+        }
+        if (sectionConnector == SectionConnector.MIDDLE_DOWN) {
+            return connectMiddleDownSection(requestSection);
+        }
+        return connectDownSection(requestSection);
+    }
+
+    private Section connectDownSection(Section requestSection) {
         this.downSection = requestSection;
         requestSection.upSection = this;
         return downSection;
     }
 
-    Section connectUpSection(Section requestSection) {
+    private Section connectUpSection(Section requestSection) {
         this.upSection = requestSection;
         requestSection.downSection = this;
         return requestSection;
     }
 
-    Section connectMiddleUpSection(Section requestSection) {
+    private Section connectMiddleUpSection(Section requestSection) {
         Section newDownSection = Section.builder()
                 .id(requestSection.getId())
                 .upSection(this)
@@ -93,7 +106,7 @@ public class Section {
         return newDownSection;
     }
 
-    Section connectMiddleDownSection(Section requestSection) {
+    private Section connectMiddleDownSection(Section requestSection) {
         Section newUpSection = Section.builder()
                 .id(requestSection.getId())
                 .upSection(this.upSection)
@@ -136,6 +149,7 @@ public class Section {
             return new SectionDisconnectResponse(this, List.of(upSection));
         }
         if (isMiddleStation(station)) {
+            distance += downSection.distance;
             downStation = downSection.downStation;
             if (downSection.downSection != null) {
                 SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection,

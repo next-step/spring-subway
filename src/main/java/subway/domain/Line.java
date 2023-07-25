@@ -46,7 +46,7 @@ public class Line {
             Optional<Section> downSection = sections.stream()
                     .filter(section -> currentSection.getDownStation().equals(section.getUpStation())).findFirst();
 
-            downSection.ifPresent(section -> currentSection.connectDownSection(downSection.get()));
+            downSection.ifPresent(section -> currentSection.connectSection(downSection.get()));
         }
     }
 

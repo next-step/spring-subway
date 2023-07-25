@@ -112,7 +112,6 @@ class LineServiceTest {
 
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-            upSection.connectDownSection(downSection);
 
             Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(upSection, downSection)));
 

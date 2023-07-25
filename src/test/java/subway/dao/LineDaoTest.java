@@ -55,7 +55,7 @@ class LineDaoTest {
 
             upSection = sectionDao.insert(line.getId(), upSection);
             downSection = sectionDao.insert(line.getId(), downSection);
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             // when
             Line result = lineDao.findById(line.getId()).get();
