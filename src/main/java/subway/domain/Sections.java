@@ -66,22 +66,29 @@ public class Sections {
     }
 
     public void validRegisterSection(Section section) {
-        if (findStations().contains(section.getUpStation())
-                && findStations().contains(section.getDownStation())) {
+        if (isSectionDuplicated(section)) {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
-        if (!findStations().contains(section.getUpStation())
-                && !findStations().contains(section.getDownStation())
-                && !sections.isEmpty()) {
+        if (isStationNotInSections(section)) {
             throw new IllegalArgumentException("등록하고자 하는 구간의 2개의 역이 모두 노선에 포함되지 않아 추가할 수 없습니다.");
         }
     }
 
+    private boolean isStationNotInSections(Section section) {
+        return !findStations().contains(section.getUpStation())
+                && !findStations().contains(section.getDownStation())
+                && !sections.isEmpty();
+    }
+
+    private boolean isSectionDuplicated(Section section) {
+        return findStations().contains(section.getUpStation()) && findStations().contains(section.getDownStation());
+    }
+
     public Optional<Section> makeUpdateSection(Section registerSection) {
-        if (findStations().contains(registerSection.getUpStation()) && findUpStations().contains(registerSection.getUpStation())) {
+        if (findUpStations().contains(registerSection.getUpStation())) {
             return Optional.of(makeNewSectionByUpStation(registerSection));
         }
-        if (findStations().contains(registerSection.getDownStation()) && findDownStations().contains(registerSection.getDownStation())) {
+        if (findDownStations().contains(registerSection.getDownStation())) {
             return Optional.of(makeNewSectionByDownStation(registerSection));
         }
         return Optional.empty();
