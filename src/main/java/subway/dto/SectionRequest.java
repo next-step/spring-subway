@@ -13,8 +13,9 @@ public class SectionRequest {
     }
 
     public SectionRequest(final String upStationId, final String downStationId, final int distance) {
-        Assert.notNull(upStationId, "상행역을 입력해야 합니다.");
-        Assert.notNull(downStationId, "하행역을 입력해야 합니다.");
+        Assert.hasText(upStationId, "상행역을 입력해야 합니다.");
+        Assert.hasText(downStationId, "하행역을 입력해야 합니다.");
+        Assert.isTrue(distance > 0, "구간 길이는 0보다 커야합니다.");
 
         this.upStationId = Long.parseLong(upStationId);
         this.downStationId = Long.parseLong(downStationId);

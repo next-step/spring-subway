@@ -10,7 +10,8 @@ public class StationRequest {
     }
 
     public StationRequest(final String name) {
-        Assert.notNull(name, "이름을 입력해야 합니다.");
+        Assert.hasText(name, "이름을 입력해야 합니다.");
+        Assert.isTrue(name.length() <= 255, "이름 길이는 255자를 초과할 수 없습니다.");
 
         this.name = name;
     }
