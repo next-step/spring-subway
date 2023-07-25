@@ -55,7 +55,6 @@ class SectionIntegrationTest extends IntegrationTest {
 
         /* when */
         final ExtractableResponse<Response> response1 = getCreateSectionAPIResponse(sectionRequest1, lineId);
-
         final ExtractableResponse<Response> response2 = getCreateSectionAPIResponse(sectionRequest2, lineId);
 
         /* then */
@@ -199,7 +198,6 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long notContainsStationId = 30L;
 
         /* when */
-
         final ExtractableResponse<Response> response = getDeleteSectionAPIResponse(lineId, notContainsStationId);
 
         /* then */
