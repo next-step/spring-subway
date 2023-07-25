@@ -47,13 +47,13 @@ public class Sections {
 
     public Optional<Section> findUpSection(Station deleteStation) {
         return sections.stream()
-            .filter(section -> section.getUpStation().equals(deleteStation))
+            .filter(section -> section.getDownStation().equals(deleteStation))
             .findFirst();
     }
 
     public Optional<Section> findDownSection(Station deleteStation) {
         return sections.stream()
-            .filter(section -> section.getDownStation().equals(deleteStation))
+            .filter(section -> section.getUpStation().equals(deleteStation))
             .findFirst();
     }
 
@@ -110,6 +110,7 @@ public class Sections {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
     }
+
 
     private SectionRegistVo registMiddleSection(Section newSection, Section targetSection) {
         if (isMatchUpStation(newSection)) {
