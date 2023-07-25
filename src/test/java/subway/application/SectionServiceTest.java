@@ -136,21 +136,21 @@ class SectionServiceTest {
     void deleteEndSectionTest() {
         // given
         final List<Section> sections = createSections();
-        final long lineId = sections.get(0).getLineId();
-        final long sectionId = sections.get(0).getId();
-        final long startStationId = sections.get(0).getUpStationId();
+        final Section deleteTarget = sections.get(0);
+        final long lineId = deleteTarget.getLineId();
+        final long startStationId = deleteTarget.getUpStationId();
 
         given(sectionDao.existByLineIdAndStationId(lineId, startStationId)).willReturn(true);
         given(sectionDao.count(lineId)).willReturn(3L);
         given(sectionDao.findAll(lineId)).willReturn(sections);
-        doNothing().when(sectionDao).delete(sectionId);
+        doNothing().when(sectionDao).delete(deleteTarget.getId());
 
         // when & then
         assertThatNoException()
             .isThrownBy(() -> sectionService.deleteSection(lineId, startStationId));
 
-        verify(sectionDao, never()).update(any());
         verify(sectionDao).delete(anyLong());
+        verify(sectionDao, never()).update(any());
     }
 
     @DisplayName("지하철 노선의 중간 역 삭제 성공")
@@ -158,25 +158,25 @@ class SectionServiceTest {
     void deleteMiddleSectionTest() {
         // given
         final List<Section> sections = createSections();
-        final long lineId = sections.get(0).getLineId();
-        final long sectionId = sections.get(0).getId();
-        final long middleStationId = sections.get(0).getDownStationId();
+        final Section deleteTarget = sections.get(0);
+        final Section updateTarget = sections.get(1);
 
-        given(sectionDao.existByLineIdAndStationId(lineId, middleStationId)).willReturn(true);
+        final long lineId = deleteTarget.getLineId();
+        final long deleteStationId = deleteTarget.getDownStationId();
+        final Section updatedResult = createUpdateResult(deleteTarget, updateTarget);
+
+        given(sectionDao.existByLineIdAndStationId(lineId, deleteStationId)).willReturn(true);
         given(sectionDao.count(lineId)).willReturn((long) sections.size());
         given(sectionDao.findAll(lineId)).willReturn(sections);
-        doNothing().when(sectionDao).delete(sectionId);
-        doNothing().when(sectionDao).update(any(Section.class));
+        doNothing().when(sectionDao).delete(deleteTarget.getId());
+        doNothing().when(sectionDao).update(updatedResult);
 
         // when & then
-
-        // 1. 거리 갱신
-        // 2. 왼쪽, 오른쪽 구간 삭제 (혹은 하나의 구간 갱신, 나머지 구간은 삭제)
         assertThatNoException()
-            .isThrownBy(() -> sectionService.deleteSection(lineId, middleStationId));
+            .isThrownBy(() -> sectionService.deleteSection(lineId, deleteStationId));
 
-        verify(sectionDao).update(any());
-        verify(sectionDao).delete(sectionId);
+        verify(sectionDao).delete(deleteTarget.getId());
+        verify(sectionDao).update(updatedResult);
     }
 
     private List<Section> createSections() {
@@ -185,5 +185,11 @@ class SectionServiceTest {
         final Section secondSection = new Section(2L, lineId, 2L, 3L, 10);
         final Section thirdSection = new Section(3L, lineId, 3L, 4L, 10);
         return Arrays.asList(firstSection, secondSection, thirdSection);
+    }
+
+    private Section createUpdateResult(final Section deleteTarget, final Section updateTarget) {
+        return new Section(updateTarget.getId(), updateTarget.getLineId(),
+            deleteTarget.getUpStationId(), updateTarget.getDownStationId(),
+            deleteTarget.getDistance() + updateTarget.getDistance());
     }
 }
