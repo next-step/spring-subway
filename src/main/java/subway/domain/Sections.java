@@ -75,14 +75,14 @@ public class Sections {
         }
     }
 
+    private boolean isSectionDuplicated(Section section) {
+        return findStations().contains(section.getUpStation()) && findStations().contains(section.getDownStation());
+    }
+
     private boolean isStationNotInSections(Section section) {
         return !findStations().contains(section.getUpStation())
                 && !findStations().contains(section.getDownStation())
                 && !sections.isEmpty();
-    }
-
-    private boolean isSectionDuplicated(Section section) {
-        return findStations().contains(section.getUpStation()) && findStations().contains(section.getDownStation());
     }
 
     public Optional<Section> makeUpdateSection(Section registerSection) {
