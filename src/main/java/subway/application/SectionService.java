@@ -48,17 +48,17 @@ public class SectionService {
         return result;
     }
 
-    public void deleteSection(final Long lineId, final Long downStationId) {
+    public void deleteSection(final Long lineId, final Long stationId) {
         final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         validateSectionsSizeIsNotOne(sections);
 
-        final Section lastSection = sections.getLastSection();
-        if (!lastSection.isSameDownStationId(downStationId)) {
-            throw new SubwayException(
-                    "해당 노선에 일치하는 하행 종점역이 존재하지 않습니다. 노선 ID : " + lineId + " 하행 종점역 ID : " + downStationId);
+        if (sections.isFirstStation(stationId)) {
+            final Section firstSection = sections.getFirstSection();
+            sectionDao.delete(firstSection.getId());
+        } else if (sections.isLastStation(stationId)) {
+            final Section lastSection = sections.getLastSection();
+            sectionDao.delete(lastSection.getId());
         }
-
-        sectionDao.delete(lastSection.getId());
     }
 
     private void validateDistance(final Long distance) {

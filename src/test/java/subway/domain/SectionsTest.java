@@ -1,20 +1,25 @@
 package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 class SectionsTest {
 
     final static Long LINE_ID = 1L;
+    final static Section FIRST_SECTION = new Section(1L, LINE_ID, 1L, 2L, 1L);
+    final static Section LAST_SECTION = new Section(4L, LINE_ID, 4L, 5L, 4L);
     final static Sections SECTIONS = new Sections(List.of(
-            new Section(1L, LINE_ID, 1L, 2L, 1L),
+            FIRST_SECTION,
             new Section(2L, LINE_ID, 2L, 3L, 2L),
             new Section(3L, LINE_ID, 3L, 4L, 3L),
-            new Section(4L, LINE_ID, 4L, 5L, 4L)
+            LAST_SECTION
     ));
 
     @Test
@@ -32,6 +37,13 @@ class SectionsTest {
     }
 
     @Test
+    @DisplayName("Sections를 빈 리스트로 생성하려는 경우 SubwayException을 던진다.")
+    void createWithEmptySectionsThrowException() {
+        assertThatThrownBy(() -> new Sections(Collections.emptyList()))
+                .isInstanceOf(SubwayException.class);
+    }
+
+    @Test
     @DisplayName("Sections에 두 Section이 있는지 확인할 수 있다.")
     void containsBoth() {
         /* given */
@@ -43,15 +55,27 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("Sections에 마지막 하행 종점을 찾을 수 있다.")
-    void findLastPrevSection() {
+    @DisplayName("Sections에 가장 처음의 구간을 찾을 수 있다.")
+    void getFirstSection() {
+        /* given */
+
+        /* when */
+        final Section firstSection = SECTIONS.getFirstSection();
+
+        /* then */
+        assertThat(firstSection).isEqualTo(FIRST_SECTION);
+    }
+
+    @Test
+    @DisplayName("Sections에 가장 마지막 구간을 찾을 수 있다.")
+    void getLastSection() {
         /* given */
 
         /* when */
         final Section lastSection = SECTIONS.getLastSection();
 
         /* then */
-        assertThat(lastSection).isEqualTo(new Section(4L, 1L, 4L, 5L, 4L));
+        assertThat(lastSection).isEqualTo(LAST_SECTION);
     }
 
     @Test
@@ -79,5 +103,4 @@ class SectionsTest {
         assertThat(SECTIONS.isLastStation(5L)).isTrue();
         assertThat(SECTIONS.isLastStation(1L)).isFalse();
     }
-
 }

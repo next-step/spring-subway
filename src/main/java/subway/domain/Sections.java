@@ -25,6 +25,13 @@ public class Sections {
         return countByStationIds(upStationId, downStationId) == 2;
     }
 
+    public Section getFirstSection() {
+        if (this.values.size() < 1) {
+            throw new SubwayException("노선에 구간이 존재하지 않습니다.");
+        }
+        return this.values.get(0);
+    }
+
     public Section getLastSection() {
         if (this.values.size() < 1) {
             throw new SubwayException("노선에 구간이 존재하지 않습니다.");

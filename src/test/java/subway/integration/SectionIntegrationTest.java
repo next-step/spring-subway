@@ -198,23 +198,21 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("지하철 노선에 등록된 하행 종점역이 아닌 경우 삭제 시 400 Bad Request로 응답한다.")
-    void badRequestWithNotPrevSectionOnLine() {
+    @DisplayName("지하철 상행 구간역을 포함한 구간을 제거한다.")
+    void deleteFirstSection() {
         /* given */
-        final Long lineId = 2L;
-        final Long downStationId = 24L;
+        final Long lineId = 3L;
+        final Long stationId = 35L;
 
         /* when */
         final ExtractableResponse<Response> response = RestAssured
-                .given().log().all().queryParam("stationId", downStationId)
+                .given().log().all().queryParam("stationId", stationId)
                 .when().delete("/lines/{lineId}/sections", lineId)
                 .then().log().all()
                 .extract();
 
         /* then */
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().jsonPath().getString("message"))
-                .isEqualTo("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다. 노선 ID : " + lineId + " 하행 종점역 ID : " + downStationId);
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
