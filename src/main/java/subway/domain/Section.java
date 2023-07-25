@@ -140,29 +140,15 @@ public class Section {
     }
 
     public SectionDisconnectResponse disconnectStation(Station station) {
-        if (isUpStation(station)) {
-            downSection.upSection = null;
-            return new SectionDisconnectResponse(this, List.of(downSection));
-        }
-        if (isDownStation(station)) {
-            upSection.downSection = null;
-            return new SectionDisconnectResponse(this, List.of(upSection));
-        }
-        if (isMiddleStation(station)) {
-            distance += downSection.distance;
-            downStation = downSection.downStation;
-            if (downSection.downSection != null) {
-                SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection,
-                        List.of(this, downSection.downSection));
-                downSection = downSection.downSection;
-                downSection.upSection = this;
-                return sectionDisconnectResponse;
-            }
-            SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection,
-                    List.of(this));
-            downSection = null;
-            return sectionDisconnectResponse;
-        }
+        Optional<SectionDisconnector> sectionDisconnectorOptional = SectionDisconnector.findSectionDisConnector(this,
+                station);
+
+        return sectionDisconnectorOptional.map(this::disconnectToCurrentSection)
+                .orElseGet(() -> disconnectToNextSection(station));
+
+    }
+
+    private SectionDisconnectResponse disconnectToNextSection(Station station) {
         if (downSection == null) {
             throw new IllegalStateException(
                     MessageFormat.format("삭제 가능한 section을 찾을 수 없습니다. station \"{0}\"", station));
@@ -170,16 +156,43 @@ public class Section {
         return downSection.disconnectStation(station);
     }
 
-    private boolean isUpStation(Station station) {
-        return station.equals(upStation) && upSection == null;
+    private SectionDisconnectResponse disconnectToCurrentSection(SectionDisconnector sectionDisconnector) {
+        if (sectionDisconnector == SectionDisconnector.UP) {
+            return disconnectUpSection();
+        }
+        if (sectionDisconnector == SectionDisconnector.MIDDLE) {
+            return disconnectMiddleSection();
+        }
+        return disconnectDownSection();
     }
 
-    private boolean isDownStation(Station station) {
-        return station.equals(downStation) && downSection == null;
+    private SectionDisconnectResponse disconnectUpSection() {
+        downSection.upSection = null;
+        return new SectionDisconnectResponse(this, List.of(downSection));
     }
 
-    private boolean isMiddleStation(Station station) {
-        return station.equals(downStation) && downSection != null;
+    private SectionDisconnectResponse disconnectMiddleSection() {
+        distance += downSection.distance;
+        downStation = downSection.downStation;
+        if (isSectionHasDescendant()) {
+            SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection,
+                    List.of(this, downSection.downSection));
+            downSection = downSection.downSection;
+            downSection.upSection = this;
+            return sectionDisconnectResponse;
+        }
+        SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection, List.of(this));
+        downSection = null;
+        return sectionDisconnectResponse;
+    }
+
+    private boolean isSectionHasDescendant() {
+        return downSection.downSection != null;
+    }
+
+    private SectionDisconnectResponse disconnectDownSection() {
+        upSection.downSection = null;
+        return new SectionDisconnectResponse(this, List.of(upSection));
     }
 
     public Long getId() {
