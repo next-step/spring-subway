@@ -80,9 +80,9 @@ public class LineService {
         Section newSection = newSection(request);
 
         Sections sections = sectionDao.findAllByLineId(lineId);
-        sections.validateInsert(newSection);
+        sections.validateConstruction(newSection);
 
-        if (sections.isInsertedMiddle(newSection)) {
+        if (sections.isConstructedInMiddle(newSection)) {
             Section overlappedSection = sections.findOverlappedSection(newSection);
             updateOverlappedSection(lineId, newSection, overlappedSection);
         }
@@ -90,16 +90,16 @@ public class LineService {
     }
 
     private void updateOverlappedSection(final Long lineId, final Section newSection, final Section overlappedSection) {
-        sectionDao.update(overlappedSection.subtractWith(newSection), lineId);
+        sectionDao.update(overlappedSection.divideWith(newSection), lineId);
     }
 
     @Transactional
     public void deleteSectionByStationId(final Long lineId, final Long stationId) {
         Station deleteStation = stationDao.findById(stationId);
         Sections sections = sectionDao.findAllByLineId(lineId);
-        sections.validateDelete(deleteStation);
-        if (sections.isMiddleStation(deleteStation)) {
-            sectionDao.insert(sections.mergeTwoSectionsBasedOn(deleteStation), lineId);
+        sections.validateClose(deleteStation);
+        if (sections.isNotTerminal(deleteStation)) {
+            sectionDao.insert(sections.connectTwoSectionBasedOn(deleteStation), lineId);
         }
         sectionDao.deleteByStation(deleteStation, lineId);
     }

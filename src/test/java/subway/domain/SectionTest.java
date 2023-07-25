@@ -30,8 +30,8 @@ class SectionTest {
         Section upMidSection = new Section(upStation, midStation,  3);
         Section midDownSection = new Section(midStation, downStation, 7);
 
-        assertEquals(oldSection.subtractWith(upMidSection), midDownSection);
-        assertEquals(oldSection.subtractWith(midDownSection), upMidSection);
+        assertEquals(oldSection.divideWith(upMidSection), midDownSection);
+        assertEquals(oldSection.divideWith(midDownSection), upMidSection);
     }
 
     @DisplayName("새로운 구간을 중간에 삽입할 때의 거리가 기존 구간의 거리와 같거나 길면 예외를 던진다.")
@@ -44,7 +44,7 @@ class SectionTest {
         Section oldSection = new Section(upStation, downStation, 10);
         Section newSection = new Section(upStation, midStation,  10);
 
-        assertThrows(IncorrectRequestException.class, () -> oldSection.subtractWith(newSection));
+        assertThrows(IncorrectRequestException.class, () -> oldSection.divideWith(newSection));
     }
 
     @DisplayName("역을 삭제할 수 있도록 기존 구간들을 합쳐서 반환한다.")
@@ -58,6 +58,6 @@ class SectionTest {
         Section midDownSection = new Section(midStation, downStation, 7);
         Section expected = new Section(upStation, downStation, 10);
 
-        assertEquals(upMidSection.mergeWith(midDownSection), expected);
+        assertEquals(upMidSection.connectWith(midDownSection), expected);
     }
 }

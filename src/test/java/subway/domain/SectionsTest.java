@@ -24,7 +24,7 @@ class SectionsTest {
 
         Section newSection = new Section(downStation, newDownStation, 10);
 
-        assertDoesNotThrow(() -> sections.validateInsert(newSection));
+        assertDoesNotThrow(() -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("상행 종점역을 연장한다.")
@@ -40,7 +40,7 @@ class SectionsTest {
 
         Section newSection = new Section(newUpStation, upStation, 10);
 
-        assertDoesNotThrow(() -> sections.validateInsert(newSection));
+        assertDoesNotThrow(() -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("기존 구간의 하행역을 기준역으로 중간 역을 추가한다.")
@@ -56,7 +56,7 @@ class SectionsTest {
 
         Section newSection = new Section(midStation, downStation, 3);
 
-        assertDoesNotThrow(() -> sections.validateInsert(newSection));
+        assertDoesNotThrow(() -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("기존 구간의 상행역을 기준역으로 중간 역을 추가한다.")
@@ -72,7 +72,7 @@ class SectionsTest {
 
         Section newSection = new Section(upStation, midStation, 3);
 
-        assertDoesNotThrow(() -> sections.validateInsert(newSection));
+        assertDoesNotThrow(() -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 두 역이 모두 존재한다면 예외를 던진다.")
@@ -86,7 +86,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, downStation,  3);
 
-        assertThrows(IncorrectRequestException.class, () -> sections.validateInsert(newSection));
+        assertThrows(IncorrectRequestException.class, () -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 두 역이 모두 존재하지 않으면 예외를 던진다.")
@@ -102,7 +102,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(newUpStation, newDownStation,  3);
 
-        assertThrows(IncorrectRequestException.class, () -> sections.validateInsert(newSection));
+        assertThrows(IncorrectRequestException.class, () -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("새로운 구간이 가운데에 삽입될 때 업데이트할 기존 구간을 반환한다.")
@@ -135,7 +135,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, midStation,  3);
 
-        assertTrue(sections.isInsertedMiddle(newSection));
+        assertTrue(sections.isConstructedInMiddle(newSection));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 끝 구간에 삽입되는지 확인한다.")
@@ -150,7 +150,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(downStation, newDownStation,  3);
 
-        assertFalse(sections.isInsertedMiddle(newSection));
+        assertFalse(sections.isConstructedInMiddle(newSection));
     }
 
     @DisplayName("구간 내에서 역을 제거할 수 있는지 확인한다.")
@@ -167,9 +167,9 @@ class SectionsTest {
                 new Section(midStation, downStation, distance)));
 
         // when & then
-        assertDoesNotThrow(() -> sections.validateDelete(upStation));
-        assertDoesNotThrow(() -> sections.validateDelete(midStation));
-        assertDoesNotThrow(() -> sections.validateDelete(downStation));
+        assertDoesNotThrow(() -> sections.validateClose(upStation));
+        assertDoesNotThrow(() -> sections.validateClose(midStation));
+        assertDoesNotThrow(() -> sections.validateClose(downStation));
     }
 
     @DisplayName("존재하지 않는 역을 제거하면 예외를 던진다.")
@@ -187,7 +187,7 @@ class SectionsTest {
                 new Section(midStation, downStation, distance)));
 
         // when & then
-        assertThrows(IncorrectRequestException.class, () -> sections.validateDelete(notExist));
+        assertThrows(IncorrectRequestException.class, () -> sections.validateClose(notExist));
     }
 
     @DisplayName("구간이 1개만 있을 때 구간을 제거하면 예외를 던진다.")
@@ -201,6 +201,6 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
 
         // when & then
-        assertThrows(IncorrectRequestException.class, () -> sections.validateDelete(downStation));
+        assertThrows(IncorrectRequestException.class, () -> sections.validateClose(downStation));
     }
 }

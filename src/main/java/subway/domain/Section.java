@@ -40,9 +40,9 @@ public class Section {
         this.distance = distance;
     }
 
-    public Section subtractWith(final Section other) {
+    public Section divideWith(final Section other) {
         validateOverlapped(other);
-        validateDistance(other);
+        validateLongerThan(other);
         Distance reducedDistance = this.distance.subtract(other.distance);
 
         if (isSameUpStation(other)) {
@@ -52,7 +52,7 @@ public class Section {
         return new Section(this.id, this.upStation, other.upStation, reducedDistance);
     }
 
-    public Section mergeWith(Section other) {
+    public Section connectWith(Section other) {
         validateConnected(other);
         Distance addedDistance = this.distance.add(other.distance);
 
@@ -68,7 +68,7 @@ public class Section {
         }
     }
 
-    private void validateDistance(final Section other) {
+    private void validateLongerThan(final Section other) {
         if (this.distance.shorterOrEqualTo(other.distance)) {
             throw new IncorrectRequestException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
         }
