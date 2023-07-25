@@ -2,19 +2,65 @@ package subway.dao;
 
 import java.util.List;
 import java.util.Optional;
+import javax.sql.DataSource;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 import subway.domain.Station;
 
-public interface StationDao {
+@Repository
+public class StationDao {
 
-    Station insert(Station station);
+    private final JdbcTemplate jdbcTemplate;
+    private final SimpleJdbcInsert insertAction;
 
-    List<Station> findAll();
+    private RowMapper<Station> rowMapper = (rs, rowNum) ->
+            new Station(
+                    rs.getLong("id"),
+                    rs.getString("name")
+            );
 
-    Optional<Station> findById(Long id);
 
-    void update(Station newStation);
+    public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.insertAction = new SimpleJdbcInsert(dataSource)
+                .withTableName("station")
+                .usingGeneratedKeyColumns("id");
+    }
 
-    void deleteById(Long id);
+    public Station insert(Station station) {
+        SqlParameterSource params = new BeanPropertySqlParameterSource(station);
+        Long id = insertAction.executeAndReturnKey(params).longValue();
+        return new Station(id, station.getName());
+    }
 
-    boolean existByName(String name);
+    public List<Station> findAll() {
+        String sql = "select * from STATION";
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
+    public Optional<Station> findById(Long id) {
+        String sql = "select * from STATION where id = ?";
+        return Optional.ofNullable(
+                DataAccessUtils.singleResult(jdbcTemplate.query(sql, rowMapper, id)));
+    }
+
+    public void update(Station newStation) {
+        String sql = "update STATION set name = ? where id = ?";
+        jdbcTemplate.update(sql, new Object[]{newStation.getName(), newStation.getId()});
+    }
+
+    public void deleteById(Long id) {
+        String sql = "delete from STATION where id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
+    public boolean existByName(String name) {
+        String sql = "select count(*) from STATION where name = ? ";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, name));
+    }
 }
