@@ -52,15 +52,17 @@ public class SectionService {
         validateSectionsHasNotStation(sections, stationId);
 
         if (sections.isFirstStation(stationId)) {
-            final Section firstSection = sections.getFirstSection();
-            sectionDao.delete(firstSection.getId());
+            sectionDao.delete(sections.getFirstSection().getId());
             return;
         } else if (sections.isLastStation(stationId)) {
-            final Section lastSection = sections.getLastSection();
-            sectionDao.delete(lastSection.getId());
+            sectionDao.delete(sections.getLastSection().getId());
             return;
         }
 
+        deleteBetween(sections, stationId);
+    }
+
+    private void deleteBetween(final Sections sections, final Long stationId) {
         final Section nextBetweenSection = sections.getBetweenSectionToNext(stationId);
         final Section prevBetweenSection = sections.getBetweenSectionToPrev(stationId);
 
