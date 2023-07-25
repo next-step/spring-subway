@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Sections {
 
@@ -94,6 +95,18 @@ public class Sections {
         return Optional.empty();
     }
 
+    private Set<Station> findUpStations() {
+        return sections.stream()
+                .map(Section::getUpStation)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Station> findDownStations() {
+        return sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet());
+    }
+
     private Section makeNewSectionByUpStation(Section registerSection) {
         Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation())
                 .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
@@ -119,22 +132,9 @@ public class Sections {
     }
 
     private Set<Station> findStations() {
-        Set<Station> stations = new HashSet<>();
-        stations.addAll(findUpStations());
-        stations.addAll(findDownStations());
-        return stations;
-    }
-
-    private Set<Station> findUpStations() {
         return sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
-    }
-
-    private Set<Station> findDownStations() {
-        return sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet());
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
