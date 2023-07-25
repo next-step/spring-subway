@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,12 +28,10 @@ public class Sections {
 
         List<Section> newSections = new ArrayList<>(this.sections);
 
-        Section oldSection = findTargetSection(section);
-
-        if (oldSection != null) {
+        findTargetSection(section).ifPresent(oldSection -> {
             newSections.remove(oldSection);
             newSections.add(oldSection.subtract(section));
-        }
+        });
 
         newSections.add(section);
         return new Sections(newSections);
@@ -58,11 +57,10 @@ public class Sections {
                 .contains(station);
     }
 
-    private Section findTargetSection(final Section section) {
+    private Optional<Section> findTargetSection(final Section section) {
         return sections.stream()
                 .filter(section::matchOneStation)
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public Sections removeStation(final Station station) {
@@ -101,7 +99,7 @@ public class Sections {
             throw new IllegalArgumentException("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
         }
     }
-    
+
     public List<Station> getSortedStations() {
         Map<Station, Station> stationMap = new HashMap<>();
 
