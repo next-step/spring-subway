@@ -54,7 +54,7 @@ public class SectionService {
     public void deleteSection(Long stationId, Long lineId) {
         Sections sections = sectionDao.findAllByLineId(lineId);
         Station deleteStation = stationDao.findById(stationId);
-        sections.validDeleteStation();
+        sections.validDeleteStation(deleteStation);
 
         Optional<Section> sectionByUpStation = sections.findSectionByUpStation(deleteStation);
         Optional<Section> sectionByDownStation = sections.findSectionByDownStation(deleteStation);

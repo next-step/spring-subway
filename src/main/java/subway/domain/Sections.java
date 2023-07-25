@@ -27,11 +27,22 @@ public class Sections {
         }
     }
 
-    public void validDeleteStation() {
+    public void validDeleteStation(Station deleteStation) {
+        validSectionsCount();
+        validStationInSections(deleteStation);
+    }
+
+    private void validSectionsCount() {
         if (sections.size() <= MINIMUM_SIZE) {
             throw new IllegalArgumentException(
                     MessageFormat.format("구간이 {0}개 이하이므로 해당역을 삭제할 수 없습니다.", MINIMUM_SIZE)
             );
+        }
+    }
+
+    private void validStationInSections(Station deleteStation) {
+        if (!findStations().contains(deleteStation)) {
+            throw new IllegalArgumentException("등록되지 않은 역을 제거할 수 없습니다.");
         }
     }
 
