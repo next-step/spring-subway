@@ -250,6 +250,31 @@ class SectionTest {
     }
 
     @Nested
+    @DisplayName("disconnectMiddleSection 메소드는")
+    class DisconnectMiddleSection_Method {
+
+        @Test
+        @DisplayName("호출되면, MiddleSection과 연결을 해제하고 재배치된다")
+        void Disconnect_MiddleSection() {
+            // given
+            Section section1 = DomainFixture.Section.buildWithStations(station1, station2, 5);
+            Section section2 = DomainFixture.Section.buildWithStations(station2, station3, 10);
+            Section section3 = DomainFixture.Section.buildWithStations(station3, station4, 100);
+
+            section1.connectDownSection(section2);
+            section2.connectDownSection(section3);
+
+            // when
+            section1.disconnectMiddleSection();
+
+            // then
+            assertThat(section1.getDownSection()).isEqualTo(section3);
+            assertThat(section1.getDistance()).isEqualTo(15);
+        }
+    }
+
+
+    @Nested
     @DisplayName("findUpSection 메소드는")
     class FindUpSection_Method {
 

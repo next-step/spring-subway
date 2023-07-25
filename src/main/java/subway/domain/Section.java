@@ -207,15 +207,9 @@ public class Section {
         return Objects.hash(id);
     }
 
-    @Override
-    public String toString() {
-        return "Section{" +
-                "id=" + id +
-                ", distance=" + distance +
-                ", upStation=" + upStation +
-                ", downStation=" + downStation +
-                ", downSection=" + downSection +
-                '}';
+    public void disconnectMiddleSection() {
+
+
     }
 
     public static class Builder {
