@@ -15,10 +15,15 @@ import subway.exception.SubwayException;
 public class Sections {
 
     private final List<Section> values;
+    private final Section firstSection;
+    private final Section lastSection;
     private final List<Long> stationIds;
 
     public Sections(final List<Section> values) {
+        validateValuesSize(values);
         this.values = Collections.unmodifiableList(getSortedSections(values));
+        this.firstSection = this.values.get(0);
+        this.lastSection = this.values.get(values.size() - 1);
         this.stationIds = sortedStationIds();
     }
 
@@ -31,17 +36,11 @@ public class Sections {
     }
 
     public Section getFirstSection() {
-        if (this.values.size() < 1) {
-            throw new SubwayException("노선에 구간이 존재하지 않습니다.");
-        }
-        return this.values.get(0);
+        return this.firstSection;
     }
 
     public Section getLastSection() {
-        if (this.values.size() < 1) {
-            throw new SubwayException("노선에 구간이 존재하지 않습니다.");
-        }
-        return this.values.get(this.values.size() - 1);
+        return this.lastSection;
     }
 
     public Section getBetweenSectionToNext(final Long stationId) {
@@ -59,15 +58,11 @@ public class Sections {
     }
 
     public boolean isFirstStation(final Long stationId) {
-        final Long firstUpStationId = this.values.get(0).getUpStationId();
-
-        return firstUpStationId.equals(stationId);
+        return this.firstSection.getUpStationId().equals(stationId);
     }
 
     public boolean isLastStation(final Long stationId) {
-        final Long lastDownStationId = this.values.get(this.values.size() - 1).getDownStationId();
-
-        return lastDownStationId.equals(stationId);
+        return this.lastSection.getDownStationId().equals(stationId);
     }
 
     public Section getContainStationSection(
@@ -87,12 +82,9 @@ public class Sections {
         final Map<Long, Section> upStationKeyMap = values.stream()
                 .collect(Collectors.toMap(Section::getUpStationId, section -> section));
 
-        final Section firstSection = findFirstSectionInNotSortedSections(values)
-                .orElseThrow(() -> new SubwayException("노선에 구간이 존재하지 않습니다."));
-
-        final List<Section> result = new ArrayList<>(List.of(firstSection));
-        Section next = upStationKeyMap.get(firstSection.getDownStationId());
-
+        final Section findFirstSection = getFirstSectionInNotSortedSections(values);
+        final List<Section> result = new ArrayList<>(List.of(findFirstSection));
+        Section next = upStationKeyMap.get(findFirstSection.getDownStationId());
         while (next != null) {
             result.add(next);
             next = upStationKeyMap.get(next.getDownStationId());
@@ -101,17 +93,18 @@ public class Sections {
         return result;
     }
 
-    private Optional<Section> findFirstSectionInNotSortedSections(final List<Section> values) {
+    private Section getFirstSectionInNotSortedSections(final List<Section> values) {
         final Set<Long> upStationIds = toSetWithMapper(values, Section::getUpStationId);
         final Set<Long> downStationIds = toSetWithMapper(values, Section::getDownStationId);
 
         upStationIds.removeAll(intersection(upStationIds, downStationIds));
 
-        return find(values, section -> upStationIds.contains(section.getUpStationId()));
+        return find(values, section -> upStationIds.contains(section.getUpStationId()))
+                .orElseThrow(() -> new SubwayException("노선에 구간이 존재하지 않습니다."));
     }
 
     private List<Long> sortedStationIds() {
-        final List<Long> result = new ArrayList<>(List.of(this.values.get(0).getUpStationId()));
+        final List<Long> result = new ArrayList<>(List.of(this.firstSection.getUpStationId()));
         for (Section section : this.values) {
             result.add(section.getDownStationId());
         }
@@ -123,6 +116,12 @@ public class Sections {
         return values.stream()
                 .filter(predicate)
                 .findAny();
+    }
+
+    private void validateValuesSize(final List<Section> values) {
+        if (values.isEmpty()) {
+            throw new SubwayException("노선에 구간이 존재하지 않습니다.");
+        }
     }
 
     private Set<Long> intersection(final Set<Long> upStationIds, final Set<Long> downStationIds) {
