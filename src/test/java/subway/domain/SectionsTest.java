@@ -14,6 +14,7 @@ class SectionsTest {
     @DisplayName("하행 종점역을 연장한다.")
     @Test
     void insertDownSection() {
+        // given
         List<Section> originSections = new ArrayList<>();
         Station upStation = new Station(4L, "잠실역");
         Station downStation = new Station(2L, "잠실나루역");
@@ -24,12 +25,14 @@ class SectionsTest {
 
         Section newSection = new Section(downStation, newDownStation, 10);
 
+        // when & then
         assertDoesNotThrow(() -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("상행 종점역을 연장한다.")
     @Test
     void insertUpSection() {
+        // given
         Station newUpStation = new Station(4L, "잠실역");
         Station upStation = new Station(2L, "잠실나루역");
         Station downStation = new Station(1L, "강변역");
@@ -40,12 +43,14 @@ class SectionsTest {
 
         Section newSection = new Section(newUpStation, upStation, 10);
 
+        // when & then
         assertDoesNotThrow(() -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("기존 구간의 하행역을 기준역으로 중간 역을 추가한다.")
     @Test
     void insertUpSectionInMiddle() {
+        // given
         Station upStation = new Station(2L, "잠실나루역");
         Station midStation = new Station(4L, "잠실역");
         Station downStation = new Station(1L, "강변역");
@@ -56,12 +61,14 @@ class SectionsTest {
 
         Section newSection = new Section(midStation, downStation, 3);
 
+        // when & then
         assertDoesNotThrow(() -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("기존 구간의 상행역을 기준역으로 중간 역을 추가한다.")
     @Test
     void insertDownSectionInMiddle() {
+        // given
         Station upStation = new Station(2L, "잠실나루역");
         Station midStation = new Station(4L, "잠실역");
         Station downStation = new Station(1L, "강변역");
@@ -72,12 +79,14 @@ class SectionsTest {
 
         Section newSection = new Section(upStation, midStation, 3);
 
+        // when & then
         assertDoesNotThrow(() -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 두 역이 모두 존재한다면 예외를 던진다.")
     @Test
     void validateInsertAllExist() {
+        // given
         Station upStation = new Station(4L, "잠실나루역");
         Station downStation = new Station(2L, "잠실역");
 
@@ -86,12 +95,14 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, downStation,  3);
 
+        // when & then
         assertThrows(IncorrectRequestException.class, () -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 두 역이 모두 존재하지 않으면 예외를 던진다.")
     @Test
     void validateInsertAllNotExist() {
+        // given
         Station upStation = new Station(4L, "잠실나루역");
         Station downStation = new Station(2L, "잠실역");
         Station newUpStation = new Station(1L, "강변역");
@@ -102,12 +113,14 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(newUpStation, newDownStation,  3);
 
+        // when & then
         assertThrows(IncorrectRequestException.class, () -> sections.validateConstruction(newSection));
     }
 
     @DisplayName("새로운 구간이 가운데에 삽입될 때 업데이트할 기존 구간을 반환한다.")
     @Test
     void oldSection() {
+        // given
         Station upStation = new Station(4L, "잠실나루역");
         Station midStation = new Station(2L, "잠실역");
         Station downStation = new Station(1L, "강변역");
@@ -116,16 +129,22 @@ class SectionsTest {
         Section oldSection = new Section(upStation, downStation, 10);
         originSections.add(oldSection);
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(upStation, midStation,  3);
-        Section newSection2 = new Section(midStation, downStation,  3);
+        Section upMidSection = new Section(upStation, midStation,  3);
+        Section midDownSection = new Section(midStation, downStation,  3);
 
-        assertEquals(sections.findOverlappedSection(newSection), oldSection);
-        assertEquals(sections.findOverlappedSection(newSection2), oldSection);
+        // when
+        Section actualUpMid = sections.findOverlappedSection(upMidSection);
+        Section actualMidDown = sections.findOverlappedSection(midDownSection);
+
+        // then
+        assertEquals(actualUpMid, new Section(upStation, downStation, 10));
+        assertEquals(actualMidDown, new Section(upStation, downStation, 10));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 가운데에 삽입되는지 확인한다.")
     @Test
     void isInsertedMiddle() {
+        // given
         Station upStation = new Station(4L, "잠실나루역");
         Station midStation = new Station(2L, "잠실역");
         Station downStation = new Station(1L, "강변역");
@@ -135,12 +154,14 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, midStation,  3);
 
+        // when & then
         assertTrue(sections.isConstructedInMiddle(newSection));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 끝 구간에 삽입되는지 확인한다.")
     @Test
     void isInsertedEnd() {
+        // given
         Station upStation = new Station(4L, "잠실나루역");
         Station downStation = new Station(2L, "잠실역");
         Station newDownStation = new Station(1L, "강변역");
@@ -150,6 +171,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(downStation, newDownStation,  3);
 
+        // when & then
         assertFalse(sections.isConstructedInMiddle(newSection));
     }
 
