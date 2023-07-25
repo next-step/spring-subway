@@ -44,23 +44,4 @@ class SortedSectionsTest {
         // then
         assertThat(stations).containsExactly(stationD, stationA, stationB, stationC);
     }
-
-    @DisplayName("Sections 의 가장 마지막 Section 을 삭제한다.")
-    @Test
-    void givenSectionsWhenFindLastSectionThenReturnLastSection() {
-        // given
-        final List<Section> sectionList = List.of(
-                new Section(line, stationA, stationB, new Distance(10L)),
-                new Section(line, stationB, stationC, new Distance(10L)),
-                new Section(line, stationD, stationA, new Distance(10L))
-        );
-        final SortedSections sortedSections = new SortedSections(sectionList);
-
-        // when
-        final Section lastSection = sortedSections.deleteLastSection();
-
-        // then
-        assertThat(lastSection).isEqualTo(new Section(line, stationB, stationC, new Distance(10L)));
-        assertThat(sortedSections.sectionLength()).isEqualTo(2);
-    }
 }

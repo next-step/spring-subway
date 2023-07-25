@@ -209,11 +209,11 @@ class SectionServiceTest {
         // when , then
         assertThatCode(() -> sectionService.createSection(line.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("거리는 1이상이어야 합니다.");
+                .hasMessage("기존 구간 길이보다 새로운 구간 길이가 더 클수는 없습니다.");
     }
 
 
-    @DisplayName("지하철 노선에 등록된 하행 종점역만 제거할 수 있다")
+    @DisplayName("지하철 노선에 등록된 제거할 수 있다")
     @Test
     void deleteSectionTest() {
         // given
@@ -234,19 +234,6 @@ class SectionServiceTest {
         assertThat(result).hasSize(1);
     }
 
-    @DisplayName("지하철 노선에 등록된 하행 종점역이 아니면 예외를 던진다.")
-    @Test
-    void deleteSectionNotLastDownStationIdThenThrow() {
-        // given
-        sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
-        sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
-
-        // when , then
-        Assertions.assertThatCode(() -> sectionService.deleteSection(line.getId(), stationB.getId()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
-    }
-
     @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
     @Test
     void deleteSectionIfOneSectionThenThrow() {
@@ -258,4 +245,19 @@ class SectionServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
     }
+
+    @DisplayName("지하철 노선에 없는 역을 삭제할 수 없습니다.")
+    @Test
+    void deleteSectionFailBecauseOfNonExist() {
+        // given
+        sectionDao.insert(new Section(line, stationA, stationB, new Distance(10L)));
+        sectionDao.insert(new Section(line, stationB, stationC, new Distance(10L)));
+
+        // when , then
+        Assertions.assertThatCode(() -> sectionService.deleteSection(line.getId(), stationE.getId()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("구간에서 역을 찾을 수 없습니다.");
+
+    }
+
 }
