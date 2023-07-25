@@ -12,27 +12,29 @@ import subway.exception.InternalStateException;
 import java.sql.SQLException;
 
 @RestControllerAdvice
-public class SubwayAdvice extends ResponseEntityExceptionHandler {
+public class SubwayAdvice {
 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<ErrorResponse> handleSQLException() {
-        ErrorResponse response = new ErrorResponse("Invalid SQL Request.");
-        return handleExceptionInternal(response, HttpStatus.CONFLICT);
+        ErrorResponse response = new ErrorResponse("Invalid SQL Error Caught.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     @ExceptionHandler(IncorrectRequestException.class)
     public ResponseEntity<ErrorResponse> handleIncorrectRequestException(IncorrectRequestException e) {
         ErrorResponse response = new ErrorResponse(e.getMessage());
-        return handleExceptionInternal(response, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(InternalStateException.class)
     public ResponseEntity<ErrorResponse> handleInternalStateException(InternalStateException e) {
         ErrorResponse response = new ErrorResponse(e.getMessage());
-        return handleExceptionInternal(response, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    private ResponseEntity<ErrorResponse> handleExceptionInternal(ErrorResponse response, HttpStatus status) {
-        return ResponseEntity.status(status).body(response);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException() {
+        ErrorResponse response = new ErrorResponse("Unknown Error Caught.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
