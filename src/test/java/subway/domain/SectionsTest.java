@@ -25,13 +25,29 @@ class SectionsTest {
         assertThatNoException().isThrownBy(() -> new Sections(sections));
     }
 
+    @DisplayName("해당 구간에 연결된 구간이 존재하는지 검증한다.")
+    @Test
+    void hasConnectedSection() {
+        // given
+        List<Section> sectionList = createSections();
+        Sections sections = new Sections(sectionList);
+
+        Section connected = new Section(5L, 1L, 7L,2L, 2);
+        Section notConnected = new Section(6L, 1L, 5L, 8L, 2);
+
+        // when & then
+        assertThat(sections.hasConnectedSection(connected)).isTrue();
+        assertThat(sections.hasConnectedSection(notConnected)).isFalse();
+    }
+
     @DisplayName("해당 구간이 추가 가능한 구간인지 검증에 성공한다.")
     @Test
     void validateSectionTest() {
         // given
-        SectionRequest sectionRequest = new SectionRequest("5", "6", 10);
         List<Section> sectionList = createSections();
         Sections sections = new Sections(sectionList);
+
+        SectionRequest sectionRequest = new SectionRequest("2", "6", 3);
 
         // when & then
         assertThatNoException()
@@ -181,9 +197,9 @@ class SectionsTest {
     private List<Section> createSections() {
         List<Section> sections = new ArrayList<>();
         sections.add(new Section(1L, 1L, 4L, 3L, 10));
-        sections.add(new Section(1L, 1L, 3L, 1L, 10));
-        sections.add(new Section(1L, 1L, 1L, 2L, 10));
-        sections.add(new Section(1L, 1L, 2L, 5L, 10));
+        sections.add(new Section(2L, 1L, 3L, 1L, 10));
+        sections.add(new Section(3L, 1L, 1L, 2L, 10));
+        sections.add(new Section(4L, 1L, 2L, 5L, 10));
         return sections;
     }
 }

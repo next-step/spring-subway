@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
@@ -22,7 +21,7 @@ public class Sections {
         });
     }
 
-    public Optional<Section> findConnectedSection(final Section newSection) {
+    public Section findConnectedSection(final Section newSection) {
         validateSection(newSection);
 
         if (upStationMap.containsKey(newSection.getUpStationId())) {
@@ -33,11 +32,16 @@ public class Sections {
             return findConnectedUpDirectionSection(newSection);
         }
 
-        return Optional.empty();
+        throw new IllegalSectionException("연결된 구간이 존재하지 않습니다.");
     }
 
     public boolean isLastStation(final long stationId) {
         return isStartStation(stationId) || isEndStation(stationId);
+    }
+
+    public boolean hasConnectedSection(final Section section) {
+        validateSection(section);
+        return !isLastStation(section.getUpStationId()) && !isLastStation(section.getDownStationId());
     }
 
     public Section findUpDirectionSection(long stationId) {
@@ -68,16 +72,16 @@ public class Sections {
         return !upStationMap.containsKey(stationId) && downStationMap.containsKey(stationId);
     }
 
-    private Optional<Section> findConnectedDownDirectionSection(Section base) {
+    private Section findConnectedDownDirectionSection(Section base) {
         final Section downDirectionSection = findDownDirectionSection(base.getUpStationId());
         validateDistance(downDirectionSection, base);
-        return Optional.of(downDirectionSection.narrowToUpDirection(base));
+        return downDirectionSection.narrowToUpDirection(base);
     }
 
-    private Optional<Section> findConnectedUpDirectionSection(Section base) {
+    private Section findConnectedUpDirectionSection(Section base) {
         final Section upDirectionSection = findUpDirectionSection(base.getDownStationId());
         validateDistance(upDirectionSection, base);
-        return Optional.of(upDirectionSection.narrowToDownDirection(base));
+        return upDirectionSection.narrowToDownDirection(base);
     }
 
     private void validateSection(final Section section) {

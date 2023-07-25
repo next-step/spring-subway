@@ -23,8 +23,10 @@ public class SectionService {
         final Sections sections = new Sections(sectionDao.findAll(lineId));
         final Section searchParams = sectionRequest.to(lineId);
 
-        sections.findConnectedSection(searchParams)
-            .ifPresent(sectionDao::update);
+        if (sections.hasConnectedSection(searchParams)) {
+            Section update = sections.findConnectedSection(searchParams);
+            sectionDao.update(update);
+        }
 
         return SectionResponse.of(sectionDao.insert(searchParams));
     }
