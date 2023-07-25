@@ -13,6 +13,7 @@ import subway.domain.Line;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
+@DisplayName("노선 서비스 테스트 - 진짜 협력 객체 사용")
 @SpringBootTest
 @Transactional
 class LineServiceTest {

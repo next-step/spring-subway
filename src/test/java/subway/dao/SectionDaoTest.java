@@ -16,6 +16,7 @@ import subway.domain.Section;
 import subway.domain.Station;
 
 
+@DisplayName("구간 DataAccessObject 테스트")
 @SpringBootTest
 @Transactional
 class SectionDaoTest {

@@ -14,6 +14,7 @@ import subway.dto.SectionResponse;
 import subway.exception.SectionCreateException;
 import subway.exception.SectionDeleteException;
 
+@DisplayName("구간 서비스 테스트 - 진짜 협력 객체 사용")
 @SpringBootTest
 @Transactional
 class SectionServiceTest {

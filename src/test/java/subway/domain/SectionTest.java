@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.SectionCreateException;
 
+@DisplayName("구간 도메인 객체 테스트")
 class SectionTest {
 
     Line line;

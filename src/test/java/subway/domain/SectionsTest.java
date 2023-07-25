@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.SectionCreateException;
 
+@DisplayName("구간 일급 컬렉션 테스트")
 class SectionsTest {
 
     @DisplayName("빈 리스트로 Sections 생성시 빈 리스트 반환")
