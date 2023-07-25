@@ -1,5 +1,6 @@
 package subway.application;
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
@@ -51,8 +52,49 @@ public class SectionService {
     @Transactional
     public void deleteSection(Long stationId, Long lineId) {
         Sections sections = sectionDao.findAllByLineId(lineId);
-        sections.canDeleteStation(stationId);
+        Station deleteStation = stationDao.findById(stationId);
+        sections.canDeleteStation(deleteStation);
 
-        sectionDao.deleteByDownStationIdAndLineId(stationId, lineId);
+        Optional<Section> upSection = sections.findUpSection(deleteStation);
+        Optional<Section> downSection = sections.findDownSection(deleteStation);
+        deleteExistedSection(upSection, downSection);
+        connectExistedStations(upSection, downSection);
     }
+
+    private void deleteExistedSection(Optional<Section> upSection, Optional<Section> downSection) {
+        if (upSection.isPresent() && downSection.isPresent()) {
+            sectionDao.deleteById(upSection.get().getId());
+            sectionDao.deleteById(downSection.get().getId());
+        }
+        if (upSection.isPresent() && downSection.isEmpty()) {
+            sectionDao.deleteById(upSection.get().getId());
+        }
+        if (upSection.isEmpty() && downSection.isPresent()) {
+            sectionDao.deleteById(downSection.get().getId());
+        }
+    }
+
+    private void connectExistedStations(Optional<Section> upSection, Optional<Section> downSection) {
+        if (upSection.isPresent() && downSection.isPresent()) {
+            Section newSection = upSection.get().combineUpSectionToDownSection(downSection.get());
+            sectionDao.insert(newSection);
+        }
+    }
+
+//    private void deleteAndAddSection(Sections sections, Station deleteStation) {
+//        Optional<Section> upSection = sections.findUpSection(deleteStation);
+//        Optional<Section> downSection = sections.findDownSection(deleteStation);
+//        if (upSection.isPresent() && downSection.isPresent()) {
+//            sectionDao.deleteById(upSection.get().getId());
+//            sectionDao.deleteById(downSection.get().getId());
+//            Section newSection = upSection.get().combineUpSectionToDownSection(downSection.get());
+//            sectionDao.insert(newSection);
+//        }
+//        if (upSection.isPresent()) {
+//            sectionDao.deleteById(upSection.get().getId());
+//        }
+//        if (downSection.isPresent()) {
+//            sectionDao.deleteById(downSection.get().getId());
+//        }
+//    }
 }

@@ -34,16 +34,23 @@ public class Sections {
         }
     }
 
-    public void canDeleteStation(Long stationId) {
+    public void canDeleteStation(Station deleteStation) {
         if (sections.size() <= MINIMUM_SIZE) {
             throw new IllegalArgumentException(
                 MessageFormat.format("구간이 {0}개 이하이므로 해당역을 삭제할 수 없습니다.", MINIMUM_SIZE)
             );
         }
-        Station downPointStation = findDownPointStation();
-        if (!Objects.equals(downPointStation.getId(), stationId)) {
-            throw new IllegalArgumentException("하행 종점역이 아니면 삭제할 수 없습니다.");
+        if (!findStations().contains(deleteStation)) {
+            throw new IllegalArgumentException("해당역이 없어 삭제할 수 없습니다.");
         }
+    }
+
+    public Optional<Section> findUpSection(Station deleteStation) {
+        return Optional.of(sections.get(0));
+    }
+
+    public Optional<Section> findDownSection(Station deleteStation) {
+        return Optional.empty();
     }
 
     public List<Station> sortStations() {
@@ -134,13 +141,6 @@ public class Sections {
             .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
     }
 
-    private Station findDownPointStation() {
-        return findStations().stream()
-            .filter(station -> !findUpStations().contains(station))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
-    }
-
     private Set<Station> findStations() {
         return Stream.concat(
                 findUpStations().stream(),
@@ -184,4 +184,5 @@ public class Sections {
             "sections=" + sections +
             '}';
     }
+
 }

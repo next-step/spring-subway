@@ -126,21 +126,27 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("하행 종점역은 삭제할 수 있다.")
+    @DisplayName("일치하는 역이 존재하면 삭제 가능하다")
     void canDelete() {
-        assertThatNoException()
-            .isThrownBy(() -> sections.canDeleteStation(4L));
+        Assertions.assertAll(
+            () -> assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(station1)),
+            () -> assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(station2)),
+            () -> assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(station3)),
+            () -> assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(station4))
+        );
     }
 
     @Test
-    @DisplayName("하행 종점역이 아니면 삭제할 수 없다.")
+    @DisplayName("일치하는 역이 없다면 삭제가 불가능하다")
     void canNotDelete() {
         Assertions.assertAll(
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(1L))
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(station5))
                 .isInstanceOf(IllegalArgumentException.class),
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(2L))
-                .isInstanceOf(IllegalArgumentException.class),
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(3L))
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(station6))
                 .isInstanceOf(IllegalArgumentException.class)
         );
     }
@@ -156,8 +162,12 @@ class SectionsTest {
     @DisplayName("구간이 1개 이하인 경우 해당역을 삭제할 수 없다")
     void canNotRemoveStation() {
         Sections sections = new Sections(List.of(section1));
-        assertThatThrownBy(() -> sections.canDeleteStation(2L))
-            .isInstanceOf(IllegalArgumentException.class);
+        Assertions.assertAll(
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(station1))
+                .isInstanceOf(IllegalArgumentException.class),
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(station2))
+                .isInstanceOf(IllegalArgumentException.class)
+        );
     }
 
     @Test

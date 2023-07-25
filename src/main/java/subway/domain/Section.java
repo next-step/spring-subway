@@ -112,4 +112,8 @@ public class Section {
             ", distance=" + distance +
             '}';
     }
+
+    public Section combineUpSectionToDownSection(Section section) {
+        return null;
+    }
 }
