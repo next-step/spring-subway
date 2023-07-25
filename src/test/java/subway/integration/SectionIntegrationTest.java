@@ -182,4 +182,28 @@ public class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
+
+    @Test
+    @DisplayName("구간 제거 예외 테스트: 구간에 없는 역을 제거하려고 하면 실패")
+    void deleteException2() {
+        // given
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new SectionRegisterRequest(2L, 3L, 10))
+                .when().post("/lines/1/sections")
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> result = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/lines/1/sections?stationId=4")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(result.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
