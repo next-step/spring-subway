@@ -15,6 +15,10 @@ import subway.domain.status.LineExceptionStatus;
 @DisplayName("Line 클래스")
 class LineTest {
 
+    private void assertLineConnectResult(Line line, Section... sectionSequence) {
+        assertThat(line.getSections()).containsExactly(sectionSequence);
+    }
+
     @Nested
     @DisplayName("connectDownSection 메소드는")
     class ConnectDownSection_Method {
@@ -36,7 +40,7 @@ class LineTest {
             line.connectSection(downSection);
 
             // then
-            assertThat(upSection.getDownSection()).isEqualTo(downSection);
+            assertLineConnectResult(line, upSection, downSection);
         }
 
         @Test
@@ -80,12 +84,10 @@ class LineTest {
             Section requestSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
 
             // when
-            Exception exception = catchException(() -> line.connectSection(requestSection));
+            line.connectSection(requestSection);
 
             // then
-            assertThat(exception).isNull();
-            assertThat(requestSection.getDownSection()).isEqualTo(section);
-            assertThat(section.getUpSection()).isEqualTo(requestSection);
+            assertLineConnectResult(line, section, requestSection);
         }
 
         @Test
@@ -158,6 +160,7 @@ class LineTest {
             assertThat(upSection.getDownSection()).isNull();
             assertThat(result.getUpdatedSections()).containsExactly(upSection);
             assertThat(result.getDeletedSection()).isEqualTo(downSection);
+            assertLineConnectResult(line, upSection);
         }
 
         @Test
@@ -198,6 +201,7 @@ class LineTest {
             assertThat(downSection.getUpSection()).isNull();
             assertThat(result.getUpdatedSections()).containsExactly(downSection);
             assertThat(result.getDeletedSection()).isEqualTo(upSection);
+            assertLineConnectResult(line, downSection);
         }
 
         @Test
@@ -220,6 +224,7 @@ class LineTest {
             assertThat(upSection.getDownSection()).isNull();
             assertThat(result.getUpdatedSections()).containsExactly(upSection);
             assertThat(result.getDeletedSection()).isEqualTo(downSection);
+            assertLineConnectResult(line, upSection);
         }
     }
 }
