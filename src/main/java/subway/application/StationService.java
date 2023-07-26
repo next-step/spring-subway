@@ -54,6 +54,9 @@ public class StationService {
 
     @Transactional
     public void deleteStationById(final Long id) {
+        stationDao.findById(id).orElseThrow(
+                () -> new StationException(ErrorCode.NO_SUCH_STATION, CAN_DELETE_ONLY_EXIST_STATION_EXCEPTION_MESSAGE));
+
         stationDao.deleteById(id);
     }
 }

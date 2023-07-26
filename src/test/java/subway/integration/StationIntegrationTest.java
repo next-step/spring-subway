@@ -193,4 +193,20 @@ public class StationIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
+
+    @DisplayName("존재하지 않는 지하철역을 제거하려 할 경우 예외를 던진다.")
+    @Test
+    void deleteNotExistsStation() {
+        // given
+        final long notExistsStationId = 9999L;
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .delete("/stations/" + notExistsStationId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
 }
