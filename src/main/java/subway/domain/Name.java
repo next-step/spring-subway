@@ -2,17 +2,18 @@ package subway.domain;
 
 import java.text.MessageFormat;
 import java.util.Objects;
-import org.springframework.util.Assert;
+import subway.util.Assert;
 
 class Name {
 
+    private static final String EXCEPTION_STATUS = "NAME-401";
     private static final int MAX_NAME_LENGTH = 255;
 
     final String value;
 
     Name(String value) {
         Assert.isTrue(value.length() <= MAX_NAME_LENGTH,
-                MessageFormat.format("Name {0}의 사이즈는 {1}보다 클 수 없습니다.", value, MAX_NAME_LENGTH));
+                () -> MessageFormat.format("Name {0}의 사이즈는 {1}보다 클 수 없습니다.", value, MAX_NAME_LENGTH), EXCEPTION_STATUS);
         this.value = value;
     }
 

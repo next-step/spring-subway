@@ -1,8 +1,8 @@
 package subway.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 import static org.mockito.Mockito.when;
+import static subway.domain.ExceptionTestSupporter.assertStatusCodeException;
 
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -32,9 +32,11 @@ class StationServiceTest {
     @DisplayName("saveStation 메소드는")
     class SaveStation_Method {
 
+        private static final String DUPLICATED_STATION = "STATION-SERVICE-401";
+
         @Test
-        @DisplayName("중복된 이름의 station이 요청되면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_If_Duplicated_Station_Name() {
+        @DisplayName("중복된 이름의 station이 요청되면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_If_Duplicated_Station_Name() {
             // given
             Station station = new Station("exists");
             StationCreateRequest stationCreateRequest = new StationCreateRequest("exists");
@@ -45,7 +47,7 @@ class StationServiceTest {
             Exception exception = catchException(() -> stationService.saveStation(stationCreateRequest));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, DUPLICATED_STATION);
         }
     }
 
@@ -53,9 +55,11 @@ class StationServiceTest {
     @DisplayName("findStationResponseById 메소드는")
     class FindStationResponseById_Method {
 
+        private static final String CANNOT_FIND_STATION = "STATION-SERVICE-402";
+
         @Test
-        @DisplayName("stationId에 해당하는 Station이 없다면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_If_Cannot_Find_Station() {
+        @DisplayName("stationId에 해당하는 Station이 없다면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_If_Cannot_Find_Station() {
             // given
             long stationId = 1L;
 
@@ -65,7 +69,7 @@ class StationServiceTest {
             Exception exception = catchException(() -> stationService.findStationResponseById(stationId));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, CANNOT_FIND_STATION);
         }
     }
 

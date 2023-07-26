@@ -6,8 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.util.Assert;
 import subway.domain.response.SectionDisconnectResponse;
+import subway.domain.status.LineExceptionStatus;
+import subway.util.Assert;
 
 public class Line {
 
@@ -84,10 +85,16 @@ public class Line {
             isDownStationExists = isStationExists(downStation, isDownStationExists, section);
         }
 
+        validIsDuplicatedSection(upStation, downStation, isUpStationExists, isDownStationExists);
+    }
+
+    private void validIsDuplicatedSection(Station upStation, Station downStation, boolean isUpStationExists,
+            boolean isDownStationExists) {
         boolean isAllExist = isDownStationExists && isUpStationExists;
+
         Assert.isTrue(!isAllExist,
                 () -> MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재합니다.", upStation,
-                        downStation, sections));
+                        downStation, sections), LineExceptionStatus.DUPLICATED_SECTIONS.getStatus());
     }
 
     private boolean isStationExists(Station upStation, boolean isUpStationExists, Section section) {
@@ -98,7 +105,8 @@ public class Line {
     }
 
     public SectionDisconnectResponse disconnectSection(Station station) {
-        Assert.isTrue(sections.size() > MIN_DELETABLE_SIZE, () -> "line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.");
+        Assert.isTrue(sections.size() > MIN_DELETABLE_SIZE, () -> "line에 구간이 하나만 있으면, 구간을 삭제할 수 없습니다.",
+                LineExceptionStatus.DISCONNECT_FAIL_DELETABLE_SIZE.getStatus());
         Section downSection = sections.get(0).findDownSection();
 
         Section upSection = downSection.findUpSection();

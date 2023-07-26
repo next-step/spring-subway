@@ -3,8 +3,9 @@ package subway.domain;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.util.Assert;
 import subway.domain.response.SectionDisconnectResponse;
+import subway.domain.status.SectionExceptionStatus;
+import subway.util.Assert;
 
 public class Section {
 
@@ -31,14 +32,18 @@ public class Section {
     }
 
     private void validate(Builder builder) {
-        Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.");
-        Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.");
+        Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.",
+                SectionExceptionStatus.NULL_STATION.getStatus());
+        Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.",
+                SectionExceptionStatus.NULL_STATION.getStatus());
         Assert.isTrue(!builder.upStation.equals(builder.downStation),
-                () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation));
+                () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation),
+                SectionExceptionStatus.DUPLICATE_STATION.getStatus());
     }
 
     public Section connectSection(Section requestSection) {
-        Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다");
+        Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다",
+                SectionExceptionStatus.NULL_REQUEST_SECTION.getStatus());
         if (isConnectUpSection(requestSection)) {
             return connectUpSection(requestSection);
         }
@@ -72,7 +77,8 @@ public class Section {
 
     private Section connectToNextSection(Section requestSection) {
         Assert.notNull(downSection,
-                () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection));
+                () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection),
+                SectionExceptionStatus.CANNOT_CONNECT_SECTION.getStatus());
 
         return downSection.connectSection(requestSection);
     }
@@ -167,10 +173,8 @@ public class Section {
     }
 
     private SectionDisconnectResponse disconnectToNextSection(Station station) {
-        if (downSection == null) {
-            throw new IllegalArgumentException(
-                    MessageFormat.format("삭제 가능한 section을 찾을 수 없습니다. station \"{0}\"", station));
-        }
+        Assert.notNull(downSection, () -> MessageFormat.format("삭제 가능한 section을 찾을 수 없습니다. station \"{0}\"", station),
+                SectionExceptionStatus.CANNOT_DISCONNECT_SECTION.getStatus());
         return downSection.disconnectStation(station);
     }
 

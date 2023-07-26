@@ -14,23 +14,27 @@ import subway.util.ErrorTemplate;
 @RestControllerAdvice
 class InternalErrorControllerAdvice {
 
+    private static final String INTERNAL_ERROR = "INTERNAL-501";
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     @ExceptionHandler(SQLException.class)
     ResponseEntity<ErrorTemplate> handleSQLException(SQLException sqlException) {
         logger.error(sqlException.getMessage());
-        return new ResponseEntity<>(ErrorTemplate.of("SQL fail"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ErrorTemplate.from(INTERNAL_ERROR, "SQL fail"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(IllegalStateException.class)
     ResponseEntity<ErrorTemplate> catchIllegalStateException(IllegalStateException illegalStateException) {
         logger.error(illegalStateException.getMessage());
-        return new ResponseEntity<>(ErrorTemplate.of("Illegal State Fail"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ErrorTemplate.from(INTERNAL_ERROR, "Illegal State Fail"),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<ErrorTemplate> catchUnknownException(Exception exception) {
         logger.error(exception.getMessage());
-        return new ResponseEntity<>(ErrorTemplate.of("Unhandled exception"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ErrorTemplate.from(INTERNAL_ERROR, "Unhandled exception"),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

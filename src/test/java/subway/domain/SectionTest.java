@@ -2,6 +2,7 @@ package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
+import static subway.domain.ExceptionTestSupporter.assertStatusCodeException;
 
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import subway.domain.response.SectionDisconnectResponse;
+import subway.domain.status.SectionExceptionStatus;
 
 @DisplayName("Section 클래스")
 class SectionTest {
@@ -37,8 +39,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("하나의 Station이 Null값으로 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Null_Station() {
+        @DisplayName("하나의 Station이 Null값으로 들어오면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Null_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station nullStation = null;
@@ -53,12 +55,12 @@ class SectionTest {
                             .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.NULL_STATION.getStatus());
         }
 
         @Test
-        @DisplayName("distance로 0 이하의 값이 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Under_Zero() {
+        @DisplayName("distance로 0 이하의 값이 들어오면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Under_Zero() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station downStation = new Station(2L, "downStation");
@@ -72,12 +74,12 @@ class SectionTest {
                     .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.ILLEGAL_DISTANCE.getStatus());
         }
 
         @Test
-        @DisplayName("upStation과 downStation이 일치하면 IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Same_Station() {
+        @DisplayName("upStation과 downStation이 일치하면 StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Same_Station() {
             // given
             Station sameStation = new Station(1L, "sameStation");
             int distance = 10;
@@ -90,7 +92,7 @@ class SectionTest {
                     .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.DUPLICATE_STATION.getStatus());
         }
     }
 
@@ -121,8 +123,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("각 Section의 Middle Station이 다르면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Different_Middle_Station() {
+        @DisplayName("각 Section의 Middle Station이 다르면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Different_Middle_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(2L, "middleStation");
@@ -136,12 +138,12 @@ class SectionTest {
             Exception exception = catchException(() -> section.connectSection(downSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.CANNOT_CONNECT_SECTION.getStatus());
         }
 
         @Test
-        @DisplayName("Section으로 Null이 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Null_Section() {
+        @DisplayName("Section으로 Null이 들어오면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Null_Section() {
             // given
             Station upStation = new Station(2L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
@@ -154,7 +156,7 @@ class SectionTest {
             Exception exception = catchException(() -> section.connectSection(downSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.NULL_REQUEST_SECTION.getStatus());
         }
     }
 
@@ -334,8 +336,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("Null값이 들어오면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Input_Null_Section() {
+        @DisplayName("Null값이 들어오면, StatusCodeException을 던진다")
+        void Throw_StatusCodeException_When_Input_Null_Section() {
             // given
             Station upStation = new Station("upStation");
             Station downStation = new Station("middleStation1");
@@ -348,7 +350,7 @@ class SectionTest {
             Exception exception = catchException(() -> upSection.connectSection(nullSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.NULL_REQUEST_SECTION.getStatus());
         }
 
         private void assertSectionConnectedStatus(Section section, List<Station> stations) {
@@ -456,8 +458,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("삭제가능한 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgument_Cannot_Find_Deletable_Station() {
+        @DisplayName("삭제가능한 station을 찾을 수 없으면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_Cannot_Find_Deletable_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
@@ -474,7 +476,7 @@ class SectionTest {
             Exception exception = catchException(() -> upSection.disconnectStation(nonExistStation));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.CANNOT_DISCONNECT_SECTION.getStatus());
         }
     }
 }

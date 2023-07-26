@@ -2,7 +2,8 @@ package subway.domain;
 
 import java.text.MessageFormat;
 import java.util.Objects;
-import org.springframework.util.Assert;
+import subway.domain.status.SectionExceptionStatus;
+import subway.util.Assert;
 
 class Distance {
 
@@ -12,7 +13,8 @@ class Distance {
 
     Distance(int value) {
         Assert.isTrue(value > MIN_NAME_VALUE,
-                () -> MessageFormat.format("distance \"{0}\"는 {1} 이하가 될 수 없습니다.", value, MIN_NAME_VALUE));
+                () -> MessageFormat.format("distance \"{0}\"는 {1} 이하가 될 수 없습니다.", value, MIN_NAME_VALUE),
+                SectionExceptionStatus.ILLEGAL_DISTANCE.getStatus());
         this.value = value;
     }
 

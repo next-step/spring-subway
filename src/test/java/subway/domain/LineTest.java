@@ -2,6 +2,7 @@ package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
+import static subway.domain.ExceptionTestSupporter.assertStatusCodeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import subway.domain.response.SectionDisconnectResponse;
+import subway.domain.status.LineExceptionStatus;
 
 @DisplayName("Line 클래스")
 class LineTest {
@@ -38,8 +40,8 @@ class LineTest {
         }
 
         @Test
-        @DisplayName("line에 이미 존재하는 station이 새로운 section의 하행 station으로 입력된다면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Input_Exist_Station() {
+        @DisplayName("line에 이미 존재하는 station이 새로운 section의 하행 station으로 입력된다면, StatusCodeException을 던진다")
+        void Throw_StatusCodeException_When_Input_Exist_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(2L, "middleStation");
@@ -54,7 +56,7 @@ class LineTest {
             Exception exception = catchException(() -> line.connectSection(existSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, LineExceptionStatus.DUPLICATED_SECTIONS.getStatus());
         }
 
     }
@@ -87,8 +89,8 @@ class LineTest {
         }
 
         @Test
-        @DisplayName("입력으로 들어온 Section의 상행, 하행 역이 line에 모두 존재할 경우, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_UpStation_And_DownStation_All_Exists() {
+        @DisplayName("입력으로 들어온 Section의 상행, 하행 역이 line에 모두 존재할 경우, StatusCodeException을 던진다")
+        void Throw_StatusCodeException_When_UpStation_And_DownStation_All_Exists() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(2L, "middleStation");
@@ -103,7 +105,7 @@ class LineTest {
             Exception exception = catchException(() -> line.connectSection(requestSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, LineExceptionStatus.DUPLICATED_SECTIONS.getStatus());
         }
     }
 
@@ -159,8 +161,8 @@ class LineTest {
         }
 
         @Test
-        @DisplayName("line에 구간이 하나만 있다면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Line_Size_1() {
+        @DisplayName("line에 구간이 하나만 있다면, StatusCodeException을 던진다")
+        void Throw_StatusCodeException_When_Line_Size_1() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station downStation = new Station(3L, "downStation");
@@ -173,7 +175,7 @@ class LineTest {
             Exception exception = catchException(() -> line.disconnectSection(downStation));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, LineExceptionStatus.DISCONNECT_FAIL_DELETABLE_SIZE.getStatus());
         }
 
         @Test

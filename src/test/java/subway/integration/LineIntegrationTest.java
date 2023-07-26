@@ -1,10 +1,14 @@
 package subway.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static subway.integration.HttpStatusAssertions.assertIsBadRequest;
 import static subway.integration.HttpStatusAssertions.assertIsCreated;
 import static subway.integration.HttpStatusAssertions.assertIsNoContent;
 import static subway.integration.HttpStatusAssertions.assertIsOk;
+import static subway.integration.LineIntegrationAssertions.assertIsCannotDisconnectSection;
+import static subway.integration.LineIntegrationAssertions.assertIsDuplicateLineName;
+import static subway.integration.LineIntegrationAssertions.assertIsDuplicateSection;
+import static subway.integration.LineIntegrationAssertions.assertIsIllegalDistance;
+import static subway.integration.LineIntegrationAssertions.assertIsLineCreated;
+import static subway.integration.LineIntegrationAssertions.assertIsLineFound;
 import static subway.integration.LineIntegrationSupporter.createLineByLineRequest;
 import static subway.integration.LineIntegrationSupporter.deleteLineByLineId;
 import static subway.integration.LineIntegrationSupporter.deleteSectionByLineIdAndStationId;
@@ -16,9 +20,6 @@ import static subway.integration.StationIntegrationSupporter.createStation;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = createLineByLineRequest(lineCreateRequest1);
 
         // then
-        assertIsCreated(response);
+        assertIsLineCreated(response);
     }
 
     @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
@@ -74,30 +75,21 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = createLineByLineRequest(lineCreateRequest1);
 
         // then
-        assertIsBadRequest(response);
+        assertIsDuplicateLineName(response);
     }
 
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
         // given
-        ExtractableResponse<Response> createResponse1 = createLineByLineRequest(lineCreateRequest1);
-        ExtractableResponse<Response> createResponse2 = createLineByLineRequest(lineCreateRequest2);
-
-        List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.valueOf(it.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
+        createLineByLineRequest(lineCreateRequest1);
+        createLineByLineRequest(lineCreateRequest2);
 
         // when
         ExtractableResponse<Response> response = findAllLines();
 
-        List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
-                .map(LineResponse::getId)
-                .collect(Collectors.toList());
-
         // then
-        assertIsOk(response);
-        assertThat(resultLineIds).containsAll(expectedLineIds);
+        assertIsLineFound(response, 2);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -112,8 +104,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = getLineByLineId(lineId);
 
         // then
-        assertIsOk(response);
-        assertThat(response.as(LineResponse.class).getId()).isEqualTo(lineId);
+        assertIsLineFound(response);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -226,7 +217,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = registerSectionToLine(lineId, middleSectionCreateRequest);
 
         // then
-        assertIsBadRequest(response);
+        assertIsIllegalDistance(response);
     }
 
     @Test
@@ -247,7 +238,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionCreateRequest3);
 
         // then
-        assertIsBadRequest(response);
+        assertIsDuplicateSection(response);
     }
 
     @Test
@@ -315,6 +306,6 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest4);
 
         // then
-        assertIsBadRequest(response);
+        assertIsCannotDisconnectSection(response);
     }
 }

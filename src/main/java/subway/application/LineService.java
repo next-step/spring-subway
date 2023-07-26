@@ -10,6 +10,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.domain.exception.StatusCodeException;
 import subway.domain.response.SectionDisconnectResponse;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
@@ -19,6 +20,11 @@ import subway.dto.StationResponse;
 
 @Service
 public class LineService {
+
+    private static final String CANNOT_FIND_LINE = "LINE-SERVICE-401";
+    private static final String CANNOT_FIND_STATION = "LINE-SERVICE-402";
+    private static final String DUPLICATE_LINE = "LINE-SERVICE-403";
+
     private final LineDao lineDao;
     private final SectionDao sectionDao;
     private final StationDao stationDao;
@@ -49,8 +55,9 @@ public class LineService {
     private void validLineRequest(LineCreateRequest lineCreateRequest) {
         lineDao.findByName(lineCreateRequest.getName()).ifPresent(
                 line -> {
-                    throw new IllegalArgumentException(
-                            MessageFormat.format("{0} 와 일치하는 line 의 이름이 이미 존재합니다.", lineCreateRequest.getName()));
+                    throw new StatusCodeException(
+                            MessageFormat.format("{0} 와 일치하는 line 의 이름이 이미 존재합니다.", lineCreateRequest.getName()),
+                            DUPLICATE_LINE);
                 }
         );
     }
@@ -111,9 +118,8 @@ public class LineService {
 
     private Line getLineById(long id) {
         return lineDao.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        MessageFormat.format("lineId \"{0}\"에 해당하는 line이 존재하지 않습니다", id)
-                ));
+                .orElseThrow(() -> new StatusCodeException(
+                        MessageFormat.format("lineId \"{0}\"에 해당하는 line이 존재하지 않습니다", id), CANNOT_FIND_LINE));
     }
 
     public void updateLine(long id, LineUpdateRequest lineUpdateRequest) {
@@ -136,10 +142,8 @@ public class LineService {
     }
 
     private Station getStation(long stationId) {
-        return stationDao.findById(stationId).orElseThrow(() -> new IllegalArgumentException(
-                        MessageFormat.format("stationId \"{0}\"에 해당하는 station이 존재하지 않습니다", stationId)
-                )
-        );
+        return stationDao.findById(stationId).orElseThrow(() -> new StatusCodeException(
+                MessageFormat.format("stationId \"{0}\"에 해당하는 station이 존재하지 않습니다", stationId), CANNOT_FIND_STATION));
     }
 
 }
