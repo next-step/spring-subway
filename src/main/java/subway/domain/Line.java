@@ -147,7 +147,18 @@ public class Line {
     }
 
     public Section disconnectSection(final Station station) {
-        return null;
+        validateLineSize();
+        validateExistStation(station);
+        final Section upSection = sections.get(0).getDownSection();
+        return upSection.disconnectSection(station);
+    }
+
+    private void validateExistStation(Station station) {
+        if (!isStationExists(station)) {
+            throw new StationException(
+                    MessageFormat.format("line \"{0}\"에 station \"{1}\"이 존재하지 않습니다.", id, station.getId())
+            );
+        }
     }
 
     private static void validateSameStations(final Station downStation, final Section downSection) {
