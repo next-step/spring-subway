@@ -3,7 +3,7 @@ package subway.domain;
 import java.util.Objects;
 
 public class Line {
-    private Long id;
+    private long id;
     private String name;
     private String color;
 
@@ -15,13 +15,13 @@ public class Line {
         this.color = color;
     }
 
-    public Line(Long id, String name, String color) {
+    public Line(long id, String name, String color) {
         this.id = id;
         this.name = name;
         this.color = color;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -35,10 +35,15 @@ public class Line {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Line line = (Line) o;
-        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color);
+        return id == line.id && Objects.equals(name, line.name) && Objects.equals(
+            color, line.color);
     }
 
     @Override
