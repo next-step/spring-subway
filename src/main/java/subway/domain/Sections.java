@@ -45,13 +45,13 @@ public class Sections {
 
     public boolean isOverlapped(final SectionParam params) {
         validateOnlyOneStationExistInLine(params);
-        boolean isUpStationNotOverlapped =
-            isStationExist(params.getUpStation().getId()) && isEndStation(
-                params.getUpStation().getId());
-        boolean isDownStationNotOverlapped =
-            isStationExist(params.getDownStation().getId()) && isEndStation(
-                params.getDownStation().getId());
-        return !isUpStationNotOverlapped && !isDownStationNotOverlapped;
+
+        boolean isUpStationOverlapped = isStationExist(params.getUpStation().getId()) &&
+            !isEndStation(params.getUpStation().getId());
+        boolean isDownStationOverlapped = isStationExist(params.getDownStation().getId()) &&
+            !isStartStation(params.getDownStation().getId());
+
+        return isUpStationOverlapped || isDownStationOverlapped;
     }
 
     public Section findUpDirectionSection(long stationId) {
