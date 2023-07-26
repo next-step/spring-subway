@@ -163,6 +163,62 @@ class LineTest {
     }
 
     @Nested
+    @DisplayName("disconnectSection 메소드는")
+    class Disconnect_Method {
+
+        @Test
+        @DisplayName("입력으로 들어온 Station이 line에 존재할 경우 연결을 끊고 재배치한다")
+        void Disconnect_And_RearrangeWhen_Input_Station_Contains_Line() {
+            // given
+            Station requestStation = station2;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, requestStation, 10);
+            Section section2 = DomainFixture.Section.buildWithStations(requestStation, station3, 20);
+
+            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1, section2)));
+
+            // when
+            Section updateSection = line.disconnectSection(requestStation);
+
+            // then
+            assertThat(updateSection.getDistance()).isEqualTo(30);
+            assertThat(updateSection.getUpStation()).isEqualTo(station1);
+            assertThat(updateSection.getDownStation()).isEqualTo(station3);
+        }
+
+        @Test
+        @DisplayName("입력으로 들어온 Station이 line에 존재하지 않을 경우, StationException을 던진다")
+        void Throw_StationException_When_Station_Not_Exists() {
+            // given
+            Station requestStation = station4;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, station2, 10);
+            Section section2 = DomainFixture.Section.buildWithStations(station2, station3, 20);
+
+            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1, section2)));
+
+            // when
+            Exception exception = catchException(() -> line.disconnectSection(requestStation));
+
+            // then
+            assertThat(exception).isInstanceOf(StationException.class);
+        }
+
+        @Test
+        @DisplayName("line에 구간이 하나만 있다면, LineException을 던진다")
+        void Throw_LineException_When_Line_Size_1() {
+            // given
+            Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
+
+            Line line = new Line(1L, "line", "red", Arrays.asList(section1));
+
+            // when
+            Exception exception = catchException(() -> line.disconnectSection(station1));
+
+            // then
+            assertThat(exception).isInstanceOf(LineException.class);
+        }
+    }
+
+    @Nested
     @DisplayName("getSortedStations 메소드는")
     class GetSortedStations_Method {
 

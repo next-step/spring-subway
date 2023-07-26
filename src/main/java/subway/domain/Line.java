@@ -82,12 +82,15 @@ public class Line {
     }
 
     private void validateStations(final Station upStation, final Station downStation) {
-        final boolean isUpStationExists = sections.stream()
-                .anyMatch(section -> isStationExists(upStation, section));
-        final boolean isDownStationExists = sections.stream()
-                .anyMatch(section -> isStationExists(downStation, section));
+        final boolean isUpStationExists = isStationExists(upStation);
+        final boolean isDownStationExists = isStationExists(downStation);
 
         validateExistStations(upStation, downStation, isUpStationExists, isDownStationExists);
+    }
+
+    private boolean isStationExists(Station station) {
+        return sections.stream()
+                .anyMatch(section -> isStationExists(station, section));
     }
 
     private boolean isStationExists(final Station station, final Section section) {
@@ -140,8 +143,11 @@ public class Line {
 
         final Section upSection = downSection.getUpSection();
         upSection.disconnectDownSection();
-
         sections.remove(downSection);
+    }
+
+    public Section disconnectSection(final Station station) {
+        return null;
     }
 
     private static void validateSameStations(final Station downStation, final Section downSection) {
