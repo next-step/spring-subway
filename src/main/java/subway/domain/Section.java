@@ -32,6 +32,14 @@ public class Section {
     public Section() {
     }
 
+    public Section combine(Section downSection) {
+        return new Section(
+                this.line,
+                this.upStation,
+                downSection.downStation,
+                new Distance(this.getDistance() + downSection.getDistance()));
+    }
+
     public Section cuttedSection(Section section) {
         return cuttedSection(section.upStation, section.downStation, section.distance);
     }
