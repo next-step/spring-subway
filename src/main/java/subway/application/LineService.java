@@ -12,8 +12,8 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.vo.StationPair;
 import subway.domain.Stations;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.ui.dto.LineRequest;
+import subway.ui.dto.LineResponse;
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalStationsException;
 

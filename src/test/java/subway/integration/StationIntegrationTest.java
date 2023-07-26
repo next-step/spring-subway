@@ -12,8 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.RestApi;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.ui.dto.StationRequest;
+import subway.ui.dto.StationResponse;
 
 @DisplayName("지하철역 관련 기능")
 class StationIntegrationTest extends IntegrationTest {

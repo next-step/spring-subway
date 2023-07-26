@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import subway.dto.SectionParam;
+import subway.application.dto.SectionParam;
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;

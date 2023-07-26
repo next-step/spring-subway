@@ -7,9 +7,9 @@ import subway.dao.StationDao;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.dto.SectionParam;
-import subway.dto.SectionRequest;
-import subway.dto.SectionResponse;
+import subway.application.dto.SectionParam;
+import subway.ui.dto.SectionRequest;
+import subway.ui.dto.SectionResponse;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 

@@ -22,9 +22,9 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.StationResponse;
+import subway.ui.dto.LineRequest;
+import subway.ui.dto.LineResponse;
+import subway.ui.dto.StationResponse;
 import subway.exception.IllegalLineException;
 
 @DisplayName("라인 서비스 테스트")

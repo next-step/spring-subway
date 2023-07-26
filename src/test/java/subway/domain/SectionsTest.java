@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.dto.SectionParam;
+import subway.application.dto.SectionParam;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 

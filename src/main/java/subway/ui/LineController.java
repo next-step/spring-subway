@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
 import subway.application.SectionService;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
-import subway.dto.SectionResponse;
+import subway.ui.dto.LineRequest;
+import subway.ui.dto.LineResponse;
+import subway.ui.dto.SectionRequest;
+import subway.ui.dto.SectionResponse;
 
 @RestController
 @RequestMapping("/lines")

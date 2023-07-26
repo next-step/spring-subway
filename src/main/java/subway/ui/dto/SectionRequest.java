@@ -1,4 +1,4 @@
-package subway.dto;
+package subway.ui.dto;
 
 import org.springframework.util.Assert;
 import subway.domain.Line;

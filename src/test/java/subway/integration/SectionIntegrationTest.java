@@ -8,9 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.RestApi;
-import subway.dto.LineRequest;
-import subway.dto.SectionRequest;
-import subway.dto.StationRequest;
+import subway.ui.dto.LineRequest;
+import subway.ui.dto.SectionRequest;
+import subway.ui.dto.StationRequest;
 
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
