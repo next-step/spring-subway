@@ -1,6 +1,7 @@
-package subway.domain;
+package subway.vo;
 
 import java.util.Objects;
+import subway.domain.Station;
 import subway.exception.IllegalStationsException;
 
 public class StationPair {
