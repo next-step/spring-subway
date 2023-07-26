@@ -2,6 +2,7 @@ package subway.domain;
 
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
+import subway.exception.IllegalStationException;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -66,12 +67,6 @@ public final class Sections {
         return sections;
     }
 
-    private void validateLine(final List<Section> sections) {
-        if (sections.isEmpty()) {
-            throw new IllegalLineException("해당 노선은 생성되지 않았습니다.");
-        }
-    }
-
     public Optional<Section> findConnectedSection(final Section newSection) {
         final boolean connectWithUpStation = checkConnection(newSection);
         final Optional<Section> connectedSection = findConnectedSection(newSection, connectWithUpStation);
@@ -79,6 +74,25 @@ public final class Sections {
         return connectedSection.flatMap(section ->
                 connectedSection(section, newSection, connectWithUpStation)
         );
+    }
+
+    public List<Station> getStations() {
+        final List<Station> stations = new ArrayList<>();
+        stations.add(sections.get(0).getUpStation());
+        sections.forEach(section -> stations.add(section.getDownStation()));
+        return Collections.unmodifiableList(stations);
+    }
+
+    public void validateCanDeleteSection() {
+        if (sections.size() < MIN_SIZE_CAN_DELETE) {
+            throw new IllegalSectionException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
+        }
+    }
+
+    private void validateLine(final List<Section> sections) {
+        if (sections.isEmpty()) {
+            throw new IllegalLineException("해당 노선은 생성되지 않았습니다.");
+        }
     }
 
     private Optional<Section> connectedSection(final Section existSection,
@@ -129,26 +143,19 @@ public final class Sections {
         }
     }
 
-    public List<Station> getStations() {
-        final List<Station> stations = new ArrayList<>();
-        stations.add(sections.get(0).getUpStation());
-        sections.forEach(section -> stations.add(section.getDownStation()));
-        return Collections.unmodifiableList(stations);
-    }
-
-    public void validateCanDeleteSection() {
-        if (sections.size() < MIN_SIZE_CAN_DELETE) {
-            throw new IllegalSectionException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
-        }
-    }
-
     public DisconnectResponse findDisconnectSections(final long stationId) {
         final List<Section> sectionsToChange = findSectionsToChange(stationId);
+        validateSectionsToChange(sectionsToChange);
+        return convertToDisconnectResponse(sectionsToChange);
+    }
 
+    private void validateSectionsToChange(final List<Section> sectionsToChange) {
         if (sectionsToChange.size() > MIN_SIZE_CAN_DELETE) {
             throw new IllegalArgumentException("[ERROR] 노선의 구간들이 올바르게 연결되어 있지 않습니다.");
         }
-        return convertToDisconnectResponse(sectionsToChange);
+        if (sectionsToChange.isEmpty()) {
+            throw new IllegalStationException("해당 노선에 삭제할 역이 존재하지 않습니다.");
+        }
     }
 
     private DisconnectResponse convertToDisconnectResponse(final List<Section> sectionsToChange) {
