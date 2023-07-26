@@ -90,8 +90,8 @@ class SectionsAddTest {
 
         SectionAdditionResult sectionAdditionResult = sections.add(targetSection);
 
-        assertThat(sectionAdditionResult.getSectionsToAdd()).isEqualTo(List.of(targetSection));
-        assertThat(sectionAdditionResult.getSectionToRemove()).isEmpty();
+        assertThat(sectionAdditionResult.getSectionsToAdd()).isEqualTo(List.of(targetSection, firstSection));
+        assertThat(sectionAdditionResult.getSectionToRemove()).isEqualTo(Optional.of(firstSection));
         assertThat(sections).isEqualTo(
             new Sections(List.of(targetSection, firstSection, secondSection)));
     }
@@ -106,8 +106,8 @@ class SectionsAddTest {
 
         SectionAdditionResult sectionAdditionResult = sections.add(targetSection);
 
-        assertThat(sectionAdditionResult.getSectionsToAdd()).isEqualTo(List.of(targetSection));
-        assertThat(sectionAdditionResult.getSectionToRemove()).isEmpty();
+        assertThat(sectionAdditionResult.getSectionsToAdd()).isEqualTo(List.of(secondSection, targetSection));
+        assertThat(sectionAdditionResult.getSectionToRemove()).isEqualTo(Optional.of(secondSection));
         assertThat(sections).isEqualTo(
             new Sections(List.of(firstSection, secondSection, targetSection)));
     }
