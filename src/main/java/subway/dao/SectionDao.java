@@ -11,6 +11,7 @@ import subway.domain.*;
 import javax.sql.DataSource;
 import java.util.List;
 
+import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 
 @Repository
@@ -78,6 +79,11 @@ public class SectionDao {
     public List<Section> findAllByLineId(final Long lineId) {
         final String sql = ROW_MAPPER_BASE_SQL + " where s.line_id = ? ";
         return jdbcTemplate.query(sql, rowMapper, lineId);
+    }
+
+    public boolean existSectionByLineId(final Long lineId) {
+        final String sql = "select count(*) > 0 from section where line_id = ? ";
+        return TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, lineId));
     }
 
     public void deleteById(final Long sectionId) {

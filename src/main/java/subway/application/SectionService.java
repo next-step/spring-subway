@@ -28,7 +28,14 @@ public class SectionService {
                                    final Long upStationId,
                                    final Long downStationId,
                                    final Long distance) {
+        validateFirstSection(lineId);
         sectionDao.insert(createSection(lineId, upStationId, downStationId, distance));
+    }
+
+    private void validateFirstSection(final Long lineId) {
+        if (sectionDao.existSectionByLineId(lineId)) {
+            throw new IllegalStateException("노선에 구간이 존재하면 생성할 수 없습니다.");
+        }
     }
 
     @Transactional
