@@ -46,45 +46,45 @@ public class LineDao {
         params.put("name", line.getName());
         params.put("color", line.getColor());
 
-        Long lineId = insertAction.executeAndReturnKey(params).longValue();
+        long lineId = insertAction.executeAndReturnKey(params).longValue();
         return new Line(lineId, line.getName(), line.getColor());
     }
 
     public List<Line> findAll() {
-        String sql = "select id, name, color from LINE";
+        String sql = "SELECT id, name, color FROM line";
         return jdbcTemplate.query(sql, lineMapper.getRowMapper());
     }
 
     public Optional<Line> findById(Long id) {
-        String sql = "select id, name, color from LINE WHERE id = ?";
+        String sql = "SELECT id, name, color FROM line WHERE id = ?";
         return jdbcTemplate.query(sql, lineMapper.getRowMapper(), id)
             .stream().findAny();
     }
 
     public void update(Line newLine) {
-        String sql = "update LINE set name = ?, color = ? where id = ?";
+        String sql = "UPDATE line SET name = ?, color = ? WHERE id = ?";
         jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
     public void deleteById(Long id) {
-        jdbcTemplate.update("delete from Line where id = ?", id);
+        jdbcTemplate.update("DELETE FROM line WHERE id = ?", id);
     }
 
     public Optional<Line> findByName(final String name) {
-        String sql = "select * from LINE WHERE name = ?";
+        String sql = "SELECT * FROM line WHERE name = ?";
         return jdbcTemplate.query(sql, lineMapper.getRowMapper(), name)
                 .stream()
                 .findAny();
     }
 
     public List<StationPair> findAllStationPair(final Long lineId) {
-        String sql = "select s1.id as s1_id, s1.name as s1_name, s2.id as s2_id, s2.name as s2_name " +
-                "from section " +
-                "join station as s1 " +
-                "on section.up_station_id = s1.id " +
-                "join station as s2 " +
-                "on section.down_station_id = s2.id " +
-                "where line_id = ?";
+        String sql = "SELECT s1.id AS s1_id, s1.name AS s1_name, s2.id AS s2_id, s2.name AS s2_name " +
+                "FROM section " +
+                "JOIN station AS s1 " +
+                "ON section.up_station_id = s1.id " +
+                "JOIN station AS s2 " +
+                "ON section.down_station_id = s2.id " +
+                "WHERE line_id = ?";
         return jdbcTemplate.query(sql, stationPairRowMapper, lineId);
     }
 }

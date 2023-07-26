@@ -33,23 +33,23 @@ public class StationDao {
     }
 
     public List<Station> findAll() {
-        String sql = "select * from STATION";
+        String sql = "SELECT * FROM station";
         return jdbcTemplate.query(sql, stationMapper.getRowMapper());
     }
 
     public Optional<Station> findById(Long id) {
-        String sql = "select * from STATION where id = ?";
+        String sql = "SELECT * FROM station WHERE id = ?";
         return jdbcTemplate.query(sql, stationMapper.getRowMapper(), id)
             .stream().findAny();
     }
 
     public void update(Station newStation) {
-        String sql = "update STATION set name = ? where id = ?";
+        String sql = "UPDATE station SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
     }
 
     public void deleteById(Long id) {
-        String sql = "delete from STATION where id = ?";
+        String sql = "DELETE FROM station WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
 }
