@@ -71,8 +71,7 @@ public class Sections {
     public SectionAdditionResult add(Section section) {
         validateOnlyOneStationIncludedInSections(section);
         Section relatedSection = getRelatedSection(section);
-        List<Section> mergedSection = SectionMerger.of(relatedSection, section)
-            .merge(relatedSection, section);
+        List<Section> mergedSection = SectionMerger.merge(relatedSection, section);
 
         replace(relatedSection, mergedSection);
 
@@ -103,11 +102,12 @@ public class Sections {
 
     private Section getRelatedSection(Section section) {
 
-        Optional<Section> sectionOptional = this.values.stream()
-            .filter(value -> value.hasSameUpStationOrDownStation(section))
+        Optional<Section> middleMergeableSectionOptional = this.values.stream()
+            .filter(value -> value.isMiddleMergeable(section))
             .findAny();
 
-        return sectionOptional.orElseGet(() -> this.values.stream()
+        return middleMergeableSectionOptional.orElseGet(() ->
+            this.values.stream()
             .filter(value -> value.isRelated(section))
             .findAny()
             .orElseThrow(() -> new IllegalArgumentException("연관된 구역이 없습니다.")));
@@ -128,19 +128,16 @@ public class Sections {
         validateExistsInSections(station);
         validateMinSectionSize();
 
-        if (isFinalUpStation(station)) {
-            return new SectionRemovalResult(null, List.of(removeFirst()));
+        List<Section> relatedSections = this.values.stream()
+            .filter(value -> value.containsStation(station))
+            .collect(Collectors.toUnmodifiableList());
+
+        if (relatedSections.size() == 1) {
+            this.values.remove(relatedSections.get(0));
+            return new SectionRemovalResult(null, List.of(relatedSections.get(0)));
         }
 
-        if (isFinalDownStation(station)) {
-            return new SectionRemovalResult(null, List.of(removeLast()));
-        }
-
-        if (isMiddleStation(station)) {
-            return removeMiddleStation(station);
-        }
-
-        throw new IllegalStateException("예상하지 못한 경우입니다.");
+        return removeMiddleStation(relatedSections);
     }
 
     private void validateExistsInSections(Station station) {
@@ -155,31 +152,9 @@ public class Sections {
         }
     }
 
-    private boolean isFinalUpStation(Station station) {
-        return getFirst().hasUpStationSameAs(station);
-    }
-
-    private Section removeFirst() {
-        return values.remove(0);
-    }
-
-    private boolean isFinalDownStation(Station station) {
-        return getLast().hasDownStationSameAs(station);
-    }
-
-    private Section removeLast() {
-        return values.remove(values.size() - 1);
-    }
-
-    private boolean isMiddleStation(Station station) {
-        return this.values.stream()
-            .anyMatch(section -> section.hasDownStationSameAs(station)) &&
-            !getLast().hasDownStationSameAs(station);
-    }
-
-    private SectionRemovalResult removeMiddleStation(Station station) {
-        Section matchedSection = findMatchedSectionSameDownStation(station);
-        Section nextSection = findNextSectionOf(matchedSection);
+    private SectionRemovalResult removeMiddleStation(List<Section> relatedSections) {
+        Section matchedSection = relatedSections.get(0);
+        Section nextSection = relatedSections.get(1);
 
         Section connectedSection = matchedSection.removeMiddleStation(nextSection);
         this.values.add(this.values.indexOf(matchedSection), connectedSection);
@@ -190,33 +165,14 @@ public class Sections {
         return new SectionRemovalResult(connectedSection, sectionToRemove);
     }
 
-    private Section findMatchedSectionSameDownStation(Station station) {
-        return this.values.stream()
-            .filter(section -> section.hasDownStationSameAs(station))
-            .findAny()
-            .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다"));
-    }
-
-    private Section findNextSectionOf(Section matchedSection) {
-        return this.values.get(this.values.indexOf(matchedSection) + 1);
-    }
-
     public List<Station> getStations() {
         List<Station> stations = toMappedList(unmodifiableList(values), Section::getUpStation);
         stations.add(getLast().getDownStation());
-        return stations;
-    }
-
-    private Section getFirst() {
-        return this.values.get(0);
+        return unmodifiableList(stations);
     }
 
     private Section getLast() {
         return this.values.get(this.values.size() - 1);
-    }
-
-    public List<Section> getValues() {
-        return unmodifiableList(values);
     }
 
     @Override

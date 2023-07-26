@@ -33,10 +33,10 @@ public enum SectionMerger {
             return FIRST;
         }
 
-        throw new IllegalArgumentException("추가할 구간의 상행역 하행역이 모두 다를 수 없습니다. 기존 구간: " + relatedSection + " 추가할 구간: " + addableSection);
+        throw new IllegalArgumentException("추가할 구간의 상행역 하행역이 모두 같거나 모두 다를 수 없습니다. 기존 구간: " + relatedSection + " 추가할 구간: " + addableSection);
     }
 
-    public List<Section> merge(Section mySection, Section relatedSection) {
-        return function.apply(mySection, relatedSection);
+    public static List<Section> merge(Section mySection, Section relatedSection) {
+        return of(mySection,relatedSection).function.apply(mySection, relatedSection);
     }
 }
