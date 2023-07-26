@@ -79,6 +79,44 @@ class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    @DisplayName("빈 문자열로 지하철 노선을 생성한다.")
+    @Test
+    void createLineWithEmptyName() {
+        // given
+        final LineRequest emptyLineRequest = new LineRequest("", "bg-red-600", 1L, 2L, 10);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(emptyLineRequest)
+                .when().post("/lines")
+                .then().log().all().
+                extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("최대 길이를 초과한 문자열로 지하철 노선을 생성한다.")
+    @Test
+    void createLineWithExceedName() {
+        // given
+        final LineRequest exceedLineRequest = new LineRequest("가".repeat(256), "bg-red-600", 1L, 2L, 10);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(exceedLineRequest)
+                .when().post("/lines")
+                .then().log().all().
+                extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {

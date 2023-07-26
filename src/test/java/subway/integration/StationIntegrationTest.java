@@ -68,6 +68,48 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    @DisplayName("빈 문자열로 지하철역을 생성한다.")
+    @Test
+    void createStationWithEmptyName() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then()
+                .log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("최대 길이를 초과한 문자열로 지하철역을 생성한다.")
+    @Test
+    void createStationWithExceedName() {
+        // given
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "가".repeat(256));
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(params)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then()
+                .log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("지하철역 목록을 조회한다.")
     @Test
     void getStations() {
