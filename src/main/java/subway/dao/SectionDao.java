@@ -1,9 +1,7 @@
 package subway.dao;
 
 import java.util.List;
-import java.util.Optional;
 import javax.sql.DataSource;
-import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -91,58 +89,6 @@ public class SectionDao {
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, lineId));
     }
 
-    public boolean existByLineIdAndStationId(Long lineId, Long stationId) {
-        String sql = "select count(*) from section where line_id = ? and (down_station_id = ? or up_station_id = ?)";
-
-        return Boolean.TRUE.equals(
-                jdbcTemplate.queryForObject(sql, Boolean.class, lineId, stationId, stationId));
-    }
-
-    public void deleteById(Long id) {
-        String sql = "delete from section where id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    public Optional<Section> findByLineIdAndUpStationId(Long lineId, Long upStationId) {
-        String sql = "select s.id as section_id, "
-                + "s.distance as distance, "
-                + "l.id as line_id, "
-                + "l.name as line_name, "
-                + "l.color as line_color, "
-                + "u.id as up_id, "
-                + "u.name as up_name, "
-                + "d.id as down_id, "
-                + "d.name as down_name "
-                + " from section as s "
-                + " INNER JOIN LINE as l ON l.id = s.line_id "
-                + " INNER JOIN STATION as u ON u.id = s.up_station_id "
-                + " INNER JOIN STATION as d ON d.id = s.down_station_id "
-                + " where s.line_id = ? and s.up_station_id = ? ";
-        return Optional.ofNullable(
-                DataAccessUtils.singleResult(
-                        jdbcTemplate.query(sql, rowMapper, lineId, upStationId)));
-    }
-
-    public Optional<Section> findByLineIdAndDownStationId(Long lineId, Long downStationId) {
-        String sql = "select s.id as section_id, "
-                + "s.distance as distance, "
-                + "l.id as line_id, "
-                + "l.name as line_name, "
-                + "l.color as line_color, "
-                + "u.id as up_id, "
-                + "u.name as up_name, "
-                + "d.id as down_id, "
-                + "d.name as down_name "
-                + " from section as s "
-                + " INNER JOIN LINE as l ON l.id = s.line_id "
-                + " INNER JOIN STATION as u ON u.id = s.up_station_id "
-                + " INNER JOIN STATION as d ON d.id = s.down_station_id "
-                + " where s.line_id = ? and s.down_station_id = ? ";
-        return Optional.ofNullable(
-                DataAccessUtils.singleResult(
-                        jdbcTemplate.query(sql, rowMapper, lineId, downStationId)));
-    }
-
     public void update(Section section) {
         String sql = "update section set "
                 + " line_id = ?, "
@@ -150,13 +96,17 @@ public class SectionDao {
                 + " down_station_id = ?, "
                 + " distance = ? "
                 + " where id = ? ";
-        Object[] mapper = new Object[]{
+        
+        jdbcTemplate.update(sql,
                 section.getLineId(),
                 section.getUpStationId(),
                 section.getDownStationId(),
                 section.getDistance(),
-                section.getId()
-        };
-        jdbcTemplate.update(sql, mapper);
+                section.getId());
+    }
+
+    public void deleteById(Long id) {
+        String sql = "delete from section where id = ?";
+        jdbcTemplate.update(sql, id);
     }
 }

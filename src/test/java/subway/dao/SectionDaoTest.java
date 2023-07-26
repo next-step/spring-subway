@@ -64,39 +64,6 @@ class SectionDaoTest {
                 section1.getDistance());
     }
 
-
-    @DisplayName("노선과 역 아이디에 해당하는 구간이 존재 여부 반환 - true")
-    @Test
-    void existByLineIdAndStationIdTrue() {
-        // given
-        long lineId = 1L;
-        sectionDao.insert(section1);
-        sectionDao.insert(section2);
-        sectionDao.insert(section3);
-        long stationId = 4L;
-        // when
-        boolean result = sectionDao.existByLineIdAndStationId(lineId, stationId);
-
-        // then
-        assertThat(result).isTrue();
-    }
-
-    @DisplayName("노선과 역 아이디에 해당하는 구간이 존재 여부 반환 - false")
-    @Test
-    void existByLineIdAndStationIdFalse() {
-        // given
-        long lineId = 1L;
-        sectionDao.insert(section1);
-        sectionDao.insert(section2);
-        sectionDao.insert(section3);
-        long stationId = 5L;
-        // when
-        boolean result = sectionDao.existByLineIdAndStationId(lineId, stationId);
-
-        // then
-        assertThat(result).isFalse();
-    }
-
     @DisplayName("구간 테이블에 특정 노선의 구간이 있는지 여부 반환 - true")
     @Test
     void existByLineIdTrue() {
