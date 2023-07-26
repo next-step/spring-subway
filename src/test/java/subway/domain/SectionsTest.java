@@ -13,7 +13,6 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.dto.SectionParam;
-import subway.dto.SectionRequest;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 
@@ -31,17 +30,18 @@ class SectionsTest {
 
     @DisplayName("해당 구간에 연결된 구간이 존재하는지 검증한다.")
     @Test
-    void hasConnectedSection() {
+    void isOverlappedTest() {
         // given
-        Sections sections = createInitialSections();
+        List<Section> sectionList =  createInitialSectionList();
+        Sections sections = new Sections(sectionList);
         Line line = sections.getLine();
 
-        SectionParam connected = new SectionParam(line.getId(), 7L, 2L, 2);
-        SectionParam notConnected = new SectionParam(line.getId(), 5L, 8L, 2);
+        SectionParam overlapped = new SectionParam(line.getId(), 7L, sectionList.get(2).getUpStation().getId(), 2);
+        SectionParam notOverlapped = new SectionParam(line.getId(), 8L, sectionList.get(0).getUpStation().getId(), 2);
 
         // when & then
-        assertThat(sections.isOverlapped(connected)).isTrue();
-        assertThat(sections.isOverlapped(notConnected)).isFalse();
+        assertThat(sections.isOverlapped(overlapped)).isTrue();
+        assertThat(sections.isOverlapped(notOverlapped)).isFalse();
     }
 
     @DisplayName("해당 구간이 추가 가능한 구간인지 검증에 성공한다.")
@@ -99,11 +99,12 @@ class SectionsTest {
     @Test
     void validateSectionDistanceFailTest() {
         // given
-        Sections sections = createInitialSections();
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
         Line line = sections.getLine();
 
         int invalidDistance = 10;
-        SectionParam sectionParam = new SectionParam(line.getId(), 1, 6, invalidDistance);
+        SectionParam sectionParam = new SectionParam(line.getId(), 7L, sectionList.get(2).getUpStation().getId(), invalidDistance);
 
         // when & then
         assertThatThrownBy(() -> sections.updateOverlappedSection(sectionParam))
@@ -115,11 +116,14 @@ class SectionsTest {
     @Test
     void validateSectionDistanceTest() {
         // given
-        Sections sections = createInitialSections();
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
         Line line = sections.getLine();
 
+        Station upStation = sectionList.get(1).getDownStation();
+
         int validDistance = 3;
-        SectionParam sectionParam = new SectionParam(line.getId(), 1, 6, validDistance);
+        SectionParam sectionParam = new SectionParam(line.getId(), upStation.getId(), 6, validDistance);
 
         // when & then
         assertThatNoException()

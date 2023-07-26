@@ -39,7 +39,7 @@ class SectionTest {
             .isInstanceOf(IllegalSectionException.class);
     }
 
-    @DisplayName("현재구간을 상행 방향으로 축소한다.")
+    @DisplayName("기존 구간의 상행역을 새로운 구간의 하행 역 방향으로 축소한다.")
     @Test
     void narrowToUpDirectionTest() {
         // given
@@ -48,21 +48,22 @@ class SectionTest {
         Station jamsil = new Station(1L, "jamsil");
         Station jamsilnaru = new Station(2L, "jamsilnaru");
 
-        Section upDirection = new Section(1L, line, overlapStation, jamsil, 6);
-        Section base = new Section(2L, line, overlapStation, jamsilnaru, 10);
+        Section newSection = new Section(1L, line, overlapStation, jamsil, 6);
+        Section overlapped = new Section(2L, line, overlapStation, jamsilnaru, 10);
 
         // when
-        Section narrow = base.narrowToUpDirection(upDirection);
+        Section narrow = overlapped.narrowToDownDirection(newSection.getDownStation(),
+            newSection.getDistance());
 
         // then
-        assertThat(narrow.getId()).isEqualTo(base.getId());
+        assertThat(narrow.getId()).isEqualTo(overlapped.getId());
         assertThat(narrow.getLine()).isEqualTo(line);
-        assertThat(narrow.getUpStation()).isEqualTo(upDirection.getDownStation());
-        assertThat(narrow.getDownStation()).isEqualTo(base.getDownStation());
-        assertThat(narrow.getDistance()).isEqualTo(base.getDistance() - upDirection.getDistance());
+        assertThat(narrow.getUpStation()).isEqualTo(newSection.getDownStation());
+        assertThat(narrow.getDownStation()).isEqualTo(overlapped.getDownStation());
+        assertThat(narrow.getDistance()).isEqualTo(overlapped.getDistance() - newSection.getDistance());
     }
 
-    @DisplayName("현재구간을 하행 방향으로 축소한다.")
+    @DisplayName("기존 구간의 하행역을 새로운 구간의 싱헹 역 방향으로 축소한다.")
     @Test
     void narrowToDownDirectionTest() {
         // given
@@ -71,19 +72,20 @@ class SectionTest {
         Station jamsilnaru = new Station(2L, "jamsilnaru");
         Station overlapStation = new Station(3L, "guui");
 
-        Section base = new Section(1L, line, jamsil, overlapStation, 10);
-        Section downDirection = new Section(1L, line, jamsilnaru, overlapStation, 6);
+        Section overlapped = new Section(1L, line, jamsil, overlapStation, 10);
+        Section newSection = new Section(1L, line, jamsilnaru, overlapStation, 6);
 
         // when
-        Section narrowed = base.narrowToDownDirection(downDirection);
+        Section narrowed = overlapped.narrowToUpDirection(newSection.getUpStation(),
+            newSection.getDistance());
 
         // then
-        assertThat(narrowed.getId()).isEqualTo(base.getId());
+        assertThat(narrowed.getId()).isEqualTo(overlapped.getId());
         assertThat(narrowed.getLine()).isEqualTo(line);
-        assertThat(narrowed.getUpStation()).isEqualTo(base.getUpStation());
-        assertThat(narrowed.getDownStation()).isEqualTo(downDirection.getUpStation());
+        assertThat(narrowed.getUpStation()).isEqualTo(overlapped.getUpStation());
+        assertThat(narrowed.getDownStation()).isEqualTo(newSection.getUpStation());
         assertThat(narrowed.getDistance())
-            .isEqualTo(base.getDistance() - downDirection.getDistance());
+            .isEqualTo(overlapped.getDistance() - newSection.getDistance());
     }
 
     @DisplayName("현재구간을 상행 방향으로 확장한다.")

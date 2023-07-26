@@ -28,14 +28,14 @@ public class Section {
         this(null, line, upStation, downStation, distance);
     }
 
-    public Section narrowToDownDirection(final Section downDirection) {
-        int narrowedDistance = distance - downDirection.distance;
-        return new Section(id, line, upStation, downDirection.getUpStation(), narrowedDistance);
+    public Section narrowToUpDirection(final Station newDown, final int narrowAmount) {
+        int narrowedDistance = distance - narrowAmount;
+        return new Section(id, line, upStation, newDown, narrowedDistance);
     }
 
-    public Section narrowToUpDirection(final Section upDirection) {
-        int narrowedDistance = distance - upDirection.distance;
-        return new Section(id, line, upDirection.getDownStation(), downStation, narrowedDistance);
+    public Section narrowToDownDirection(final Station newUp, final int narrowAmount) {
+        int narrowedDistance = distance - narrowAmount;
+        return new Section(id, line, newUp, downStation, narrowedDistance);
     }
 
     public Section extendToUpDirection(final Section upDirection) {
@@ -43,8 +43,8 @@ public class Section {
         return new Section(id, line, upDirection.getUpStation(), downStation, extendedDistance);
     }
 
-    public boolean isDistanceLessThanOrEqualTo(final Section other) {
-        return this.distance <= other.distance;
+    public boolean isDistanceLessThanOrEqualTo(final int other) {
+        return this.distance <= other;
     }
 
     private void validateStations(final Station upStation, final Station downStation) {
