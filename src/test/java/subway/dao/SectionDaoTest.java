@@ -47,7 +47,7 @@ class SectionDaoTest {
     void findAllTest() {
         // given
         Section upSection = initializeSection();
-        Section downSection = extendSection(upSection.getLine(), upSection.getDownStationId());
+        Section downSection = extendSection(upSection.getLine(), upSection.getDownStation());
         long lineId = upSection.getLine().getId();
 
         // when
@@ -64,8 +64,8 @@ class SectionDaoTest {
     void updateTest() {
         // given
         Section section = initializeSection();
-        Section update = new Section(section.getId(), section.getLine(), section.getUpStationId(),
-            section.getDownStationId(), 20);
+        Section update = new Section(section.getId(), section.getLine(), section.getUpStation(),
+            section.getDownStation(), 20);
         long lineId = section.getLine().getId();
 
         // when
@@ -99,7 +99,7 @@ class SectionDaoTest {
         // given
         Section section = initializeSection();
         long lineId = section.getLine().getId();
-        extendSection(section.getLine(), section.getDownStationId());
+        extendSection(section.getLine(), section.getDownStation());
 
         // when
         long totalCount = sectionDao.count(lineId);
@@ -119,7 +119,7 @@ class SectionDaoTest {
         assertAll(
             "노선에 역 존재하는지 여부 테스트",
             () -> assertTrue(sectionDao.existByLineIdAndStationId(section.getLine().getId(),
-                section.getDownStationId())),
+                section.getDownStation().getId())),
             () -> assertFalse(
                 sectionDao.existByLineIdAndStationId(section.getLine().getId(), notExistStationId))
         );
@@ -132,14 +132,14 @@ class SectionDaoTest {
         Station station2 = stationDao.insert(new Station("상왕십리"));
 
         return sectionDao.insert(
-            new Section(line, station1.getId(), station2.getId(), 10)
+            new Section(line, station1, station2, 10)
         );
     }
 
-    private Section extendSection(Line line, long upStationId) {
+    private Section extendSection(Line line, Station upStation) {
         Station extendedStation = stationDao.insert(new Station("신당"));
         return sectionDao.insert(
-            new Section(line, upStationId, extendedStation.getId(), 10)
+            new Section(line, upStation, extendedStation, 10)
         );
     }
 }

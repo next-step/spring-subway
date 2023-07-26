@@ -7,48 +7,48 @@ public class Section {
 
     private final Long id;
     private final Line line;
-    private final Long upStationId;
-    private final Long downStationId;
+    private final Station upStation;
+    private final Station downStation;
     private final Integer distance;
 
-    public Section(final Long id, final Line line, final Long upStationId,
-        final Long downStationId, final Integer distance) {
-        validateStations(upStationId, downStationId);
+    public Section(final Long id, final Line line, final Station upStation,
+        final Station downStation, final Integer distance) {
+        validateStations(upStation, downStation);
         validateDistance(distance);
 
         this.id = id;
         this.line = line;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public Section(final Line line, final Long upStationId, final Long downStationId,
+    public Section(final Line line, final Station upStation, final Station downStation,
         final Integer distance) {
-        this(null, line, upStationId, downStationId, distance);
+        this(null, line, upStation, downStation, distance);
     }
 
     public Section narrowToDownDirection(final Section downDirection) {
         int narrowedDistance = distance - downDirection.distance;
-        return new Section(id, line, upStationId, downDirection.getUpStationId(), narrowedDistance);
+        return new Section(id, line, upStation, downDirection.getUpStation(), narrowedDistance);
     }
 
     public Section narrowToUpDirection(final Section upDirection) {
         int narrowedDistance = distance - upDirection.distance;
-        return new Section(id, line, upDirection.getDownStationId(), downStationId, narrowedDistance);
+        return new Section(id, line, upDirection.getDownStation(), downStation, narrowedDistance);
     }
 
     public Section extendToUpDirection(final Section upDirection) {
         int extendedDistance = upDirection.distance + distance;
-        return new Section(id, line, upDirection.getUpStationId(), downStationId, extendedDistance);
+        return new Section(id, line, upDirection.getUpStation(), downStation, extendedDistance);
     }
 
     public boolean isDistanceLessThanOrEqualTo(final Section other) {
         return this.distance <= other.distance;
     }
 
-    private void validateStations(final Long upStationId, final Long downStationId) {
-        if (upStationId.equals(downStationId)) {
+    private void validateStations(final Station upStation, final Station downStation) {
+        if (upStation.equals(downStation)) {
             throw new IllegalSectionException("상행역과 하행역은 달라야 합니다.");
         }
     }
@@ -67,12 +67,12 @@ public class Section {
         return line;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Integer getDistance() {
@@ -89,14 +89,14 @@ public class Section {
         }
         Section section = (Section) o;
         return Objects.equals(id, section.id) && Objects.equals(line,
-            section.line) && Objects.equals(upStationId, section.upStationId)
-            && Objects.equals(downStationId, section.downStationId)
+            section.line) && Objects.equals(upStation, section.upStation)
+            && Objects.equals(downStation, section.downStation)
             && Objects.equals(distance, section.distance);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, line, upStationId, downStationId, distance);
+        return Objects.hash(id, line, upStation, downStation, distance);
     }
 
     @Override
@@ -104,8 +104,8 @@ public class Section {
         return "Section{" +
             "id=" + id +
             ", lineId=" + line +
-            ", upStationId=" + upStationId +
-            ", downStationId=" + downStationId +
+            ", upStationId=" + upStation +
+            ", downStationId=" + downStation +
             ", distance=" + distance +
             '}';
     }

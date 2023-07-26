@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
@@ -38,18 +39,24 @@ class LineServiceTest {
     private LineDao lineDao;
     @Mock
     private SectionDao sectionDao;
+    @Mock
+    private StationDao stationDao;
 
     @Test
     @DisplayName("노선을 저장한다.")
     void saveLineTest() {
         // given
         Line line = createInitialLine();
-        Section section = new Section(1L, line, 1L, 2L, 10);
+        Station upStation = new Station(1L, "jamsil");
+        Station downStation = new Station(2L, "jamsilnaru");
+        Section section = new Section(1L, line, upStation, downStation, 10);
         LineRequest lineRequest = convertToLineRequest(line, section);
 
         given(lineDao.findByName(line.getName())).willReturn(Optional.empty());
         given(lineDao.insert(any(Line.class))).willReturn(line);
         given(sectionDao.insert(any(Section.class))).willReturn(section);
+        given(stationDao.findById(upStation.getId())).willReturn(Optional.of(upStation));
+        given(stationDao.findById(downStation.getId())).willReturn(Optional.of(downStation));
 
         // when
         LineResponse lineResponse = lineService.saveLine(lineRequest);
@@ -63,7 +70,9 @@ class LineServiceTest {
     @DisplayName("동일한 이름으로 노선을 저장하면 예외를 던진다.")
     void saveLineDuplicateNameExceptionTest() {
         Line line = createInitialLine();
-        Section section = new Section(1L, line, 1L, 2L, 10);
+        Station upStation = new Station(1L, "jamsil");
+        Station downStation = new Station(2L, "jamsilnaru");
+        Section section = new Section(1L, line, upStation, downStation, 10);
         LineRequest lineRequest = convertToLineRequest(line, section);
 
         given(lineDao.findByName(line.getName())).willReturn(Optional.of(line));
@@ -147,8 +156,8 @@ class LineServiceTest {
     }
 
     private LineRequest convertToLineRequest(Line line, Section section) {
-        return new LineRequest(line.getName(), section.getUpStationId(),
-            section.getDownStationId(), section.getDistance(), line.getColor());
+        return new LineRequest(line.getName(), section.getUpStation().getId(),
+            section.getDownStation().getId(), section.getDistance(), line.getColor());
     }
 
     private List<Long> getSortedStationIds() {

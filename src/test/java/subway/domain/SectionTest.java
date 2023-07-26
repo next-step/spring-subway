@@ -15,13 +15,13 @@ class SectionTest {
     void createSectionTest() {
         // given
         Line line = createInitialLine();
-        long upStationId = 2L;
-        long downStationId = 4L;
+        Station upStation = new Station(1L, "jamsil");
+        Station downStation = new Station(2L, "jamsilnaru");
         int distance = 10;
 
         // when & then
         assertThatNoException().isThrownBy(
-            () -> new Section(line, upStationId, downStationId, distance));
+            () -> new Section(line, upStation, downStation, distance));
     }
 
     @DisplayName("길이 유효성 검증 테스트")
@@ -29,12 +29,12 @@ class SectionTest {
     void validateDistanceTest() {
         // given
         Line line = createInitialLine();
-        long upStationId = 2L;
-        long downStationId = 4L;
+        Station upStation = new Station(1L, "jamsil");
+        Station downStation = new Station(2L, "jamsilnaru");
         int invalidDistance = 0;
 
         // when & then
-        assertThatThrownBy(() -> new Section(line, upStationId, downStationId, invalidDistance))
+        assertThatThrownBy(() -> new Section(line, upStation, downStation, invalidDistance))
             .hasMessage("구간 길이는 0보다 커야한다.")
             .isInstanceOf(IllegalSectionException.class);
     }
@@ -44,9 +44,12 @@ class SectionTest {
     void narrowToUpDirectionTest() {
         // given
         Line line = createInitialLine();
-        long overlapStationId = 1L;
-        Section upDirection = new Section(1L, line, overlapStationId, 2L, 6);
-        Section base = new Section(2L, line, overlapStationId, 3L, 10);
+        Station overlapStation = new Station(3L, "guui");
+        Station jamsil = new Station(1L, "jamsil");
+        Station jamsilnaru = new Station(2L, "jamsilnaru");
+
+        Section upDirection = new Section(1L, line, overlapStation, jamsil, 6);
+        Section base = new Section(2L, line, overlapStation, jamsilnaru, 10);
 
         // when
         Section narrow = base.narrowToUpDirection(upDirection);
@@ -54,8 +57,8 @@ class SectionTest {
         // then
         assertThat(narrow.getId()).isEqualTo(base.getId());
         assertThat(narrow.getLine()).isEqualTo(line);
-        assertThat(narrow.getUpStationId()).isEqualTo(upDirection.getDownStationId());
-        assertThat(narrow.getDownStationId()).isEqualTo(base.getDownStationId());
+        assertThat(narrow.getUpStation()).isEqualTo(upDirection.getDownStation());
+        assertThat(narrow.getDownStation()).isEqualTo(base.getDownStation());
         assertThat(narrow.getDistance()).isEqualTo(base.getDistance() - upDirection.getDistance());
     }
 
@@ -63,10 +66,13 @@ class SectionTest {
     @Test
     void narrowToDownDirectionTest() {
         // given
-        long overlapStationId = 3L;
         Line line = createInitialLine();
-        Section base = new Section(1L, line, 1L, overlapStationId, 10);
-        Section downDirection = new Section(1L, line, 2L, overlapStationId, 6);
+        Station jamsil = new Station(1L, "jamsil");
+        Station jamsilnaru = new Station(2L, "jamsilnaru");
+        Station overlapStation = new Station(3L, "guui");
+
+        Section base = new Section(1L, line, jamsil, overlapStation, 10);
+        Section downDirection = new Section(1L, line, jamsilnaru, overlapStation, 6);
 
         // when
         Section narrowed = base.narrowToDownDirection(downDirection);
@@ -74,8 +80,8 @@ class SectionTest {
         // then
         assertThat(narrowed.getId()).isEqualTo(base.getId());
         assertThat(narrowed.getLine()).isEqualTo(line);
-        assertThat(narrowed.getUpStationId()).isEqualTo(base.getUpStationId());
-        assertThat(narrowed.getDownStationId()).isEqualTo(downDirection.getUpStationId());
+        assertThat(narrowed.getUpStation()).isEqualTo(base.getUpStation());
+        assertThat(narrowed.getDownStation()).isEqualTo(downDirection.getUpStation());
         assertThat(narrowed.getDistance())
             .isEqualTo(base.getDistance() - downDirection.getDistance());
     }
@@ -84,10 +90,13 @@ class SectionTest {
     @Test
     void extendToUpDirectionTest() {
         // given
-        long overlapStationId = 2L;
         Line line = createInitialLine();
-        Section upDirection = new Section(1L, line, 1L, overlapStationId, 5);
-        Section base = new Section(2L, line, overlapStationId, 3L, 10);
+        Station jamsil = new Station(1L, "jamsil");
+        Station jamsilnaru = new Station(2L, "jamsilnaru");
+        Station overlapStation = new Station(3L, "guui");
+
+        Section upDirection = new Section(1L, line, jamsil, overlapStation, 5);
+        Section base = new Section(2L, line, overlapStation, jamsilnaru, 10);
 
         // when
         Section extended = base.extendToUpDirection(upDirection);
@@ -95,8 +104,8 @@ class SectionTest {
         // then
         assertThat(extended.getId()).isEqualTo(base.getId());
         assertThat(extended.getLine()).isEqualTo(line);
-        assertThat(extended.getUpStationId()).isEqualTo(upDirection.getUpStationId());
-        assertThat(extended.getDownStationId()).isEqualTo(base.getDownStationId());
+        assertThat(extended.getUpStation()).isEqualTo(upDirection.getUpStation());
+        assertThat(extended.getDownStation()).isEqualTo(base.getDownStation());
         assertThat(extended.getDistance())
             .isEqualTo(upDirection.getDistance() + base.getDistance());
     }

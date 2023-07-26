@@ -6,22 +6,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Station;
 import subway.domain.StationPair;
 import subway.domain.Stations;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.exception.IllegalLineException;
+import subway.exception.IllegalStationsException;
 
 @Service
 public class LineService {
 
     private final LineDao lineDao;
+    private final StationDao stationDao;
     private final SectionDao sectionDao;
 
-    public LineService(final LineDao lineDao, final SectionDao sectionDao) {
+    public LineService(final LineDao lineDao, StationDao stationDao, final SectionDao sectionDao) {
         this.lineDao = lineDao;
+        this.stationDao = stationDao;
         this.sectionDao = sectionDao;
     }
 
@@ -30,10 +35,15 @@ public class LineService {
         validateDuplicateName(request.getName());
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
+        Station upStation = stationDao.findById(request.getUpStationId())
+                .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역입니다."));
+        Station downStation = stationDao.findById(request.getDownStationId())
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역입니다."));
+
         sectionDao.insert(new Section(
                 persistLine,
-                request.getUpStationId(),
-                request.getDownStationId(),
+                upStation,
+                downStation,
                 request.getDistance())
         );
 

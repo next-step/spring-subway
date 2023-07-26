@@ -26,8 +26,8 @@ public class SectionResponse {
         return new SectionResponse(
                 section.getId(),
                 section.getLine().getId(),
-                section.getUpStationId(),
-                section.getDownStationId(),
+                section.getUpStation().getId(),
+                section.getDownStation().getId(),
                 section.getDistance()
         );
     }

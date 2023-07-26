@@ -141,8 +141,8 @@ class LineDaoTest {
         Station station2 = stationDao.insert(new Station("상왕십리"));
         Station station3 = stationDao.insert(new Station("신당"));
 
-        sectionDao.insert(new Section(line, station1.getId(), station2.getId(), 10));
-        sectionDao.insert(new Section(line, station2.getId(), station3.getId(), 10));
+        sectionDao.insert(new Section(line, station1, station2, 10));
+        sectionDao.insert(new Section(line, station2, station3, 10));
 
         // when
         List<StationPair> result = lineDao.findAllStationPair(line.getId());

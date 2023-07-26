@@ -3,30 +3,46 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Section;
 import subway.domain.Sections;
+import subway.domain.Station;
+import subway.dto.SectionParam;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.IllegalSectionException;
+import subway.exception.IllegalStationsException;
 
 @Service
 public class SectionService {
 
     private final SectionDao sectionDao;
+    private final StationDao stationDao;
 
-    public SectionService(final SectionDao sectionDao) {
+    public SectionService(final SectionDao sectionDao, StationDao stationDao) {
         this.sectionDao = sectionDao;
+        this.stationDao = stationDao;
     }
 
     @Transactional
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
-        final Sections sections = new Sections(sectionDao.findAll(lineId));
-        final Section newSection = sectionRequest.to(sections.getLine());
 
-        if (sections.isOverlapped(newSection)) {
-            updateOverlappedSection(newSection, sections);
+        final Station upStation = stationDao.findById(sectionRequest.getUpStationId())
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
+        final Station downStation = stationDao.findById(sectionRequest.getDownStationId())
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
+
+        final Sections sections = new Sections(sectionDao.findAll(lineId));
+        final SectionParam params = new SectionParam(lineId, sectionRequest.getUpStationId(),
+            sectionRequest.getDownStationId(),
+            sectionRequest.getDistance());
+
+        if (sections.isOverlapped(params)) {
+            updateOverlappedSection(params, sections);
         }
 
+        final Section newSection =  new Section(sections.getLine(), upStation, downStation,
+            sectionRequest.getDistance());
         return SectionResponse.of(sectionDao.insert(newSection));
     }
 
@@ -44,8 +60,8 @@ public class SectionService {
         deleteInnerSection(stationId, sections);
     }
 
-    private void updateOverlappedSection(final Section searchParams, final Sections sections) {
-        Section updateResult = sections.updateOverlappedSection(searchParams);
+    private void updateOverlappedSection(final SectionParam params, final Sections sections) {
+        Section updateResult = sections.updateOverlappedSection(params);
         sectionDao.update(updateResult);
     }
 

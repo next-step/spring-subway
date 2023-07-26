@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,8 +20,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.IllegalLineException;
@@ -35,25 +38,34 @@ class SectionServiceTest {
 
     @Mock
     private SectionDao sectionDao;
+    @Mock
+    private StationDao stationDao;
 
     @DisplayName("구간 생성 성공")
     @Test
     void createSectionTest() {
         // given
-        final SectionRequest sectionRequest = new SectionRequest("2", "3", 10);
         final Line line = createInitialLine();
-        final Section newSection = new Section(2L, line, 2L, 3L, 10);
-        final Section oldSection = new Section(1L, line, 1L, 2L, 10);
+        List<Section> sections = createSections();
 
-        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
+        final Station upStation = sections.get(sections.size() - 1).getDownStation();
+        final Station downStation = new Station(5, "gundae");
+        final Section newSection = new Section(12L, line, upStation, downStation, 10);
+
+        final SectionRequest sectionRequest = new SectionRequest(String.valueOf(upStation.getId()),
+            String.valueOf(downStation.getId()), 10);
+
+        given(sectionDao.findAll(1L)).willReturn(sections);
         given(sectionDao.insert(any(Section.class))).willReturn(newSection);
+        given(stationDao.findById(upStation.getId())).willReturn(Optional.of(upStation));
+        given(stationDao.findById(downStation.getId())).willReturn(Optional.of(downStation));
 
         // when
         final SectionResponse sectionResponse = sectionService.saveSection(1L, sectionRequest);
 
         // then
-        assertThat(sectionResponse.getUpStationId()).isEqualTo(2);
-        assertThat(sectionResponse.getDownStationId()).isEqualTo(3);
+        assertThat(sectionResponse.getUpStationId()).isEqualTo(newSection.getUpStation().getId());
+        assertThat(sectionResponse.getDownStationId()).isEqualTo(newSection.getDownStation().getId());
         assertThat(sectionResponse.getDistance()).isEqualTo(10);
     }
 
@@ -76,7 +88,9 @@ class SectionServiceTest {
     void createSectionWithBothExistInLineTest() {
         // given
         final Line line = createInitialLine();
-        final Section oldSection = new Section(1L, line, 1L, 2L, 10);
+        Station upStation = new Station(1L, "jamsil");
+        Station downStation = new Station(2L, "jamsilnaru");
+        final Section oldSection = new Section(1L, line, upStation, downStation, 10);
         final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
@@ -92,7 +106,9 @@ class SectionServiceTest {
     void createSectionWithBothNotExistInLineTest() {
         // given
         final Line line = createInitialLine();
-        final Section oldSection = new Section(1L, line, 1L, 2L, 10);
+        Station upStation = new Station(1L, "jamsil");
+        Station downStation = new Station(2L, "jamsilnaru");
+        final Section oldSection = new Section(1L, line, upStation, downStation, 10);
         final SectionRequest sectionRequest = new SectionRequest("3", "4", 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
@@ -142,7 +158,7 @@ class SectionServiceTest {
         final List<Section> sections = createSections();
         final Section deleteTarget = sections.get(0);
         final long lineId = deleteTarget.getLine().getId();
-        final long startStationId = deleteTarget.getUpStationId();
+        final long startStationId = deleteTarget.getUpStation().getId();
 
         given(sectionDao.existByLineIdAndStationId(lineId, startStationId)).willReturn(true);
         given(sectionDao.count(lineId)).willReturn(3L);
@@ -166,7 +182,7 @@ class SectionServiceTest {
         final Section updateTarget = sections.get(1);
 
         final long lineId = deleteTarget.getLine().getId();
-        final long deleteStationId = deleteTarget.getDownStationId();
+        final long deleteStationId = deleteTarget.getDownStation().getId();
         final Section updatedResult = createUpdateResult(deleteTarget, updateTarget);
 
         given(sectionDao.existByLineIdAndStationId(lineId, deleteStationId)).willReturn(true);
@@ -189,15 +205,21 @@ class SectionServiceTest {
 
     private List<Section> createSections() {
         final Line line = createInitialLine();
-        final Section firstSection = new Section(1L, line, 1L, 2L, 10);
-        final Section secondSection = new Section(2L, line, 2L, 3L, 10);
-        final Section thirdSection = new Section(3L, line, 3L, 4L, 10);
+
+        Station jamsil = new Station(2, "잠실");
+        Station jamsilnaru = new Station(1, "잠실나루");
+        Station gangbyeon = new Station(4, "강변");
+        Station guui = new Station(3, "구의");
+
+        final Section firstSection = new Section(1L, line, jamsil, jamsilnaru, 10);
+        final Section secondSection = new Section(2L, line, jamsilnaru, gangbyeon, 10);
+        final Section thirdSection = new Section(3L, line, gangbyeon, guui, 10);
         return Arrays.asList(firstSection, secondSection, thirdSection);
     }
 
     private Section createUpdateResult(final Section deleteTarget, final Section updateTarget) {
         return new Section(updateTarget.getId(), updateTarget.getLine(),
-            deleteTarget.getUpStationId(), updateTarget.getDownStationId(),
+            deleteTarget.getUpStation(), updateTarget.getDownStation(),
             deleteTarget.getDistance() + updateTarget.getDistance());
     }
 }
