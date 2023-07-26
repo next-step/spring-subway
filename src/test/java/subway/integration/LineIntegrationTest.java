@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import subway.dto.ExceptionResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
 import subway.dto.StationRequest;
 import subway.exception.ErrorCode;
 
@@ -229,7 +230,7 @@ public class LineIntegrationTest extends IntegrationTest {
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
 
-        LineRequest updateRequest = new LineRequest("구신분당선", "bg-red-600");
+        LineUpdateRequest updateRequest = new LineUpdateRequest("구신분당선", "bg-red-600");
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -255,7 +256,7 @@ public class LineIntegrationTest extends IntegrationTest {
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
 
-        LineRequest updateRequest = new LineRequest("4호선", "bg-red-600");
+        LineUpdateRequest updateRequest = new LineUpdateRequest("4호선", "bg-red-600");
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

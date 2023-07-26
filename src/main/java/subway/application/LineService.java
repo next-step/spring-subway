@@ -11,6 +11,7 @@ import subway.domain.Station;
 import subway.dto.LineDataResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
 import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
@@ -64,7 +65,7 @@ public class LineService {
     }
 
     @Transactional
-    public void updateLine(final Long id, final LineRequest lineUpdateRequest) {
+    public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
