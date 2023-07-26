@@ -87,9 +87,9 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("지하철 구간을 삭제한다.")
+    @DisplayName("지하철 노선의 하행 마지막 구간을 삭제한다.")
     @Test
-    void deleteSection() {
+    void deleteLastSection() {
         // given
         createInitialLine();
 
@@ -98,6 +98,22 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(1L, 3L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 노선의 하행 마지막이 아닌 구간을 삭제한다.")
+    @Test
+    void deleteAnySectionNotLast() {
+        // given
+        createInitialLine();
+
+        StationIntegrationSupporter.createStation(stationRequest);
+        SectionIntegrationSupporter.createSectionInLine(1L, sectionRequest);
+
+        // when
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(1L, 2L);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

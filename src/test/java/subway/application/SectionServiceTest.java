@@ -121,9 +121,9 @@ class SectionServiceTest {
                 .isInstanceOf(IllegalSectionException.class);
     }
 
-    @DisplayName("구간 삭제 성공")
+    @DisplayName("하행 마지막 구간 삭제 성공")
     @Test
-    void deleteSection() {
+    void deleteLastSection() {
         // given
         final long stationId = 3;
 
