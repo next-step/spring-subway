@@ -46,7 +46,10 @@ public class SectionService {
 
         Optional<Section> cutSection =
                 preProcessSaveSection(lineId, upStation, downStation, distance);
-        cutSection.ifPresent(sectionDao::update);
+        cutSection.ifPresent(cut -> {
+            sectionDao.deleteById(cut.getId());
+            sectionDao.insert(cut);
+        });
 
         Section section = new Section(line, upStation, downStation, distance);
         Section result = sectionDao.insert(section);
