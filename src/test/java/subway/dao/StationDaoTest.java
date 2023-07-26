@@ -82,13 +82,23 @@ class StationDaoTest extends DaoTest {
     }
 
     @Test
-    @DisplayName("Station id를 Station을 삭제할 수 있다.")
+    @DisplayName("Station id로 Station을 삭제할 수 있다.")
     void deleteStation() {
+        // given
+        Station station = stationDao.insert(new Station("몽촌토성역"));
         // when
-        stationDao.deleteById(1L);
+        stationDao.deleteById(station.getId());
 
         // then
-        assertThat(stationDao.findById(1L).isEmpty()).isTrue();
+        assertThat(stationDao.findById(station.getId()).isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Station id를 참조하는 경우 Station을 삭제할 수 없다.")
+    void deleteReferencedStation() {
+        assertThatCode(() -> stationDao.deleteById(1L))
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("1개 이상 구간이 참조하는 역은 삭제할 수 없습니다 : 1");
     }
 
     @Test

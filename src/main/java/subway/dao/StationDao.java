@@ -1,5 +1,6 @@
 package subway.dao;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -67,6 +68,10 @@ public class StationDao {
 
     public void deleteById(final Long id) {
         String sql = "delete from STATION where id = ?";
-        jdbcTemplate.update(sql, id);
+        try {
+            jdbcTemplate.update(sql, id);
+        } catch (DataIntegrityViolationException e) {
+            throw new SubwayException("1개 이상 구간이 참조하는 역은 삭제할 수 없습니다 : " + id, e);
+        }
     }
 }
