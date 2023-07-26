@@ -1,14 +1,17 @@
 package subway.application;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import subway.dao.LineDao;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
+import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.IllegalLineException;
@@ -28,20 +31,33 @@ class SectionServiceTest {
     @InjectMocks
     private SectionService sectionService;
 
-    @Mock private SectionDao sectionDao;
+    @Mock
+    private SectionDao sectionDao;
+
+    @Mock
+    private LineDao lineDao;
+
+    @Mock
+    private StationDao stationDao;
 
     @DisplayName("구간 생성 성공")
     @Test
     void createSection() {
         // given
-        final SectionRequest sectionRequest = new SectionRequest( "2", "3",10);
-        final Section newSection = new Section(2L, 1L,  2L, 3L,10);
-        final Section oldSection = new Section(1L, 1L, 1L, 2L, 10);
+        final Line line = new Line(1L, "4호선", "blue");
+        final Station station1 = new Station(1L, "오이도");
+        final Station station2 = new Station(2L, "안산");
+        final Station station3 = new Station(3L, "한대앞");
+        final Section newSection = new Section(2L, line, station2, station3, 10);
+        final Section oldSection = new Section(1L, line, station1, station2, 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
+        given(stationDao.findById(station2.getId())).willReturn(Optional.of(station2));
+        given(stationDao.findById(station3.getId())).willReturn(Optional.of(station3));
         given(sectionDao.insert(any(Section.class))).willReturn(newSection);
 
         // when
+        final SectionRequest sectionRequest = new SectionRequest("2", "3", 10);
         final SectionResponse sectionResponse = sectionService.saveSection(1L, sectionRequest);
 
         // then
@@ -55,7 +71,7 @@ class SectionServiceTest {
     void createSectionWithUnmatchedLineId() {
         // given
         final long lineId = 3L;
-        final SectionRequest sectionRequest = new SectionRequest( "1", "2",10);
+        final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
@@ -68,12 +84,17 @@ class SectionServiceTest {
     @Test
     void createSectionWithBothExistInLine() {
         // given
-        final Section oldSection = new Section(1L, 1L, 1L, 2L,  10);
-        final SectionRequest sectionRequest = new SectionRequest( "1", "2",10);
+        final Line line = new Line(1L, "4호선", "blue");
+        final Station station1 = new Station(1L, "오이도");
+        final Station station2 = new Station(2L, "안산");
+        final Section oldSection = new Section(1L, line, station1, station2, 10);
 
+        given(stationDao.findById(station1.getId())).willReturn(Optional.of(station1));
+        given(stationDao.findById(station2.getId())).willReturn(Optional.of(station2));
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
 
         // when & then
+        final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
                 .isInstanceOf(IllegalSectionException.class);
@@ -83,13 +104,19 @@ class SectionServiceTest {
     @Test
     void createSectionWithBothNotExistInLine() {
         // given
-        final Section oldSection = new Section(1L, 1L, 1L, 2L,  10);
-        final SectionRequest sectionRequest = new SectionRequest( "3", "4",10);
+        final Line line = new Line(1L, "4호선", "blue");
+        final Station station1 = new Station(1L, "오이도");
+        final Station station2 = new Station(2L, "안산");
+        final Section oldSection = new Section(1L, line, station1, station2, 10);
+        final SectionRequest sectionRequest = new SectionRequest("3", "4", 10);
 
-        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
+        given(sectionDao.findAll(line.getId())).willReturn(List.of(oldSection));
+        given(lineDao.findById(line.getId())).willReturn(line);
+        given(stationDao.findById(sectionRequest.getUpStationId())).willReturn(Optional.of(new Station(3L, "한대앞")));
+        given(stationDao.findById(sectionRequest.getDownStationId())).willReturn(Optional.of(new Station(4L, "중앙")));
 
         // when & then
-        assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
+        assertThatThrownBy(() -> sectionService.saveSection(line.getId(), sectionRequest))
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
@@ -100,11 +127,16 @@ class SectionServiceTest {
         // given
         final long stationId = 3;
 
-        given(sectionDao.findLastSection(1L))
-                .willReturn(Optional.of(new Section(1L, 2L, 3L, 10)));
+        final Line line = new Line(1L, "4호선", "blue");
+        final Station station2 = new Station(2L, "안산");
+        final Station station3 = new Station(3L, "한대앞");
+
+        given(stationDao.findById(station3.getId())).willReturn(Optional.of(station3));
+        given(sectionDao.findLastSection(line.getId()))
+                .willReturn(Optional.of(new Section(line, station2, station3, 10)));
 
         // when & then
-        assertThatNoException().isThrownBy(() -> sectionService.deleteSection(1L, stationId));
+        assertThatNoException().isThrownBy(() -> sectionService.deleteSection(line.getId(), stationId));
     }
 
     @DisplayName("지하철 노선의 하행 종점역이 아닐 때 구간 제거 실패")
@@ -114,8 +146,14 @@ class SectionServiceTest {
         final long lineId = 1L;
         final long stationId = 1L;
 
+        final Line line = new Line(1L, "4호선", "blue");
+        final Station station1 = new Station(1L, "오이도");
+        final Station station2 = new Station(2L, "안산");
+        final Station station3 = new Station(3L, "한대앞");
+
+        given(stationDao.findById(stationId)).willReturn(Optional.of(station1));
         given(sectionDao.findLastSection(lineId))
-                .willReturn(Optional.of(new Section(lineId, 2L, 3L, 10)));
+                .willReturn(Optional.of(new Section(line, station2, station3, 10)));
 
         // when & then
         assertThatThrownBy(() -> sectionService.deleteSection(lineId, stationId))
@@ -127,15 +165,18 @@ class SectionServiceTest {
     @Test
     void deleteSectionAtLineHasOneSection() {
         // given
-        final long lineId = 1L;
-        final long stationId = 2L;
+        final Line line = new Line(1L, "4호선", "blue");
+        final Station station1 = new Station(1L, "오이도");
+        final Station station2 = new Station(2L, "안산");
 
-        given(sectionDao.findLastSection(lineId))
-                .willReturn(Optional.of(new Section(lineId, 1L, 2L, 10)));
-        given(sectionDao.count(lineId)).willReturn(1L);
+        given(stationDao.findById(station2.getId())).willReturn(Optional.of(station2));
+        given(sectionDao.findLastSection(line.getId()))
+                .willReturn(Optional.of(new Section(line, station1, station2, 10)));
+        given(sectionDao.count(line.getId()))
+                .willReturn(1L);
 
         // when & then
-        assertThatThrownBy(() -> sectionService.deleteSection(lineId, stationId))
+        assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), station2.getId()))
                 .hasMessage("해당 노선은 구간이 한개입니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }

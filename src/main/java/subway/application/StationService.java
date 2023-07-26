@@ -1,10 +1,12 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.IllegalStationException;
 import subway.exception.IllegalStationsException;
 
 import java.util.List;
@@ -19,9 +21,18 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
+        validateByName(stationRequest.getName());
         Station station = stationDao.insert(new Station(stationRequest.getName()));
         return StationResponse.of(station);
+    }
+
+    private void validateByName(final String name) {
+        stationDao.findByName(name)
+                .ifPresent(station -> {
+                    throw new IllegalStationException(String.format("중복된 이름(%s)의 역이 존재합니다.", name));
+                });
     }
 
     public StationResponse findStationById(Long id) {

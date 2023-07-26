@@ -8,10 +8,13 @@ import java.util.stream.Collectors;
 
 public final class LineWithStationsResponse {
 
-    private final long id;
-    private final String name;
-    private final String color;
-    private final List<StationResponse> stations;
+    private long id;
+    private String name;
+    private String color;
+    private List<StationResponse> stations;
+
+    private LineWithStationsResponse() {
+    }
 
     private LineWithStationsResponse(final LineResponse lineResponse,
                                      final List<StationResponse> stations) {

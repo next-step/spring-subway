@@ -51,11 +51,18 @@ public class SectionService {
     }
 
     public void deleteSection(final long lineId, final long stationId) {
-        final Station station = findStation(stationId);
+        final Station station = findStationById(stationId);
         validateLineAndLastStation(lineId, station);
         validateSectionInLine(lineId);
 
         sectionDao.deleteLastSection(lineId, station.getId());
+    }
+
+    private Station findStationById(final long id) {
+        return stationDao.findById(id)
+                .orElseThrow(() ->
+                        new IllegalStationsException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
+                );
     }
 
     private Station findStation(final long id) {

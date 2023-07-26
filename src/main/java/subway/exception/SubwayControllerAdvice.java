@@ -21,6 +21,12 @@ public class SubwayControllerAdvice {
         return new ErrorResponse(exception.getMessage());
     }
 
+    @ExceptionHandler(IllegalStationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse illegalStationExceptionHandler(IllegalStationException exception) {
+        return new ErrorResponse(exception.getMessage());
+    }
+
     @ExceptionHandler(IllegalStationsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse illegalStationsExceptionHandler(IllegalStationsException exception) {

@@ -7,9 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
-import subway.dao.StationPairDao;
+import subway.dao.SectionDao;
 import subway.domain.Line;
-import subway.domain.StationPair;
+import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineWithStationsResponse;
 import subway.dto.StationResponse;
@@ -31,23 +31,25 @@ class LineServiceTest {
     private LineDao lineDao;
 
     @Mock
-    private StationPairDao stationPairDao;
+    private SectionDao sectionDao;
 
     @DisplayName("상행 종점부터 하행 종점까지 정렬된 역들을 반환한다.")
     @Test
     void findStationsInLine() {
         // given
-        Long lineId = 1L;
-        Station station1 = new Station(1L, "오이도");
-        Station station2 = new Station(2L, "정왕");
-        Station station3 = new Station(3L, "안산");
-        Station station4 = new Station(4L, "한대앞");
+        final Long lineId = 1L;
+        final Line line = new Line(lineId, "1호선", "blue");
 
-        given(lineDao.findById(lineId)).willReturn(new Line(1L, "1호선", "blue"));
-        given(stationPairDao.findAllStationPair(lineId)).willReturn(List.of(
-                new StationPair(station4, station1),
-                new StationPair(station1, station3),
-                new StationPair(station3, station2)
+        final Station station1 = new Station(1L, "오이도");
+        final Station station2 = new Station(2L, "정왕");
+        final Station station3 = new Station(3L, "안산");
+        final Station station4 = new Station(4L, "한대앞");
+
+        given(lineDao.findById(lineId)).willReturn(line);
+        given(sectionDao.findAll(lineId)).willReturn(List.of(
+                new Section(line, station4, station1, 10),
+                new Section(line, station1, station3, 10),
+                new Section(line, station3, station2, 10)
         ));
 
         // when
@@ -55,13 +57,13 @@ class LineServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(lineResponse.getStationResponses().get(0).getId())
+                () -> assertThat(lineResponse.getStations().get(0).getId())
                         .isEqualTo(StationResponse.of(station4).getId()),
-                () -> assertThat(lineResponse.getStationResponses().get(1).getId())
+                () -> assertThat(lineResponse.getStations().get(1).getId())
                         .isEqualTo(StationResponse.of(station1).getId()),
-                () -> assertThat(lineResponse.getStationResponses().get(2).getId())
+                () -> assertThat(lineResponse.getStations().get(2).getId())
                         .isEqualTo(StationResponse.of(station3).getId()),
-                () -> assertThat(lineResponse.getStationResponses().get(3).getId())
+                () -> assertThat(lineResponse.getStations().get(3).getId())
                         .isEqualTo(StationResponse.of(station2).getId())
         );
     }

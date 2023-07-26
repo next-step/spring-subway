@@ -8,7 +8,7 @@ public final class Line {
     private String name;
     private String color;
 
-    public Line() {
+    private Line() {
     }
 
     public Line(String name, String color) {

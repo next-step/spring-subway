@@ -6,7 +6,7 @@ public final class Station {
     private Long id;
     private String name;
 
-    public Station() {
+    private Station() {
     }
 
     public Station(Long id, String name) {
