@@ -1,6 +1,7 @@
 package subway.domain;
 
 import org.junit.jupiter.api.Test;
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,14 +12,14 @@ class DistanceTest {
     void distanceEqualToZero() {
         assertThatCode(() -> new Distance(0))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("구간의 거리는 0보다 커야 합니다. : 0");
+                .hasMessage(ErrorCode.DISTANCE_VALIDATE_POSITIVE.getMessage() + "0");
     }
 
     @Test
     void distanceLessThanZero() {
         assertThatCode(() -> new Distance(-1))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("구간의 거리는 0보다 커야 합니다. : -1");
+                .hasMessage(ErrorCode.DISTANCE_VALIDATE_POSITIVE.getMessage() + "-1");
     }
 
     @Test
@@ -40,7 +41,7 @@ class DistanceTest {
         // when, then
         assertThatCode(() -> distance1.subtract(distance2))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다. 새 구간 거리 : 10");
+                .hasMessage(ErrorCode.DISTANCE_VALIDATE_SUBTRACT.getMessage() + "10");
     }
 
     @Test
@@ -52,6 +53,6 @@ class DistanceTest {
         // when, then
         assertThatCode(() -> distance1.subtract(distance2))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다. 새 구간 거리 : 11");
+                .hasMessage(ErrorCode.DISTANCE_VALIDATE_SUBTRACT.getMessage() + "11");
     }
 }

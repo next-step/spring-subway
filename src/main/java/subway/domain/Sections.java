@@ -1,5 +1,6 @@
 package subway.domain;
 
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import java.util.ArrayList;
@@ -47,13 +48,13 @@ public class Sections {
 
     private void validateBothMatches(final Section section) {
         if (contains(section.getUpStation()) && contains(section.getDownStation())) {
-            throw new SubwayException("두 역 중 하나만 노선에 포함되어야 합니다");
+            throw new SubwayException(ErrorCode.NEW_SECTION_BOTH_MATCH);
         }
     }
 
     private void validateNoMatches(final Section section) {
         if (notContains(section.getUpStation()) && notContains(section.getDownStation())) {
-            throw new SubwayException("두 역 중 하나는 기존 노선에 포함되어야 합니다");
+            throw new SubwayException(ErrorCode.NEW_SECTION_NO_MATCH);
         }
     }
 
@@ -97,13 +98,13 @@ public class Sections {
 
     private void validateContainStation(Station station) {
         if (notContains(station)) {
-            throw new SubwayException("노선에 역이 포함되지 않을 때는 삭제할 수 없습니다.");
+            throw new SubwayException(ErrorCode.REMOVE_SECTION_NOT_CONTAIN);
         }
     }
 
     private void validateSize() {
         if (sections.size() < 2) {
-            throw new SubwayException("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
+            throw new SubwayException(ErrorCode.SECTION_VALIDATE_SIZE);
         }
     }
 

@@ -1,5 +1,6 @@
 package subway.domain;
 
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import java.util.Objects;
@@ -29,7 +30,7 @@ public class Section {
 
     private void validate(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new SubwayException("구간의 상행역과 하행역이 같을 수 없습니다");
+            throw new SubwayException(ErrorCode.SECTION_SAME_STATIONS);
         }
     }
 

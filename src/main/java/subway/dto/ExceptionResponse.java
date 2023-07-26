@@ -1,7 +1,10 @@
 package subway.dto;
 
 public class ExceptionResponse {
-    private final String message;
+    private String message;
+
+    public ExceptionResponse() {
+    }
 
     public ExceptionResponse(String message) {
         this.message = message;

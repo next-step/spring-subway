@@ -8,10 +8,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ExceptionResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.StationRequest;
-import subway.exception.SubwayException;
+import subway.exception.ErrorCode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,7 +78,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("상행역 id가 존재하지 않습니다 : 5");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.UP_STATION_ID_NO_EXIST.getMessage() + "5");
     }
 
     @Test
@@ -97,7 +99,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("하행역 id가 존재하지 않습니다 : 5");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.DOWN_STATION_ID_NO_EXIST.getMessage() + "5");
     }
 
     @Test
@@ -118,7 +121,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("노선 이름이 이미 존재합니다 : 2호선");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.LINE_NAME_DUPLICATE.getMessage() + "2호선");
     }
 
     @Test
@@ -138,7 +142,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("구간의 상행역과 하행역이 같을 수 없습니다");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.SECTION_SAME_STATIONS.getMessage());
     }
 
     @Test
@@ -210,7 +215,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("노선 id가 존재하지 않습니다 : 5");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.LINE_ID_NO_EXIST.getMessage() + "5");
     }
 
     @Test
@@ -260,7 +266,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("노선 이름이 이미 존재합니다 : 4호선");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.LINE_NAME_DUPLICATE.getMessage() + "4호선");
     }
 
     @Test

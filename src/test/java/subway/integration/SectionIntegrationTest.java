@@ -8,10 +8,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ExceptionResponse;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
-import subway.exception.SubwayException;
+import subway.exception.ErrorCode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.integration.TestRequestUtil.createLine;
@@ -134,7 +135,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("두 역 중 하나만 노선에 포함되어야 합니다");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.NEW_SECTION_BOTH_MATCH.getMessage());
     }
 
     //34
@@ -157,7 +159,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("두 역 중 하나는 기존 노선에 포함되어야 합니다");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.NEW_SECTION_NO_MATCH.getMessage());
     }
 
     // 32
@@ -176,7 +179,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다. 새 구간 거리 : 15");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.DISTANCE_VALIDATE_SUBTRACT.getMessage() + "15");
     }
 
     @Test
@@ -194,7 +198,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("구간의 상행역과 하행역이 같을 수 없습니다");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.SECTION_SAME_STATIONS.getMessage());
     }
 
     @Test
@@ -212,7 +217,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("상행역 id가 존재하지 않습니다 : 5");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.UP_STATION_ID_NO_EXIST.getMessage() + "5");
     }
 
     @Test
@@ -230,7 +236,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("하행역 id가 존재하지 않습니다 : 5");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.DOWN_STATION_ID_NO_EXIST.getMessage() + "5");
     }
 
     @Test
@@ -317,7 +324,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.SECTION_VALIDATE_SIZE.getMessage());
     }
 
     @Test
@@ -345,6 +353,7 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(SubwayException.class)).hasMessage("노선에 역이 포함되지 않을 때는 삭제할 수 없습니다.");
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.REMOVE_SECTION_NOT_CONTAIN.getMessage());
     }
 }

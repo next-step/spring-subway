@@ -2,6 +2,7 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import java.util.List;
@@ -111,7 +112,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections.removeStation(deleteStation))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("노선에 역이 포함되지 않을 때는 삭제할 수 없습니다.");
+                .hasMessage(ErrorCode.REMOVE_SECTION_NOT_CONTAIN.getMessage());
     }
 
     @Test
@@ -130,7 +131,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections.removeStation(deleteStation))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
+                .hasMessage(ErrorCode.SECTION_VALIDATE_SIZE.getMessage());
     }
 
     @Test
@@ -145,7 +146,7 @@ class SectionsTest {
 
         assertThatCode(() -> sections.addSection(section))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("두 역 중 하나만 노선에 포함되어야 합니다");
+                .hasMessage(ErrorCode.NEW_SECTION_BOTH_MATCH.getMessage());
     }
 
     @Test
@@ -167,7 +168,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections.addSection(section2))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("두 역 중 하나는 기존 노선에 포함되어야 합니다");
+                .hasMessage(ErrorCode.NEW_SECTION_NO_MATCH.getMessage());
     }
 
     @Test
@@ -288,7 +289,7 @@ class SectionsTest {
         // when, then
         assertThatCode(() -> sections.addSection(newSection))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다. 새 구간 거리 : 10");
+                .hasMessage(ErrorCode.DISTANCE_VALIDATE_SUBTRACT.getMessage() + "10");
     }
 
     @Test

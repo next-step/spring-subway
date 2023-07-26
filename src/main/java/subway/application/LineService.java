@@ -10,6 +10,7 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import java.util.List;
@@ -31,9 +32,9 @@ public class LineService {
     public LineResponse saveLine(final LineRequest request) {
         Line line = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = stationDao.findById(request.getUpStationId())
-                .orElseThrow(() -> new SubwayException("상행역 id가 존재하지 않습니다 : " + request.getUpStationId()));
+                .orElseThrow(() -> new SubwayException(ErrorCode.UP_STATION_ID_NO_EXIST, request.getUpStationId()));
         Station downStation = stationDao.findById(request.getDownStationId())
-                .orElseThrow(() -> new SubwayException("하행역 id가 존재하지 않습니다 : " + request.getDownStationId()));
+                .orElseThrow(() -> new SubwayException(ErrorCode.DOWN_STATION_ID_NO_EXIST, request.getDownStationId()));
 
         sectionDao.insert(new Section(upStation, downStation, request.getDistance()), line.getId());
 
@@ -58,7 +59,7 @@ public class LineService {
 
     public Line findLineById(final Long id) {
         return lineDao.findById(id)
-                .orElseThrow(() -> new SubwayException("노선 id가 존재하지 않습니다 : " + id));
+                .orElseThrow(() -> new SubwayException(ErrorCode.LINE_ID_NO_EXIST, id));
     }
 
     @Transactional

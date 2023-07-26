@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Station;
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import javax.sql.DataSource;
@@ -41,7 +42,7 @@ public class StationDao {
             Long id = insertAction.executeAndReturnKey(params).longValue();
             return new Station(id, station.getName());
         } catch (DuplicateKeyException e) {
-            throw new SubwayException("이미 존재하는 역 이름입니다 : " + station.getName(), e);
+            throw new SubwayException(ErrorCode.STATION_NAME_DUPLICATE, station.getName(), e);
         }
     }
 
@@ -66,7 +67,7 @@ public class StationDao {
         try {
             jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
         } catch (DuplicateKeyException e) {
-            throw new SubwayException("역 이름이 이미 존재합니다 : " + newStation.getName());
+            throw new SubwayException(ErrorCode.STATION_NAME_DUPLICATE, newStation.getName());
         }
     }
 
@@ -75,7 +76,7 @@ public class StationDao {
         try {
             jdbcTemplate.update(sql, id);
         } catch (DataIntegrityViolationException e) {
-            throw new SubwayException("1개 이상 구간이 참조하는 역은 삭제할 수 없습니다 : " + id, e);
+            throw new SubwayException(ErrorCode.STATION_REFERENCED, id, e);
         }
     }
 }

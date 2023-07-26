@@ -12,6 +12,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import javax.sql.DataSource;
@@ -74,7 +75,7 @@ public class LineDao {
             Long lineId = insertAction.executeAndReturnKey(params).longValue();
             return new Line(lineId, line.getName(), line.getColor());
         } catch (DuplicateKeyException e) {
-            throw new SubwayException("노선 이름이 이미 존재합니다 : " + line.getName(), e);
+            throw new SubwayException(ErrorCode.LINE_NAME_DUPLICATE, line.getName(), e);
         }
     }
 
@@ -113,7 +114,7 @@ public class LineDao {
         try {
             jdbcTemplate.update(sql, line.getName(), line.getColor(), line.getId());
         } catch (DuplicateKeyException e) {
-            throw new SubwayException("노선 이름이 이미 존재합니다 : " + line.getName(), e);
+            throw new SubwayException(ErrorCode.LINE_NAME_DUPLICATE, line.getName(), e);
         }
     }
 

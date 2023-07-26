@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import java.util.List;
@@ -58,7 +59,7 @@ class LineDaoTest extends DaoTest {
         // when, then
         assertThatCode(() -> lineDao.insert(line))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("노선 이름이 이미 존재합니다 : 2호선");
+                .hasMessage(ErrorCode.LINE_NAME_DUPLICATE.getMessage() + "2호선");
     }
 
     @Test
@@ -88,7 +89,7 @@ class LineDaoTest extends DaoTest {
         // when, then
         assertThatCode(() -> lineDao.update(line))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("노선 이름이 이미 존재합니다 : 3호선");
+                .hasMessage(ErrorCode.LINE_NAME_DUPLICATE.getMessage() + "3호선");
     }
 
     @Test

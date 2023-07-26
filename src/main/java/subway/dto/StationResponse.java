@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StationResponse {
-    private final Long id;
-    private final String name;
+    private Long id;
+    private String name;
+
+    public StationResponse() {
+    }
 
     public StationResponse(final Long id, final String name) {
         this.id = id;

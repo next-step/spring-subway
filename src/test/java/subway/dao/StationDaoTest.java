@@ -3,6 +3,7 @@ package subway.dao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.domain.Station;
+import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import java.util.List;
@@ -79,7 +80,7 @@ class StationDaoTest extends DaoTest {
         // when, then
         assertThatCode(() -> stationDao.update(station))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("역 이름이 이미 존재합니다 : 강남역");
+                .hasMessage(ErrorCode.STATION_NAME_DUPLICATE.getMessage() + "강남역");
     }
 
     @Test
@@ -99,7 +100,7 @@ class StationDaoTest extends DaoTest {
     void deleteReferencedStation() {
         assertThatCode(() -> stationDao.deleteById(1L))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("1개 이상 구간이 참조하는 역은 삭제할 수 없습니다 : 1");
+                .hasMessage(ErrorCode.STATION_REFERENCED.getMessage() + "1");
     }
 
     @Test
