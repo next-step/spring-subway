@@ -41,7 +41,7 @@ public class Section {
                 SectionExceptionStatus.DUPLICATE_STATION.getStatus());
     }
 
-    public Section connectSection(Section requestSection) {
+    Section connectSection(Section requestSection) {
         Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다",
                 SectionExceptionStatus.NULL_REQUEST_SECTION.getStatus());
         if (isConnectUpSection(requestSection)) {
@@ -133,21 +133,21 @@ public class Section {
         return newUpSection;
     }
 
-    public Section findDownSection() {
+    Section findDownSection() {
         if (downSection == null) {
             return this;
         }
         return downSection.findDownSection();
     }
 
-    public Section findUpSection() {
+    Section findUpSection() {
         if (upSection == null) {
             return this;
         }
         return upSection.findUpSection();
     }
 
-    public SectionDisconnectResponse disconnectStation(Station requestStation) {
+    SectionDisconnectResponse disconnectStation(Station requestStation) {
         if (isDisconnectUpStation(requestStation)) {
             return disconnectUpSection();
         }
@@ -212,19 +212,25 @@ public class Section {
     }
 
     public Section getDownSection() {
-        return downSection;
+        if (downSection == null) {
+            return null;
+        }
+        return downSection.deepCopy();
     }
 
     public Section getUpSection() {
-        return upSection;
+        if (upSection == null) {
+            return null;
+        }
+        return upSection.deepCopy();
     }
 
     public Station getUpStation() {
-        return upStation;
+        return new Station(upStation.getId(), upStation.getName());
     }
 
     public Station getDownStation() {
-        return downStation;
+        return new Station(downStation.getId(), downStation.getName());
     }
 
     public int getDistance() {
@@ -260,6 +266,17 @@ public class Section {
                 ", distance=" + distance +
                 ", downSection=" + downSection +
                 '}';
+    }
+
+    public Section deepCopy() {
+        return builder()
+                .id(id)
+                .upStation(upStation)
+                .downStation(downStation)
+                .upSection(upSection)
+                .downSection(downSection)
+                .distance(distance.value)
+                .build();
     }
 
     public static class Builder {

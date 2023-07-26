@@ -2,7 +2,6 @@ package subway.domain;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -130,7 +129,7 @@ public class Line {
     }
 
     public List<Section> getSections() {
-        return Collections.unmodifiableList(sections);
+        return List.copyOf(sections);
     }
 
     @Override
