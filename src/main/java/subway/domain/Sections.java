@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import subway.domain.vo.SectionRegistVo;
 
 public class Sections {
 
@@ -34,29 +33,40 @@ public class Sections {
         }
     }
 
-    public void canDeleteStation(Long stationId) {
+    public void canDeleteStation(Station deleteStation) {
         if (sections.size() <= MINIMUM_SIZE) {
             throw new IllegalArgumentException(
                 MessageFormat.format("구간이 {0}개 이하이므로 해당역을 삭제할 수 없습니다.", MINIMUM_SIZE)
             );
         }
-        Station downPointStation = findDownPointStation();
-        if (!Objects.equals(downPointStation.getId(), stationId)) {
-            throw new IllegalArgumentException("하행 종점역이 아니면 삭제할 수 없습니다.");
+        if (!findStations().contains(deleteStation)) {
+            throw new IllegalArgumentException("해당역이 없어 삭제할 수 없습니다.");
         }
+    }
+
+    public Optional<Section> findUpSectionFrom(Station station) {
+        return sections.stream()
+            .filter(section -> section.getDownStation().equals(station))
+            .findFirst();
+    }
+
+    public Optional<Section> findDownSectionFrom(Station station) {
+        return sections.stream()
+            .filter(section -> section.getUpStation().equals(station))
+            .findFirst();
     }
 
     public List<Station> sortStations() {
         List<Station> sortedStations = new ArrayList<>();
         Map<Station, Section> stationLayerMap = initLayerMap();
 
-        Station nowStation = findUpPointStation();
-        sortedStations.add(nowStation);
+        Station upStationInSection = findUpTerminusStation();
+        sortedStations.add(upStationInSection);
 
-        while (stationLayerMap.containsKey(nowStation)) {
-            Section section = stationLayerMap.get(nowStation);
+        while (stationLayerMap.containsKey(upStationInSection)) {
+            Section section = stationLayerMap.get(upStationInSection);
             sortedStations.add(section.getDownStation());
-            nowStation = section.getDownStation();
+            upStationInSection = section.getDownStation();
         }
 
         return sortedStations;
@@ -70,95 +80,73 @@ public class Sections {
             ));
     }
 
-    public SectionRegistVo registSection(Section newSection) {
+    public Optional<Section> findModifiedSection(Section section) {
         if (sections.isEmpty()) {
-            return new SectionRegistVo(newSection);
+            return Optional.empty();
         }
-        validRegistSection(newSection);
-
-        Optional<Section> targetSection = findTargetSection(newSection);
+        validExistedStation(section);
+        validDuplicatedStation(section);
+        Optional<Section> targetSection = findDuplicatedSection(section);
         if (targetSection.isEmpty()) {
-            return new SectionRegistVo(newSection);
+            return Optional.empty();
         }
-        return registMiddleSection(newSection, targetSection.get());
+        return divideSection(section, targetSection.get());
     }
 
-    private void validRegistSection(Section newSection) {
-        validDuplicatedStation(newSection);
-        validExistedStation(newSection);
-    }
-
-    private void validExistedStation(Section newSection) {
-        if (!isMatchUpStation(newSection) && !isMatchDownStation(newSection)) {
+    private void validExistedStation(Section section) {
+        if (!matchUpStation(section) && !matchDownStation(section)) {
             throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
         }
     }
 
-    private void validDuplicatedStation(Section newSection) {
-        if (isMatchUpStation(newSection) && isMatchDownStation(newSection)) {
+    private void validDuplicatedStation(Section section) {
+        if (matchUpStation(section) && matchDownStation(section)) {
             throw new IllegalArgumentException("기존 구간의 상행역과 하행역이 중복 됩니다.");
         }
     }
 
-
-    private SectionRegistVo registMiddleSection(Section newSection, Section targetSection) {
-        if (isMatchUpStation(newSection)) {
-            return new SectionRegistVo(newSection, newSection.findMiddleUpSection(targetSection));
-        }
-        if (isMatchDownStation(newSection)) {
-            return new SectionRegistVo(newSection, newSection.findMiddleDownSection(targetSection));
-        }
-
-        throw new IllegalArgumentException("해당 구간은 추가할 수 없습니다.");
-    }
-
-    private Optional<Section> findTargetSection(Section newSection) {
+    private Optional<Section> findDuplicatedSection(Section section) {
         return sections.stream()
-            .map(newSection::targetSection)
+            .map(section::findDuplicatedSection)
             .filter(Objects::nonNull)
             .findFirst();
     }
 
-    private boolean isMatchUpStation(Section newSection) {
-        return findStations().contains(newSection.getUpStation());
+    private Optional<Section> divideSection(Section section, Section targetSection) {
+        if (matchUpStation(section)) {
+            return Optional.of(section.divideDownSection(targetSection));
+        }
+        if (matchDownStation(section)) {
+            return Optional.of(section.divideUpSection(targetSection));
+        }
+        return Optional.empty();
     }
 
-    private boolean isMatchDownStation(Section newSection) {
-        return findStations().contains(newSection.getDownStation());
+    private boolean matchUpStation(Section section) {
+        return findStations().contains(section.getUpStation());
     }
 
-    private Station findUpPointStation() {
+    private boolean matchDownStation(Section section) {
+        return findStations().contains(section.getDownStation());
+    }
+
+    private Station findUpTerminusStation() {
         return findStations().stream()
             .filter(station -> !findDownStations().contains(station))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
     }
 
-    private Station findDownPointStation() {
-        return findStations().stream()
-            .filter(station -> !findUpStations().contains(station))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("노선이 잘못되었습니다."));
-    }
-
     private Set<Station> findStations() {
-        return Stream.concat(
-                findUpStations().stream(),
-                findDownStations().stream()
-            )
-            .collect(Collectors.toSet());
-    }
-
-    private Set<Station> findUpStations() {
         return sections.stream()
-            .map(Section::getUpStation)
-            .collect(Collectors.toSet());
+            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+            .collect(Collectors.toUnmodifiableSet());
     }
 
     private Set<Station> findDownStations() {
         return sections.stream()
             .map(Section::getDownStation)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
@@ -184,4 +172,5 @@ public class Sections {
             "sections=" + sections +
             '}';
     }
+
 }

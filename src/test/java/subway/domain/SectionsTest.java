@@ -6,11 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.domain.vo.SectionRegistVo;
 
 class SectionsTest {
 
@@ -79,7 +79,7 @@ class SectionsTest {
     @Test
     @DisplayName("새로운 구간의 상행과 하행이 기존 섹션에 있을 경우 예외가 발생한다.")
     void validNewSectionDownStation() {
-        assertThatThrownBy(() -> sections.registSection(section1))
+        assertThatThrownBy(() -> sections.findModifiedSection(section1))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -94,7 +94,7 @@ class SectionsTest {
             10
         );
         assertThatNoException()
-            .isThrownBy(() -> sections.registSection(section4));
+            .isThrownBy(() -> sections.findModifiedSection(section4));
     }
 
     @Test
@@ -107,7 +107,7 @@ class SectionsTest {
             line1,
             10
         );
-        assertThatThrownBy(() -> sections.registSection(section4))
+        assertThatThrownBy(() -> sections.findModifiedSection(section4))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -121,26 +121,32 @@ class SectionsTest {
             line1,
             10
         );
-        assertThatThrownBy(() -> sections.registSection(section4))
+        assertThatThrownBy(() -> sections.findModifiedSection(section4))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("하행 종점역은 삭제할 수 있다.")
+    @DisplayName("일치하는 역이 존재하면 삭제 가능하다")
     void canDelete() {
-        assertThatNoException()
-            .isThrownBy(() -> sections.canDeleteStation(4L));
+        Assertions.assertAll(
+            () -> assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(station1)),
+            () -> assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(station2)),
+            () -> assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(station3)),
+            () -> assertThatNoException()
+                .isThrownBy(() -> sections.canDeleteStation(station4))
+        );
     }
 
     @Test
-    @DisplayName("하행 종점역이 아니면 삭제할 수 없다.")
+    @DisplayName("일치하는 역이 없다면 삭제가 불가능하다")
     void canNotDelete() {
         Assertions.assertAll(
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(1L))
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(station5))
                 .isInstanceOf(IllegalArgumentException.class),
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(2L))
-                .isInstanceOf(IllegalArgumentException.class),
-            () -> assertThatThrownBy(() -> sections.canDeleteStation(3L))
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(station6))
                 .isInstanceOf(IllegalArgumentException.class)
         );
     }
@@ -149,15 +155,19 @@ class SectionsTest {
     @DisplayName("Line에 역이 하나도 없다면 구간이 무조건 등록된다")
     void registSectionInEmptyLine() {
         Sections sections = new Sections(Collections.emptyList());
-        assertThatNoException().isThrownBy(() -> sections.registSection(section1));
+        assertThatNoException().isThrownBy(() -> sections.findModifiedSection(section1));
     }
 
     @Test
     @DisplayName("구간이 1개 이하인 경우 해당역을 삭제할 수 없다")
     void canNotRemoveStation() {
         Sections sections = new Sections(List.of(section1));
-        assertThatThrownBy(() -> sections.canDeleteStation(2L))
-            .isInstanceOf(IllegalArgumentException.class);
+        Assertions.assertAll(
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(station1))
+                .isInstanceOf(IllegalArgumentException.class),
+            () -> assertThatThrownBy(() -> sections.canDeleteStation(station2))
+                .isInstanceOf(IllegalArgumentException.class)
+        );
     }
 
     @Test
@@ -170,7 +180,7 @@ class SectionsTest {
             5
         );
 
-        SectionRegistVo result = sections.registSection(addSection);
+        Optional<Section> modifiedSection = sections.findModifiedSection(addSection);
 
         Section expectedNewSection = new Section(
             3L,
@@ -180,10 +190,7 @@ class SectionsTest {
             5
         );
 
-        Assertions.assertAll(
-            () -> assertThat(result.getAddSection().equals(addSection)).isTrue(),
-            () -> assertThat(result.getUpdateSection().get().equals(expectedNewSection)).isTrue()
-        );
+        assertThat(modifiedSection.get().equals(expectedNewSection)).isTrue();
     }
 
     @Test
@@ -196,7 +203,7 @@ class SectionsTest {
             15
         );
 
-        assertThatThrownBy(() -> sections.registSection(newSection))
+        assertThatThrownBy(() -> sections.findModifiedSection(newSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -216,11 +223,8 @@ class SectionsTest {
             line1,
             5
         );
-        SectionRegistVo result = sections.registSection(addSection);
-        Assertions.assertAll(
-            () -> assertThat(result.getAddSection().equals(addSection)).isTrue(),
-            () -> assertThat(result.getUpdateSection().get().equals(expectedNewSection)).isTrue()
-        );
+        Optional<Section> modifiedSection = sections.findModifiedSection(addSection);
+        assertThat(modifiedSection.get().equals(expectedNewSection)).isTrue();
     }
 
     @Test
@@ -233,7 +237,7 @@ class SectionsTest {
             15
         );
 
-        assertThatThrownBy(() -> sections.registSection(newSection))
+        assertThatThrownBy(() -> sections.findModifiedSection(newSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
