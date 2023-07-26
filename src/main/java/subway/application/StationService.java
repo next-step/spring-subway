@@ -7,7 +7,6 @@ import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 import subway.exception.IllegalStationException;
-import subway.exception.IllegalStationsException;
 
 import java.util.List;
 import java.util.stream.Collectors;

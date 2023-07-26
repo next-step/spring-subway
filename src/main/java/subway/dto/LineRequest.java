@@ -5,6 +5,9 @@ import subway.exception.IllegalRequestException;
 
 public final class LineRequest {
 
+    private static final int MAX_NAME_LENGTH = 255;
+    private static final int MAX_COLOR_LENGTH = 20;
+
     private String name;
     private long upStationId;
     private long downStationId;
@@ -37,6 +40,9 @@ public final class LineRequest {
         if (name == null || name.isBlank()) {
             throw new IllegalRequestException("노선의 이름은 최소 한 글자 이상이어야 합니다.");
         }
+        if (name.length() > MAX_NAME_LENGTH) {
+            throw new IllegalRequestException("노선의 이름은 " + MAX_NAME_LENGTH + "자를 넘을 수 없습니다.");
+        }
     }
 
     private void validateUpStationId(final long upStationId) {
@@ -60,6 +66,9 @@ public final class LineRequest {
     private void validateColor(final String color) {
         if (color == null || color.isBlank()) {
             throw new IllegalRequestException("노선의 색깔은 최소 한 글자 이상이어야 합니다.");
+        }
+        if (color.length() > MAX_COLOR_LENGTH) {
+            throw new IllegalRequestException("색깔 문자열의 길이는 " + MAX_COLOR_LENGTH + "자를 넘을 수 없습니다.");
         }
     }
 
