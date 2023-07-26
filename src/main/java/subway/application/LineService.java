@@ -16,6 +16,7 @@ import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
 import subway.exception.ErrorCode;
+import subway.exception.LineException;
 import subway.exception.SectionException;
 import subway.exception.StationException;
 
@@ -27,6 +28,7 @@ public class LineService {
     private static final String NO_DOWN_STATION_EXCEPTION_MESSAGE = "새로운 구간의 하행역이 존재하지 않습니다.";
     private static final String NO_SAVED_SECTION_EXCEPTION_MESSAGE = "등록된 구간이 없습니다.";
     private static final String NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE = "해당 노선의 구간이 존재하지 않습니다.";
+    private static final String NO_LINE_EXCEPTION_MESSAGE = "존재하지 않는 노선입니다.";
 
     private final LineDao lineDao;
     private final StationDao stationDao;
@@ -73,7 +75,8 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public Line findLineById(final Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id)
+                .orElseThrow(() -> new LineException(ErrorCode.NO_SUCH_LINE, NO_LINE_EXCEPTION_MESSAGE));
     }
 
     @Transactional

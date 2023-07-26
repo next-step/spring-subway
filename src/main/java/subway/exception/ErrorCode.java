@@ -1,6 +1,8 @@
 package subway.exception;
 
 public enum ErrorCode {
+    NO_SUCH_LINE(404, "LIN001", "존재하지 않는 노선입니다."),
+
     EMPTY_SECTION(404, "SEC001", "구간이 존재하지 않습니다."),
     INVALID_SECTION(400, "SEC002", "삽입 시 기준역은 한 개의 역이어야 합니다."),
     SAME_SECTION(400, "SEC003", "상행역과 하행역은 다른 역이어야 합니다."),
