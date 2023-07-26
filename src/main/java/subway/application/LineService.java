@@ -97,13 +97,16 @@ public class LineService {
         sectionDao.update(section);
     }
 
-    public void disconnectSectionByStationId(final Long lineId, final Long stationId) {
+    public void disconnectDownSectionByStationId(final Long lineId, final Long stationId) {
         final Line line = getLineById(lineId);
         final Station station = getStation(stationId);
 
         line.disconnectDownSection(station);
 
-        sectionDao.deleteByLineIdAndDownStationId(lineId, stationId);
+        sectionDao.deleteByLineIdAndStationId(lineId, stationId);
+    }
+
+    public void disconnectSectionByStationId(final Long lineId, final Long stationId) {
     }
 
     private Line getLineById(final Long id) {

@@ -46,12 +46,14 @@ class LineServiceTest {
     private Station station1;
     private Station station2;
     private Station station3;
+    private Station station4;
 
     @BeforeEach
     void beforeEach() {
         station1 = new Station(1L, "station1");
         station2 = new Station(2L, "station2");
         station3 = new Station(3L, "station3");
+        station4 = new Station(4L, "station4");
     }
 
 
@@ -89,8 +91,8 @@ class LineServiceTest {
     }
 
     @Nested
-    @DisplayName("disconnectSectionByStationId 메소드는")
-    class DisconnectSectionByStationId_Method {
+    @DisplayName("disconnectDownSectionByStationId 메소드는")
+    class DisconnectDownSectionByStationId_Method {
 
         @Test
         @DisplayName("stationId와 line의 하행이 일치하면, 연결을 해제하고 삭제한다")
@@ -98,7 +100,6 @@ class LineServiceTest {
             // given
             Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
             Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
-            section1.connectDownSection(section2);
 
             Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1, section2)));
 
@@ -110,11 +111,43 @@ class LineServiceTest {
 
             // when
             Exception exception = catchException(
-                    () -> lineService.disconnectSectionByStationId(line.getId(), station3.getId()));
+                    () -> lineService.disconnectDownSectionByStationId(line.getId(), station3.getId()));
 
             // then
             assertThat(exception).isNull();
         }
 
+    }
+
+    @Nested
+    @DisplayName("disconnectSectionByStationId 메소드는")
+    class DisconnectSectionByStationId_Method {
+
+        @Test
+        @DisplayName("line에 존재하는 station을 제거하고 재배치한다")
+        void Disconnect_And_Delete_When_Station_In_Line() {
+            // given
+            Section section1 = DomainFixture.Section.buildWithStations(station1, station2, 1);
+            Section section2 = DomainFixture.Section.buildWithStations(station2, station3, 2);
+            Section section3 = DomainFixture.Section.buildWithStations(station3, station4, 4);
+
+            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1, section2, section3)));
+
+            when(lineDao.findById(line.getId())).thenReturn(Optional.of(line));
+
+            when(stationDao.findById(station1.getId())).thenReturn(Optional.of(station1));
+            when(stationDao.findById(station2.getId())).thenReturn(Optional.of(station2));
+            when(stationDao.findById(station3.getId())).thenReturn(Optional.of(station3));
+
+            // when
+            Exception exception = catchException(
+                    () -> lineService.disconnectSectionByStationId(line.getId(), station2.getId()));
+
+            // then
+            assertThat(exception).isNull();
+            assertThat(section3.getUpSection().getDistance()).isEqualTo(3);
+            assertThat(section3.getUpSection().getDownStation()).isEqualTo(station3);
+            assertThat(section3.getUpSection().getUpStation()).isEqualTo(station1);
+        }
     }
 }
