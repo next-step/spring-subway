@@ -45,27 +45,11 @@ class LineTest {
             Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1, section2)));
 
             // when
-            line.disconnectDownSection(station3);
+            line.disconnectSection(station3);
 
             // then
             assertThat(section1.getDownSection()).isNull();
             assertThat(section2.getUpSection()).isNull();
-        }
-
-        @Test
-        @DisplayName("입력된 Station이 line의 하행 Station과 일치 하지 않으면, StationException을 던진다")
-        void Throw_StationException_When_Not_Equal_Station() {
-            // given
-            Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
-            Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
-
-            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1, section2)));
-
-            // when
-            Exception exception = catchException(() -> line.disconnectDownSection(station1));
-
-            // then
-            assertThat(exception).isInstanceOf(StationException.class);
         }
 
         @Test
@@ -77,30 +61,10 @@ class LineTest {
             Line line = new Line(1L, "line", "red", Arrays.asList(section1));
 
             // when
-            Exception exception = catchException(() -> line.disconnectDownSection(station2));
+            Exception exception = catchException(() -> line.disconnectSection(station2));
 
             // then
             assertThat(exception).isInstanceOf(LineException.class);
-        }
-
-        @Test
-        @DisplayName("line의 중간에 있는 section을 삭제하려고 할 경우, StationException을 던진다")
-        void Throw_SectionException_When_Disconnect_Middle_Section() {
-            // given
-            Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
-            Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
-            Section section3 = DomainFixture.Section.buildWithStations(station3, station4);
-
-            section1.connectSection(section2);
-            section2.connectSection(section3);
-
-            Line line = new Line(1L, "line", "red", Arrays.asList(section1, section2, section3));
-
-            // when
-            Exception exception = catchException(() -> line.disconnectDownSection(station3));
-
-            // then
-            assertThat(exception).isInstanceOf(StationException.class);
         }
     }
 
