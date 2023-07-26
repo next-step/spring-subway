@@ -145,6 +145,24 @@ class LineIntegrationTest extends IntegrationTest {
         assertThat(resultResponse.getId()).isEqualTo(lineId);
     }
 
+    @DisplayName("존재하지 않는 지하철 노선을 조회할 경우 예외를 던진다.")
+    @Test
+    void getNotExistsLine() {
+        // given
+        final Long notExistsLineId = 9999L;
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{lineId}", notExistsLineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     @DisplayName("지하철 노선을 수정한다.")
     @Test
     void updateLine() {

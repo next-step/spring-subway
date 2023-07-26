@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.dto.ErrorResponse;
 import subway.exception.ErrorCode;
+import subway.exception.LineException;
 import subway.exception.SectionException;
 import subway.exception.StationException;
 
@@ -17,21 +18,20 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(SectionException.class)
-    protected ResponseEntity<ErrorResponse> handleSectionException(final SectionException e) {
+    @ExceptionHandler({LineException.class, SectionException.class, StationException.class})
+    protected ResponseEntity<ErrorResponse> handleSectionException(final RuntimeException e) {
         log.error(e.getMessage());
 
-        final ErrorCode errorCode = e.getErrorCode();
-        final ErrorResponse errorResponse = ErrorResponse.of(errorCode);
+        ErrorCode errorCode;
 
-        return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
-    }
+        if (e instanceof LineException) {
+            errorCode = ((LineException) e).getErrorCode();
+        } else if (e instanceof SectionException) {
+            errorCode = ((SectionException) e).getErrorCode();
+        } else {
+            errorCode = ((StationException) e).getErrorCode();
+        }
 
-    @ExceptionHandler(StationException.class)
-    protected ResponseEntity<ErrorResponse> handleStationException(final StationException e) {
-        log.error(e.getMessage());
-
-        final ErrorCode errorCode = e.getErrorCode();
         final ErrorResponse errorResponse = ErrorResponse.of(errorCode);
 
         return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
