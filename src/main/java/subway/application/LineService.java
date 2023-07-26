@@ -15,6 +15,7 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.dto.StationResponse;
 import subway.exception.ErrorCode;
 import subway.exception.LineException;
 import subway.exception.SectionException;
@@ -70,7 +71,11 @@ public class LineService {
         Sections sections = sectionDao.findAllByLineId(id)
                 .orElseThrow(() -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
-        return LineStationsResponse.from(persistLine, sections.toStations());
+        List<StationResponse> stationResponses = sections.toStations().stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
+
+        return LineStationsResponse.from(persistLine, stationResponses);
     }
 
     @Transactional(readOnly = true)
