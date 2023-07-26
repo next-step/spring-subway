@@ -45,7 +45,7 @@ public class SubWayExceptionHandler {
         printLog(exception);
         return ResponseEntity.internalServerError()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorResponse.of(INTERNAL_SERVER_ERROR.value(), exception.getMessage()));
+                .body(ErrorResponse.of(INTERNAL_SERVER_ERROR.value(), "접근해서는 안되는 영역에 접근했습니다."));
     }
 
     private void printLog(final Exception exception) {
