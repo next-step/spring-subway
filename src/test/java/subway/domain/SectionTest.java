@@ -22,7 +22,7 @@ class SectionTest {
 
     }
 
-    @DisplayName("구간 정상 생성")
+    @DisplayName("노선 정보 , 상행역 , 하행역 , 상행역과 하행역 사이 거리가 입력으로 주어지면 구간을 생성하는데 성공한다.")
     @Test
     void validationSuccess() {
         // given, when, then
@@ -30,7 +30,7 @@ class SectionTest {
                 .doesNotThrowAnyException();
     }
 
-    @DisplayName("노선 아이디가 null 일시 구간 생성 실패")
+    @DisplayName("노선 정보가 null 이면 구간 생성 실패하고 예외를 던진다.")
     @Test
     void validationLineIdNotNull() {
         // given, when, then
@@ -40,7 +40,7 @@ class SectionTest {
                 .hasMessage("노선은 null일 수 없습니다.");
     }
 
-    @DisplayName("상행역 아이디가 null 일시 구간 생성 실패")
+    @DisplayName("상행역 정보가 null 이면 구간 생성 실패하고 예외를 던진다.")
     @Test
     void validationUpStationIdNotNull() {
         // given , when, then
@@ -50,7 +50,7 @@ class SectionTest {
                 .hasMessage("상행역 null일 수 없습니다.");
     }
 
-    @DisplayName("하행역 아이디가 null 일시 구간 생성 실패")
+    @DisplayName("하행역 정보가 null 이면 구간 생성 실패하고 예외를 던진다.")
     @Test
     void validationDownStationIdNotNull() {
         // given,  when, then
@@ -60,7 +60,7 @@ class SectionTest {
                 .hasMessage("하행역 null일 수 없습니다.");
     }
 
-    @DisplayName("거리가 null 일시 구간 생성 실패")
+    @DisplayName("구간 정보가 null 이면 구간 생성 실패하고 예외를 던진다.")
     @Test
     void validationDistanceNotNull() {
         // given , when, then
@@ -70,7 +70,7 @@ class SectionTest {
                 .hasMessage("거리는 null일 수 없습니다.");
     }
 
-    @DisplayName("상행역 아이디와 하행역 아이디는 같을 시 구간 생성 실패")
+    @DisplayName("상행역과 하행역이 같을 시 구간 생성 실패하고 예외를 던진다.")
     @Test
     void validationUpStationIdNotEqualDownStationId() {
         // given, when, then

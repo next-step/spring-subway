@@ -27,7 +27,7 @@ class SortedSectionsTest {
         stationE = new Station(5L, "신촌");
     }
 
-    @DisplayName("여러 개의 Section 정보가 있을 때 정렬된 순서로 역을 반환")
+    @DisplayName("D -> A -> B -> C 구간이 주어졌을 때 SortedSections.toStation 을 호출하면 D , A , B ,C  순서로 역을 반환한다.")
     @Test
     void givenManySectionsWhenToStationsThenOrderedStations() {
         // given

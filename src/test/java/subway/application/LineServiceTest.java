@@ -34,7 +34,7 @@ class LineServiceTest {
     @Autowired
     private SectionDao sectionDao;
 
-    @DisplayName("지하철 노선을 생성하면서 첫 구간도 함께 생성한다.")
+    @DisplayName("하행역과 상행역 주어지면 노선과 첫 번째 구간을 생성한다.")
     @Test
     void saveLineAndSaveFirstSection() {
         // given

@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.domain.Station;
 import subway.dto.response.StationResponse;
+import subway.error.ErrorResponse;
 import subway.integration.helper.StationIntegrationHelper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,12 +21,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철역 관련 기능")
 public class StationIntegrationTest extends IntegrationTest {
 
-    @DisplayName("지하철역을 생성한다.")
+    @DisplayName("[POST] [/stations] 지하철역 이름을 입력으로 지하철역을 생성한다.")
     @Test
     void createStation() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        Map<String, String> params = Map.of("name", "강남역");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -42,12 +41,11 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    @DisplayName("[POST] [/stations] 기존에 존재하는 지하철역 이름으로 지하철역을 생성하면 BAD_REQUEST 웅답을 받는다.")
     @Test
     void createStationWithDuplicateName() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "강남역");
+        Map<String, String> params = Map.of("name", "강남역");
         StationIntegrationHelper.createStation(params);
 
         // when
@@ -63,7 +61,7 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("지하철역 목록을 조회한다.")
+    @DisplayName("[GET] [/stations] 지하철역 목록을 조회한다.")
     @Test
     void getStations() {
         /// given
@@ -88,7 +86,7 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(resultStationIds).contains(stationA.getId(), stationB.getId());
     }
 
-    @DisplayName("지하철역을 조회한다.")
+    @DisplayName("[GET] [/stations/{stationId}] 지하철역 ID 로 지하철역을 조회한다.")
     @Test
     void getStation() {
         /// given
@@ -108,7 +106,24 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(stationResponse.getId()).isEqualTo(station.getId());
     }
 
-    @DisplayName("지하철역을 수정한다.")
+    @DisplayName("[GET] [/stations/{stationId}] 없는 지하철역 ID 로 지하철역을 조회하면 BAD_REQUEST 웅답을 받는다.")
+    @Test
+    void notFoundStation() {
+        // given , when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .when()
+                .get("/stations/{stationId}", 1L)
+                .then().log().all()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.body().as(ErrorResponse.class);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(errorResponse.getMessage()).isEqualTo("역을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("[PUT] [/stations/{stationId}] 지하철역 ID , 지하철역 이름으로 지하철역을 수정한다.")
     @Test
     void updateStation() {
         // given
@@ -130,7 +145,7 @@ public class StationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("지하철역을 제거한다.")
+    @DisplayName("[DELETE] [/stations/{stationId}] 노선 ID로 지하철역을 제거한다.")
     @Test
     void deleteStation() {
         // given

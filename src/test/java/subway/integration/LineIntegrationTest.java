@@ -13,6 +13,7 @@ import subway.domain.Station;
 import subway.dto.request.LineCreateRequest;
 import subway.dto.response.LineResponse;
 import subway.dto.response.LineWithStationsResponse;
+import subway.error.ErrorResponse;
 import subway.integration.helper.LineIntegrationHelper;
 import subway.integration.helper.StationIntegrationHelper;
 
@@ -41,7 +42,7 @@ public class LineIntegrationTest extends IntegrationTest {
 
     }
 
-    @DisplayName("지하철 노선을 생성하면서 첫 구간도 함께 생성한다.")
+    @DisplayName("[POST] [/lines] 라인 이름 , 색깔 , 상행역 ,하행역 ID , 거리를 요청으로 지하철 노선을 생성하면서 첫 구간도 함께 생성한다.")
     @Test
     void createLine() {
         // when
@@ -57,7 +58,7 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
+    @DisplayName("[POST] [/lines] 기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성하면 BAD_REQUEST 웅답을 받는다.")
     @Test
     void createLineWithDuplicateName() {
         // given
@@ -76,7 +77,7 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("지하철 노선 목록을 조회한다.")
+    @DisplayName("[GET] [/lines] 노선 ID로 지하철 노선 목록을 조회한다.")
     @Test
     void getLines() {
         // given
@@ -99,7 +100,7 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(resultLineIds).contains(lineA.getId(), lineB.getId());
     }
 
-    @DisplayName("지하철 노선을 조회한다.")
+    @DisplayName("[GET] [/lines/{lineId}] 노선 ID로 지하철 노선을 조회한다.")
     @Test
     void getLine() {
         // given
@@ -120,7 +121,29 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(resultResponse.getId()).isEqualTo(lineId);
     }
 
-    @DisplayName("지하철 노선을 수정한다.")
+    @DisplayName("[GET] [/lines/{lineId}] 없는 노선을 조회하면 BAD_REQUEST 웅답을 받는다.")
+    @Test
+    void notFoundLine() {
+        // given
+        final Line line = LineIntegrationHelper.createLine(lineCreateRequestA);
+
+        // when
+        Long lineId = line.getId();
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{lineId}", -1L)
+                .then().log().all()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.body().as(ErrorResponse.class);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(errorResponse.getMessage()).isEqualTo("노선을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("[PUT] [/lines/{lineId}] 노선 ID 와 이름 , 색깔을 입력으로 지하철 노선을 수정한다.")
     @Test
     void updateLine() {
         // given
@@ -140,7 +163,7 @@ public class LineIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
-    @DisplayName("지하철 노선을 제거한다.")
+    @DisplayName("[DELETE] [/lines/{lineId}] 노선 ID로 지하철 노선을 제거한다.")
     @Test
     void deleteLine() {
         // given
