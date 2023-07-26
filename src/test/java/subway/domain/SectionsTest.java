@@ -98,7 +98,7 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("역 포함 여부를 반환한다.")
+    @DisplayName("역을 포함한다.")
     void hasStation() {
         //given
         Line lineA = new Line(1L, "A", "red");
@@ -114,7 +114,7 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("노선의 첫 역인지 여부를 반환한다.")
+    @DisplayName("노선의 첫 역이다.")
     void isFirst() {
         //given
         Line lineA = new Line(1L, "A", "red");
@@ -129,7 +129,7 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("노선의 마지막 역인지 여부를 반환한다.")
+    @DisplayName("노선의 마지막 역이다.")
     void isLast() {
         //given
         Line lineA = new Line(1L, "A", "red");

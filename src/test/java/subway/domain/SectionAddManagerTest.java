@@ -44,7 +44,7 @@ class SectionAddManagerTest {
         Station stationC = new Station(3L, "C");
         Station stationD = new Station(4L, "D");
 
-        Section firstSection = new Section(1L, lineA, stationA, stationB, 5);
+        Section firstSection = new Section(1L, lineA, stationA, stationC, 5);
         Section secondSection = new Section(2L, lineA, stationB, stationD, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
 
@@ -56,8 +56,8 @@ class SectionAddManagerTest {
     }
 
     @Test
-    @DisplayName("노선의 특정 구간과 상행역만 같은 경우 노선에 추가할 수 있다.")
-    void addSectionOfSameUpStationAsLinesSection() {
+    @DisplayName("노선의 특정 구간과 상행역만 같은 경우 노선에 추가한다.")
+    void addSectionOfSameUpStation() {
         //given
         Line lineA = new Line(1L, "A", "#ff0000");
         Station stationA = new Station(1L, "A");
@@ -73,6 +73,27 @@ class SectionAddManagerTest {
 
         //when & then
         assertThatCode(() -> sectionAddManager.validate(stationB, stationC, 3))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("노선의 특정 구간과 하행역만 같은 경우 노선에 추가한다.")
+    void addSectionOfSameDownStation() {
+        //given
+        Line lineA = new Line(1L, "A", "#ff0000");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
+        Station stationD = new Station(4L, "D");
+
+        Section firstSection = new Section(1L, lineA, stationA, stationB, 5);
+        Section secondSection = new Section(2L, lineA, stationB, stationD, 5);
+        Sections sections = new Sections(List.of(firstSection, secondSection));
+
+        SectionAddManager sectionAddManager = new SectionAddManager(sections);
+
+        //when & then
+        assertThatCode(() -> sectionAddManager.validate(stationC, stationD, 3))
             .doesNotThrowAnyException();
     }
 

@@ -40,7 +40,7 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("해당 역은 구간의 상행역과 같다")
+    @DisplayName("해당 역은 자신의 상행역과 같다")
     void hasUpStation() {
         //given
         Line lineA = new Line(1L, "A", "red");
@@ -55,7 +55,7 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("해당 역은 구간의 하행역과 같다")
+    @DisplayName("해당 역은 자신의 하행역과 같다")
     void hasDownStation() {
         //given
         Line lineA = new Line(1L, "A", "red");
@@ -103,7 +103,7 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("대상 구간의 길이가 같거나 긴 경우 자를 수 없다.")
+    @DisplayName("주어진 구간의 길이가 같거나 긴 경우 자를 수 없다.")
     void cannotCutByLargeOrSameLengthSection() {
         //given
         Line lineA = new Line(1L, "A", "red");
@@ -123,7 +123,7 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("구간의 상행역과 추가할 구간의 상행역이 같은 경우 자른다.")
+    @DisplayName("구간의 상행역과 주어진 구간의 상행역이 같은 경우 구간의 윗부분을 잘라낸다.")
     void cutUpperPart() {
         //given
         Line lineA = new Line(1L, "A", "red");
@@ -144,7 +144,7 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("구간의 하행역과 추가할 구간의 하행역이 같은 경우 자른다.")
+    @DisplayName("구간의 하행역과 주어진 구간의 하행역이 같은 경우 구간의 아랫부분을 잘라낸다.")
     void cutLowerPart() {
         //given
         Line lineA = new Line(1L, "A", "red");
@@ -165,7 +165,7 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("구간의 상행역, 하행역이 추가할 구간의 상행역, 하행역과 모두 같거나 모두 다른 경우 자를 수 없다.")
+    @DisplayName("구간의 상행역, 하행역이 주어진 구간의 상행역, 하행역과 모두 같거나 모두 다른 경우 자를 수 없다.")
     void cannotCutByFullMatchOrNoMatchSection() {
         //given
         Line lineA = new Line(1L, "A", "red");
@@ -207,7 +207,7 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("구간의 하행역과 대상 구간의 상행역이 다른 경우 연장할 수 없다.")
+    @DisplayName("구간의 하행역과 주어진 구간의 상행역이 다른 경우 연장할 수 없다.")
     void cannotExtendByNotConnectedSection() {
         //given
         Line lineA = new Line(1L, "A", "red");
