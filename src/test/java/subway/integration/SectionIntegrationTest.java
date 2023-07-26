@@ -132,6 +132,19 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    @DisplayName("지하철 노선에 해당 역이 존재하지 않을 때 구간 제거 실패")
+    @Test
+    void deleteSectionAtLineNotHasStation() {
+        // given
+        createInitialLine();
+
+        // when
+        ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(2L, 2L);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     private void createInitialLine() {
         final LineRequest lineRequest = new LineRequest("1호선", 1L, 2L, 10, "blue");
         final StationRequest stationRequest1 = new StationRequest("인천");

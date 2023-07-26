@@ -42,7 +42,7 @@ public class StationService {
     private Station findStation(final long id) {
         return stationDao.findById(id)
                 .orElseThrow(() ->
-                        new IllegalStationsException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
+                        new IllegalStationException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
                 );
     }
 
