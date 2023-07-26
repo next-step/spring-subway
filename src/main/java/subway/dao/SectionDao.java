@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import subway.dao.mapper.SectionMapper;
 import subway.domain.Section;
 
 @Repository
@@ -16,21 +16,14 @@ public class SectionDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
+    private final SectionMapper sectionMapper;
 
-    private final RowMapper<Section> rowMapper = (rs, rowNum) ->
-        new Section(
-            rs.getLong("id"),
-            rs.getLong("line_id"),
-            rs.getLong("up_station_id"),
-            rs.getLong("down_station_id"),
-            rs.getInt("distance")
-        );
-
-    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource, SectionMapper sectionMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
             .withTableName("section")
             .usingGeneratedKeyColumns("id");
+        this.sectionMapper = sectionMapper;
     }
 
     public Section insert(final Section section) {
@@ -44,14 +37,14 @@ public class SectionDao {
         String sql = "select * from SECTION S1 " +
             "where S1.line_id = ? " +
             "and not exists(select * from section S2 where S1.down_station_id = S2.up_station_id)";
-        return jdbcTemplate.query(sql, rowMapper, lineId)
+        return jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId)
             .stream()
             .findAny();
     }
 
     public List<Section> findAll(final long lineId) {
         String sql = "select * from SECTION where line_id = ?";
-        return jdbcTemplate.query(sql, rowMapper, lineId);
+        return jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId);
     }
 
     public void update(final Section newSection) {
@@ -77,12 +70,12 @@ public class SectionDao {
 
     public long count(final long lineId) {
         String sql = "select * from section where line_id = ?";
-        return jdbcTemplate.query(sql, rowMapper, lineId)
+        return jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId)
             .size();
     }
 
     public boolean existByLineIdAndStationId(long lineId, long stationId) {
         String sql = "select * from section where line_id = ? and (up_station_id = ? or down_station_id = ?)";
-        return !jdbcTemplate.query(sql, rowMapper, lineId, stationId, stationId).isEmpty();
+        return !jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId, stationId, stationId).isEmpty();
     }
 }
