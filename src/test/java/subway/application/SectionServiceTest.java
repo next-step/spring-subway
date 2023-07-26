@@ -65,7 +65,8 @@ class SectionServiceTest {
 
         // then
         assertThat(sectionResponse.getUpStationId()).isEqualTo(newSection.getUpStation().getId());
-        assertThat(sectionResponse.getDownStationId()).isEqualTo(newSection.getDownStation().getId());
+        assertThat(sectionResponse.getDownStationId()).isEqualTo(
+            newSection.getDownStation().getId());
         assertThat(sectionResponse.getDistance()).isEqualTo(10);
     }
 
@@ -75,6 +76,11 @@ class SectionServiceTest {
         // given
         final long lineId = 3L;
         final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
+
+        Station upStation = new Station(2, "잠실");
+        Station downStation = new Station(1, "잠실나루");
+        given(stationDao.findById(upStation.getId())).willReturn(Optional.of(upStation));
+        given(stationDao.findById(downStation.getId())).willReturn(Optional.of(downStation));
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
@@ -94,6 +100,8 @@ class SectionServiceTest {
         final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
+        given(stationDao.findById(upStation.getId())).willReturn(Optional.of(upStation));
+        given(stationDao.findById(downStation.getId())).willReturn(Optional.of(downStation));
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
@@ -106,11 +114,19 @@ class SectionServiceTest {
     void createSectionWithBothNotExistInLineTest() {
         // given
         final Line line = createInitialLine();
+
         Station upStation = new Station(1L, "jamsil");
         Station downStation = new Station(2L, "jamsilnaru");
         final Section oldSection = new Section(1L, line, upStation, downStation, 10);
-        final SectionRequest sectionRequest = new SectionRequest("3", "4", 10);
 
+        Station notExistStation1 = new Station(3L, "gangbyeon");
+        Station notExistStation2 = new Station(4L, "guui");
+
+        final SectionRequest sectionRequest = new SectionRequest(String.valueOf(notExistStation1.getId()),
+            String.valueOf(notExistStation2.getId()), 5);
+
+        given(stationDao.findById(notExistStation1.getId())).willReturn(Optional.of(notExistStation1));
+        given(stationDao.findById(notExistStation2.getId())).willReturn(Optional.of(notExistStation2));
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
 
         // when & then

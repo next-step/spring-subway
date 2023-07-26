@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -214,7 +213,6 @@ class SectionsTest {
         station.add(new Station(3L, "역삼역"));
         station.add(new Station(4L, "선릉역"));
         station.add(new Station(5L, "삼성역"));
-        Collections.shuffle(station);
         return station;
     }
 
