@@ -90,6 +90,29 @@ public class Section {
         return downSection.connectSection(requestSection);
     }
 
+    public Section disconnectSection(final Station requestStation) {
+        if (requestStation == null) {
+            throw new StationException("requestStation이 존재하지 않습니다");
+        }
+
+        Optional<SectionDisconnector> sectionDisconnectorOptional = SectionDisconnector
+                .findSectionDisconnector(this, requestStation);
+        if (sectionDisconnectorOptional.isEmpty()) {
+            return disconnectSectionIfDownSectionPresent(requestStation);
+        }
+        return sectionDisconnectorOptional.get().disconnectSection(this, requestStation);
+    }
+
+    private Section disconnectSectionIfDownSectionPresent(final Station requestStation) {
+        if (downSection == null) {
+            throw new SectionException(
+                    MessageFormat.format("line에서 requestStation \"{0}\"을 제거할 수 없습니다.", requestStation)
+            );
+        }
+
+        return downSection.disconnectSection(requestStation);
+    }
+
     public Section connectDownSection(final Section requestSection) {
         this.downSection = requestSection;
         requestSection.upSection = this;
@@ -170,6 +193,15 @@ public class Section {
         upSection = null;
     }
 
+    public void disconnectMiddleSection() {
+        downStation = downSection.downStation;
+        distance += downSection.distance;
+
+        if (downSection.getDownSection() != null) {
+            connectDownSection(downSection.getDownSection());
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -207,10 +239,6 @@ public class Section {
         return Objects.hash(id);
     }
 
-    public void disconnectMiddleSection() {
-
-
-    }
 
     public static class Builder {
 
