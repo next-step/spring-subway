@@ -28,7 +28,7 @@ class SectionsTest {
         Sections sections = new Sections(List.of(thirdSection, secondSection, firstSection));
 
         //then
-        List<Section> actual = sections.getValues();
+        List<Section> actual = sections.getSections();
         assertThat(actual).isEqualTo(List.of(firstSection, secondSection, thirdSection))
             .isNotEqualTo(List.of(thirdSection, secondSection, firstSection));
     }

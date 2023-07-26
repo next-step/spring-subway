@@ -9,17 +9,18 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.util.CollectionUtils;
 
 public class Sections {
 
-    private final List<Section> values;
+    private final List<Section> sections;
 
     public Sections(List<Section> candidateValues) {
         validateNullOrEmpty(candidateValues);
         validateAllBelongToSameLine(candidateValues);
-        this.values = sort(candidateValues);
+        this.sections = sort(candidateValues);
 
-        validateConnectedSections(candidateValues, this.values);
+        validateConnectedSections(candidateValues, this.sections);
     }
 
     private void validateNullOrEmpty(List<Section> values) {
@@ -83,7 +84,7 @@ public class Sections {
     }
 
     public List<Station> getStations() {
-        List<Station> stations = values.stream()
+        List<Station> stations = sections.stream()
             .map(Section::getUpStation)
             .collect(Collectors.toList());
         stations.add(getLast().getDownStation());
@@ -103,26 +104,26 @@ public class Sections {
     }
 
     public Optional<Section> filter(Predicate<Section> condition) {
-        return values.stream()
+        return sections.stream()
             .filter(condition)
             .findAny();
     }
 
     public int getSize() {
-        return values.size();
+        return sections.size();
     }
 
     private Section getFirst() {
-        return this.values.get(0);
+        return CollectionUtils.firstElement(sections);
     }
 
 
     private Section getLast() {
-        return this.values.get(this.values.size() - 1);
+        return CollectionUtils.lastElement(sections);
     }
 
-    public List<Section> getValues() {
-        return values;
+    public List<Section> getSections() {
+        return sections;
     }
 
     @Override
@@ -134,18 +135,18 @@ public class Sections {
             return false;
         }
         Sections sections = (Sections) o;
-        return Objects.equals(values, sections.values);
+        return Objects.equals(this.sections, sections.sections);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(values);
+        return Objects.hash(sections);
     }
 
     @Override
     public String toString() {
         return "Sections{" +
-            "values=" + values +
+            "values=" + sections +
             '}';
     }
 }
