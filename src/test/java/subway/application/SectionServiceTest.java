@@ -128,56 +128,53 @@ class SectionServiceTest {
         final long stationId = 3;
 
         final Line line = new Line(1L, "4호선", "blue");
+        final Station station1 = new Station(1L, "오이도");
         final Station station2 = new Station(2L, "안산");
         final Station station3 = new Station(3L, "한대앞");
+        final Section section1 = new Section(line, station1, station2, 10);
+        final Section section2 = new Section(line, station2, station3, 10);
 
-        given(stationDao.findById(station3.getId())).willReturn(Optional.of(station3));
-        given(sectionDao.findLastSection(line.getId()))
-                .willReturn(Optional.of(new Section(line, station2, station3, 10)));
+        given(sectionDao.findAll(line.getId())).willReturn(List.of(section1, section2));
 
         // when & then
         assertThatNoException().isThrownBy(() -> sectionService.deleteSection(line.getId(), stationId));
     }
 
-    @DisplayName("지하철 노선의 하행 종점역이 아닐 때 구간 제거 실패")
+    @DisplayName("하행 마지막 구간이 아닌 구간 삭제 성공")
     @Test
-    void deleteSectionWithNotLastStation() {
+    void deleteAnySectionNotLast() {
         // given
-        final long lineId = 1L;
-        final long stationId = 1L;
+        final long stationId = 2;
 
         final Line line = new Line(1L, "4호선", "blue");
         final Station station1 = new Station(1L, "오이도");
         final Station station2 = new Station(2L, "안산");
         final Station station3 = new Station(3L, "한대앞");
+        final Section section1 = new Section(line, station1, station2, 10);
+        final Section section2 = new Section(line, station2, station3, 10);
 
-        given(stationDao.findById(stationId)).willReturn(Optional.of(station1));
-        given(sectionDao.findLastSection(lineId))
-                .willReturn(Optional.of(new Section(line, station2, station3, 10)));
+        given(sectionDao.findAll(line.getId())).willReturn(List.of(section1, section2));
 
         // when & then
-        assertThatThrownBy(() -> sectionService.deleteSection(lineId, stationId))
-                .hasMessage("해당 역은 노선의 하행 종점역이 아닙니다.")
-                .isInstanceOf(IllegalSectionException.class);
+        assertThatNoException().isThrownBy(() -> sectionService.deleteSection(line.getId(), stationId));
     }
 
     @DisplayName("지하철 노선에 구간이 1개일 때 구간 제거 실패")
     @Test
     void deleteSectionAtLineHasOneSection() {
         // given
+        final long stationId = 2;
+
         final Line line = new Line(1L, "4호선", "blue");
         final Station station1 = new Station(1L, "오이도");
         final Station station2 = new Station(2L, "안산");
+        final Section section1 = new Section(line, station1, station2, 10);
 
-        given(stationDao.findById(station2.getId())).willReturn(Optional.of(station2));
-        given(sectionDao.findLastSection(line.getId()))
-                .willReturn(Optional.of(new Section(line, station1, station2, 10)));
-        given(sectionDao.count(line.getId()))
-                .willReturn(1L);
+        given(sectionDao.findAll(line.getId())).willReturn(List.of(section1));
 
         // when & then
-        assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), station2.getId()))
-                .hasMessage("해당 노선은 구간이 한개입니다.")
+        assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), stationId))
+                .hasMessage("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
 }
