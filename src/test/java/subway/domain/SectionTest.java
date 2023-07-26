@@ -2,12 +2,15 @@ package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
+import static subway.domain.ExceptionTestSupporter.assertStatusCodeException;
 
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import subway.domain.response.SectionDisconnectResponse;
+import subway.domain.status.SectionExceptionStatus;
 
 @DisplayName("Section 클래스")
 class SectionTest {
@@ -36,8 +39,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("하나의 Station이 Null값으로 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Null_Station() {
+        @DisplayName("하나의 Station이 Null값으로 들어오면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Null_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station nullStation = null;
@@ -52,12 +55,12 @@ class SectionTest {
                             .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.NULL_STATION.getStatus());
         }
 
         @Test
-        @DisplayName("distance로 0 이하의 값이 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Under_Zero() {
+        @DisplayName("distance로 0 이하의 값이 들어오면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Under_Zero() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station downStation = new Station(2L, "downStation");
@@ -71,12 +74,12 @@ class SectionTest {
                     .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.ILLEGAL_DISTANCE.getStatus());
         }
 
         @Test
-        @DisplayName("upStation과 downStation이 일치하면 IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Same_Station() {
+        @DisplayName("upStation과 downStation이 일치하면 StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Same_Station() {
             // given
             Station sameStation = new Station(1L, "sameStation");
             int distance = 10;
@@ -89,7 +92,7 @@ class SectionTest {
                     .build());
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.DUPLICATE_STATION.getStatus());
         }
     }
 
@@ -109,7 +112,7 @@ class SectionTest {
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
             // when
-            section.connectDownSection(downSection);
+            section.connectSection(downSection);
 
             Section result = section.getDownSection();
             Section resultUpSection = result.getUpSection();
@@ -120,8 +123,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("각 Section의 Middle Station이 다르면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Different_Middle_Station() {
+        @DisplayName("각 Section의 Middle Station이 다르면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Different_Middle_Station() {
             // given
             Station upStation = new Station(1L, "upStation");
             Station middleStation = new Station(2L, "middleStation");
@@ -135,12 +138,12 @@ class SectionTest {
             Exception exception = catchException(() -> section.connectSection(downSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.CANNOT_CONNECT_SECTION.getStatus());
         }
 
         @Test
-        @DisplayName("Section으로 Null이 들어오면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_When_Input_Null_Section() {
+        @DisplayName("Section으로 Null이 들어오면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_When_Input_Null_Section() {
             // given
             Station upStation = new Station(2L, "upStation");
             Station middleStation = new Station(1L, "middleStation");
@@ -153,7 +156,7 @@ class SectionTest {
             Exception exception = catchException(() -> section.connectSection(downSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.NULL_REQUEST_SECTION.getStatus());
         }
     }
 
@@ -172,55 +175,13 @@ class SectionTest {
             Section section = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            section.connectDownSection(downSection);
+            section.connectSection(downSection);
 
             // when
             Section result = section.findDownSection();
 
             // then
             assertThat(result).isEqualTo(downSection);
-        }
-    }
-
-    @Nested
-    @DisplayName("disconnectDownSection 메소드는")
-    class DisconnectDownSection_Method {
-
-        @Test
-        @DisplayName("호출되면, DownSection과 연결을 해제한다")
-        void Disconnect_DownSection() {
-            // given
-            Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(1L, "middleStation");
-            Station downStation = new Station(2L, "downStation");
-
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-
-            upSection.connectDownSection(downSection);
-
-            // when
-            upSection.disconnectDownSection();
-
-            // then
-            assertThat(upSection.getDownSection()).isNull();
-            assertThat(downSection.getUpSection()).isNull();
-        }
-
-        @Test
-        @DisplayName("downSection이 null 이라면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Null_DownSection() {
-            // given
-            Station upStation = new Station(1L, "upStation");
-            Station middleStation = new Station(1L, "middleStation");
-
-            Section section = DomainFixture.Section.buildWithStations(upStation, middleStation);
-
-            // when
-            Exception exception = catchException(section::disconnectDownSection);
-
-            // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -239,7 +200,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             // when
             Section result = downSection.findUpSection();
@@ -261,8 +222,8 @@ class SectionTest {
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation);
 
-            upSection.connectDownSection(middleSection);
-            middleSection.connectDownSection(downSection);
+            upSection.connectSection(middleSection);
+            middleSection.connectSection(downSection);
 
             // when
             Section result = downSection.findUpSection();
@@ -290,7 +251,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 10);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation1, downStation, 10);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 9);
 
@@ -314,7 +275,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation2, 10);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 10);
 
-            upSection.connectDownSection(downSection);
+            upSection.connectSection(downSection);
 
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 9);
 
@@ -338,7 +299,7 @@ class SectionTest {
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 10);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 10);
 
-            middleSection.connectDownSection(downSection);
+            middleSection.connectSection(downSection);
 
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 100);
 
@@ -362,7 +323,7 @@ class SectionTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation1, 10);
             Section middleSection = DomainFixture.Section.buildWithStations(middleStation1, middleStation2, 10);
 
-            upSection.connectDownSection(middleSection);
+            upSection.connectSection(middleSection);
 
             Section downSection = DomainFixture.Section.buildWithStations(middleStation2, downStation, 100);
 
@@ -375,8 +336,8 @@ class SectionTest {
         }
 
         @Test
-        @DisplayName("Null값이 들어오면, IllegalArgumentException을 던진다")
-        void Throw_IllegalArgumentException_When_Input_Null_Section() {
+        @DisplayName("Null값이 들어오면, StatusCodeException을 던진다")
+        void Throw_StatusCodeException_When_Input_Null_Section() {
             // given
             Station upStation = new Station("upStation");
             Station downStation = new Station("middleStation1");
@@ -389,7 +350,7 @@ class SectionTest {
             Exception exception = catchException(() -> upSection.connectSection(nullSection));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, SectionExceptionStatus.NULL_REQUEST_SECTION.getStatus());
         }
 
         private void assertSectionConnectedStatus(Section section, List<Station> stations) {
@@ -398,6 +359,126 @@ class SectionTest {
                 assertThat(section.getDownStation()).isEqualTo(stations.get(stationIdx + 1));
                 section = section.getDownSection();
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("disconnectStation 메소드는")
+    class DisconnectStation_Method {
+
+        @Test
+        @DisplayName("연결된 구간의 첫번째 station을 삭제할 수 있다.")
+        void Disconnect_FirstSection() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Station downStation = new Station(2L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            upSection.connectSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = upSection.disconnectStation(upStation);
+
+            // then
+            assertThat(downSection.getUpSection()).isNull();
+            assertThat(result.getUpdatedSections()).containsExactly(downSection);
+            assertThat(result.getDeletedSection()).isEqualTo(upSection);
+        }
+
+        @Test
+        @DisplayName("호출되면, 마지막 Station과 연결을 해제한다")
+        void Disconnect_LastSection() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Station downStation = new Station(2L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            upSection.connectSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = upSection.disconnectStation(downStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isNull();
+            assertThat(result.getDeletedSection()).isEqualTo(downSection);
+            assertThat(result.getUpdatedSections()).containsExactly(upSection);
+        }
+
+        @Test
+        @DisplayName("section이 3개 이상일때, 중간 station 이라면, 연결을 해제하고 양쪽 station과 연결한다")
+        void Disconnect_Section_And_Connect_Children_Descendant() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleUpStation = new Station(2L, "middleUpStation");
+            Station middleDownStation = new Station(3L, "middleDownStation");
+            Station downStation = new Station(4L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleUpStation, 10);
+            Section middleSection = DomainFixture.Section.buildWithStations(middleUpStation, middleDownStation, 10);
+            Section downSection = DomainFixture.Section.buildWithStations(middleDownStation, downStation);
+
+            upSection.connectSection(middleSection);
+            middleSection.connectSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = upSection.disconnectStation(middleUpStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isEqualTo(downSection);
+            assertThat(result.getDeletedSection()).isEqualTo(middleSection);
+            assertThat(result.getUpdatedSections()).containsExactly(upSection, downSection);
+            assertThat(upSection.getDistance()).isEqualTo(20);
+        }
+
+        @Test
+        @DisplayName("section이 2개일때, 중간 station 이라면, 연결을 해제하고 양쪽 station과 연결한다")
+        void Disconnect_Section_And_Connect_Children_Descendant_When_Section_Only_Two() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(4L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation, 10);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation, 10);
+
+            upSection.connectSection(downSection);
+
+            // when
+            SectionDisconnectResponse result = upSection.disconnectStation(middleStation);
+
+            // then
+            assertThat(upSection.getDownSection()).isNull();
+            assertThat(result.getDeletedSection()).isEqualTo(downSection);
+            assertThat(result.getUpdatedSections()).containsExactly(upSection);
+            assertThat(result.getUpdatedSections().get(0).getDistance()).isEqualTo(20);
+        }
+
+        @Test
+        @DisplayName("삭제가능한 station을 찾을 수 없으면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_Cannot_Find_Deletable_Station() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(1L, "middleStation");
+            Station downStation = new Station(2L, "downStation");
+
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            upSection.connectSection(downSection);
+
+            Station nonExistStation = new Station(4L, "nonExistStation");
+
+            // when
+            Exception exception = catchException(() -> upSection.disconnectStation(nonExistStation));
+
+            // then
+            assertStatusCodeException(exception, SectionExceptionStatus.CANNOT_DISCONNECT_SECTION.getStatus());
         }
     }
 }

@@ -3,17 +3,18 @@ package subway.domain;
 import java.util.Objects;
 
 public class Station {
+
     private final Long id;
-    private final String name;
+    private final Name name;
 
     public Station(Long id, String name) {
         this.id = id;
-        this.name = name;
+        this.name = new Name(name);
     }
 
     public Station(String name) {
         this.id = null;
-        this.name = name;
+        this.name = new Name(name);
     }
 
     public Long getId() {
@@ -21,7 +22,7 @@ public class Station {
     }
 
     public String getName() {
-        return name;
+        return name.value;
     }
 
     @Override

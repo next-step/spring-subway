@@ -4,10 +4,10 @@ import java.util.Objects;
 import subway.domain.Station;
 
 public class StationResponse {
-    private final Long id;
+    private final long id;
     private final String name;
 
-    public StationResponse(Long id, String name) {
+    public StationResponse(long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -16,7 +16,7 @@ public class StationResponse {
         return new StationResponse(station.getId(), station.getName());
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 

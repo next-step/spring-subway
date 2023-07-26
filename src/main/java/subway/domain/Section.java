@@ -1,16 +1,16 @@
 package subway.domain;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import org.springframework.util.Assert;
+import subway.domain.response.SectionDisconnectResponse;
+import subway.domain.status.SectionExceptionStatus;
+import subway.util.Assert;
 
 public class Section {
 
-    private static final int MIN_DISTANCE_SIZE = 0;
-
     private final Long id;
-    private int distance;
+    private Distance distance;
     private Station upStation;
     private Station downStation;
     private Section upSection;
@@ -21,7 +21,7 @@ public class Section {
 
         this.upStation = builder.upStation;
         this.downStation = builder.downStation;
-        this.distance = builder.distance;
+        this.distance = new Distance(builder.distance);
         this.id = builder.id;
         this.upSection = builder.upSection;
         this.downSection = builder.downSection;
@@ -32,54 +32,77 @@ public class Section {
     }
 
     private void validate(Builder builder) {
-        Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.");
-        Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.");
-        Assert.isTrue(builder.distance > MIN_DISTANCE_SIZE,
-                () -> MessageFormat.format("distance \"{0}\"는 0 이하가 될 수 없습니다.", builder.distance));
+        Assert.notNull(builder.upStation, () -> "upStation은 null이 될 수 없습니다.",
+                SectionExceptionStatus.NULL_STATION.getStatus());
+        Assert.notNull(builder.downStation, () -> "downStation은 null이 될 수 없습니다.",
+                SectionExceptionStatus.NULL_STATION.getStatus());
         Assert.isTrue(!builder.upStation.equals(builder.downStation),
-                () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation));
+                () -> MessageFormat.format("upStation\"{0}\"과 downStation\"{1}\"은 같을 수 없습니다.", upStation, downStation),
+                SectionExceptionStatus.DUPLICATE_STATION.getStatus());
     }
 
     Section connectSection(Section requestSection) {
-        Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다");
-        Optional<SectionConnector> sectionConnectorOptional = SectionConnector
-                .findSectionConnector(this, requestSection);
-
-        if (sectionConnectorOptional.isEmpty()) {
-            return connectSectionIfDownSectionPresent(requestSection);
+        Assert.notNull(requestSection, () -> "requestSection은 null이 될 수 없습니다",
+                SectionExceptionStatus.NULL_REQUEST_SECTION.getStatus());
+        if (isConnectUpSection(requestSection)) {
+            return connectUpSection(requestSection);
         }
-
-        return sectionConnectorOptional.get().connectSection(this, requestSection);
+        if (isConnectMiddleUpSection(requestSection)) {
+            return connectMiddleUpSection(requestSection);
+        }
+        if (isConnectMiddleDownSection(requestSection)) {
+            return connectMiddleDownSection(requestSection);
+        }
+        if (isConnectDownSection(requestSection)) {
+            return connectDownSection(requestSection);
+        }
+        return connectToNextSection(requestSection);
     }
 
+    private boolean isConnectUpSection(Section requestSection) {
+        return upSection == null && upStation.equals(requestSection.getDownStation());
+    }
 
-    private Section connectSectionIfDownSectionPresent(Section requestSection) {
+    private boolean isConnectMiddleUpSection(Section requestSection) {
+        return upStation.equals(requestSection.getUpStation());
+    }
+
+    private boolean isConnectMiddleDownSection(Section requestSection) {
+        return downStation.equals(requestSection.getDownStation());
+    }
+
+    private boolean isConnectDownSection(Section requestSection) {
+        return downSection == null && downStation.equals(requestSection.getUpStation());
+    }
+
+    private Section connectToNextSection(Section requestSection) {
         Assert.notNull(downSection,
-                () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection));
+                () -> MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection),
+                SectionExceptionStatus.CANNOT_CONNECT_SECTION.getStatus());
 
         return downSection.connectSection(requestSection);
     }
 
-    public Section connectDownSection(Section requestSection) {
+    private Section connectDownSection(Section requestSection) {
         this.downSection = requestSection;
         requestSection.upSection = this;
         return downSection;
     }
 
-    Section connectUpSection(Section requestSection) {
+    private Section connectUpSection(Section requestSection) {
         this.upSection = requestSection;
         requestSection.downSection = this;
         return requestSection;
     }
 
-    Section connectMiddleUpSection(Section requestSection) {
+    private Section connectMiddleUpSection(Section requestSection) {
         Section newDownSection = Section.builder()
                 .id(requestSection.getId())
                 .upSection(this)
                 .downSection(this.downSection)
                 .upStation(requestSection.downStation)
                 .downStation(this.downStation)
-                .distance(this.distance - requestSection.getDistance())
+                .distance(this.distance.value - requestSection.getDistance())
                 .build();
 
         this.downStation = requestSection.downStation;
@@ -87,18 +110,18 @@ public class Section {
             this.downSection.upSection = newDownSection;
         }
         this.downSection = newDownSection;
-        this.distance = requestSection.getDistance();
+        this.distance = new Distance(requestSection.getDistance());
         return newDownSection;
     }
 
-    Section connectMiddleDownSection(Section requestSection) {
+    private Section connectMiddleDownSection(Section requestSection) {
         Section newUpSection = Section.builder()
                 .id(requestSection.getId())
                 .upSection(this.upSection)
                 .downSection(this)
                 .upStation(this.upStation)
                 .downStation(requestSection.upStation)
-                .distance(this.distance - requestSection.getDistance())
+                .distance(this.distance.value - requestSection.getDistance())
                 .build();
 
         this.upStation = requestSection.upStation;
@@ -106,28 +129,82 @@ public class Section {
             this.upSection.downSection = newUpSection;
         }
         this.upSection = newUpSection;
-        this.distance = requestSection.getDistance();
+        this.distance = new Distance(requestSection.getDistance());
         return newUpSection;
     }
 
-    public Section findDownSection() {
+    Section findDownSection() {
         if (downSection == null) {
             return this;
         }
         return downSection.findDownSection();
     }
 
-    public Section findUpSection() {
+    Section findUpSection() {
         if (upSection == null) {
             return this;
         }
         return upSection.findUpSection();
     }
 
-    public void disconnectDownSection() {
-        Assert.notNull(downSection, () -> "downSection이 null 일때, \"disconnectDownSection()\" 를 호출할 수 없습니다");
+    SectionDisconnectResponse disconnectStation(Station requestStation) {
+        if (isDisconnectUpStation(requestStation)) {
+            return disconnectUpSection();
+        }
+        if (isDisconnectMiddleStation(requestStation)) {
+            return disconnectMiddleSection();
+        }
+        if (isDisconnectDownStation(requestStation)) {
+            return disconnectDownSection();
+        }
+        return disconnectToNextSection(requestStation);
+    }
+
+    private boolean isDisconnectUpStation(Station requestStation) {
+        return upStation.equals(requestStation) && upSection == null;
+    }
+
+    private boolean isDisconnectMiddleStation(Station requestStation) {
+        return downStation.equals(requestStation) && downSection != null;
+    }
+
+    private boolean isDisconnectDownStation(Station requestStation) {
+        return downStation.equals(requestStation) && downSection == null;
+    }
+
+    private SectionDisconnectResponse disconnectToNextSection(Station station) {
+        Assert.notNull(downSection, () -> MessageFormat.format("삭제 가능한 section을 찾을 수 없습니다. station \"{0}\"", station),
+                SectionExceptionStatus.CANNOT_DISCONNECT_SECTION.getStatus());
+        return downSection.disconnectStation(station);
+    }
+
+    private SectionDisconnectResponse disconnectUpSection() {
         downSection.upSection = null;
+        return new SectionDisconnectResponse(this, List.of(downSection));
+    }
+
+    private SectionDisconnectResponse disconnectMiddleSection() {
+        distance = new Distance(distance.value + downSection.getDistance());
+        downStation = downSection.downStation;
+        if (isSectionHasDescendant()) {
+            SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection,
+                    List.of(this, downSection.downSection));
+            downSection = downSection.downSection;
+            downSection.upSection = this;
+            return sectionDisconnectResponse;
+        }
+        SectionDisconnectResponse sectionDisconnectResponse = new SectionDisconnectResponse(downSection, List.of(this));
         downSection = null;
+        return sectionDisconnectResponse;
+    }
+
+    private boolean isSectionHasDescendant() {
+        return downSection.downSection != null;
+    }
+
+    private SectionDisconnectResponse disconnectDownSection() {
+        upSection.downSection = null;
+        return new SectionDisconnectResponse(this, List.of(upSection));
     }
 
     public Long getId() {
@@ -135,23 +212,29 @@ public class Section {
     }
 
     public Section getDownSection() {
-        return downSection;
+        if (downSection == null) {
+            return null;
+        }
+        return downSection.deepCopy();
     }
 
     public Section getUpSection() {
-        return upSection;
+        if (upSection == null) {
+            return null;
+        }
+        return upSection.deepCopy();
     }
 
     public Station getUpStation() {
-        return upStation;
+        return new Station(upStation.getId(), upStation.getName());
     }
 
     public Station getDownStation() {
-        return downStation;
+        return new Station(downStation.getId(), downStation.getName());
     }
 
     public int getDistance() {
-        return distance;
+        return distance.value;
     }
 
     @Override
@@ -183,6 +266,17 @@ public class Section {
                 ", distance=" + distance +
                 ", downSection=" + downSection +
                 '}';
+    }
+
+    public Section deepCopy() {
+        return builder()
+                .id(id)
+                .upStation(upStation)
+                .downStation(downStation)
+                .upSection(upSection)
+                .downSection(downSection)
+                .distance(distance.value)
+                .build();
     }
 
     public static class Builder {

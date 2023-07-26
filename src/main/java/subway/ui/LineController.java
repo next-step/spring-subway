@@ -1,12 +1,10 @@
 package subway.ui;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +18,6 @@ import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
 import subway.dto.SectionCreateRequest;
-import subway.util.ErrorTemplate;
 
 @RestController
 @RequestMapping("/lines")
@@ -44,24 +41,24 @@ public class LineController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+    public ResponseEntity<LineResponse> findLineById(@PathVariable long id) {
         return ResponseEntity.ok(lineService.findLineResponseById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLine(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteLine(@PathVariable long id) {
         lineService.deleteLineById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{lineId}/sections")
-    public ResponseEntity<Void> createSection(@PathVariable("lineId") Long lineId,
+    public ResponseEntity<Void> createSection(@PathVariable("lineId") long lineId,
             @RequestBody SectionCreateRequest sectionCreateRequest) {
 
         lineService.connectSectionByStationId(lineId, sectionCreateRequest);
@@ -69,15 +66,10 @@ public class LineController {
     }
 
     @DeleteMapping("/{lineId}/sections")
-    public ResponseEntity<Void> deleteSection(@PathVariable("lineId") Long lineId,
-            @RequestParam("stationId") Long stationId) {
+    public ResponseEntity<Void> deleteSection(@PathVariable("lineId") long lineId,
+            @RequestParam("stationId") long stationId) {
 
         lineService.disconnectSectionByStationId(lineId, stationId);
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<ErrorTemplate> handleSQLException(SQLException sqlException) {
-        return new ResponseEntity<>(ErrorTemplate.of("SQL fail"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

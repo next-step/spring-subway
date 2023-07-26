@@ -6,12 +6,17 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import subway.dao.StationDao;
 import subway.domain.Station;
+import subway.domain.exception.StatusCodeException;
 import subway.dto.StationCreateRequest;
 import subway.dto.StationResponse;
 import subway.dto.StationUpdateRequest;
 
 @Service
 public class StationService {
+
+    private static final String DUPLICATED_STATION = "STATION-SERVICE-401";
+    private static final String CANNOT_FIND_STATION = "STATION-SERVICE-402";
+
     private final StationDao stationDao;
 
     public StationService(StationDao stationDao) {
@@ -21,17 +26,18 @@ public class StationService {
     public StationResponse saveStation(StationCreateRequest stationCreateRequest) {
         stationDao.findByName(stationCreateRequest.getName())
                 .ifPresent(station -> {
-                    throw new IllegalArgumentException(
-                            MessageFormat.format("{0}에 해당하는 station이 이미 존재합니다.", stationCreateRequest.getName()));
+                    throw new StatusCodeException(
+                            MessageFormat.format("{0}에 해당하는 station이 이미 존재합니다.", stationCreateRequest.getName()),
+                            DUPLICATED_STATION);
                 });
 
         Station station = stationDao.insert(new Station(stationCreateRequest.getName()));
         return StationResponse.of(station);
     }
 
-    public StationResponse findStationResponseById(Long id) {
-        Station station = stationDao.findById(id).orElseThrow(() -> new IllegalArgumentException(
-                MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id)));
+    public StationResponse findStationResponseById(long id) {
+        Station station = stationDao.findById(id).orElseThrow(() -> new StatusCodeException(
+                MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id), CANNOT_FIND_STATION));
 
         return StationResponse.of(station);
     }
@@ -44,11 +50,11 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
-    public void updateStation(Long id, StationUpdateRequest stationUpdateRequest) {
+    public void updateStation(long id, StationUpdateRequest stationUpdateRequest) {
         stationDao.update(new Station(id, stationUpdateRequest.getName()));
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteStationById(long id) {
         stationDao.deleteById(id);
     }
 }

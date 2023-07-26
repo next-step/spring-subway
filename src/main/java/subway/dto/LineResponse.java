@@ -5,12 +5,12 @@ import java.util.Objects;
 import subway.domain.Line;
 
 public class LineResponse {
-    private final Long id;
+    private final long id;
     private final String name;
     private final String color;
     private final List<StationResponse> stations;
 
-    public LineResponse(Long id, String name, String color, List<StationResponse> stations) {
+    public LineResponse(long id, String name, String color, List<StationResponse> stations) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -25,7 +25,7 @@ public class LineResponse {
         return new LineResponse(line.getId(), line.getName(), line.getColor(), stations);
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -50,8 +50,8 @@ public class LineResponse {
             return false;
         }
         LineResponse that = (LineResponse) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name)
-                && Objects.equals(color, that.color);
+        return id == that.id && Objects.equals(name, that.name) && Objects.equals(color, that.color)
+                && Objects.equals(stations, that.stations);
     }
 
     @Override

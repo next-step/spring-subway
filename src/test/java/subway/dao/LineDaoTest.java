@@ -3,6 +3,7 @@ package subway.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -44,8 +45,6 @@ class LineDaoTest {
         @DisplayName("lineId에 연결된 모든 Section이 포함된 Line을 반환한다.")
         void Return_Line_Include_All_Section_With_Line_Id() {
             // given
-            Line line = lineDao.insert(new Line("line", "red", List.of()));
-
             Station upStation = stationDao.insert(new Station("upStationName"));
             Station middleStation = stationDao.insert(new Station("middleStationName"));
             Station downStation = stationDao.insert(new Station("downStationName"));
@@ -53,15 +52,16 @@ class LineDaoTest {
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
 
-            upSection = sectionDao.insert(line.getId(), upSection);
-            downSection = sectionDao.insert(line.getId(), downSection);
-            upSection.connectDownSection(downSection);
+            Line line = lineDao.insert(new Line("line", "red", new ArrayList<>(List.of(upSection, downSection))));
+
+            sectionDao.insert(line.getId(), upSection);
+            sectionDao.insert(line.getId(), downSection);
 
             // when
             Line result = lineDao.findById(line.getId()).get();
 
             // then
-            assertThat(result.getSections()).containsAll(List.of(upSection, downSection));
+            assertThat(result.getSections()).containsAll(line.getSections());
         }
 
         @Test

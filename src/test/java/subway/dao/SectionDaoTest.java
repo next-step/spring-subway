@@ -87,7 +87,7 @@ class SectionDaoTest {
         @DisplayName("어떠한 값도 찾을 수 없다면, Empty List를 반환한다.")
         void Return_Empty_List_Cannot_Find_Any_Sections() {
             // given
-            Long lineId = 1L;
+            long lineId = 1L;
 
             // when
             List<Section> result = sectionDao.findAllByLineId(lineId);
@@ -95,38 +95,6 @@ class SectionDaoTest {
             // then
             assertThat(result).isEmpty();
         }
-    }
-
-    @Nested
-    @DisplayName("deleteByLineIdAndDownStationId 메소드는")
-    class DeleteByLineIdAndDownStationId_Method {
-
-        @Test
-        @DisplayName("lineId와 stationId에 일치하는 Section을 삭제한다")
-        void Delete_Section_Equals_LineId_And_StationId() {
-            // given
-            Line line = lineDao.insert(new Line("line", "red", List.of()));
-
-            Station upStation = stationDao.insert(new Station("upStationName"));
-            Station middleStation = stationDao.insert(new Station("middleStationName"));
-            Station downStation = stationDao.insert(new Station("downStationName"));
-
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-
-            upSection = sectionDao.insert(line.getId(), upSection);
-            downSection = sectionDao.insert(line.getId(), downSection);
-
-            upSection.connectDownSection(downSection);
-
-            // when
-            sectionDao.deleteByLineIdAndDownStationId(line.getId(), downStation.getId());
-            List<Section> sections = sectionDao.findAllByLineId(line.getId());
-
-            // then
-            assertThat(sections).hasSize(1).doesNotContain(downSection);
-        }
-
     }
 
     @Nested
@@ -154,6 +122,31 @@ class SectionDaoTest {
 
             // then
             assertThat(result).isEqualTo(updatedSection);
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteBySectionId 메소드는")
+    class DeleteBySectionId_Method {
+
+        @Test
+        @DisplayName("SECTIONS.id에 해당하는 Section을 삭제한다")
+        void Delete_Section_Equals_Sections_Id() {
+            // given
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
+
+            Station upStation = stationDao.insert(new Station("upStationName"));
+            Station downStation = stationDao.insert(new Station("downStationName"));
+
+            Section section = DomainFixture.Section.buildWithStations(upStation, downStation);
+            section = sectionDao.insert(line.getId(), section);
+
+            // when
+            sectionDao.deleteBySectionId(section.getId());
+            List<Section> result = sectionDao.findAllByLineId(line.getId());
+
+            // then
+            assertThat(result).isEmpty();
         }
     }
 }

@@ -3,6 +3,7 @@ package subway.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 import static org.mockito.Mockito.when;
+import static subway.domain.ExceptionTestSupporter.assertStatusCodeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ import subway.domain.DomainFixture;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.domain.exception.StatusCodeException;
 import subway.dto.LineCreateRequest;
 import subway.dto.SectionCreateRequest;
 
@@ -30,6 +32,10 @@ import subway.dto.SectionCreateRequest;
 @ContextConfiguration(classes = LineService.class)
 @DisplayName("LineService 클래스")
 class LineServiceTest {
+
+    private static final String CANNOT_FIND_LINE = "LINE-SERVICE-401";
+    private static final String CANNOT_FIND_STATION = "LINE-SERVICE-402";
+    private static final String DUPLICATE_LINE = "LINE-SERVICE-403";
 
     @Autowired
     private LineService lineService;
@@ -48,10 +54,10 @@ class LineServiceTest {
     class ConnectSectionByStationId_Method {
 
         @Test
-        @DisplayName("lineId에 해당하는 line을 찾을 수 없으면, IllegalArgumentException 던진다")
-        void Throw_IllegalArgumentException_If_CannotFind_Line() {
+        @DisplayName("lineId에 해당하는 line을 찾을 수 없으면, StatusCodeException 던진다")
+        void Throw_StatusCodeException_If_CannotFind_Line() {
             // given
-            Long lineId = 1L;
+            long lineId = 1L;
             SectionCreateRequest sectionCreateRequest = new SectionCreateRequest(2L, 3L, 10);
 
             when(lineDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
@@ -61,7 +67,7 @@ class LineServiceTest {
                     sectionCreateRequest));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, CANNOT_FIND_LINE);
         }
 
         @Test
@@ -112,7 +118,6 @@ class LineServiceTest {
 
             Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
             Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-            upSection.connectDownSection(downSection);
 
             Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(upSection, downSection)));
 
@@ -131,11 +136,11 @@ class LineServiceTest {
         }
 
         @Test
-        @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_Cannot_Find_StationId() {
+        @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_Cannot_Find_StationId() {
             // given
-            Long lineId = 1L;
-            Long stationId = 2L;
+            long lineId = 1L;
+            long stationId = 2L;
 
             when(stationDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
@@ -143,24 +148,25 @@ class LineServiceTest {
             Exception exception = catchException(() -> lineService.disconnectSectionByStationId(lineId, stationId));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, CANNOT_FIND_STATION);
         }
 
         @Test
-        @DisplayName("lineId에 해당하는 line을 찾을 수 없ㅇ면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_Cannot_Find_Any_Line_By_LineId() {
+        @DisplayName("lineId에 해당하는 line을 찾을 수 없으면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_Cannot_Find_Any_Line_By_LineId() {
             // given
-            Long lineId = 1L;
-            Long stationId = 2L;
+            long lineId = 1L;
+            long stationId = 2L;
 
             when(lineDao.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+            when(stationDao.findById(Mockito.anyLong())).thenReturn(Optional.of(new Station("mock")));
 
             // when
             Exception exception = catchException(
                     () -> lineService.disconnectSectionByStationId(lineId, stationId));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, CANNOT_FIND_LINE);
         }
     }
 
@@ -169,8 +175,8 @@ class LineServiceTest {
     class SaveLine_Method {
 
         @Test
-        @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_Cannot_Find_StationId() {
+        @DisplayName("stationId에 해당하는 station을 찾을 수 없으면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_Cannot_Find_StationId() {
             // given
             LineCreateRequest lineCreateRequest = new LineCreateRequest("line", "red", 1L, 2L, 10);
 
@@ -180,12 +186,12 @@ class LineServiceTest {
             Exception exception = catchException(() -> lineService.saveLine(lineCreateRequest));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertStatusCodeException(exception, CANNOT_FIND_STATION);
         }
 
         @Test
-        @DisplayName("이름이 일치하는 line이 존재한다면, IllegalArgumentException을 던진다.")
-        void Throw_IllegalArgumentException_If_Exist_Duplicated_Named_Line() {
+        @DisplayName("이름이 일치하는 line이 존재한다면, StatusCodeException을 던진다.")
+        void Throw_StatusCodeException_If_Exist_Duplicated_Named_Line() {
             // given
             Line line = new Line(1L, "line", "red");
             LineCreateRequest lineCreateRequest = new LineCreateRequest(line.getName(), "red", 1L, 2L, 10);
@@ -196,7 +202,8 @@ class LineServiceTest {
             Exception exception = catchException(() -> lineService.saveLine(lineCreateRequest));
 
             // then
-            assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+            assertThat(exception).isInstanceOf(StatusCodeException.class);
+            assertStatusCodeException(exception, DUPLICATE_LINE);
         }
     }
 }
