@@ -73,33 +73,24 @@ public class Sections {
         return result;
     }
 
-    public Optional<Section> validateAndCutSectionIfExist(Station upStation, Station downStation,
-            Distance distance) {
-        if (sections.isEmpty()) {
-            return Optional.empty();
-        }
+    public boolean isFirstStation(Station downStation) {
+        return !sections.isEmpty() &&
+                sections.get(0).getUpStation().equals(downStation);
+    }
 
-        Optional<Section> upStationSection = sections.stream()
-                .filter(section -> section.getUpStation().equals(upStation)).findAny();
-        Optional<Section> downStationSection = sections.stream()
+    public boolean isLastStation(Station upStation) {
+        return !sections.isEmpty() &&
+                sections.get(sections.size() - 1).getDownStation().equals(upStation);
+    }
+
+    public Optional<Section> findDownStationMatchSection(Station downStation) {
+        return sections.stream()
                 .filter(section -> section.getDownStation().equals(downStation)).findAny();
-        boolean isLast = sections.get(sections.size() - 1).getDownStation().equals(upStation);
-        boolean isFirst = sections.get(0).getUpStation().equals(downStation);
+    }
 
-        validateStationNotExist(
-                upStationSection.isEmpty(), downStationSection.isEmpty(), isLast, isFirst);
-        validateStationBothExist(
-                upStationSection.isPresent(), downStationSection.isPresent(), isLast, isFirst);
-
-        if (upStationSection.isPresent()) {
-            return cutSection(upStation, downStation, distance, upStationSection.get());
-        }
-
-        if (downStationSection.isPresent()) {
-            return cutSection(upStation, downStation, distance, downStationSection.get());
-        }
-
-        return Optional.empty();
+    public Optional<Section> findUpStationMatchSection(Station upStation) {
+        return sections.stream()
+                .filter(section -> section.getUpStation().equals(upStation)).findAny();
     }
 
     private static Optional<Section> cutSection(Station upStation, Station downStation,
@@ -121,6 +112,10 @@ public class Sections {
         if (upStationSection && downStationSection && !isLast && !isFirst) {
             throw new SectionCreateException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
         }
+    }
+
+    public boolean isEmpty() {
+        return sections.isEmpty();
     }
 
     public SectionDeleteVo findDeletedAndCombinedSections(Long stationId) {

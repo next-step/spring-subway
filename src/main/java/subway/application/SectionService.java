@@ -10,6 +10,7 @@ import subway.dao.StationDao;
 import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.SectionCreateType;
 import subway.domain.Sections;
 import subway.domain.Station;
 import subway.domain.vo.SectionDeleteVo;
@@ -59,7 +60,8 @@ public class SectionService {
             Distance distance) {
 
         Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        return sections.validateAndCutSectionIfExist(upStation, downStation, distance);
+        SectionCreateType createType = SectionCreateType.of(sections, upStation, downStation);
+        return createType.cutSection(sections, upStation, downStation, distance);
     }
 
     @Transactional
