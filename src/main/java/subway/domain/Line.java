@@ -5,23 +5,23 @@ import java.util.Objects;
 public class Line {
 
     private Long id;
-    private Name name;
-    private String color;
+    private final Name name;
+    private final Color color;
 
     public Line(final String name, final String color) {
-        this(new Name(name), color);
+        this(new Name(name), new Color(color));
     }
 
-    public Line(final Name name, final String color) {
+    public Line(final Name name, final Color color) {
         this.name = name;
         this.color = color;
     }
 
     public Line(final Long id, final String name, final String color) {
-        this(id, new Name(name), color);
+        this(id, new Name(name), new Color(color));
     }
 
-    public Line(final Long id, final Name name, final String color) {
+    public Line(final Long id, final Name name, final Color color) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -35,7 +35,7 @@ public class Line {
         return name;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 

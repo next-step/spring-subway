@@ -14,7 +14,7 @@ public class LineStationsResponse extends LineResponse{
     }
 
     public static LineStationsResponse from(final Line line, final List<StationResponse> stations) {
-        return new LineStationsResponse(line.getId(), line.getName().getValue(), line.getColor(), stations);
+        return new LineStationsResponse(line.getId(), line.getName().getValue(), line.getColor().getValue(), stations);
     }
 
     public List<StationResponse> getStations() {

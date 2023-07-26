@@ -10,13 +10,14 @@ public class Distance {
 
     private final int value;
 
-    public Distance(final int value) {
+    public Distance(final Integer value) {
         validatePositive(value);
+
         this.value = value;
     }
 
-    private void validatePositive(final int distance) {
-        if (distance <= 0) {
+    private void validatePositive(final Integer distance) {
+        if (distance == null || distance <= 0) {
             throw new SectionException(ErrorCode.NOT_POSITIVE_DISTANCE, DISTANCE_POSITIVE_EXCEPTION_MESSAGE);
         }
     }

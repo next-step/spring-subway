@@ -1,6 +1,8 @@
 package subway.exception;
 
 public enum ErrorCode {
+    INVALID_COLOR_LENGTH(400, "COL001", "색상명의 길이를 벗어났습니다."),
+
     INVALID_NAME_LENGTH(400, "NAM001", "지하철 역명이나 노선명의 길이의 범위를 벗어났습니다."),
 
     NO_SUCH_LINE(404, "LIN001", "존재하지 않는 노선입니다."),
