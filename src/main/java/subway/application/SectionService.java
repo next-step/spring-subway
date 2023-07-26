@@ -12,10 +12,10 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.domain.vo.SectionDeleteVo;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.LineNotFoundException;
-import subway.exception.SectionDeleteException;
 import subway.exception.StationNotFoundException;
 
 @Service
@@ -67,14 +67,9 @@ public class SectionService {
     public void deleteSection(Long lineId, Long stationId) {
         List<Section> sectionList = sectionDao.findAllByLineId(lineId);
         Sections sections = new Sections(sectionList);
-        Section lastSection = sections.findLastSection();
-        validateIsNotLast(stationId, lastSection);
-        sectionDao.deleteById(lastSection.getId());
+        SectionDeleteVo deleteVo = sections.findDeletedAndCombinedSections(stationId);
+        deleteVo.getDeleteSections().forEach(section -> sectionDao.deleteById(section.getId()));
+        deleteVo.getCombinedSection().ifPresent(sectionDao::insert);
     }
 
-    private static void validateIsNotLast(Long stationId, Section lastSection) {
-        if (!lastSection.getDownStationId().equals(stationId)) {
-            throw new SectionDeleteException("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
-        }
-    }
 }

@@ -185,10 +185,9 @@ class SectionServiceTest {
                 .hasMessage("역사이에 역 등록시 구간이 기존 구간보다 작아야합니다.");
     }
 
-
-    @DisplayName("지하철 노선에 등록된 하행 종점역만 제거할 수 있다")
+    @DisplayName("지하철 노선에 등록된 하행 종점역을 제거할 수 있다")
     @Test
-    void deleteSectionTest() {
+    void deleteFinalSectionTest() {
         // given
         Long lineId = 1L;
         Long lastStationId = 3L;
@@ -202,21 +201,34 @@ class SectionServiceTest {
                 .doesNotThrowAnyException();
     }
 
-    @DisplayName("지하철 노선에 등록된 하행 종점역이 아니면 예외를 던진다.")
+    @DisplayName("지하철 노선에 등록된 상행 종점역을 제거할 수 있다")
     @Test
-    void deleteSectionNotLastDownStationIdThenThrow() {
+    void deleteFirstSectionTest() {
         // given
         Long lineId = 1L;
-        Long lastStationId = 3L;
         SectionResponse sectionResponse1 = sectionService.saveSection(lineId,
                 new SectionRequest(1L, 2L, 10L));
         SectionResponse sectionResponse2 = sectionService.saveSection(lineId,
-                new SectionRequest(2L, lastStationId, 10L));
+                new SectionRequest(2L, 3L, 10L));
 
         // when, then
-        assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId + 1))
-                .isInstanceOf(SectionDeleteException.class)
-                .hasMessage("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
+        assertThatCode(() -> sectionService.deleteSection(lineId, 1L))
+                .doesNotThrowAnyException();
+    }
+
+    @DisplayName("지하철 노선에 등록된 중간역을 제거할 수 있다")
+    @Test
+    void deleteMiddleSectionTest() {
+        // given
+        Long lineId = 1L;
+        SectionResponse sectionResponse1 = sectionService.saveSection(lineId,
+                new SectionRequest(1L, 2L, 10L));
+        SectionResponse sectionResponse2 = sectionService.saveSection(lineId,
+                new SectionRequest(2L, 3L, 10L));
+
+        // when, then
+        assertThatCode(() -> sectionService.deleteSection(lineId, 2L))
+                .doesNotThrowAnyException();
     }
 
     @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
@@ -232,5 +244,21 @@ class SectionServiceTest {
         assertThatCode(() -> sectionService.deleteSection(lineId, lastStationId))
                 .isInstanceOf(SectionDeleteException.class)
                 .hasMessage("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+    }
+
+    @DisplayName("지하철 노선에 등록되지 않은 역 제거시 예외발생")
+    @Test
+    void deleteStationNotInLineThenThrow() {
+        // given
+        Long lineId = 1L;
+        SectionResponse sectionResponse1 = sectionService.saveSection(lineId,
+                new SectionRequest(1L, 2L, 10L));
+        SectionResponse sectionResponse2 = sectionService.saveSection(lineId,
+                new SectionRequest(2L, 3L, 10L));
+
+        // when, then
+        assertThatCode(() -> sectionService.deleteSection(lineId, 5L))
+                .isInstanceOf(SectionDeleteException.class)
+                .hasMessage("노선에 해당하는 역을 가진 구간이 없습니다.");
     }
 }
