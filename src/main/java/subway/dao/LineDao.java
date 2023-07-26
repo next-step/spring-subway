@@ -1,5 +1,6 @@
 package subway.dao;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class LineDao {
@@ -76,7 +78,7 @@ public class LineDao {
         return jdbcTemplate.query(sql, lineRowMapper);
     }
 
-    public Line findById(final Long id) {
+    public Optional<Line> findById(final Long id) {
         String sql = "select section.id as section_id, " +
                 "up_station.id as up_station_id, " +
                 "up_station.name as up_station_name, " +
@@ -92,9 +94,12 @@ public class LineDao {
                 "left join STATION down_station on section.down_station_id = down_station.id " +
                 "where section.line_id = ?";
 
-        Line line = jdbcTemplate.query(sql, extractor, id);
-
-        return line;
+        try {
+            Line line = jdbcTemplate.query(sql, extractor, id);
+            return Optional.of(line);
+        } catch (DataIntegrityViolationException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(final Line newLine) {

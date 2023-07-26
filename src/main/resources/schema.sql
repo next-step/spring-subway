@@ -20,5 +20,6 @@ create table if not exists SECTION
     down_station_id bigint not null,
     line_id bigint not null,
     distance int not null,
-    primary key(id)
+    primary key(id),
+    constraint line_id_fk foreign key (line_id) references LINE(id) on delete cascade
 );

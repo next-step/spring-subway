@@ -54,7 +54,8 @@ public class LineService {
     }
 
     public Line findLineById(final Long id) {
-        return lineDao.findById(id);
+        // TODO
+        return lineDao.findById(id).orElseThrow();
     }
 
     @Transactional
