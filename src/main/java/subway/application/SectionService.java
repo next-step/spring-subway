@@ -11,6 +11,7 @@ import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.SectionCreateType;
+import subway.domain.SectionDeleteType;
 import subway.domain.Sections;
 import subway.domain.Station;
 import subway.domain.vo.SectionDeleteVo;
@@ -68,9 +69,17 @@ public class SectionService {
     public void deleteSection(Long lineId, Long stationId) {
         List<Section> sectionList = sectionDao.findAllByLineId(lineId);
         Sections sections = new Sections(sectionList);
-        SectionDeleteVo deleteVo = sections.findDeletedAndCombinedSections(stationId);
+        SectionDeleteVo deleteVo = findSectionDeleteVo(stationId, sections);
         deleteVo.getDeleteSections().forEach(section -> sectionDao.deleteById(section.getId()));
         deleteVo.getCombinedSection().ifPresent(sectionDao::insert);
+    }
+
+    private static SectionDeleteVo findSectionDeleteVo(Long stationId, Sections sections) {
+        SectionDeleteType deleteType = SectionDeleteType.of(sections, stationId);
+        Optional<Section> upSection = sections.findByDownStationId(stationId);
+        Optional<Section> downSection = sections.findByUpStationId(stationId);
+
+        return deleteType.deleteAndCombineSections(upSection, downSection);
     }
 
 }

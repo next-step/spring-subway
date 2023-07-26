@@ -7,8 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import subway.domain.vo.SectionDeleteVo;
-import subway.exception.SectionDeleteException;
 
 public class Sections {
 
@@ -82,49 +80,22 @@ public class Sections {
                 sections.get(sections.size() - 1).getDownStation().equals(upStation);
     }
 
-    public Optional<Section> findDownStationMatchSection(Station downStation) {
+    public Optional<Section> findByUpStationId(Long stationId) {
         return sections.stream()
-                .filter(section -> section.getDownStation().equals(downStation)).findAny();
+                .filter(section -> section.getUpStationId().equals(stationId)).findAny();
     }
 
-    public Optional<Section> findUpStationMatchSection(Station upStation) {
+    public Optional<Section> findByDownStationId(Long stationId) {
         return sections.stream()
-                .filter(section -> section.getUpStation().equals(upStation)).findAny();
+                .filter(section -> section.getDownStationId().equals(stationId)).findAny();
     }
 
     public boolean isEmpty() {
         return sections.isEmpty();
     }
 
-    public SectionDeleteVo findDeletedAndCombinedSections(Long stationId) {
-        if (sections.isEmpty()) {
-            throw new SectionDeleteException("노선에 존재하는 역이 없습니다.");
-        }
-        if (sections.size() < MINIMUM_DELETE_SIZE) {
-            throw new SectionDeleteException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
-        }
-        Optional<Section> upSection = sections.stream()
-                .filter(section -> section.getDownStationId().equals(stationId))
-                .findAny();
-        Optional<Section> downSection = sections.stream()
-                .filter(section -> section.getUpStationId().equals(stationId))
-                .findAny();
-
-        if (upSection.isPresent() && downSection.isPresent()) {
-            List<Section> deleteSections = List.of(upSection.get(), downSection.get());
-            Section combinedSection = upSection.get().combine(downSection.get());
-            return new SectionDeleteVo(deleteSections, Optional.of(combinedSection));
-        }
-        if (upSection.isPresent()) {
-            List<Section> deleteSections = List.of(upSection.get());
-            return new SectionDeleteVo(deleteSections, Optional.empty());
-        }
-        if (downSection.isPresent()) {
-            List<Section> deleteSections = List.of(downSection.get());
-            return new SectionDeleteVo(deleteSections, Optional.empty());
-        }
-
-        throw new SectionDeleteException("노선에 해당하는 역을 가진 구간이 없습니다.");
+    public int size() {
+        return sections.size();
     }
 
     public List<Section> getSections() {

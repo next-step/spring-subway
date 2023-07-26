@@ -23,14 +23,14 @@ public enum SectionCreateType {
             (upStationMatch, downStationMatch, isFirst, isLast)
                     -> upStationMatch && !isFirst && !downStationMatch,
             ((sections, upStation, downStation, distance)
-                    -> Optional.of(sections.findUpStationMatchSection(upStation).get()
+                    -> Optional.of(sections.findByUpStationId(upStation.getId()).get()
                     .cuttedSection(upStation, downStation, distance)))
     ),
     ADD_MIDDLE_WITH_DOWN_STATION(
             (upStationMatch, downStationMatch, isFirst, isLast)
                     -> downStationMatch && !isLast && !upStationMatch,
             ((sections, upStation, downStation, distance)
-                    -> Optional.of(sections.findDownStationMatchSection(downStation).get()
+                    -> Optional.of(sections.findByDownStationId(downStation.getId()).get()
                     .cuttedSection(upStation, downStation, distance)))
     ),
     BOTH_STATION_NOT_EXIST(
@@ -62,8 +62,8 @@ public enum SectionCreateType {
             return NO_SECTION_IN_LINE;
         }
 
-        boolean upStationMatch = sections.findUpStationMatchSection(upStation).isPresent();
-        boolean downStationMatch = sections.findDownStationMatchSection(downStation).isPresent();
+        boolean upStationMatch = sections.findByUpStationId(upStation.getId()).isPresent();
+        boolean downStationMatch = sections.findByDownStationId(downStation.getId()).isPresent();
         boolean isLast = sections.isLastStation(upStation);
         boolean isFirst = sections.isFirstStation(downStation);
 
@@ -71,7 +71,7 @@ public enum SectionCreateType {
                 .filter(sectionCreateType -> sectionCreateType.matchFunction
                         .match(upStationMatch, downStationMatch, isFirst, isLast))
                 .findFirst()
-                .orElse(BOTH_STATION_EXIST);
+                .orElseThrow(() -> new SectionCreateException("구간 생성 타입 검사에 실패했습니다."));
     }
 
     public Optional<Section> cutSection(
