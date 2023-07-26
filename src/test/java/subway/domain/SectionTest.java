@@ -33,4 +33,17 @@ class SectionTest {
                 .hasMessage("구간 길이는 0보다 커야합니다.")
                 .isInstanceOf(IllegalSectionException.class);
     }
+
+    @DisplayName("상행 및 하행역 유효성 검증 테스트")
+    @Test
+    void validateStationsTest() {
+        // given
+        final Line line = new Line(1L, "4호선", "blue");
+        final Station station = new Station(1L, "오이도");
+
+        // when & then
+        assertThatThrownBy(() -> new Section(line, station, station, 0))
+                .hasMessage("상행역과 하행역은 같을 수 없습니다.")
+                .isInstanceOf(IllegalSectionException.class);
+    }
 }
