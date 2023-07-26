@@ -130,26 +130,4 @@ class LineDaoTest {
             .isPresent()
             .hasValue(response);
     }
-
-    @Test
-    @DisplayName("노선에 속한 모든 구간과 연관된 역 정보를 조회한다.")
-    void findAllStationPair() {
-        // given
-        Line line = lineDao.insert(lineRequest1);
-
-        Station station1 = stationDao.insert(new Station("왕십리"));
-        Station station2 = stationDao.insert(new Station("상왕십리"));
-        Station station3 = stationDao.insert(new Station("신당"));
-
-        sectionDao.insert(new Section(line, station1, station2, 10));
-        sectionDao.insert(new Section(line, station2, station3, 10));
-
-        // when
-        List<StationPair> result = lineDao.findAllStationPair(line.getId());
-
-        // then
-        assertThat(result).contains(
-            new StationPair(station1, station2), new StationPair(station2, station3)
-        );
-    }
 }

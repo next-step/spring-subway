@@ -6,31 +6,16 @@ import java.util.Map;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.dao.mapper.LineMapper;
 import subway.domain.Line;
-import subway.domain.Station;
-import subway.domain.StationPair;
 
 @Repository
 public class LineDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
     private final LineMapper lineMapper;
-
-    private final RowMapper<StationPair> stationPairRowMapper = (rs, rowNum) ->
-            new StationPair(
-                    new Station(
-                            rs.getLong("s1_id"),
-                            rs.getString("s1_name")
-                    ),
-                    new Station(
-                            rs.getLong("s2_id"),
-                            rs.getString("s2_name")
-                    )
-            );
 
     public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource, LineMapper lineMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -75,16 +60,5 @@ public class LineDao {
         return jdbcTemplate.query(sql, lineMapper.getRowMapper(), name)
                 .stream()
                 .findAny();
-    }
-
-    public List<StationPair> findAllStationPair(final Long lineId) {
-        String sql = "SELECT s1.id AS s1_id, s1.name AS s1_name, s2.id AS s2_id, s2.name AS s2_name " +
-                "FROM section " +
-                "JOIN station AS s1 " +
-                "ON section.up_station_id = s1.id " +
-                "JOIN station AS s2 " +
-                "ON section.down_station_id = s2.id " +
-                "WHERE line_id = ?";
-        return jdbcTemplate.query(sql, stationPairRowMapper, lineId);
     }
 }

@@ -117,7 +117,7 @@ class LineServiceTest {
         Line line = createInitialLine();
 
         given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
-        given(lineDao.findAllStationPair(line.getId())).willReturn(createInitialStationPairs());
+        given(sectionDao.findAll(line.getId())).willReturn(createInitialSections(line));
 
         // when
         LineResponse lineResponse = lineService.findLineResponseById(line.getId());
@@ -146,13 +146,13 @@ class LineServiceTest {
         return stations;
     }
 
-    private List<StationPair> createInitialStationPairs() {
+    private List<Section> createInitialSections(Line line) {
         List<Station> stations = createInitialStations();
-        List<StationPair> stationPairs = new ArrayList<>();
-        stationPairs.add(new StationPair(stations.get(3), stations.get(0)));
-        stationPairs.add(new StationPair(stations.get(0), stations.get(2)));
-        stationPairs.add(new StationPair(stations.get(2), stations.get(1)));
-        return stationPairs;
+        List<Section> sections = new ArrayList<>();
+        sections.add(new Section(2L, line, stations.get(3), stations.get(0), 10));
+        sections.add(new Section(1L, line, stations.get(0), stations.get(2), 10));
+        sections.add(new Section(3L, line, stations.get(2), stations.get(1), 10));
+        return sections;
     }
 
     private LineRequest convertToLineRequest(Line line, Section section) {

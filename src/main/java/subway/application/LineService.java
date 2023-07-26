@@ -63,7 +63,9 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         final Line persistLine = findLineById(id);
-        final List<StationPair> stationPairs = lineDao.findAllStationPair(id);
+        final List<StationPair> stationPairs = sectionDao.findAll(id).stream()
+            .map(section -> new StationPair(section.getUpStation(), section.getDownStation()))
+            .collect(Collectors.toList());
         final Stations stations = new Stations(stationPairs);
         return LineResponse.of(persistLine, stations.getStations());
     }
