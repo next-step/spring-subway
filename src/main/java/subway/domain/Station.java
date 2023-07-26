@@ -3,32 +3,40 @@ package subway.domain;
 import java.util.Objects;
 
 public class Station {
-    private Long id;
-    private String name;
+    private final Long id;
+    private final StationName name;
 
-    public Station(Long id, String name) {
+    public Station(final Long id, final String name) {
+        this(id, new StationName(name));
+    }
+
+    public Station(final Long id, final StationName name) {
         this.id = id;
         this.name = name;
     }
 
-    public Station(String name) {
-        this.name = name;
+    public Station(final String name) {
+        this(null, new StationName(name));
+    }
+
+    public Station(final StationName name) {
+        this(null, name);
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public StationName getName() {
+        return this.name;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Station station = (Station) o;
-        return id.equals(station.id) && name.equals(station.name);
+        final Station station = (Station) o;
+        return Objects.equals(id, station.id) && Objects.equals(name, station.name);
     }
 
     @Override

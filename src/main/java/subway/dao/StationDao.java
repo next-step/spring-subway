@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Station;
+import subway.domain.StationName;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -16,10 +17,12 @@ public class StationDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
 
-    private RowMapper<Station> rowMapper = (rs, rowNum) ->
+    private final RowMapper<Station> rowMapper = (rs, rowNum) ->
             new Station(
                     rs.getLong("id"),
-                    rs.getString("name")
+                    new StationName(
+                            rs.getString("name")
+                    )
             );
 
 
@@ -69,7 +72,7 @@ public class StationDao {
 
     public void update(Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
-        jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
+        jdbcTemplate.update(sql, newStation.getName().getValue(), newStation.getId());
     }
 
     public void deleteById(Long id) {
