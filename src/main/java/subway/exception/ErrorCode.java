@@ -21,7 +21,9 @@ public enum ErrorCode {
     INVALID_STATION_NAME_BLANK(BAD_REQUEST, "역 이름이 빈칸이면 안됩니다"),
     NOT_FOUND_REMOVE_STATION(NOT_FOUND, "지우려는 역이 존재하지 않습니다"),
     NOT_FOUND_STATION(NOT_FOUND, "찾는 역이 존재하지 않습니다"),
-    NOT_FOUND_START(NOT_FOUND, "스타트 지점인 구간이 없습니다.");
+    NOT_FOUND_START(NOT_FOUND, "스타트 지점인 구간이 없습니다."),
+    NOT_FOUND_LINE(NOT_FOUND, "찾는 노선이 존재하지 않습니다"),
+    NOT_FOUND_SECTION(NOT_FOUND, "찾는 구간이 존재하지 않습니다");
 
 
     private final HttpStatus httpStatus;

@@ -1,17 +1,20 @@
 package subway.application;
 
+import static subway.exception.ErrorCode.NOT_FOUND_STATION;
+
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import subway.exception.SubwayException;
 
 @Service
 public class StationService {
+
     private final StationDao stationDao;
 
     public StationService(final StationDao stationDao) {
@@ -26,7 +29,9 @@ public class StationService {
 
     @Transactional(readOnly = true)
     public StationResponse findStationResponseById(final Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        Station station = stationDao.findById(id)
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
+        return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
@@ -34,8 +39,8 @@ public class StationService {
         List<Station> stations = stationDao.findAll();
 
         return stations.stream()
-                .map(StationResponse::of)
-                .collect(Collectors.toList());
+            .map(StationResponse::of)
+            .collect(Collectors.toList());
     }
 
     @Transactional

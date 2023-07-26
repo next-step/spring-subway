@@ -3,8 +3,10 @@ package subway.dao;
 import static subway.exception.ErrorCode.DUPLICATED_STATION_NAME;
 
 import java.util.List;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -36,14 +38,14 @@ public class StationDao {
 
     public Station insert(final Station station) {
         SqlParameterSource params = new BeanPropertySqlParameterSource(station);
-        Long id;
 
         try {
-            id = insertAction.executeAndReturnKey(params).longValue();
+            Long id = insertAction.executeAndReturnKey(params).longValue();
+            return new Station(id, station.getName());
+
         } catch (DuplicateKeyException e) {
             throw new SubwayException(DUPLICATED_STATION_NAME);
         }
-        return new Station(id, station.getName());
     }
 
     public List<Station> findAll() {
@@ -51,9 +53,15 @@ public class StationDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Station findById(final Long id) {
+    public Optional<Station> findById(final Long id) {
         String sql = "select * from STATION where id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+
+        try {
+            Station station = jdbcTemplate.queryForObject(sql, rowMapper, id);
+            return Optional.of(station);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(final Station newStation) {
