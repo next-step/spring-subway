@@ -49,7 +49,7 @@ class SectionTest {
             5);
 
         // when
-        Section narrowed = current.narrowToUpDirection(newSection.getDownStation(),
+        Section narrowed = current.narrowToDownDirection(newSection.getDownStation(),
             newSection.getDistance());
 
         // then
