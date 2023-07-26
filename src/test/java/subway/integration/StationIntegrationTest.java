@@ -1,6 +1,10 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.integration.TestSettingUtils.createStationWith;
+import static subway.integration.TestSettingUtils.createStationsWithNames;
+import static subway.integration.TestSettingUtils.extractCreatedId;
+import static subway.integration.TestSettingUtils.extractCreatedIds;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -8,6 +12,7 @@ import io.restassured.response.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,19 +23,27 @@ import subway.dto.StationResponse;
 @DisplayName("지하철역 관련 기능")
 class StationIntegrationTest extends IntegrationTest {
 
-    static void createInitialStations() {
-        createStation(new StationRequest("A"));
-        createStation(new StationRequest("B"));
-        createStation(new StationRequest("C"));
-        createStation(new StationRequest("D"));
+    @Override
+    @BeforeEach
+    void setUp() {
+        super.setUp();
     }
 
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
+        //given
+        final StationRequest stationRequest = new StationRequest("강남역");
+
         // when
-        ExtractableResponse<Response> response = createStation(
-            new StationRequest("강남역"));
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .body(stationRequest)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/stations")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -41,11 +54,18 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        createStation(new StationRequest("강남역"));
+        final StationRequest stationRequest = new StationRequest("강남역");
+        createStationWith(stationRequest);
 
         // when
-        ExtractableResponse<Response> response = createStation(
-            new StationRequest("강남역"));
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .body(stationRequest)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .post("/stations")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -55,11 +75,8 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStations() {
         /// given
-        ExtractableResponse<Response> createResponse1 = createStation(
-            new StationRequest("강남역"));
-
-        ExtractableResponse<Response> createResponse2 = createStation(
-            new StationRequest("역삼역"));
+        final List<ExtractableResponse<Response>> responses = createStationsWithNames("사당역",
+            "방배역", "서초역");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -70,10 +87,8 @@ class StationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
-            .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
-            .collect(Collectors.toList());
-        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class)
+        final List<Long> expectedStationIds = extractCreatedIds(responses);
+        final List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class)
             .stream()
             .map(StationResponse::getId)
             .collect(Collectors.toList());
@@ -84,12 +99,12 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStation() {
         /// given
-        ExtractableResponse<Response> createResponse = createStation(
-            new StationRequest("강남역"));
+        final StationRequest stationRequest = new StationRequest("사당역");
+        final Long stationId = extractCreatedId(createStationWith(stationRequest));
 
         // when
-        Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
             .when()
             .get("/stations/{stationId}", stationId)
             .then().log().all()
@@ -105,8 +120,8 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void updateStation() {
         // given
-        ExtractableResponse<Response> createResponse = createStation(
-            new StationRequest("강남역"));
+        final StationRequest stationRequest = new StationRequest("사당역");
+        final ExtractableResponse<Response> createResponse = createStationWith(stationRequest);
 
         // when
         String uri = createResponse.header("Location");
@@ -126,12 +141,13 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = createStation(
-            new StationRequest("강남역"));
+        final StationRequest stationRequest = new StationRequest("사당역");
+        final ExtractableResponse<Response> createResponse = createStationWith(stationRequest);
 
         // when
         String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
             .when()
             .delete(uri)
             .then().log().all()
@@ -139,16 +155,5 @@ class StationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    static ExtractableResponse<Response> createStation(StationRequest stationRequest) {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .body(stationRequest)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .post("/stations")
-            .then().log().all()
-            .extract();
-        return response;
     }
 }

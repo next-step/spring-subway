@@ -37,7 +37,8 @@ public class SectionService {
         SectionAddManager sectionAddManager = new SectionAddManager(sections);
         sectionAddManager.validate(upStation, downStation, distance);
         Section section = new Section(line, upStation, downStation, distance);
-        sectionAddManager.lookForChange(section).ifPresent(sectionDao::update);
+        sectionAddManager.lookForChange(section)
+            .ifPresent(sectionDao::update);
         sectionDao.save(section);
     }
 
@@ -49,7 +50,8 @@ public class SectionService {
 
         SectionRemoveManager sectionRemoveManager = new SectionRemoveManager(sections);
         sectionRemoveManager.validate(station);
-        sectionRemoveManager.lookForChange(station).ifPresent(sectionDao::update);
+        sectionRemoveManager.lookForChange(station)
+            .ifPresent(sectionDao::update);
         sectionDao.deleteByLineAndStation(line, station);
     }
 

@@ -58,6 +58,10 @@ public class LineDao {
     }
 
     public void delete(Line line) {
-        jdbcTemplate.update("delete from Line where id = ?", line.getId());
+        jdbcTemplate.update("delete from LINE where id = ?", line.getId());
+    }
+
+    public void deleteAll() {
+        jdbcTemplate.update("delete from LINE");
     }
 }

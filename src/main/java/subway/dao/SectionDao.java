@@ -119,4 +119,8 @@ public class SectionDao {
         return jdbcTemplate.queryForStream(sql, rowToSectionMapper, id)
             .findAny();
     }
+
+    public void deleteAll() {
+        jdbcTemplate.update("delete from SECTION");
+    }
 }
