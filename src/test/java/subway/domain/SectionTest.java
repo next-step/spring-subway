@@ -419,8 +419,8 @@ class SectionTest {
             Station middleDownStation = new Station(3L, "middleDownStation");
             Station downStation = new Station(4L, "downStation");
 
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleUpStation);
-            Section middleSection = DomainFixture.Section.buildWithStations(middleUpStation, middleDownStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleUpStation, 10);
+            Section middleSection = DomainFixture.Section.buildWithStations(middleUpStation, middleDownStation, 10);
             Section downSection = DomainFixture.Section.buildWithStations(middleDownStation, downStation);
 
             upSection.connectSection(middleSection);
@@ -433,6 +433,7 @@ class SectionTest {
             assertThat(upSection.getDownSection()).isEqualTo(downSection);
             assertThat(result.getDeletedSection()).isEqualTo(middleSection);
             assertThat(result.getUpdatedSections()).containsExactly(upSection, downSection);
+            assertThat(upSection.getDistance()).isEqualTo(20);
         }
 
         @Test
@@ -443,8 +444,8 @@ class SectionTest {
             Station middleStation = new Station(2L, "middleStation");
             Station downStation = new Station(4L, "downStation");
 
-            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
-            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation, 10);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation, 10);
 
             upSection.connectSection(downSection);
 
@@ -455,6 +456,7 @@ class SectionTest {
             assertThat(upSection.getDownSection()).isNull();
             assertThat(result.getDeletedSection()).isEqualTo(downSection);
             assertThat(result.getUpdatedSections()).containsExactly(upSection);
+            assertThat(result.getUpdatedSections().get(0).getDistance()).isEqualTo(20);
         }
 
         @Test
