@@ -1,6 +1,5 @@
 package subway.application;
 
-import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,9 +44,9 @@ public class SectionService {
                 .orElseThrow(() -> new StationNotFoundException(request.getDownStationId()));
         Distance distance = new Distance(request.getDistance());
 
-        Optional<Section> cuttedSection =
+        Optional<Section> cutSection =
                 preProcessSaveSection(lineId, upStation, downStation, distance);
-        cuttedSection.ifPresent(sectionDao::update);
+        cutSection.ifPresent(sectionDao::update);
 
         Section section = new Section(line, upStation, downStation, distance);
         Section result = sectionDao.insert(section);
@@ -67,8 +66,7 @@ public class SectionService {
 
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
-        List<Section> sectionList = sectionDao.findAllByLineId(lineId);
-        Sections sections = new Sections(sectionList);
+        Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         SectionDeleteVo deleteVo = findSectionDeleteVo(stationId, sections);
         deleteVo.getDeleteSections().forEach(section -> sectionDao.deleteById(section.getId()));
         deleteVo.getCombinedSection().ifPresent(sectionDao::insert);
