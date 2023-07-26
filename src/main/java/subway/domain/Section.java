@@ -53,6 +53,10 @@ public final class Section {
         return station.equals(upStation) || station.equals(downStation);
     }
 
+    public boolean hasStation(final long stationId) {
+        return upStation.equalsId(stationId) || downStation.equalsId(stationId);
+    }
+
     public boolean isDistanceGreaterThan(final int other) {
         return this.distance > other;
     }
@@ -91,5 +95,9 @@ public final class Section {
 
     public Integer getDistance() {
         return distance;
+    }
+
+    public Section updateUpStationAndDistance(final Section other) {
+        return new Section(id, line, other.upStation, downStation, distance + other.distance);
     }
 }

@@ -14,6 +14,8 @@ import subway.dto.SectionResponse;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 
+import java.util.List;
+
 @Service
 public class SectionService {
 
@@ -32,8 +34,8 @@ public class SectionService {
         final Sections sections = new Sections(sectionDao.findAll(lineId));
 
         final Line line = findLine(lineId);
-        final Station upStation = findStation(sectionRequest.getUpStationId());
-        final Station downStation = findStation(sectionRequest.getDownStationId());
+        final Station upStation = findStationById(sectionRequest.getUpStationId());
+        final Station downStation = findStationById(sectionRequest.getDownStationId());
         final Section section = new Section(line, upStation, downStation, sectionRequest.getDistance());
 
         sections.findConnectedSection(section)
@@ -50,22 +52,28 @@ public class SectionService {
         return sectionDao.insert(section);
     }
 
+    @Transactional
     public void deleteSection(final long lineId, final long stationId) {
-        final Station station = findStationById(stationId);
-        validateLineAndLastStation(lineId, station);
-        validateSectionInLine(lineId);
+        final Sections sections = new Sections(sectionDao.findAll(lineId));
+        validateSections(sections);
 
-        sectionDao.deleteLastSection(lineId, station.getId());
+        final List<Section> connectedSections = sections.findConnected(stationId);
+        final Section delete = connectedSections.get(0);
+        if(connectedSections.size() == 2) {
+            final Section update = connectedSections.get(1);
+            sectionDao.update(update.updateUpStationAndDistance(delete));
+        }
+
+        sectionDao.delete(delete);
+    }
+
+    private void validateSections(final Sections sections) {
+        if (sections.size() < 2) {
+            throw new IllegalSectionException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
+        }
     }
 
     private Station findStationById(final long id) {
-        return stationDao.findById(id)
-                .orElseThrow(() ->
-                        new IllegalStationsException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
-                );
-    }
-
-    private Station findStation(final long id) {
         return stationDao.findById(id)
                 .orElseThrow(() ->
                         new IllegalStationsException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))

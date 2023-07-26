@@ -2,6 +2,7 @@ package subway.domain;
 
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
+import subway.exception.IllegalStationException;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -132,5 +133,26 @@ public final class Sections {
         stations.add(sections.get(0).getUpStation());
         sections.forEach(section -> stations.add(section.getDownStation()));
         return Collections.unmodifiableList(stations);
+    }
+
+    public int size() {
+        return sections.size();
+    }
+
+    public List<Section> findConnected(final long stationId) {
+        final List<Section> result = sections.stream()
+                .filter(section -> section.hasStation(stationId))
+                .collect(Collectors.toUnmodifiableList());
+        validateSections(result);
+        return sort(result);
+    }
+
+    private static void validateSections(final List<Section> result) {
+        if (result.size() > 2) {
+            throw new IllegalArgumentException("[ERROR] 노선의 구간들이 올바르게 연결되어 있지 않습니다.");
+        }
+        if (result.isEmpty()) {
+            throw new IllegalStationException("해당 노선에 역이 존재하지 않습니다.");
+        }
     }
 }

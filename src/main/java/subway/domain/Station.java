@@ -38,4 +38,8 @@ public final class Station {
     public int hashCode() {
         return Objects.hash(id, name);
     }
+
+    public boolean equalsId(final long id) {
+        return this.id == id;
+    }
 }
