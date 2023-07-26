@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.integration.TestRequestUtil.createLine;
 import static subway.integration.TestRequestUtil.createStation;
 
-@DisplayName("지하철 노선 관련 기능")
+@DisplayName("지하철 노선 관련 기능 통합 테스트")
 public class LineIntegrationTest extends IntegrationTest {
     private Long station1Id;
     private Long station2Id;

@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("SectionDao 단위 테스트")
 class SectionDaoTest extends DaoTest {
     @Test
     @DisplayName("Section id로 Section을 조회하면 Station들을 함께 조회한다.")

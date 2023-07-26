@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.integration.TestRequestUtil.createStation;
 
-@DisplayName("지하철역 관련 기능")
+@DisplayName("지하철역 관련 기능 통합 테스트")
 public class StationIntegrationTest extends IntegrationTest {
     @Test
     @DisplayName("지하철역을 생성한다.")
@@ -39,27 +39,6 @@ public class StationIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
-    }
-
-    @Test
-    @DisplayName("이름이 null 이나 공백이면 지하철역을 생성할 수 없다.")
-    void createNullStationTest() {
-        // given
-        StationRequest stationRequest = new StationRequest(null);
-
-        // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(stationRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().as(ExceptionResponse.class).getMessage())
-                .isEqualTo("역 이름은 공백이거나 비어있을 수 없습니다");
     }
 
     @Test

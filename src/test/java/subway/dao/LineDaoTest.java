@@ -12,6 +12,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+@DisplayName("LineDao 단위 테스트")
 class LineDaoTest extends DaoTest {
     @Test
     @DisplayName("Line id로 Line을 조회하면 Line이 포함하는 Sections, Station들을 함께 Optional을 반환한다.")

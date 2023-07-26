@@ -10,6 +10,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+@DisplayName("Sections 일급 컬렉션 단위 테스트")
 class SectionsTest {
     @Test
     @DisplayName("하행 종점역을 삭제할 수 있다.")

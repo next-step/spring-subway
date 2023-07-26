@@ -7,6 +7,7 @@ import subway.exception.SubwayException;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+@DisplayName("Section 도메인 단위 테스트")
 class SectionTest {
     @Test
     @DisplayName("구간의 상행역과 하행역이 같은 경우 예외 반환")

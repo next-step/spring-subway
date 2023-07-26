@@ -8,9 +8,9 @@ public class LineRequest {
     private String name;
     @NotBlank(message = "노선 색상은 필수 항목입니다")
     private String color;
-    @NotNull(message = "상행역 id는 필수 항목입니다")
+    @NotNull(message = "상행종점역 id는 필수 항목입니다")
     private Long upStationId;
-    @NotNull(message = "하행역 id는 필수 항목입니다")
+    @NotNull(message = "하행종점역 id는 필수 항목입니다")
     private Long downStationId;
     @NotNull(message = "거리는 필수 항목입니다")
     private Integer distance;
@@ -18,10 +18,6 @@ public class LineRequest {
     public LineRequest() {
     }
 
-    public LineRequest(final String name, final String color) {
-        this.name = name;
-        this.color = color;
-    }
 
     public LineRequest(
             final String name,
@@ -53,7 +49,7 @@ public class LineRequest {
         return downStationId;
     }
 
-    public int getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 }

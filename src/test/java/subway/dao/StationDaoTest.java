@@ -11,6 +11,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+@DisplayName("StationDao 단위 테스트")
 class StationDaoTest extends DaoTest {
     @Test
     @DisplayName("Station id로 Station을 조회할 수 있다.")
