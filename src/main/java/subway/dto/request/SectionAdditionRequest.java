@@ -5,27 +5,27 @@ import javax.validation.constraints.NotNull;
 public class SectionAdditionRequest {
 
     @NotNull
-    private final long upStationId;
+    private final Long upStationId;
     @NotNull
-    private final long downStationId;
+    private final Long downStationId;
     @NotNull
-    private final int distance;
+    private final Integer distance;
 
-    public SectionAdditionRequest(long upStationId, long downStationId, int distance) {
+    public SectionAdditionRequest(Long upStationId, Long downStationId, Integer distance) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public long getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
-    public long getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public int getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 }

@@ -85,7 +85,7 @@ class StationIntegrationTest extends IntegrationTest {
             new StationRequest("강남역"));
 
         // when
-        Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
         ExtractableResponse<Response> response = SubWayFixture.findStationById(stationId);
 
         // then

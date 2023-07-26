@@ -8,18 +8,18 @@ public class LineCreationRequest {
     @NotBlank
     private String name;
     @NotNull
-    private long upStationId;
+    private Long upStationId;
     @NotNull
-    private long downStationId;
+    private Long downStationId;
     @NotNull
-    private int distance;
+    private Integer distance;
     @NotBlank
     private String color;
 
     public LineCreationRequest() {
     }
 
-    public LineCreationRequest(String name, long upStationId, long downStationId, Integer distance,
+    public LineCreationRequest(String name, Long upStationId, Long downStationId, Integer distance,
         String color) {
         this.name = name;
         this.upStationId = upStationId;
@@ -32,15 +32,15 @@ public class LineCreationRequest {
         return name;
     }
 
-    public long getUpStationId() {
+    public Long getUpStationId() {
         return upStationId;
     }
 
-    public long getDownStationId() {
+    public Long getDownStationId() {
         return downStationId;
     }
 
-    public int getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 
