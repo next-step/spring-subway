@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
 import subway.application.SectionService;
+import subway.dto.LineDataResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.SectionRequest;
@@ -39,7 +40,7 @@ public class LineController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LineResponse>> findAllLines() {
+    public ResponseEntity<List<LineDataResponse>> findAllLines() {
         return ResponseEntity.ok(lineService.findLineResponses());
     }
 

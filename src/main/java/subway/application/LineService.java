@@ -8,6 +8,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.dto.LineDataResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.exception.ErrorCode;
@@ -41,10 +42,10 @@ public class LineService {
         return LineResponse.of(line);
     }
 
-    public List<LineResponse> findLineResponses() {
+    public List<LineDataResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(LineResponse::of)
+                .map(LineDataResponse::of)
                 .collect(Collectors.toList());
     }
 
