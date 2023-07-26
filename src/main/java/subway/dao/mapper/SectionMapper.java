@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import subway.domain.Section;
 
 @Component
-public class SectionMapper {
+public final class SectionMapper {
 
     private final RowMapper<Section> rowMapper = (rs, rowNum) ->
         new Section(
