@@ -1,7 +1,5 @@
 package subway.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class Section {
@@ -102,11 +100,11 @@ public class Section {
         }
     }
 
-    public boolean isUpStation(Station station) {
+    public boolean hasUpStation(Station station) {
         return upStation.equals(station);
     }
 
-    public boolean isDownStation(Station station) {
+    public boolean hasDownStation(Station station) {
         return downStation.equals(station);
     }
 

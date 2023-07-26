@@ -10,15 +10,12 @@ import org.junit.jupiter.api.Test;
 class SectionRemoveManagerTest {
 
     @Test
-    @DisplayName("구간이 1개인 경우 구간을 삭제할 수 없다")
+    @DisplayName("구간이 1개인 경우 삭제할 수 없다")
     void cannotRemoveOneSizeSections() {
         //given
         Line lineA = new Line(1L, "A", "#ff0000");
         Station stationA = new Station(1L, "A");
         Station stationB = new Station(2L, "B");
-        Station stationC = new Station(3L, "C");
-        Station stationD = new Station(4L, "D");
-        Station stationE = new Station(5L, "E");
 
         Section section = new Section(1L, lineA, stationA, stationB, 1);
         Sections sections = new Sections(List.of(section));
@@ -48,12 +45,13 @@ class SectionRemoveManagerTest {
 
         //when & then
         assertThatThrownBy(() -> sectionRemoveManager.validate(stationD))
-            .isInstanceOf(IllegalStateException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("노선에서 역을 제거할 수 있는 경우 변경 대상 구간이 존재한다.")
-    void removeThenUpdateExists() {
+    @DisplayName("노선에서 중간에 위치한 역을 제거하는 경우 변경 대상 구간이 존재한다.")
+    void removeInMiddleThenUpdateExists() {
+        //given
         Line lineA = new Line(1L, "A", "#ff0000");
         Station stationA = new Station(1L, "A");
         Station stationB = new Station(2L, "B");
@@ -66,6 +64,26 @@ class SectionRemoveManagerTest {
         SectionRemoveManager sectionRemoveManager = new SectionRemoveManager(sections);
 
         //when & then
-        assertThat(sectionRemoveManager.lookForChange(stationA)).isNotEmpty();
+        assertThat(sectionRemoveManager.lookForChange(stationB)).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("노선에서 종점역을 제거하는 경우 변경 대상 구간이 존재하지 않는다.")
+    void removeEndThenUpdateExists() {
+        //given
+        Line lineA = new Line(1L, "A", "#ff0000");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
+
+        Section sectionA = new Section(1L, lineA, stationA, stationB, 1);
+        Section sectionB = new Section(2L, lineA, stationB, stationC, 1);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        SectionRemoveManager sectionRemoveManager = new SectionRemoveManager(sections);
+
+        //when & then
+        assertThat(sectionRemoveManager.lookForChange(stationA)).isEmpty();
+        assertThat(sectionRemoveManager.lookForChange(stationC)).isEmpty();
     }
 }

@@ -34,7 +34,7 @@ public class SectionAddManager {
 
     private Predicate<Section> hasOneOf(final Station upStation,
         final Station downStation) {
-        return section -> section.isUpStation(upStation) || section.isDownStation(downStation);
+        return section -> section.hasUpStation(upStation) || section.hasDownStation(downStation);
     }
 
     private Predicate<Section> isLongerThan(final int distance) {

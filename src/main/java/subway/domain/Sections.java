@@ -95,11 +95,11 @@ public class Sections {
     }
 
     public boolean isFirst(Station station) {
-        return getFirst().isUpStation(station);
+        return getFirst().hasUpStation(station);
     }
 
     public boolean isLast(Station station) {
-        return getLast().isDownStation(station);
+        return getLast().hasDownStation(station);
     }
 
     public Optional<Section> filter(Predicate<Section> condition) {

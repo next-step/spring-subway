@@ -32,12 +32,12 @@ public class SectionRemoveManager {
     }
 
     private Section getUpperSection(final Station station) {
-        return sections.filter(section -> section.isDownStation(station))
+        return sections.filter(section -> section.hasDownStation(station))
             .orElseThrow(() -> new IllegalStateException("역의 위 구간을 찾을 수 없습니다."));
     }
 
     private Section getLowerSection(final Station station) {
-        return sections.filter(section -> section.isUpStation(station))
+        return sections.filter(section -> section.hasUpStation(station))
             .orElseThrow(() -> new IllegalStateException("역의 아래 구간을 찾을 수 없습니다."));
     }
 
