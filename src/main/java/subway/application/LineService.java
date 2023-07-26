@@ -32,8 +32,8 @@ public class LineService {
     public LineResponse saveLine(LineRequest request) {
 
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = getStationOrElseThrow(request.getUpStationId());
-        Station downStation = getStationOrElseThrow(request.getDownStationId());
+        Station upStation = getStationBy(request.getUpStationId());
+        Station downStation = getStationBy(request.getDownStationId());
         sectionDao.save(
             new Section(persistLine, upStation, downStation, request.getDistance()));
 
@@ -55,20 +55,9 @@ public class LineService {
 
     @Transactional
     public LineResponse findLineResponseById(Long id) {
-        final Line line = getLineOrElseThrow(id);
+        final Line line = getLineBy(id);
         Sections sections = sectionDao.findAllBy(line);
         return LineResponse.of(line, sections);
-    }
-
-    private Station getStationOrElseThrow(Long id) {
-        return stationDao.findById(id)
-            .orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\""));
-    }
-
-    private Line getLineOrElseThrow(Long id) {
-        return lineDao.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 
     @Transactional
@@ -78,8 +67,19 @@ public class LineService {
 
     @Transactional
     public void deleteLineById(Long id) {
-        Line line = getLineOrElseThrow(id);
+        Line line = getLineBy(id);
         sectionDao.deleteByLine(line);
         lineDao.delete(line);
+    }
+
+    private Station getStationBy(Long id) {
+        return stationDao.findById(id)
+            .orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\""));
+    }
+
+    private Line getLineBy(Long id) {
+        return lineDao.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 }

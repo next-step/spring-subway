@@ -14,7 +14,7 @@ public class SectionAddManager {
     public void validate(final Station upStation, final Station downStation, final int distance) {
         validateLineHasOneOf(upStation, downStation);
 
-        sections.filter(hasOneOf(upStation, downStation))
+        sections.filter(matchOneOf(upStation, downStation))
             .ifPresent(section -> validateDistance(section, distance));
     }
 
@@ -29,7 +29,7 @@ public class SectionAddManager {
             .map(section -> section.cutBy(newSection));
     }
 
-    private Predicate<Section> hasOneOf(final Station upStation, final Station downStation) {
+    private Predicate<Section> matchOneOf(final Station upStation, final Station downStation) {
         return section -> section.hasUpStation(upStation) || section.hasDownStation(downStation);
     }
 
