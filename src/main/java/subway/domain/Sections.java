@@ -1,15 +1,18 @@
 package subway.domain;
 
-import java.util.Collections;
+import static java.util.Collections.unmodifiableList;
+import static subway.util.CollectionUtil.toGroupByMap;
+import static subway.util.CollectionUtil.toMappedList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import subway.dto.SectionAdditionResult;
 import subway.dto.SectionRemovalResult;
+import subway.util.CollectionUtil;
 
 public class Sections {
 
@@ -31,7 +34,8 @@ public class Sections {
 
     private List<Section> sort(List<Section> values) {
 
-        Map<Station, Section> sectionByUpStation = createSectionByUpstation(values);
+        Map<Station, Section> sectionByUpStation = toGroupByMap(unmodifiableList(values),
+            Section::getUpStation);
 
         return Stream.iterate(findFirstSection(values),
                 section -> getNextSection(section, sectionByUpStation))
@@ -39,28 +43,14 @@ public class Sections {
             .collect(Collectors.toList());
     }
 
-
-    //Todo: 유틸로 뺀다
-    private Map<Station, Section> createSectionByUpstation(List<Section> values) {
-        return values.stream()
-            .collect(Collectors.toMap(Section::getUpStation, Function.identity()));
-    }
-
     private Section findFirstSection(List<Section> values) {
 
-        List<Station> downStations = extractDownStations(values);
+        List<Station> downStations = CollectionUtil.toMappedList(unmodifiableList(values), Section::getDownStation);
 
         return values.stream()
-                .filter(section -> !downStations.contains(section.getUpStation()))
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("노선은 순환할 수 없습니다."));
-    }
-
-    //Todo: 유틸로 뺀다
-    private List<Station> extractDownStations(List<Section> values) {
-        return values.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toList());
+            .filter(section -> !downStations.contains(section.getUpStation()))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("노선은 순환할 수 없습니다."));
     }
 
     private static Section getNextSection(Section section, Map<Station, Section> nextSectionMap) {
@@ -81,7 +71,8 @@ public class Sections {
     public SectionAdditionResult add(Section section) {
         validateOnlyOneStationIncludedInSections(section);
         Section relatedSection = getRelatedSection(section);
-        List<Section> mergedSection = SectionMerger.of(relatedSection, section).merge(relatedSection,section);
+        List<Section> mergedSection = SectionMerger.of(relatedSection, section)
+            .merge(relatedSection, section);
 
         replace(relatedSection, mergedSection);
 
@@ -95,20 +86,25 @@ public class Sections {
 
     private void checkBothStationsInLine(Section section) {
         if (isStationExists(section.getUpStation()) && isStationExists(section.getDownStation())) {
-            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다. upStation: " + section.getUpStation() + " downStation: " + section.getDownStation());
+            throw new IllegalArgumentException(
+                "두 역이 모두 노선에 포함되어 있습니다. upStation: " + section.getUpStation() + " downStation: "
+                    + section.getDownStation());
         }
     }
 
     private void checkNoneOfStationsInLine(Section section) {
-        if (!isStationExists(section.getUpStation()) && !isStationExists(section.getDownStation())) {
-            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다. upStation: " + section.getUpStation() + " downStation: " + section.getDownStation());
+        if (!isStationExists(section.getUpStation()) && !isStationExists(
+            section.getDownStation())) {
+            throw new IllegalArgumentException(
+                "두 역이 모두 노선에 포함되어 있지 않습니다. upStation: " + section.getUpStation() + " downStation: "
+                    + section.getDownStation());
         }
     }
 
     private Section getRelatedSection(Section section) {
 
-        Optional<Section> sectionOptional = this.values.stream().
-            filter(value -> value.hasSameUpStationOrDownStation(section))
+        Optional<Section> sectionOptional = this.values.stream()
+            .filter(value -> value.hasSameUpStationOrDownStation(section))
             .findAny();
 
         return sectionOptional.orElseGet(() -> this.values.stream()
@@ -177,8 +173,8 @@ public class Sections {
 
     private boolean isMiddleStation(Station station) {
         return this.values.stream()
-                .anyMatch(section -> section.hasDownStationSameAs(station)) &&
-                !getLast().hasDownStationSameAs(station);
+            .anyMatch(section -> section.hasDownStationSameAs(station)) &&
+            !getLast().hasDownStationSameAs(station);
     }
 
     private SectionRemovalResult removeMiddleStation(Station station) {
@@ -206,9 +202,7 @@ public class Sections {
     }
 
     public List<Station> getStations() {
-        List<Station> stations = values.stream()
-            .map(Section::getUpStation)
-            .collect(Collectors.toList());
+        List<Station> stations = toMappedList(unmodifiableList(values), Section::getUpStation);
         stations.add(getLast().getDownStation());
         return stations;
     }
@@ -222,7 +216,7 @@ public class Sections {
     }
 
     public List<Section> getValues() {
-        return Collections.unmodifiableList(values);
+        return unmodifiableList(values);
     }
 
     @Override
