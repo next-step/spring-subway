@@ -28,9 +28,7 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest request) {
         validateDuplicateName(request.getName());
-        final Line persistLine = lineDao.insert(
-            new Line(request.getName(), request.getColor())
-        );
+        final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
         sectionDao.insert(new Section(
                 persistLine,
