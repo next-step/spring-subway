@@ -1,5 +1,8 @@
 package subway.application;
 
+import static subway.exception.ErrorCode.NOT_FOUND_LINE;
+import static subway.exception.ErrorCode.NOT_FOUND_STATION;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
+import subway.exception.SubwayException;
 
 @Service
 public class LineService {
@@ -31,8 +35,10 @@ public class LineService {
     @Transactional
     public LineWithStationsResponse saveLine(final LineRequest request) {
         Line line = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+        Station upStation = stationDao.findById(request.getUpStationId())
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
+        Station downStation = stationDao.findById(request.getDownStationId())
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
         Section section = new Section(upStation, downStation, request.getDistance());
 
         Line newLine = line.addSections(section);
@@ -51,7 +57,8 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineWithStationsResponse findLineResponseById(final Long id) {
-        Line line = lineDao.findById(id);
+        Line line = lineDao.findById(id)
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_LINE));
         return LineWithStationsResponse.of(line);
     }
 
@@ -62,7 +69,8 @@ public class LineService {
 
     @Transactional
     public void deleteLineById(final Long id) {
-        Line line = lineDao.findById(id);
+        Line line = lineDao.findById(id)
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_LINE));
         sectionDao.deleteSections(line.getSections().getSections());
         lineDao.deleteById(id);
     }

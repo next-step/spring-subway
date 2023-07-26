@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -40,7 +42,6 @@ public class LineDao {
         Long id = rs.getLong("line_id");
         String name = rs.getString("line_name");
         String color = rs.getString("line_color");
-
         while (isNext) {
             sections.add(
                 new Section(
@@ -52,7 +53,6 @@ public class LineDao {
             );
             isNext = rs.next();
         }
-
         return new Line(id, name, color, new Sections(sections));
     };
 
@@ -68,15 +68,13 @@ public class LineDao {
         params.put("id", line.getId());
         params.put("name", line.getName());
         params.put("color", line.getColor());
-        Long lineId;
 
         try {
-            lineId = insertAction.executeAndReturnKey(params).longValue();
+            Long lineId = insertAction.executeAndReturnKey(params).longValue();
+            return new Line(lineId, line.getName(), line.getColor());
         } catch (DuplicateKeyException e) {
             throw new SubwayException(DUPLICATED_LINE_NAME, e);
         }
-
-        return new Line(lineId, line.getName(), line.getColor());
     }
 
     public List<Line> findAll() {
@@ -85,7 +83,8 @@ public class LineDao {
         return jdbcTemplate.query(sql, lineRowMapper);
     }
 
-    public Line findById(final Long id) {
+
+    public Optional<Line> findById(final Long id) {
         String sql = "select section.id as section_id, " +
             "up_station.id as up_station_id, " +
             "up_station.name as up_station_name, " +
@@ -101,9 +100,12 @@ public class LineDao {
             "left join STATION down_station on section.down_station_id = down_station.id " +
             "where section.line_id = ?";
 
-        Line line = jdbcTemplate.query(sql, extractor, id);
-
-        return line;
+        try {
+            Line line = jdbcTemplate.query(sql, extractor, id);
+            return Optional.of(line);
+        } catch (DataIntegrityViolationException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(final Line newLine) {
