@@ -63,7 +63,11 @@ public class StationDao {
 
     public void update(final Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
-        jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
+        try {
+            jdbcTemplate.update(sql, newStation.getName(), newStation.getId());
+        } catch (DuplicateKeyException e) {
+            throw new SubwayException("역 이름이 이미 존재합니다 : " + newStation.getName());
+        }
     }
 
     public void deleteById(final Long id) {

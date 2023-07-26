@@ -61,7 +61,47 @@ public class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
+    @DisplayName("존재하지 않는 상행종점역으로 지하철 노선을 생성할 수 없다.")
+    void createLineWithNonExistUpStationTest() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", 5L, station2Id, 14);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("상행역 id가 존재하지 않습니다 : 5");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 하행종점역으로 지하철 노선을 생성할 수 없다.")
+    void createLineWithNonExistDownStationTest() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, 5L, 14);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("하행역 id가 존재하지 않습니다 : 5");
+    }
+
+    @Test
+    @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성할 수 없다.")
     void createLineWithDuplicateName() {
         // given
         LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
@@ -153,6 +193,27 @@ public class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 id로 지하철 노선을 조회한다.")
+    void getLineNonExist() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+
+        // when
+        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{lineId}", 5L)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("노선 id가 존재하지 않습니다 : 5");
+    }
+
+    @Test
     @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
         // given
@@ -173,6 +234,33 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("기존에 존재하는 노선 이름으로 지하철 노선을 수정할 수 없다.")
+    void updateLineDuplicateName() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+
+        LineRequest lineRequest2 = new LineRequest("4호선", "green", station1Id, station2Id, 14);
+        createLine(lineRequest2);
+
+        // when
+        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+
+        LineRequest updateRequest = new LineRequest("4호선", "bg-red-600");
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(updateRequest)
+                .when().put("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("노선 이름이 이미 존재합니다 : 4호선");
     }
 
     @Test

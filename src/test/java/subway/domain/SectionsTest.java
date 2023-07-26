@@ -145,7 +145,7 @@ class SectionsTest {
 
         assertThatCode(() -> sections.addSection(section))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage("두 역 모두 기존 노선에 포함될 수 없습니다.");
+                .hasMessage("두 역 중 하나만 노선에 포함되어야 합니다");
     }
 
     @Test

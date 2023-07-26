@@ -47,7 +47,7 @@ public class Sections {
 
     private void validateBothMatches(final Section section) {
         if (contains(section.getUpStation()) && contains(section.getDownStation())) {
-            throw new SubwayException("두 역 모두 기존 노선에 포함될 수 없습니다.");
+            throw new SubwayException("두 역 중 하나만 노선에 포함되어야 합니다");
         }
     }
 

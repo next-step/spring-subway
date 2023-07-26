@@ -2,7 +2,6 @@ package subway.dao;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DuplicateKeyException;
 import subway.domain.Station;
 import subway.exception.SubwayException;
 
@@ -78,7 +77,9 @@ class StationDaoTest extends DaoTest {
         Station station = new Station(1L, "강남역");
 
         // when, then
-        assertThatCode(() -> stationDao.update(station)).isInstanceOf(DuplicateKeyException.class);
+        assertThatCode(() -> stationDao.update(station))
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("역 이름이 이미 존재합니다 : 강남역");
     }
 
     @Test

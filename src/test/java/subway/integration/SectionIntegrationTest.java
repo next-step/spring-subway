@@ -134,6 +134,7 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("두 역 중 하나만 노선에 포함되어야 합니다");
     }
 
     //34
@@ -194,6 +195,42 @@ public class SectionIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().as(SubwayException.class)).hasMessage("구간의 상행역과 하행역이 같을 수 없습니다");
+    }
+
+    @Test
+    @DisplayName("상행역이 존재하지 않으면 추가할 수 없다.")
+    void createSectionTes9() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(5L, station2Id, 14);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("상행역 id가 존재하지 않습니다 : 5");
+    }
+
+    @Test
+    @DisplayName("하행역이 존재하지 않으면 추가할 수 없다.")
+    void createSectionTest10() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(station1Id, 5L, 14);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("하행역 id가 존재하지 않습니다 : 5");
     }
 
     @Test
