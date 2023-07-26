@@ -1,5 +1,6 @@
 package subway.domain;
 
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 import subway.exception.InternalStateException;
 
@@ -8,108 +9,81 @@ import java.util.stream.Collectors;
 
 public class Sections {
 
-    private static final String SAME_STATION_EXCEPTION_MESSAGE = "새로운 구간은 기존 구간고 1개 역만 겹쳐야 합니다.";
-    private static final String EMPTY_EXCEPTION_MESSAGE = "최소 1개 이상의 구간이 있어야 합니다.";
-    private static final String AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE = "구간은 0개가 될 수 없습니다.";
-    private static final String DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE = "마지막 구간만 삭제할 수 있습니다.";
-    private static final String CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE = "출발역에 해당되는 구간을 찾을 수 없습니다.";
-    private static final String TWO_MORE_START_STATION_EXCEPTION_MESSAGE = "상행 종점역이 두 개 이상입니다.";
-    private static final String CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE = "상행 종점역을 찾을 수 없습니다.";
-    private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
-
     private final List<Section> sections;
     private final Set<Station> upStations;
     private final Set<Station> downStations;
 
     public Sections(final List<Section> sections) {
+        validateNotEmpty(sections);
         this.upStations = sections.stream()
                 .map(Section::getUpStation)
                 .collect(Collectors.toSet());
         this.downStations = sections.stream()
                 .map(Section::getDownStation)
                 .collect(Collectors.toSet());
-        this.sections = sorted(sections);
+        this.sections = connectInOrder(sections);
     }
 
-    public void validateDelete(final Station lastStation) {
-        if (this.sections.size() <= 1) {
-            throw new InternalStateException(AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
-        }
-        if (!lastSection().getDownStation().equals(lastStation)) {
-            throw new IncorrectRequestException(DELETE_ONLY_LAST_SECTION_EXCEPTION_MESSAGE);
-        }
+    private List<Section> connectInOrder(final List<Section> sections) {
+        Map<Station, Section> sectionsByUpStation = new HashMap<>();
+        sections.forEach(section -> sectionsByUpStation.put(section.getUpStation(), section));
+        return connectInOrder(sections, sectionsByUpStation);
     }
 
-    private List<Section> sorted(final List<Section> sections) {
-        Station first = findFirstStation();
-
-        Map<Station, Section> stationToSection = new HashMap<>();
-        sections.forEach(section -> stationToSection.put(section.getUpStation(), section));
-
-        return sortSections(sections, first, stationToSection);
-    }
-
-    private List<Section> sortSections(List<Section> sections, Station first, Map<Station, Section> stationToSection) {
-        List<Section> sortedSection = new ArrayList<>();
-        Section nextSection = findByUpStation(sections, first);
-        sortedSection.add(nextSection);
+    private List<Section> connectInOrder(final List<Section> sections, final Map<Station, Section> sectionsByUpStation) {
+        List<Section> connectedSection = new ArrayList<>();
+        Section nextSection = sectionsByUpStation.get(firstStation());
+        connectedSection.add(nextSection);
         for (int i = 1; i < sections.size(); i++) {
             Station lastDownStation = nextSection.getDownStation();
-            nextSection = stationToSection.get(lastDownStation);
-            sortedSection.add(nextSection);
+            nextSection = sectionsByUpStation.get(lastDownStation);
+            connectedSection.add(nextSection);
         }
-        return sortedSection;
+        return Collections.unmodifiableList(connectedSection);
     }
 
-    private Section findByUpStation(final List<Section> sections, final Station upStation) {
-        return sections.stream()
-                .filter(section -> section.getUpStation().equals(upStation))
+    private Station firstStation() {
+        Set<Station> terminalUpStation = new HashSet<>(this.upStations);
+        terminalUpStation.removeAll(downStations);
+
+        validateOnlyOneTerminal(terminalUpStation);
+
+        return terminalUpStation.stream()
                 .findFirst()
-                .orElseThrow(() -> new InternalStateException(CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
-    }
-
-    private Station findFirstStation() {
-        Set<Station> endUpStations = new HashSet<>(this.upStations);
-        endUpStations.removeAll(downStations);
-
-        if (endUpStations.size() > 1) {
-            throw new InternalStateException(TWO_MORE_START_STATION_EXCEPTION_MESSAGE);
-        }
-
-        return endUpStations.stream()
-                .findFirst()
-                .orElseThrow(() -> new InternalStateException(CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new InternalStateException(ErrorCode.CANNOT_FIND_TERMINAL_UP_STATION, ""));
     }
 
     private Section lastSection() {
-        validateEmpty();
         return this.sections.get(this.sections.size() - 1);
     }
 
-    public boolean isInsertedMiddle(final Section newSection) {
-        boolean containsUpStation = this.upStations.contains(newSection.getUpStation());
-        boolean containsDownStation = this.downStations.contains(newSection.getDownStation());
-
-        return containsUpStation || containsDownStation;
-    }
-
-    public Section cut(final Section oldSection, final Section newSection) {
-        validateDistance(oldSection, newSection);
-        Distance reducedDistance = oldSection.distanceDifference(newSection);
-
-        if (oldSection.isSameUpStation(newSection)) {
-            return new Section(newSection.getDownStation(), oldSection.getDownStation(), reducedDistance);
-        }
-
-        return new Section(oldSection.getUpStation(), newSection.getUpStation(), reducedDistance);
-
-    }
-
-    public Section oldSection(final Section newSection) {
+    public Section findOverlappedSection(final Section newSection) {
+        validateConstructedInMiddle(newSection);
         return sections.stream()
                 .filter(section -> section.isSameUpStation(newSection) || section.isSameDownStation(newSection))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new InternalStateException(ErrorCode.NOT_OVERLAPPED_SECTION, ""));
+    }
+
+    private void validateConstructedInMiddle(Section newSection) {
+        if (!isConstructedInMiddle(newSection)) {
+            throw new InternalStateException(ErrorCode.CANNOT_CONSTRUCTED_IN_MIDDLE, String.format("신설 구간 상행역: %s, 하행역: %s", newSection.getUpStation().getName(), newSection.getDownStation().getName()));
+        }
+    }
+
+    public Section connectTwoSectionBasedOn(Station station) {
+        validateClose(station);
+        Section upSection = sections.stream()
+                .filter(section -> section.getDownStation().equals(station))
+                .findFirst()
+                .orElseThrow(() -> new InternalStateException(ErrorCode.NOT_FOUND_STATION_IN_SECTION, station.getName()));
+
+        Section downSection = sections.stream()
+                .filter(section -> section.getUpStation().equals(station))
+                .findFirst()
+                .orElseThrow(() -> new InternalStateException(ErrorCode.NOT_FOUND_STATION_IN_SECTION, station.getName()));
+
+        return upSection.connectWith(downSection);
     }
 
     public List<Station> toStations() {
@@ -121,9 +95,27 @@ public class Sections {
         return stations;
     }
 
-    public void validateInsert(final Section newSection) {
+    private Set<Station> gatherAllStations() {
         Set<Station> allStations = new HashSet<>(upStations);
         allStations.addAll(downStations);
+        return allStations;
+    }
+
+    public boolean isConstructedInMiddle(final Section newSection) {
+        boolean containsUpStation = this.upStations.contains(newSection.getUpStation());
+        boolean containsDownStation = this.downStations.contains(newSection.getDownStation());
+
+        return containsUpStation || containsDownStation;
+    }
+
+    public boolean isNotTerminal(Station station) {
+        Set<Station> middleStations = new HashSet<>(upStations);
+        middleStations.retainAll(downStations);
+        return middleStations.contains(station);
+    }
+
+    public void validateConstruction(final Section newSection) {
+        Set<Station> allStations = gatherAllStations();
 
         boolean hasUpStation = allStations.contains(newSection.getUpStation());
         boolean hasDownStation = allStations.contains(newSection.getDownStation());
@@ -131,34 +123,41 @@ public class Sections {
         validateExistOnlyOne(hasUpStation, hasDownStation);
     }
 
-    private void validateDistance(final Section oldSection, final Section newSection) {
-        if (oldSection.shorterOrEqualTo(newSection)) {
-            throw new IncorrectRequestException(LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
+    public void validateClose(final Station station) {
+        validateAtLeastOneSection();
+
+        Set<Station> allStations = gatherAllStations();
+        if (!allStations.contains(station)) {
+            throw new IncorrectRequestException(ErrorCode.NOT_EXIST_STATION_IN_LINE, station.getName());
         }
     }
 
-    private void validateEmpty() {
-        if (this.sections.isEmpty()) {
-            throw new IncorrectRequestException(EMPTY_EXCEPTION_MESSAGE);
+    private void validateAtLeastOneSection() {
+        if (this.sections.size() <= 1) {
+            throw new IncorrectRequestException(ErrorCode.CANNOT_CLOSE_LAST_SECTION, "");
+        }
+    }
+
+    private void validateNotEmpty(List<Section> sections) {
+        if (sections.isEmpty()) {
+            throw new IncorrectRequestException(ErrorCode.AT_LEAST_ONE_SECTION, "");
         }
     }
 
     private void validateExistOnlyOne(final boolean hasUpStation, final boolean hasDownStation) {
         if (hasUpStation == hasDownStation) {
-            throw new IncorrectRequestException(SAME_STATION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(ErrorCode.ONLY_ONE_OVERLAPPED_STATION, "");
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Sections sections1 = (Sections) o;
-        return Objects.equals(sections, sections1.sections);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sections);
+    private void validateOnlyOneTerminal(Set<Station> terminalStations) {
+        if (terminalStations.size() > 1) {
+            throw new InternalStateException(
+                    ErrorCode.TWO_MORE_TERMINAL_STATION,
+                    terminalStations.stream()
+                            .map(Station::getName)
+                            .collect(Collectors.joining())
+            );
+        }
     }
 }

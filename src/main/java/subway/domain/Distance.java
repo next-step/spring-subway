@@ -1,12 +1,12 @@
 package subway.domain;
 
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
 import java.util.Objects;
 
 public class Distance {
 
-    private static final String DISTANCE_POSITIVE_EXCEPTION_MESSAGE = "거리는 양수여야 합니다.";
     private final int value;
 
     public Distance(final int value) {
@@ -16,7 +16,7 @@ public class Distance {
 
     private void validatePositive(final int distance) {
         if (distance <= 0) {
-            throw new IncorrectRequestException(DISTANCE_POSITIVE_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(ErrorCode.NEGATIVE_DISTANCE, String.valueOf(distance));
         }
     }
 
@@ -24,8 +24,12 @@ public class Distance {
         return this.value <= other.value;
     }
 
-    public Distance difference(final Distance other) {
+    public Distance subtract(final Distance other) {
         return new Distance(this.value - other.value);
+    }
+
+    public Distance add(final Distance other) {
+        return new Distance(this.value + other.value);
     }
 
     public int getValue() {

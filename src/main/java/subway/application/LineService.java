@@ -13,10 +13,13 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.exception.ErrorCode;
+import subway.exception.IncorrectRequestException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @Service
 public class LineService {
 
@@ -32,6 +35,10 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(final LineRequest request) {
+        lineDao.findByName(request.getName())
+                .ifPresent(line -> {
+                    throw new IncorrectRequestException(ErrorCode.DUPLICATED_LINE_NAME, request.getName());
+                });
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Section section = newSection(SectionRequest.of(request));
         sectionDao.insert(section, persistLine.getId());
@@ -49,7 +56,6 @@ public class LineService {
         return lineDao.findAll();
     }
 
-    @Transactional(readOnly = true)
     public LineStationsResponse findLineResponseById(final Long id) {
         Line persistLine = findLineById(id);
         Sections sections = sectionDao.findAllByLineId(id);
@@ -75,27 +81,31 @@ public class LineService {
         Section newSection = newSection(request);
 
         Sections sections = sectionDao.findAllByLineId(lineId);
-        sections.validateInsert(newSection);
+        sections.validateConstruction(newSection);
 
-        if (sections.isInsertedMiddle(newSection)) {
-            Section oldSection = sections.oldSection(newSection);
-            sectionDao.deleteById(oldSection.getId());
-            sectionDao.insert(sections.cut(oldSection, newSection), lineId);
+        if (sections.isConstructedInMiddle(newSection)) {
+            Section overlappedSection = sections.findOverlappedSection(newSection);
+            updateOverlappedSection(lineId, newSection, overlappedSection);
         }
         sectionDao.insert(newSection, lineId);
     }
 
-    @Transactional
-    public void deleteSectionByStationId(final Long lineId, final String stationId) {
-        Long deleteId = Long.parseLong(stationId);
-        Station deleteStation = stationDao.findById(deleteId);
+    private void updateOverlappedSection(final Long lineId, final Section newSection, final Section overlappedSection) {
+        sectionDao.update(overlappedSection.divideWith(newSection), lineId);
+    }
 
+    @Transactional
+    public void deleteSectionByStationId(final Long lineId, final Long stationId) {
+        Station deleteStation = stationDao.findById(stationId);
         Sections sections = sectionDao.findAllByLineId(lineId);
-        sections.validateDelete(deleteStation);
+        sections.validateClose(deleteStation);
+        if (sections.isNotTerminal(deleteStation)) {
+            sectionDao.insert(sections.connectTwoSectionBasedOn(deleteStation), lineId);
+        }
         sectionDao.deleteByStation(deleteStation, lineId);
     }
 
-    private Section newSection(SectionRequest request) {
+    private Section newSection(final SectionRequest request) {
         Station upStation = stationDao.findById(request.getUpStationId());
         Station downStation = stationDao.findById(request.getDownStationId());
         return new Section(upStation, downStation, request.getDistance());

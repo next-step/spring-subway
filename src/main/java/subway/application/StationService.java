@@ -6,10 +6,13 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.ErrorCode;
+import subway.exception.IncorrectRequestException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @Service
 public class StationService {
 
@@ -21,7 +24,12 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(final StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
+        String name = stationRequest.getName();
+        stationDao.findByName(name)
+                .ifPresent(station -> {
+                    throw new IncorrectRequestException(ErrorCode.DUPLICATED_STATION_NAME, name);
+                });
+        Station station = stationDao.insert(new Station(name));
         return StationResponse.of(station);
     }
 

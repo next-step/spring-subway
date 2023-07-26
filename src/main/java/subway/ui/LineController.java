@@ -7,11 +7,10 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
-import subway.exception.InternalStateException;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -60,22 +59,15 @@ public class LineController {
 
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam String stationId) {
-        lineService.deleteSectionByStationId(id, stationId);
+        lineService.deleteSectionByStationId(id, parseIdInParam(stationId));
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
-    }
-
-    @ExceptionHandler(IncorrectRequestException.class)
-    public ResponseEntity<Void> handleIncorrectRequestException() {
-        return ResponseEntity.badRequest().build();
-    }
-
-    @ExceptionHandler(InternalStateException.class)
-    public ResponseEntity<Void> handleInternalStateException() {
-        return ResponseEntity.badRequest().build();
+    private static Long parseIdInParam(final String stationId) {
+        try {
+            return Long.parseLong(stationId);
+        } catch (NumberFormatException e) {
+            throw new IncorrectRequestException(ErrorCode.INVALID_STATION_ID, stationId);
+        }
     }
 }

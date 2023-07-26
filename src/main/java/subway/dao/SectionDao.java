@@ -17,20 +17,32 @@ public class SectionDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-    private final RowMapper<Section> rowMapper;
 
-    public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource, final StationDao stationDao) {
+    private final RowMapper<Station> rowUpStationMapper = (rs, rowNum) ->
+            new Station(
+                    rs.getLong("up_station_id"),
+                    rs.getString("up_station_name")
+            );
+
+    private final RowMapper<Station> rowDownStationMapper = (rs, rowNum) ->
+            new Station(
+                    rs.getLong("down_station_id"),
+                    rs.getString("down_station_name")
+            );
+
+    private final RowMapper<Section> rowMapper = (rs, rowNum) ->
+            new Section(
+                    rs.getLong("section_id"),
+                    rowUpStationMapper.mapRow(rs, rowNum),
+                    rowDownStationMapper.mapRow(rs, rowNum),
+                    rs.getInt("distance")
+            );
+
+    public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("section")
                 .usingGeneratedKeyColumns("id");
-        this.rowMapper = (rs, rowNum) ->
-                new Section(
-                        rs.getLong("id"),
-                        stationDao.findById(rs.getLong("up_station_id")),
-                        stationDao.findById(rs.getLong("down_station_id")),
-                        rs.getInt("distance")
-                );
     }
 
     public void insert(final Section section, final Long lineId) {
@@ -45,17 +57,26 @@ public class SectionDao {
     }
 
     public Sections findAllByLineId(final Long lineId) {
-        String sql = "select * from SECTION where line_id = ?";
+        String sql = "select s.id AS section_id, up_station_id, down_station_id, distance, " +
+                "up.name AS up_station_name, down.name AS down_station_name " +
+                "from SECTION s join STATION up on s.up_station_id = up.id " +
+                "join STATION down on s.down_station_id = down.id " +
+                "where line_id = ?";
         return new Sections(jdbcTemplate.query(sql, rowMapper, lineId));
     }
 
     public void deleteByStation(final Station station, final Long lineId) {
-        jdbcTemplate.update("delete from SECTION where down_station_id = ? and line_id = ?",
-                station.getId(), lineId);
+        jdbcTemplate.update("delete from SECTION where (up_station_id = ? or down_station_id = ?) and line_id = ?",
+                station.getId(), station.getId(), lineId);
     }
 
-    public void deleteById(final Long id) {
-        String sql = "delete from SECTION where id = ?";
-        jdbcTemplate.update(sql, id);
+    public void update(final Section newSection, final Long lineId) {
+        Long upStationId = newSection.getUpStation().getId();
+        Long downStationId = newSection.getDownStation().getId();
+        int distance = newSection.getDistance().getValue();
+        String sql = "update SECTION " +
+                "set up_station_id = ?, down_station_id = ?, line_id = ?, distance = ? " +
+                "where id = ?";
+        jdbcTemplate.update(sql, new Object[]{upStationId, downStationId, lineId, distance, newSection.getId()});
     }
 }

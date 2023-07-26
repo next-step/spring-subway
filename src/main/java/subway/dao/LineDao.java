@@ -1,5 +1,6 @@
 package subway.dao;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -10,6 +11,7 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class LineDao {
@@ -58,5 +60,14 @@ public class LineDao {
 
     public void deleteById(final Long id) {
         jdbcTemplate.update("delete from Line where id = ?", id);
+    }
+
+    public Optional<Line> findByName(String name) {
+        String sql = "select id, name, color from LINE WHERE name = ?";
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, name));
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return Optional.empty();
+        }
     }
 }

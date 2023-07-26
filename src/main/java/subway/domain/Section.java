@@ -1,12 +1,12 @@
 package subway.domain;
 
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
+import subway.exception.InternalStateException;
 
 import java.util.Objects;
 
 public class Section {
-
-    private static final String SAME_STATION_EXCEPTION_MESSAGE = "상행역과 하행역은 다른 역이어야 합니다.";
 
     private Long id;
     private Station upStation;
@@ -37,9 +37,61 @@ public class Section {
         this.distance = distance;
     }
 
+    public Section divideWith(final Section other) {
+        validateOverlapped(other);
+        validateLongerThan(other);
+        Distance reducedDistance = this.distance.subtract(other.distance);
+
+        if (isSameUpStation(other)) {
+            return new Section(this.id, other.downStation, this.downStation, reducedDistance);
+        }
+
+        return new Section(this.id, this.upStation, other.upStation, reducedDistance);
+    }
+
+    public Section connectWith(Section other) {
+        validateConnected(other);
+        Distance addedDistance = this.distance.add(other.distance);
+
+        if (isUpConnected(other)) {
+            return new Section(other.upStation, this.downStation, addedDistance);
+        }
+        return new Section(this.upStation, other.downStation, addedDistance);
+    }
+
+    private void validateConnected(Section other) {
+        if (!isUpConnected(other) && !isDownConnected(other)) {
+            throw new IncorrectRequestException(
+                    ErrorCode.NOT_CONNECTED_SECTION,
+                    String.format("구간1 상행역: %s 하행역: %s, 구간2 상행역: %s 하행역: %s", this.upStation.getName(), this.downStation.getName(), other.upStation.getName(), other.downStation.getName())
+            );
+        }
+    }
+
+    private void validateLongerThan(final Section other) {
+        if (this.distance.shorterOrEqualTo(other.distance)) {
+            throw new IncorrectRequestException(
+                    ErrorCode.LONGER_THAN_ORIGIN_SECTION,
+                    String.format("기존 구간 길이: %d, 신설 구간 길이: %d", this.distance.getValue(), other.distance.getValue())
+            );
+        }
+    }
+
+    private void validateOverlapped(Section other) {
+        if (!isSameUpStation(other) && !isSameDownStation(other)) {
+            throw new InternalStateException(
+                    ErrorCode.NOT_OVERLAPPED_SECTION,
+                    String.format("기존 구간 상행역: %s 하행역: %s, 신설 구간 상행역: %s 하행역: %s", this.upStation.getName(), this.downStation.getName(), other.upStation.getName(), other.downStation.getName())
+            );
+        }
+    }
+
     private void validateDifferent(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new IncorrectRequestException(SAME_STATION_EXCEPTION_MESSAGE);
+            throw new IncorrectRequestException(
+                    ErrorCode.SAME_STATION_SECTION,
+                    String.format("상행역: %s, 하행역 %s", upStation.getName(), downStation.getName())
+            );
         }
     }
 
@@ -51,12 +103,12 @@ public class Section {
         return downStation.equals(other.downStation);
     }
 
-    public boolean shorterOrEqualTo(final Section other) {
-        return distance.shorterOrEqualTo(other.distance);
+    public boolean isUpConnected(final Section other) {
+        return upStation.equals(other.downStation);
     }
 
-    public Distance distanceDifference(final Section other) {
-        return this.distance.difference(other.distance);
+    public boolean isDownConnected(final Section other) {
+        return downStation.equals(other.upStation);
     }
 
     public Long getId() {

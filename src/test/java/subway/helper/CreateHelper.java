@@ -4,33 +4,14 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
-import subway.dto.StationResponse;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import subway.dto.*;
 
 public class CreateHelper {
 
-    public static List<Long> getStationIds() {
-        ExtractableResponse<Response> stations = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
-        return stations.jsonPath().getList(".", StationResponse.class).stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
-    }
-
-    public static void createSection(List<Long> stationIds, int index, int index1, Long lineId) {
-        SectionRequest params = new SectionRequest(stationIds.get(index), stationIds.get(index1), 10);
+    public static void createSection(Long upStationId, Long downStationId, int distance, Long lineId) {
+        SectionRequest sectionRequest = new SectionRequest(upStationId, downStationId, distance);
         RestAssured.given()
-                .body(params)
+                .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines/{id}/sections", lineId)
@@ -38,11 +19,8 @@ public class CreateHelper {
                 .extract();
     }
 
-    public static Long createLine(String name, String color) {
-        createStation("강남역");
-        createStation("역삼역");
-        List<Long> stationIds = getStationIds();
-        LineRequest lineRequest = new LineRequest(name, color, stationIds.get(0), stationIds.get(1), 10);
+    public static Long createLine(String name, String color, Long upStationId, Long downStationId, int distance) {
+        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
         ExtractableResponse<Response> lineResponse = RestAssured.given()
                 .body(lineRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -53,15 +31,15 @@ public class CreateHelper {
         return lineResponse.as(LineResponse.class).getId();
     }
 
-    public static void createStation(String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        RestAssured.given().log().all()
-                .body(params)
+    public static Long createStation(String name) {
+        StationRequest stationRequest = new StationRequest(name);
+        ExtractableResponse<Response> stationResponse = RestAssured.given()
+                .body(stationRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/stations")
-                .then().log().all()
+                .then()
                 .extract();
+        return stationResponse.as(StationResponse.class).getId();
     }
 }
