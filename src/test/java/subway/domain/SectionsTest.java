@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SectionException;
+import subway.exception.StationException;
 
 class SectionsTest {
 
@@ -88,7 +90,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, downStation,  3);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
+        assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 두 역이 모두 존재하지 않으면 예외를 던진다.")
@@ -104,7 +106,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(newUpStation, newDownStation,  3);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
+        assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
 
     @DisplayName("새로운 구간이 가운데에 삽입될 때 업데이트할 기존 구간을 반환한다.")
@@ -186,7 +188,7 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
         Section  newSection = new Section(newUpStation, newDownStation, distance);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
+        assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
 
     @DisplayName("새로운 구간의 하행역이 노선에 등록되어 있을 경우")
@@ -201,7 +203,7 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
         Section  newSection = new Section(newUpStation, newDownStation, distance);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
+        assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
 
     @DisplayName("새로운 구간을 중간에 삽입할 때의 거리가 기존 구간의 거리와 같거나 긴 경우 예외를 던진다.")
@@ -217,7 +219,7 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, midStation,  10);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.cut(oldSection, newSection));
+        assertThrows(SectionException.class, () -> sections.cut(oldSection, newSection));
     }
 
     @DisplayName("존재하는 역을 제거하려는 경우 검증을 통과한다.")
@@ -254,7 +256,7 @@ class SectionsTest {
                 new Section(downStation, newDownStation, distance)));
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> sections.validateDelete(notExistsStation));
+        assertThrows(StationException.class, () -> sections.validateDelete(notExistsStation));
     }
 
     @DisplayName("구간이 1개만 있을 때 구간을 제거하는 경우 예외를 던진다.")
@@ -268,6 +270,6 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
 
         // when & then
-        assertThrows(IllegalStateException.class, () -> sections.validateDelete(downStation));
+        assertThrows(SectionException.class, () -> sections.validateDelete(downStation));
     }
 }

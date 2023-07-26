@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import subway.exception.SectionException;
 
 class DistanceTest {
 
@@ -13,7 +14,7 @@ class DistanceTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, 0})
     void notPositiveDistance(int distance) {
-        assertThrows(IllegalArgumentException.class, () -> new Distance(distance));
+        assertThrows(SectionException.class, () -> new Distance(distance));
     }
 
     @DisplayName("Distance 간 차이를 구하는 경우")
