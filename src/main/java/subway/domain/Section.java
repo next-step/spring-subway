@@ -69,10 +69,6 @@ public final class Section {
         return upStation.equals(this.upStation);
     }
 
-    public boolean equalsDownStation(final Station downStation) {
-        return downStation.equals(this.downStation);
-    }
-
     public boolean equalsDownStation(final Section other) {
         return other.downStation.equals(this.downStation);
     }
@@ -95,9 +91,5 @@ public final class Section {
 
     public Integer getDistance() {
         return distance;
-    }
-
-    public Section updateUpStationAndDistance(final Section other) {
-        return new Section(id, line, other.upStation, downStation, distance + other.distance);
     }
 }
