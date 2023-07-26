@@ -15,7 +15,7 @@ public class LineResponse {
     }
 
     public static LineResponse of(final Line line) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor());
+        return new LineResponse(line.getId(), line.getName().getValue(), line.getColor());
     }
 
     public Long getId() {

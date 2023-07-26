@@ -35,7 +35,7 @@ public class LineDao {
     public Line insert(final Line line) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", line.getId());
-        params.put("name", line.getName());
+        params.put("name", line.getName().getValue());
         params.put("color", line.getColor());
 
         Long lineId = insertAction.executeAndReturnKey(params).longValue();
@@ -62,7 +62,7 @@ public class LineDao {
     public void update(final Line newLine) {
         String sql = "update LINE set name = ?, color = ? where id = ?";
 
-        jdbcTemplate.update(sql, new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
+        jdbcTemplate.update(sql, new Object[]{newLine.getName().getValue(), newLine.getColor(), newLine.getId()});
     }
 
     public void deleteById(final Long id) {

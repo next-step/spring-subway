@@ -6,7 +6,7 @@ import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -31,7 +31,10 @@ public class StationDao {
     }
 
     public Station insert(final Station station) {
-        SqlParameterSource params = new BeanPropertySqlParameterSource(station);
+        final SqlParameterSource params = new MapSqlParameterSource()
+//                .addValue("id", station.getId())
+                .addValue("name", station.getName().getValue());
+
         Long id = insertAction.executeAndReturnKey(params).longValue();
 
         return new Station(id, station.getName());
@@ -56,7 +59,7 @@ public class StationDao {
     public void update(final Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
 
-        jdbcTemplate.update(sql, new Object[]{newStation.getName(), newStation.getId()});
+        jdbcTemplate.update(sql, new Object[]{newStation.getName().getValue(), newStation.getId()});
     }
 
     public void deleteById(final Long id) {

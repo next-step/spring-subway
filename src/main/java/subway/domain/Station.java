@@ -5,17 +5,22 @@ import java.util.Objects;
 public class Station {
 
     private Long id;
-    private String name;
+    private Name name;
 
-    public Station() {
+    public Station(final String name) {
+        this(new Name(name));
     }
 
-    public Station(final Long id, final String name) {
-        this.id = id;
+    public Station(final Name name) {
         this.name = name;
     }
 
-    public Station(final String name) {
+    public Station(final Long id, final String name) {
+        this(id, new Name(name));
+    }
+
+    public Station(final Long id, final Name name) {
+        this.id = id;
         this.name = name;
     }
 
@@ -23,7 +28,7 @@ public class Station {
         return id;
     }
 
-    public String getName() {
+    public Name getName() {
         return name;
     }
 
