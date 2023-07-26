@@ -14,17 +14,9 @@ public class SectionAddManager {
     public void validate(final Station upStation, final Station downStation, final int distance) {
         validateLineHasOneOf(upStation, downStation);
 
-        if (canAddToLineEnd(upStation, downStation)) {
-            return;
-        }
-
         sections.filter(hasOneOf(upStation, downStation))
             .filter(isLongerThan(distance))
             .orElseThrow(() -> new IllegalArgumentException("추가할 구간의 크기가 너무 큽니다."));
-    }
-
-    private boolean canAddToLineEnd(final Station upStation, final Station downStation) {
-        return sections.isFirst(downStation) || sections.isLast(upStation);
     }
 
     public Optional<Section> lookForChange(Section newSection) {
@@ -32,8 +24,7 @@ public class SectionAddManager {
             .map(section -> section.cutBy(newSection));
     }
 
-    private Predicate<Section> hasOneOf(final Station upStation,
-        final Station downStation) {
+    private Predicate<Section> hasOneOf(final Station upStation, final Station downStation) {
         return section -> section.hasUpStation(upStation) || section.hasDownStation(downStation);
     }
 
@@ -45,17 +36,17 @@ public class SectionAddManager {
         boolean hasUpStation = sections.hasStation(upStation);
         boolean hasDownStation = sections.hasStation(downStation);
 
-        validateBothStationsInLine(hasUpStation, hasDownStation);
-        validateBothStationsNotInLine(hasUpStation, hasDownStation);
+        validateBoth(hasUpStation, hasDownStation);
+        validateNotBoth(hasUpStation, hasDownStation);
     }
 
-    private void validateBothStationsInLine(final boolean hasUpStation, final boolean hasDownStation) {
+    private void validateBoth(final boolean hasUpStation, final boolean hasDownStation) {
         if (hasUpStation && hasDownStation) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다.");
         }
     }
 
-    private void validateBothStationsNotInLine(final boolean hasUpStation, final boolean hasDownStation) {
+    private void validateNotBoth(final boolean hasUpStation, final boolean hasDownStation) {
         if (!hasUpStation && !hasDownStation) {
             throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다.");
         }
