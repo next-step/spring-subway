@@ -13,11 +13,16 @@ import subway.domain.Section;
 @Repository
 public class SectionDao {
 
+    private static final String SECTION_FIELD_SELECT_SQL =
+        "SELECT s.id AS id, s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, s.distance AS distance, "
+            + "l.id AS line_id, l.name AS line_name, l.color AS line_color ";
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
     private final SectionMapper sectionMapper;
 
-    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource, SectionMapper sectionMapper) {
+    public SectionDao(JdbcTemplate jdbcTemplate, DataSource dataSource,
+        SectionMapper sectionMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
             .withTableName("section")
@@ -39,8 +44,7 @@ public class SectionDao {
     }
 
     public List<Section> findAll(final long lineId) {
-        final String sql = "SELECT s.id AS id, s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, s.distance AS distance, "
-            + "l.id AS line_id, l.name AS line_name, l.color AS line_color "
+        final String sql = SECTION_FIELD_SELECT_SQL
             + "FROM section AS s "
             + "JOIN line AS l "
             + "ON s.line_id = l.id "
@@ -49,18 +53,17 @@ public class SectionDao {
     }
 
     public boolean existByLineIdAndStationId(final long lineId, final long stationId) {
-        final String sql = "SELECT s.id AS id, s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, s.distance AS distance, "
-            + "l.id AS line_id, l.name AS line_name, l.color AS line_color "
+        final String sql = SECTION_FIELD_SELECT_SQL
             + "FROM section AS s "
             + "JOIN line AS l "
             + "ON s.line_id = l.id "
             + "WHERE l.id = ? AND (s.up_station_id = ? OR s.down_station_id = ?)";
-        return !jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId, stationId, stationId).isEmpty();
+        return !jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId, stationId, stationId)
+            .isEmpty();
     }
 
     public long count(final long lineId) {
-        final String sql = "SELECT s.id AS id, s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, s.distance AS distance, "
-            + "l.id AS line_id, l.name AS line_name, l.color AS line_color "
+        final String sql = SECTION_FIELD_SELECT_SQL
             + "FROM section AS s "
             + "JOIN line AS l "
             + "ON s.line_id = l.id "
