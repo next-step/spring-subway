@@ -2,6 +2,8 @@ INSERT INTO STATION (id, name)
 values (default, '서울대입구역');
 INSERT INTO STATION (id, name)
 values (default, '잠실역');
+INSERT INTO STATION (id, name)
+values (default, '상도역');
 
 INSERT INTO LINE (id, name, color)
 values (default, '2호선', 'green');

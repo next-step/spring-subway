@@ -1,36 +1,17 @@
 package subway.dao;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import subway.domain.Line;
 import subway.domain.Section;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-class LineDaoTest {
-    private LineDao lineDao;
-
-    @BeforeEach
-    void setUp() {
-        DataSource dataSource = new EmbeddedDatabaseBuilder()
-                .generateUniqueName(true)
-                .setType(EmbeddedDatabaseType.H2)
-                .addScript("classpath:schema.sql")
-                .addScript("classpath:test-data.sql")
-                .build();
-
-        lineDao = new LineDao(new JdbcTemplate(dataSource), dataSource);
-    }
-
+class LineDaoTest extends DaoTest {
     @Test
     @DisplayName("id로 Line을 조회하면 Line이 포함하는 Sections, Station들을 함께 Optional을 반환한다.")
     void findByIdWithSectionsAndStations() {
@@ -86,12 +67,12 @@ class LineDaoTest {
 
         // when
         lineDao.update(line);
-        Line persistenceLine = lineDao.findById(1L).get();
+        Line persistentLine = lineDao.findById(1L).get();
 
         // then
-        assertThat(persistenceLine.getId()).isEqualTo(1L);
-        assertThat(persistenceLine.getName()).isEqualTo("3호선");
-        assertThat(persistenceLine.getColor()).isEqualTo("orange");
+        assertThat(persistentLine.getId()).isEqualTo(1L);
+        assertThat(persistentLine.getName()).isEqualTo("3호선");
+        assertThat(persistentLine.getColor()).isEqualTo("orange");
     }
 
     @Test
@@ -114,6 +95,7 @@ class LineDaoTest {
 
         // then
         assertThat(lineDao.findById(1L).isEmpty()).isTrue();
+        assertThat(sectionDao.findById(1L).isEmpty()).isTrue();
     }
 
     @Test
