@@ -62,5 +62,4 @@ public class LineDao {
                 .stream()
                 .findAny();
     }
-
 }

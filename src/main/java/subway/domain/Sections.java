@@ -2,13 +2,14 @@ package subway.domain;
 
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
-import subway.exception.IllegalStationException;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class Sections {
+
+    private static final int MIN_SIZE_CAN_DELETE = 2;
 
     private final List<Section> sections;
 
@@ -135,24 +136,50 @@ public final class Sections {
         return Collections.unmodifiableList(stations);
     }
 
-    public int size() {
-        return sections.size();
+    public void validateCanDeleteSection() {
+        if (sections.size() < MIN_SIZE_CAN_DELETE) {
+            throw new IllegalSectionException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
+        }
     }
 
-    public List<Section> findConnected(final long stationId) {
-        final List<Section> result = sections.stream()
-                .filter(section -> section.hasStation(stationId))
-                .collect(Collectors.toUnmodifiableList());
-        validateSections(result);
-        return sort(result);
-    }
+    public DisconnectResponse findDisconnectSections(final long stationId) {
+        final List<Section> sectionsToChange = findSectionsToChange(stationId);
 
-    private static void validateSections(final List<Section> result) {
-        if (result.size() > 2) {
+        if (sectionsToChange.size() > MIN_SIZE_CAN_DELETE) {
             throw new IllegalArgumentException("[ERROR] 노선의 구간들이 올바르게 연결되어 있지 않습니다.");
         }
-        if (result.isEmpty()) {
-            throw new IllegalStationException("해당 노선에 역이 존재하지 않습니다.");
+        return convertToDisconnectResponse(sectionsToChange);
+    }
+
+    private DisconnectResponse convertToDisconnectResponse(final List<Section> sectionsToChange) {
+        if(sectionsToChange.size() == 2) {
+            return new DisconnectResponse(sectionsToChange.get(0), sectionsToChange.get(1));
+        }
+        return new DisconnectResponse(sectionsToChange.get(0), null);
+    }
+
+    private List<Section> findSectionsToChange(final long stationId) {
+        return sections.stream()
+                .filter(section -> section.hasStation(stationId))
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public static final class DisconnectResponse {
+
+        private final Section deleteSection;
+        private final Section updateSection;
+
+        private DisconnectResponse(final Section deleteSection, final Section updateSection) {
+            this.deleteSection = deleteSection;
+            this.updateSection = updateSection;
+        }
+
+        public Section getDeleteSection() {
+            return deleteSection;
+        }
+
+        public Section getUpdateSection() {
+            return updateSection;
         }
     }
 }

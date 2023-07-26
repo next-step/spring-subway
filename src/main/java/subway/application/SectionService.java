@@ -11,10 +11,7 @@ import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
-import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
-
-import java.util.List;
 
 @Service
 public class SectionService {
@@ -55,22 +52,16 @@ public class SectionService {
     @Transactional
     public void deleteSection(final long lineId, final long stationId) {
         final Sections sections = new Sections(sectionDao.findAll(lineId));
-        validateSections(sections);
-
-        final List<Section> connectedSections = sections.findConnected(stationId);
-        final Section delete = connectedSections.get(0);
-        if(connectedSections.size() == 2) {
-            final Section update = connectedSections.get(1);
-            sectionDao.update(update.updateUpStationAndDistance(delete));
-        }
-
-        sectionDao.delete(delete);
+        sections.validateCanDeleteSection();
+        disconnectSection(stationId, sections);
     }
 
-    private void validateSections(final Sections sections) {
-        if (sections.size() < 2) {
-            throw new IllegalSectionException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
+    private void disconnectSection(final long stationId, final Sections sections) {
+        final Sections.DisconnectResponse disconnectResponse = sections.findDisconnectSections(stationId);
+        if(disconnectResponse.getUpdateSection() != null) {
+            sectionDao.update(disconnectResponse.getUpdateSection());
         }
+        sectionDao.delete(disconnectResponse.getDeleteSection());
     }
 
     private Station findStationById(final long id) {
@@ -78,21 +69,5 @@ public class SectionService {
                 .orElseThrow(() ->
                         new IllegalStationsException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
                 );
-    }
-
-    private void validateLineAndLastStation(final long lineId, final Station station) {
-        final Section lastSection = sectionDao.findLastSection(lineId)
-                .orElseThrow(() -> new IllegalSectionException("해당 노선은 생성되지 않았습니다."));
-
-        if (!lastSection.equalsDownStation(station)) {
-            throw new IllegalSectionException("해당 역은 노선의 하행 종점역이 아닙니다.");
-        }
-    }
-
-    private void validateSectionInLine(final long lineId) {
-        final long sectionCount = sectionDao.count(lineId);
-        if (sectionCount == 1L) {
-            throw new IllegalSectionException("해당 노선은 구간이 한개입니다.");
-        }
     }
 }

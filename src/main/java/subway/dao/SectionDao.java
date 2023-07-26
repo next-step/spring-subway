@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
 public class SectionDao {
@@ -49,20 +48,6 @@ public class SectionDao {
 
         Long id = insertAction.executeAndReturnKey(params).longValue();
         return new Section(id, section.getLine(), section.getUpStation(), section.getDownStation(), section.getDistance());
-    }
-
-    public Optional<Section> findLastSection(final Long lineId) {
-        String sql = SELECT_ALL_FROM_SECTION_QUERY +
-                "WHERE s.line_id = ? " +
-                "AND NOT EXISTS(SELECT s1.id FROM section AS s1 WHERE s.down_station_id = s1.up_station_id) ";
-        return jdbcTemplate.query(sql, rowMapper, lineId)
-                .stream()
-                .findAny();
-    }
-
-    public void deleteLastSection(final long lineId, final long stationId) {
-        String sql = "DELETE FROM section WHERE line_id = ? AND down_station_id = ?";
-        jdbcTemplate.update(sql, lineId, stationId);
     }
 
     public long count(final long lineId) {

@@ -119,22 +119,6 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @DisplayName("지하철 노선의 하행 종점역이 아닐 때 구간 제거 실패")
-    @Test
-    void deleteSectionWithNotLastStation() {
-        // given
-        createInitialLine();
-
-        StationIntegrationSupporter.createStation(stationRequest);
-        SectionIntegrationSupporter.createSectionInLine(1L, sectionRequest);
-
-        // when
-        ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(1L, 1L);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
     @DisplayName("지하철 노선에 구간이 1개일 때 구간 제거 실패")
     @Test
     void deleteSectionAtLineHasOneSection() {
