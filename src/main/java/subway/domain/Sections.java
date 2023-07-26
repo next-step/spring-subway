@@ -7,12 +7,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import subway.domain.vo.SectionDeleteVo;
 import subway.exception.SectionCreateException;
 import subway.exception.SectionDeleteException;
 
 public class Sections {
 
-    private static final int MINIMUM_SIZE = 1;
+    private static final int MINIMUM_DELETE_SIZE = 2;
     private final List<Section> sections;
 
     public Sections(List<Section> sections) {
@@ -72,17 +73,6 @@ public class Sections {
         return result;
     }
 
-    public Section findLastSection() {
-        validateSize(sections);
-        return sections.get(sections.size() - 1);
-    }
-
-    private static void validateSize(List<Section> sections) {
-        if (sections.size() <= MINIMUM_SIZE) {
-            throw new SectionDeleteException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
-        }
-    }
-
     public Optional<Section> validateAndCutSectionIfExist(Station upStation, Station downStation,
             Distance distance) {
         if (sections.isEmpty()) {
@@ -131,6 +121,37 @@ public class Sections {
         if (upStationSection && downStationSection && !isLast && !isFirst) {
             throw new SectionCreateException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
         }
+    }
+
+    public SectionDeleteVo findDeletedAndCombinedSections(Long stationId) {
+        if (sections.isEmpty()) {
+            throw new SectionDeleteException("노선에 존재하는 역이 없습니다.");
+        }
+        if (sections.size() < MINIMUM_DELETE_SIZE) {
+            throw new SectionDeleteException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+        }
+        Optional<Section> upSection = sections.stream()
+                .filter(section -> section.getDownStationId().equals(stationId))
+                .findAny();
+        Optional<Section> downSection = sections.stream()
+                .filter(section -> section.getUpStationId().equals(stationId))
+                .findAny();
+
+        if (upSection.isPresent() && downSection.isPresent()) {
+            List<Section> deleteSections = List.of(upSection.get(), downSection.get());
+            Section combinedSection = upSection.get().combine(downSection.get());
+            return new SectionDeleteVo(deleteSections, Optional.of(combinedSection));
+        }
+        if (upSection.isPresent()) {
+            List<Section> deleteSections = List.of(upSection.get());
+            return new SectionDeleteVo(deleteSections, Optional.empty());
+        }
+        if (downSection.isPresent()) {
+            List<Section> deleteSections = List.of(downSection.get());
+            return new SectionDeleteVo(deleteSections, Optional.empty());
+        }
+
+        throw new SectionDeleteException("노선에 해당하는 역을 가진 구간이 없습니다.");
     }
 
     public List<Section> getSections() {
