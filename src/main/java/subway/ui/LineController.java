@@ -1,11 +1,9 @@
 package subway.ui;
 
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +23,7 @@ import subway.dto.SectionRequest;
 public class LineController {
 
     private static final String NOT_POSITIVE_STATION_ID_EXCEPTION_MESSAGE = "stationId는 정수만 입력받을 수 있습니다.";
+
     private final LineService lineService;
 
     public LineController(LineService lineService) {
@@ -78,10 +77,5 @@ public class LineController {
         lineService.deleteSectionByStationId(id, Long.parseLong(stationId));
 
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
     }
 }

@@ -28,13 +28,13 @@ class LineIntegrationTest extends IntegrationTest {
     public void setUp() {
         super.setUp();
 
-        CreateHelper.createStation("잠실역");
-        CreateHelper.createStation("역삼역");
-        CreateHelper.createStation("교대역");
-        CreateHelper.createStation("강변역");
+        final Long firstStationId = CreateHelper.createStation("잠실역");
+        final Long secondStationId = CreateHelper.createStation("역삼역");
+        final Long thirdStationId = CreateHelper.createStation("교대역");
+        final Long fourthStationId = CreateHelper.createStation("강변역");
 
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10);
-        lineRequest2 = new LineRequest("구신분당선", "bg-red-600", 3L, 4L, 11);
+        lineRequest1 = new LineRequest("신분당선", "bg-red-600", firstStationId, secondStationId, 10);
+        lineRequest2 = new LineRequest("구신분당선", "bg-red-600", thirdStationId, fourthStationId, 11);
     }
 
     @DisplayName("지하철 노선을 생성한다.")
