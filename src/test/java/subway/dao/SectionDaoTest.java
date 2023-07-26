@@ -26,7 +26,6 @@ class SectionDaoTest {
 
     private Section section1;
     private Section section2;
-    private Section section3;
 
     @Autowired
     private LineDao lineDao;
@@ -40,11 +39,9 @@ class SectionDaoTest {
         Station station1 = stationDao.findById(1L).get();
         Station station2 = stationDao.findById(2L).get();
         Station station3 = stationDao.findById(3L).get();
-        Station station4 = stationDao.findById(4L).get();
 
         section1 = new Section(line, station1, station2, new Distance(10L));
         section2 = new Section(line, station2, station3, new Distance(10L));
-        section3 = new Section(line, station3, station4, new Distance(10L));
     }
 
     @DisplayName("노선아이디와 상행역아이디와 하행역아이디와 거리를 가지고 구간을 생성한다.")

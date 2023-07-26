@@ -75,12 +75,6 @@ public enum SectionDeleteType {
         return this.combineFunction.deleteAndCombineSections(upSection, downSection);
     }
 
-    private static class Constants {
-
-        // lambda식에서 사용가능한 중첩 클래스 상수
-        private static final int MINIMUM_DELETE_SIZE = 1;
-    }
-
     @FunctionalInterface
     private interface MatchFunction {
 
@@ -93,9 +87,15 @@ public enum SectionDeleteType {
         SectionDeleteVo deleteAndCombineSections(
                 Optional<Section> upSection,
                 Optional<Section> downSection);
-
     }
 
+    /**
+     * lambda식에서 사용가능한 중첩 클래스 상수
+     */
+    private static class Constants {
+
+        private static final int MINIMUM_DELETE_SIZE = 1;
+    }
 }
 
 
