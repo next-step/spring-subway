@@ -263,4 +263,38 @@ class LineIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
+
+    @Test
+    @DisplayName("Line의 상행 Section을 제거한다")
+    void deleteUpSectionOfLine() {
+        // given
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest2, stationRequest3, 5);
+
+        registerSectionToLine(lineId, sectionRequest);
+
+        // when
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest1);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("Line의 중간 Section을 제거한다")
+    void deleteMiddleSectionOfLine() {
+        // given
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(LineResponse.class).getId();
+
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest2, stationRequest3, 5);
+
+        registerSectionToLine(lineId, sectionRequest);
+
+        // when
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest2);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
 }

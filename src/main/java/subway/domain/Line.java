@@ -149,7 +149,7 @@ public class Line {
     public Section disconnectSection(final Station station) {
         validateLineSize();
         validateExistStation(station);
-        final Section upSection = sections.get(0).getDownSection();
+        final Section upSection = sections.get(0).findUpSection();
         return upSection.disconnectSection(station);
     }
 
