@@ -3,6 +3,7 @@ package subway.ui;
 import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,6 +39,12 @@ public class ExceptionHandlers {
         log.error(exception.getMessage());
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<Void> handleDuplicateKeyException(DuplicateKeyException exception) {
+        log.error(exception.getMessage());
+        return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(SQLException.class)
