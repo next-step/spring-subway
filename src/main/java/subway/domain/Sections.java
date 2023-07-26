@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import subway.domain.vo.SectionDeleteVo;
-import subway.exception.SectionCreateException;
 import subway.exception.SectionDeleteException;
 
 public class Sections {
@@ -91,27 +90,6 @@ public class Sections {
     public Optional<Section> findUpStationMatchSection(Station upStation) {
         return sections.stream()
                 .filter(section -> section.getUpStation().equals(upStation)).findAny();
-    }
-
-    private static Optional<Section> cutSection(Station upStation, Station downStation,
-            Distance distance, Section originalSection) {
-        return Optional.of(originalSection
-                .cuttedSection(upStation, downStation, distance));
-    }
-
-    private static void validateStationBothExist(boolean upStationSection,
-            boolean downStationSection, boolean isLast, boolean isFirst) {
-        if ((upStationSection || isLast)
-                && (downStationSection || isFirst)) {
-            throw new SectionCreateException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
-        }
-    }
-
-    private static void validateStationNotExist(boolean upStationSection,
-            boolean downStationSection, boolean isLast, boolean isFirst) {
-        if (upStationSection && downStationSection && !isLast && !isFirst) {
-            throw new SectionCreateException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
-        }
     }
 
     public boolean isEmpty() {
