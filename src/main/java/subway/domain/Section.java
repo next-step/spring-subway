@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Section {
 
-    private Long id;
+    private final Long id;
     private final Long lineId;
     private final Long upStationId;
     private final Long downStationId;
@@ -14,6 +14,10 @@ public class Section {
 
     public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
         this(null, lineId, upStationId, downStationId, distance);
+    }
+
+    public Section(final Long id, final Section section) {
+        this(id, section.lineId, section.upStationId, section.downStationId, section.distance);
     }
 
     public Section(
@@ -39,20 +43,41 @@ public class Section {
         return new Section(this.lineId, this.upStationId, from.upStationId, this.distance - from.distance);
     }
 
+    public Section merge(final Section target) {
+        if (!isHead(target)) {
+            throw new SubwayException("구간이 연결되어있지 않습니다.");
+        }
+
+        return new Section(
+                this.lineId,
+                this.upStationId,
+                target.downStationId,
+                this.distance + target.distance
+        );
+    }
+
     public Long subtractDistance(final Section target) {
         return this.distance - target.distance;
     }
 
-    public boolean isSameUpStationId(final Section target) {
+    public boolean isSameUpStation(final Section target) {
         return Objects.equals(this.upStationId, target.upStationId);
     }
 
-    public boolean isSameDownStationId(final Section target) {
+    public boolean isSameDownStation(final Section target) {
         return Objects.equals(this.downStationId, target.downStationId);
     }
 
-    public boolean doesNotContainsDownStation(final Long targetStationId) {
-        return !Objects.equals(this.downStationId, targetStationId);
+    public boolean isSameUpStationId(final Long targetId) {
+        return Objects.equals(this.upStationId, targetId);
+    }
+
+    public boolean isSameDownStationId(final Long targetId) {
+        return Objects.equals(this.downStationId, targetId);
+    }
+
+    public boolean isHead(final Section target) {
+        return Objects.equals(this.downStationId, target.upStationId);
     }
 
     public Long getId() {
@@ -93,14 +118,6 @@ public class Section {
         if (upStationId == null || downStationId == null) {
             throw new SubwayException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
         }
-    }
-
-    public boolean isHead(final Section target) {
-        return Objects.equals(this.downStationId, target.upStationId);
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
     }
 
     @Override

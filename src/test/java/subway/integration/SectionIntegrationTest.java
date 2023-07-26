@@ -177,8 +177,25 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("지하철 구간을 제거한다.")
-    void deleteSection() {
+    @DisplayName("지하철 노선의 상행 종점역을 포함하는 구간을 제거한다.")
+    void deleteSectionContainsFirstSection() {
+        /* given */
+        final Long lineId = 2L;
+
+        /* when */
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all().queryParam("stationId", "23")
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        /* then */
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("지하철 노선의 하행 종점역을 포함하는 구간을 제거한다.")
+    void deleteSectionContainsLastStation() {
         /* given */
         final Long lineId = 2L;
 
@@ -194,8 +211,8 @@ class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("지하철 노선에 등록된 하행 종점역이 아닌 경우 삭제 시 400 Bad Request로 응답한다.")
-    void badRequestWithNotPrevSectionOnLine() {
+    @DisplayName("지하철 노선의 중간역을 포함하는 구간을 제거한다.")
+    void deleteSection() {
         /* given */
         final Long lineId = 2L;
 
@@ -207,9 +224,7 @@ class SectionIntegrationTest extends IntegrationTest {
                 .extract();
 
         /* then */
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.body().jsonPath().getString("message"))
-                .isEqualTo("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다.");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @Test

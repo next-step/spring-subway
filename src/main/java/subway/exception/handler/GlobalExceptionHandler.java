@@ -1,6 +1,7 @@
 package subway.exception.handler;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.exception.SubwayException;
@@ -9,15 +10,15 @@ import subway.exception.dto.ExceptionResponse;
 import java.sql.SQLException;
 
 @RestControllerAdvice
-public class ExceptionHandler {
+public class GlobalExceptionHandler {
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(SubwayException.class)
+    @ExceptionHandler(SubwayException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleSubwayException(final SubwayException exception) {
         return new ExceptionResponse(exception.getMessage());
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(SQLException.class)
+    @ExceptionHandler(SQLException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleSQLException(final SQLException exception) {
         exception.printStackTrace();

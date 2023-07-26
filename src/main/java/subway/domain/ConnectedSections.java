@@ -5,6 +5,7 @@ import subway.utils.SetUtils;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -23,6 +24,15 @@ public class ConnectedSections {
         return Collections.unmodifiableList(this.connectedSections);
     }
 
+    public List<Long> getSortedStationIds() {
+        final List<Long> sortedStationIds = connectedSections.stream()
+                .map(Section::getUpStationId)
+                .collect(Collectors.toList());
+        sortedStationIds.add(getLastSection().getDownStationId());
+
+        return sortedStationIds;
+    }
+
     public SectionEditResult add(final Section target) {
         validateAddSectionCondition(target);
 
@@ -39,21 +49,20 @@ public class ConnectedSections {
     public SectionEditResult remove(final Long targetStationId) {
         validateRemoveSectionCondition(targetStationId);
 
-        final Section removed = connectedSections.remove(connectedSections.size() - 1);
+        if (isRemovableFirstSection(targetStationId)) {
+            return new SectionEditResult(
+                    Collections.emptyList(),
+                    List.of(removeFirstSection())
+            );
+        }
+        if (isRemovableLastSection(targetStationId)) {
+            return new SectionEditResult(
+                    Collections.emptyList(),
+                    List.of(removeLastSection())
+            );
+        }
 
-        return new SectionEditResult(
-                Collections.emptySet(),
-                Set.of(removed)
-        );
-    }
-
-    public List<Long> getSortedStationIds() {
-        final List<Long> sortedStationIds = connectedSections.stream()
-                .map(Section::getUpStationId)
-                .collect(Collectors.toList());
-        sortedStationIds.add(getLastSection().getDownStationId());
-
-        return sortedStationIds;
+        return removeBetween(targetStationId);
     }
 
     private List<Section> convertToConnectedSections(final List<Section> sections) {
@@ -67,12 +76,12 @@ public class ConnectedSections {
     }
 
     private List<Section> generateConnectedSections(final List<Section> sections, final Long firstStationId) {
-        final Map<Long, Section> upStationToSection = sections.stream()
+        final Map<Long, Section> sectionByUpStationId = sections.stream()
                 .collect(Collectors.toMap(Section::getUpStationId, Function.identity()));
 
-        return Stream.iterate(upStationToSection.get(firstStationId),
+        return Stream.iterate(sectionByUpStationId.get(firstStationId),
                         Objects::nonNull,
-                        section -> upStationToSection.get(section.getDownStationId()))
+                        section -> sectionByUpStationId.get(section.getDownStationId()))
                 .collect(Collectors.toList());
     }
 
@@ -84,12 +93,12 @@ public class ConnectedSections {
 
     private SectionEditResult addOnLastSection(final Section target) {
         connectedSections.add(target);
-        return new SectionEditResult(Set.of(target), Collections.emptySet());
+        return new SectionEditResult(List.of(target), Collections.emptyList());
     }
 
     private SectionEditResult addOnFirstSection(final Section target) {
         connectedSections.add(0, target);
-        return new SectionEditResult(Set.of(target), Collections.emptySet());
+        return new SectionEditResult(List.of(target), Collections.emptyList());
     }
 
     private SectionEditResult addOnBetween(final Section target) {
@@ -110,14 +119,52 @@ public class ConnectedSections {
 
     private OptionalInt findUpStationAddIndex(final Section target) {
         return IntStream.range(0, connectedSections.size())
-                .filter(i -> getSection(i).isSameUpStationId(target))
+                .filter(i -> getSection(i).isSameUpStation(target))
                 .findAny();
     }
 
     private OptionalInt findDownStationAddIndex(final Section target) {
         return IntStream.range(0, connectedSections.size())
-                .filter(i -> getSection(i).isSameDownStationId(target))
+                .filter(i -> getSection(i).isSameDownStation(target))
                 .findAny();
+    }
+
+    private SectionEditResult removeBetween(final Long targetStationId) {
+        final Section upSection = removeWithMapper(index -> getSection(index).isSameDownStationId(targetStationId));
+        final Section downSection = removeWithMapper(index -> getSection(index).isSameUpStationId(targetStationId));
+
+        final Section mergedSection = upSection.merge(downSection);
+
+        return new SectionEditResult(
+                List.of(mergedSection),
+                List.of(upSection, downSection)
+        );
+    }
+
+    private Section removeWithMapper(final IntPredicate mapper) {
+        return IntStream.range(0, connectedSections.size())
+                .filter(mapper)
+                .mapToObj(connectedSections::remove)
+                .findAny()
+                .orElseThrow(() ->
+                        new SubwayIllegalArgumentException("삭제할 역의 구간을 찾지 못하였습니다.")
+                );
+    }
+
+    private Section removeFirstSection() {
+        return connectedSections.remove(0);
+    }
+
+    private Section removeLastSection() {
+        return connectedSections.remove(connectedSections.size() - 1);
+    }
+
+    private boolean isRemovableFirstSection(final Long targetStationId) {
+        return getFirstSection().getUpStationId().equals(targetStationId);
+    }
+
+    private boolean isRemovableLastSection(final Long targetStationId) {
+        return getLastSection().getDownStationId().equals(targetStationId);
     }
 
     /**
@@ -133,8 +180,8 @@ public class ConnectedSections {
         connectedSections.add(index, target);
 
         return new SectionEditResult(
-                Set.of(subtracted, target),
-                Set.of(removed)
+                List.of(target, subtracted),
+                List.of(removed)
         );
     }
 
@@ -151,8 +198,8 @@ public class ConnectedSections {
         connectedSections.add(index, subtracted);
 
         return new SectionEditResult(
-                Set.of(target, subtracted),
-                Set.of(removed)
+                List.of(subtracted, target),
+                List.of(removed)
         );
     }
 
@@ -203,8 +250,8 @@ public class ConnectedSections {
         if (connectedSections.size() == 1) {
             throw new SubwayIllegalArgumentException("해당 노선에 구간이 하나여서 제거할 수 없습니다.");
         }
-        if (getLastSection().doesNotContainsDownStation(targetStationId)) {
-            throw new SubwayIllegalArgumentException("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다.");
+        if (!getStationIds().contains(targetStationId)) {
+            throw new SubwayIllegalArgumentException("삭제하려는 역이 전체 구간에 존재하지 않습니다. 삭제하려는 역: " + targetStationId);
         }
     }
 

@@ -7,7 +7,6 @@ import subway.exception.SubwayIllegalArgumentException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -120,8 +119,8 @@ class ConnectedSectionsTest {
         SectionEditResult sectionEditResult = connectedSections.add(target);
 
         /* then */
-        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Set.of(target));
-        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(Collections.emptySet());
+        assertThat(sectionEditResult.getAddedSections()).isEqualTo(List.of(target));
+        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(Collections.emptyList());
         assertIterableEquals(
                 List.of(
                         new Section(14L, 1L, 10L, 11L, 777L),
@@ -143,8 +142,8 @@ class ConnectedSectionsTest {
         SectionEditResult sectionEditResult = connectedSections.add(target);
 
         /* then */
-        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Set.of(target));
-        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(Collections.emptySet());
+        assertThat(sectionEditResult.getAddedSections()).isEqualTo(List.of(target));
+        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(Collections.emptyList());
         assertIterableEquals(
                 List.of(
                         section1,
@@ -178,13 +177,13 @@ class ConnectedSectionsTest {
 
         /* then */
         assertThat(sectionEditResult.getAddedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         target,
                         new Section(null, 1L, 17L, 12L, 700L)
                 )
         );
         assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         new Section(11L, 1L, 11L, 12L, 777L)
                 )
         );
@@ -210,13 +209,13 @@ class ConnectedSectionsTest {
 
         /* then */
         assertThat(sectionEditResult.getAddedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         new Section(null, 1L, 11L, 17L, 700L),
                         target
                 )
         );
         assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         new Section(11L, 1L, 11L, 12L, 777L)
                 )
         );
@@ -232,33 +231,62 @@ class ConnectedSectionsTest {
     }
 
     @Test
-    @DisplayName("구간을 삭제할 수 있다.")
-    void remove() {
+    @DisplayName("상행 종점역이 포함된 구간을 삭제할 수 있다.")
+    void removeFirstStationSection() {
+        /* given */
+        final Long stationId = 11L;
+
+        /* when */
+        final SectionEditResult sectionEditResult = connectedSections.remove(stationId);
+
+        /* then */
+        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Collections.emptyList());
+        assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
+                List.of(
+                        new Section(11L, 1L, 11L, 12L, 777L)
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("하행 종점역이 포함된 구간을 삭제할 수 있다.")
+    void removeLastStationSection() {
         /* given */
         final Long stationId = 14L;
 
         /* when */
-        SectionEditResult sectionEditResult = connectedSections.remove(stationId);
+        final SectionEditResult sectionEditResult = connectedSections.remove(stationId);
 
         /* then */
-        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Collections.emptySet());
+        assertThat(sectionEditResult.getAddedSections()).isEqualTo(Collections.emptyList());
         assertThat(sectionEditResult.getRemovedSections()).isEqualTo(
-                Set.of(
+                List.of(
                         new Section(13L, 1L, 13L, 14L, 777L)
                 )
         );
     }
 
     @Test
-    @DisplayName("삭제할 역이 하행 종점역이 아닌 경우 삭제 시 SubwayIllegalException을 던진다.")
-    void removeFailWithNotLastStation() {
+    @DisplayName("서로 다른 역 사이에 있는 중간역을 포함하는 구간을 삭제할 수 있다.")
+    void removeBetweenStationSection() {
         /* given */
-        final Long stationId = 12L;
+        final Long stationId = 13L;
 
+        /* when */
+        final SectionEditResult editResult = connectedSections.remove(stationId);
 
-        /* when & then */
-        assertThatThrownBy(() -> connectedSections.remove(stationId)).isInstanceOf(SubwayIllegalArgumentException.class)
-                .hasMessage("해당 노선에 일치하는 하행 종점역이 존재하지 않습니다.");
+        /* then */
+        assertThat(editResult.getAddedSections()).isEqualTo(
+                List.of(
+                        new Section(1L, 12L, 14L, 777L * 2)
+                )
+        );
+        assertThat(editResult.getRemovedSections()).isEqualTo(
+                List.of(
+                        new Section(12L, 1L, 12L, 13L, 777L),
+                        new Section(13L, 1L, 13L, 14L, 777L)
+                )
+        );
     }
 
     @Test
@@ -270,5 +298,16 @@ class ConnectedSectionsTest {
         /* when & then */
         assertThatThrownBy(() -> sections.remove(11L)).isInstanceOf(SubwayIllegalArgumentException.class)
                 .hasMessage("해당 노선에 구간이 하나여서 제거할 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("삭제하려는 역이 전체 구간에 존재하지 않는 역인 경우 삭제 시 SubwayIllegalException을 던진다.")
+    void removeFailWithDoesNotExistStationInConnectedSections() {
+        /* given */
+        final Long stationId = 999L;
+
+        /* when & then */
+        assertThatThrownBy(() -> connectedSections.remove(stationId)).isInstanceOf(SubwayIllegalArgumentException.class)
+                .hasMessage("삭제하려는 역이 전체 구간에 존재하지 않습니다. 삭제하려는 역: 999");
     }
 }
