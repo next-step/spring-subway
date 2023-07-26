@@ -1,5 +1,7 @@
 package subway.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import subway.domain.Line;
 import subway.domain.Station;
 
@@ -8,16 +10,18 @@ import java.util.stream.Collectors;
 
 public class LineResponse {
 
-    private Long id;
-    private String name;
-    private String color;
-    private List<StationResponse> stations;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<StationResponse> stations;
 
-    private LineResponse() {
-        /* no-op */
-    }
-
-    public LineResponse(final Long id, final String name, final String color, final List<StationResponse> stations) {
+    @JsonCreator
+    public LineResponse(
+            @JsonProperty("id") final Long id,
+            @JsonProperty("name") final String name,
+            @JsonProperty("color") final String color,
+            @JsonProperty("stations") final List<StationResponse> stations
+    ) {
         this.id = id;
         this.name = name;
         this.color = color;

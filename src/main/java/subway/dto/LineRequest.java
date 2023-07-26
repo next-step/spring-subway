@@ -1,16 +1,24 @@
 package subway.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class LineRequest {
-    private String name;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
-    private String color;
+    
+    private final String name;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final int distance;
+    private final String color;
 
-    public LineRequest() {
-    }
-
-    public LineRequest(final String name, final Long upStationId, final Long downStationId, final int distance, final String color) {
+    @JsonCreator
+    public LineRequest(
+            @JsonProperty("name") final String name,
+            @JsonProperty("upStationId") final Long upStationId,
+            @JsonProperty("downStationId") final Long downStationId,
+            @JsonProperty("distance") final int distance,
+            @JsonProperty("color") final String color
+    ) {
         this.name = name;
         this.upStationId = upStationId;
         this.downStationId = downStationId;

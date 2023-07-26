@@ -1,20 +1,24 @@
 package subway.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import subway.domain.Distance;
 import subway.domain.Section;
 
 public class SectionResponse {
 
-    private Long id;
-    private Long upStationId;
-    private Long downStationId;
-    private int distance;
+    private final Long id;
+    private final Long upStationId;
+    private final Long downStationId;
+    private final int distance;
 
-    private SectionResponse() {
-        /* no-op */
-    }
-
-    SectionResponse(final Long id, final Long upStationId, final Long downStationId, final Distance distance) {
+    @JsonCreator
+    public SectionResponse(
+            @JsonProperty("id") final Long id,
+            @JsonProperty("upStationId") final Long upStationId,
+            @JsonProperty("downStationId") final Long downStationId,
+            @JsonProperty("distance") final Distance distance
+    ) {
         this.id = id;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
