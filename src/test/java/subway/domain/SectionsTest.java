@@ -1,20 +1,25 @@
 package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 class SectionsTest {
 
-    final static Long LINE_ID = 1L;
-    final static Sections SECTIONS = new Sections(List.of(
-            new Section(1L, LINE_ID, 1L, 2L, 1L),
+    private final static Long LINE_ID = 1L;
+    private final static Section FIRST_SECTION = new Section(1L, LINE_ID, 1L, 2L, 1L);
+    private final static Section LAST_SECTION = new Section(4L, LINE_ID, 4L, 5L, 4L);
+    private final static Sections SECTIONS = new Sections(List.of(
+            FIRST_SECTION,
             new Section(2L, LINE_ID, 2L, 3L, 2L),
             new Section(3L, LINE_ID, 3L, 4L, 3L),
-            new Section(4L, LINE_ID, 4L, 5L, 4L)
+            LAST_SECTION
     ));
 
     @Test
@@ -22,13 +27,22 @@ class SectionsTest {
     void create() {
         /* given */
         final List<Section> sections = List.of(
-                new Section(1L, 1L, 2L, 1L),
-                new Section(2L, 2L, 3L, 2L),
-                new Section(3L, 3L, 4L, 3L)
+                new Section(LINE_ID, 1L, 2L, 1L),
+                new Section(LINE_ID, 2L, 3L, 2L),
+                new Section(LINE_ID, 3L, 4L, 3L)
         );
 
         /* when & then */
         assertDoesNotThrow(() -> new Sections(sections));
+    }
+
+    @Test
+    @DisplayName("Sections를 빈 리스트로 생성하려는 경우 SubwayException을 던진다.")
+    void createWithEmptySectionsThrowException() {
+        List<Section> sections = Collections.emptyList();
+
+        assertThatThrownBy(() -> new Sections(sections))
+                .isInstanceOf(SubwayException.class);
     }
 
     @Test
@@ -43,15 +57,27 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("Sections에 마지막 하행 종점을 찾을 수 있다.")
-    void findLastPrevSection() {
+    @DisplayName("Sections에 가장 처음의 구간을 찾을 수 있다.")
+    void getFirstSection() {
+        /* given */
+
+        /* when */
+        final Section firstSection = SECTIONS.getFirstSection();
+
+        /* then */
+        assertThat(firstSection).isEqualTo(FIRST_SECTION);
+    }
+
+    @Test
+    @DisplayName("Sections에 가장 마지막 구간을 찾을 수 있다.")
+    void getLastSection() {
         /* given */
 
         /* when */
         final Section lastSection = SECTIONS.getLastSection();
 
         /* then */
-        assertThat(lastSection).isEqualTo(new Section(4L, 1L, 4L, 5L, 4L));
+        assertThat(lastSection).isEqualTo(LAST_SECTION);
     }
 
     @Test
@@ -69,15 +95,44 @@ class SectionsTest {
     @Test
     @DisplayName("현재 구간들 중 상행 종점역인지 확인한다.")
     void isFirstStation() {
-        assertThat(SECTIONS.isFirstStation(1L)).isTrue();
+        assertThat(SECTIONS.isFirstStation(FIRST_SECTION.getUpStationId())).isTrue();
         assertThat(SECTIONS.isFirstStation(5L)).isFalse();
     }
 
     @Test
     @DisplayName("현재 구간들 중 하행 종점역인지 확인한다.")
     void isLastStation() {
-        assertThat(SECTIONS.isLastStation(5L)).isTrue();
+        assertThat(SECTIONS.isLastStation(LAST_SECTION.getDownStationId())).isTrue();
         assertThat(SECTIONS.isLastStation(1L)).isFalse();
     }
 
+    @Test
+    @DisplayName("하행 역이 같은 구간을 반환한다.")
+    void getBetweenSectionToNext() {
+        assertThat(SECTIONS.getBetweenSectionToNext(2L)).isEqualTo(FIRST_SECTION);
+    }
+
+    @Test
+    @DisplayName("하행 역이 같은 구간이 없는 경우 SubwayException을 던진다.")
+    void getBetweenSectionToNextWithException() {
+        final Long isNotValidSectionId = 1234L;
+
+        assertThatThrownBy(() -> SECTIONS.getBetweenSectionToNext(isNotValidSectionId))
+                .isInstanceOf(SubwayException.class);
+    }
+
+    @Test
+    @DisplayName("상행 역이 같은 구간을 반환한다.")
+    void getBetweenSectionToPrev() {
+        assertThat(SECTIONS.getBetweenSectionToPrev(4L)).isEqualTo(LAST_SECTION);
+    }
+
+    @Test
+    @DisplayName("상행 역이 같은 구간이 없는 경우 SubwayException을 던진다.")
+    void getBetweenSectionToPrevWithException() {
+        final Long isNotValidSectionId = 1234L;
+
+        assertThatThrownBy(() -> SECTIONS.getBetweenSectionToPrev(isNotValidSectionId))
+                .isInstanceOf(SubwayException.class);
+    }
 }

@@ -33,9 +33,7 @@ public class SectionService {
     private Section insertBetween(final Sections sections, final SectionRequest sectionRequest) {
         final Long upStationId = sectionRequest.getUpStationId();
         final Long downStationId = sectionRequest.getDownStationId();
-        final Section targetSection = sections.findContainStationSection(upStationId, downStationId)
-                .orElseThrow(() -> new SubwayException(
-                        "상행 역과 하행 역이 모두 노선에 없습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId));
+        final Section targetSection = sections.getContainStationSection(upStationId, downStationId);
 
         validateDistance(targetSection.subtractDistance(sectionRequest.getDistance()));
         final Section requestSection = sectionRequest.toSection(targetSection.getLineId());
@@ -48,17 +46,29 @@ public class SectionService {
         return result;
     }
 
-    public void deleteSection(final Long lineId, final Long downStationId) {
+    public void deleteSection(final Long lineId, final Long stationId) {
         final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         validateSectionsSizeIsNotOne(sections);
+        validateSectionsHasNotStation(sections, stationId);
 
-        final Section lastSection = sections.getLastSection();
-        if (!lastSection.isSameDownStationId(downStationId)) {
-            throw new SubwayException(
-                    "해당 노선에 일치하는 하행 종점역이 존재하지 않습니다. 노선 ID : " + lineId + " 하행 종점역 ID : " + downStationId);
+        if (sections.isFirstStation(stationId)) {
+            sectionDao.delete(sections.getFirstSection().getId());
+            return;
+        } else if (sections.isLastStation(stationId)) {
+            sectionDao.delete(sections.getLastSection().getId());
+            return;
         }
 
-        sectionDao.delete(lastSection.getId());
+        deleteBetween(sections, stationId);
+    }
+
+    private void deleteBetween(final Sections sections, final Long stationId) {
+        final Section nextBetweenSection = sections.getBetweenSectionToNext(stationId);
+        final Section prevBetweenSection = sections.getBetweenSectionToPrev(stationId);
+
+        sectionDao.delete(nextBetweenSection.getId());
+        sectionDao.delete(prevBetweenSection.getId());
+        sectionDao.insert(nextBetweenSection.merge(prevBetweenSection));
     }
 
     private void validateDistance(final Long distance) {
@@ -79,6 +89,12 @@ public class SectionService {
         if (sections.containsBoth(upStationId, downStationId)) {
             throw new SubwayException(
                     "상행 역과 하행 역이 이미 노선에 모두 등록되어 있습니다. 상행 역 ID : " + upStationId + " 하행 역 ID : " + downStationId);
+        }
+    }
+
+    private void validateSectionsHasNotStation(final Sections sections, final Long stationId) {
+        if (!sections.containsStation(stationId)) {
+            throw new SubwayException("해당 구간에는 해당 역이 존재하지 않아서 제거할 수 없습니다. 역 ID : " + stationId);
         }
     }
 }

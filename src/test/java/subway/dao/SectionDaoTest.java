@@ -13,7 +13,7 @@ import subway.domain.Section;
 @Transactional
 class SectionDaoTest {
 
-    private static final long NEW_SECTION_ID = 6L;
+    private static final long NEW_SECTION_ID = 8L;
     private static final long LINE_ID = 1L;
     private static final long UP_STATION_ID = 12L;
     private static final long DOWN_STATION_ID = 13L;
