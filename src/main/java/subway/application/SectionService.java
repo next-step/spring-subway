@@ -2,16 +2,16 @@ package subway.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.application.dto.SectionParam;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.application.dto.SectionParam;
-import subway.ui.dto.SectionRequest;
-import subway.ui.dto.SectionResponse;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
+import subway.ui.dto.SectionRequest;
+import subway.ui.dto.SectionResponse;
 
 @Service
 public class SectionService {
@@ -27,22 +27,18 @@ public class SectionService {
     @Transactional
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
 
-        final Station upStation = stationDao.findById(sectionRequest.getUpStationId())
-            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
-        final Station downStation = stationDao.findById(sectionRequest.getDownStationId())
-            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
+        final Station upStation = getStationById(sectionRequest.getUpStationId());
+        final Station downStation = getStationById(sectionRequest.getDownStationId());
 
         final Sections sections = new Sections(sectionDao.findAll(lineId));
-        final SectionParam params = new SectionParam(lineId, sectionRequest.getUpStationId(),
-            sectionRequest.getDownStationId(),
+        final SectionParam params = new SectionParam(lineId, upStation, downStation,
             sectionRequest.getDistance());
 
         if (sections.isOverlapped(params)) {
             updateOverlappedSection(params, sections);
         }
 
-        final Section newSection =  new Section(sections.getLine(), upStation, downStation,
-            sectionRequest.getDistance());
+        final Section newSection = params.to(sections.getLine());
         return SectionResponse.of(sectionDao.insert(newSection));
     }
 
@@ -77,6 +73,11 @@ public class SectionService {
     private void deleteLastSection(long stationId, Sections sections) {
         final Section connectedSection = sections.getLastSection(stationId);
         sectionDao.delete(connectedSection.getId());
+    }
+
+    private Station getStationById(final long stationId) {
+        return stationDao.findById(stationId)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
     }
 
     private void validateLineInStation(final long lineId, final long stationId) {

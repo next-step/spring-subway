@@ -35,17 +35,10 @@ public class LineService {
         validateDuplicateName(request.getName());
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
-        Station upStation = stationDao.findById(request.getUpStationId())
-                .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역입니다."));
-        Station downStation = stationDao.findById(request.getDownStationId())
-            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역입니다."));
+        Station upStation = getStationById(request.getUpStationId());
+        Station downStation = getStationById(request.getDownStationId());
 
-        sectionDao.insert(new Section(
-                persistLine,
-                upStation,
-                downStation,
-                request.getDistance())
-        );
+        sectionDao.insert(new Section(persistLine, upStation, downStation, request.getDistance()));
 
         return LineResponse.of(persistLine);
     }
@@ -63,11 +56,20 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         final Line persistLine = findLineById(id);
-        final List<StationPair> stationPairs = sectionDao.findAll(id).stream()
-            .map(section -> new StationPair(section.getUpStation(), section.getDownStation()))
-            .collect(Collectors.toList());
+        final List<StationPair> stationPairs = getStationPairs(id);
         final Stations stations = new Stations(stationPairs);
         return LineResponse.of(persistLine, stations.getStations());
+    }
+
+    private Station getStationById(long stationId) {
+        return stationDao.findById(stationId)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역입니다."));
+    }
+
+    private List<StationPair> getStationPairs(Long id) {
+        return sectionDao.findAll(id).stream()
+            .map(StationPair::of)
+            .collect(Collectors.toList());
     }
 
     public Line findLineById(Long id) {

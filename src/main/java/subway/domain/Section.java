@@ -28,14 +28,14 @@ public class Section {
         this(null, line, upStation, downStation, distance);
     }
 
-    public Section narrowToUpDirection(final Station newDown, final int narrowAmount) {
+    public Section narrowToUpDirection(final Station narrowdDownStation, final int narrowAmount) {
         int narrowedDistance = distance - narrowAmount;
-        return new Section(id, line, upStation, newDown, narrowedDistance);
+        return new Section(id, line, upStation, narrowdDownStation, narrowedDistance);
     }
 
-    public Section narrowToDownDirection(final Station newUp, final int narrowAmount) {
+    public Section narrowToDownDirection(final Station narrowedUpStation, final int narrowAmount) {
         int narrowedDistance = distance - narrowAmount;
-        return new Section(id, line, newUp, downStation, narrowedDistance);
+        return new Section(id, line, narrowedUpStation, downStation, narrowedDistance);
     }
 
     public Section extendToUpDirection(final Section upDirection) {

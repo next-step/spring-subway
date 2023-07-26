@@ -23,21 +23,16 @@ public class Sections {
     }
 
     public Section updateOverlappedSection(final SectionParam params) {
-        // 새로 추가할 구간 정보
-        validateSection(params);
+        validateOnlyOneStationExistInLine(params);
 
-        if (upStationMap.containsKey(params.getUpStationId())) {
-            // 새로 추가하는 구간의 상행역이 이미 존재함
-            Section overlappedSection = upStationMap.get(params.getUpStationId());
-            // 중복 상행 - (새로운 하행) - 기존 하행
-            // overlappedSection 의 상행역을 params 의 하행역으로 narrow (downDirection)
+        if (upStationMap.containsKey(params.getUpStation().getId())) {
+            Section overlappedSection = upStationMap.get(params.getUpStation().getId());
             return updateOverlappedDownDirectionSection(overlappedSection, params);
 
         }
 
-        // 새로 추가하는 구간의 하행역이 이미 존재함
-        if (downStationMap.containsKey(params.getDownStationId())) {
-            Section overlappedSection = downStationMap.get(params.getDownStationId());
+        if (downStationMap.containsKey(params.getDownStation().getId())) {
+            Section overlappedSection = downStationMap.get(params.getDownStation().getId());
             return updateOverlappedUpDirectionSection(overlappedSection, params);
         }
 
@@ -49,19 +44,14 @@ public class Sections {
     }
 
     public boolean isOverlapped(final SectionParam params) {
-        // 두 역중 하나만 존재하고 있음을 검증 완료.
-        validateSection(params);
-        // params 의 up 이 기존에 존재할 경우, 하행종점역이면 안됨
-        if (isStationExist(params.getUpStationId()) && isEndStation(params.getUpStationId())) {
-            return false;
-        }
-
-        // params 의 down 이 기존에 존재할 경우, 상행종점역이면 안됨
-        if (isStationExist(params.getDownStationId()) && isStartStation(params.getDownStationId())) {
-            return false;
-        }
-
-        return true;
+        validateOnlyOneStationExistInLine(params);
+        boolean isUpStationNotOverlapped =
+            isStationExist(params.getUpStation().getId()) && isEndStation(
+                params.getUpStation().getId());
+        boolean isDownStationNotOverlapped =
+            isStationExist(params.getDownStation().getId()) && isEndStation(
+                params.getDownStation().getId());
+        return !isUpStationNotOverlapped && !isDownStationNotOverlapped;
     }
 
     public Section findUpDirectionSection(long stationId) {
@@ -100,24 +90,20 @@ public class Sections {
         return !upStationMap.containsKey(stationId) && downStationMap.containsKey(stationId);
     }
 
-    // 중복 상행 - (새로운 하행) - 기존 하행
-    // overlappedSection 의 상행역을 params 의 하행역으로 narrow (downDirection)
     private Section updateOverlappedDownDirectionSection(Section overlapped, SectionParam params) {
-        final Station newUpStation = new Station();
         validateDistance(overlapped, params.getDistance());
-        return overlapped.narrowToDownDirection(newUpStation, params.getDistance());
+        return overlapped.narrowToDownDirection(overlapped.getUpStation(), params.getDistance());
     }
 
 
     private Section updateOverlappedUpDirectionSection(Section overlapped, SectionParam params) {
-        final Station newDownStation = new Station();
         validateDistance(overlapped, params.getDistance());
-        return overlapped.narrowToUpDirection(newDownStation, params.getDistance());
+        return overlapped.narrowToUpDirection(overlapped.getDownStation(), params.getDistance());
     }
 
-    private void validateSection(final SectionParam params) {
-        boolean upStationExist = isStationExist(params.getUpStationId());
-        boolean downStationExist = isStationExist(params.getDownStationId());
+    private void validateOnlyOneStationExistInLine(final SectionParam params) {
+        boolean upStationExist = isStationExist(params.getUpStation().getId());
+        boolean downStationExist = isStationExist(params.getDownStation().getId());
         if (upStationExist == downStationExist) {
             throw new IllegalSectionException("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
         }
