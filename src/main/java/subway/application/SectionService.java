@@ -27,8 +27,8 @@ public class SectionService {
     public void saveSection(final Long lineId, final SectionRequest request) {
         // TODO
         Line line = lineDao.findById(lineId).orElseThrow();
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+        Station upStation = stationDao.findById(request.getUpStationId()).orElseThrow();
+        Station downStation = stationDao.findById(request.getDownStationId()).orElseThrow();
         Section section = new Section(upStation, downStation, request.getDistance());
 
         Line newLine = line.addSection(section);
@@ -42,7 +42,7 @@ public class SectionService {
     public void deleteStation(final Long lineId, final Long stationId) {
         // TODO
         Line line = lineDao.findById(lineId).orElseThrow();
-        Station station = stationDao.findById(stationId);
+        Station station = stationDao.findById(stationId).orElseThrow();
 
         Line newLine = line.removeStation(station);
         SectionsChange changes = SectionsChange.of(line, newLine);

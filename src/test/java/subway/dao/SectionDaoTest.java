@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SectionDaoTest extends DaoTest {
     @Test
-    @DisplayName("id로 Section을 조회하면 Station들을 함께 조회한다.")
+    @DisplayName("Section id로 Section을 조회하면 Station들을 함께 조회한다.")
     void findSectionById() {
         // when
         Section section = sectionDao.findById(1L).get();
@@ -24,7 +24,7 @@ class SectionDaoTest extends DaoTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 id로 Section을 조회하면 empty Optional을 반환한다.")
+    @DisplayName("존재하지 않는 Section id로 Section을 조회하면 empty Optional을 반환한다.")
     void findSectionByNonExistId() {
         // when
         Optional<Section> byId = sectionDao.findById(3L);

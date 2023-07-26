@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 public class DaoTest {
     protected LineDao lineDao;
     protected SectionDao sectionDao;
+    protected StationDao stationDao;
 
     @BeforeEach
     void setUp() {
@@ -22,5 +23,6 @@ public class DaoTest {
 
         lineDao = new LineDao(new JdbcTemplate(dataSource), dataSource);
         sectionDao = new SectionDao(new JdbcTemplate(dataSource), dataSource);
+        stationDao = new StationDao(new JdbcTemplate(dataSource), dataSource);
     }
 }

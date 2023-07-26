@@ -29,8 +29,9 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(final LineRequest request) {
         Line line = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+        //TODO
+        Station upStation = stationDao.findById(request.getUpStationId()).orElseThrow();
+        Station downStation = stationDao.findById(request.getDownStationId()).orElseThrow();
 
         sectionDao.insert(new Section(upStation, downStation, request.getDistance()), line.getId());
 

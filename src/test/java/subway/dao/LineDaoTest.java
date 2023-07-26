@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 class LineDaoTest extends DaoTest {
     @Test
-    @DisplayName("id로 Line을 조회하면 Line이 포함하는 Sections, Station들을 함께 Optional을 반환한다.")
+    @DisplayName("Line id로 Line을 조회하면 Line이 포함하는 Sections, Station들을 함께 Optional을 반환한다.")
     void findByIdWithSectionsAndStations() {
         // when
         Line line = lineDao.findById(1L).get();
@@ -29,13 +29,13 @@ class LineDaoTest extends DaoTest {
     }
 
     @Test
-    @DisplayName("id가 존재하지 않는 경우 Empty Optional을 반환한다.")
+    @DisplayName("Line id가 존재하지 않는 경우 Empty Optional을 반환한다.")
     void findByNonExistId() {
         assertThat(lineDao.findById(3L).isEmpty()).isTrue();
     }
 
     @Test
-    @DisplayName("name이 중복되지 않는 Line을 삽입할 수 있다.")
+    @DisplayName("Line name이 중복되지 않는 Line을 삽입할 수 있다.")
     void insertNoDuplicateName() {
         // given
         Line line = new Line("3호선", "orange");
@@ -50,7 +50,7 @@ class LineDaoTest extends DaoTest {
     }
 
     @Test
-    @DisplayName("name이 중복되는 Line은 삽입할 수 없다.")
+    @DisplayName("Line name이 중복되는 Line은 삽입할 수 없다.")
     void insertDuplicateName() {
         // given
         Line line = new Line("2호선", "orange");
@@ -60,7 +60,7 @@ class LineDaoTest extends DaoTest {
     }
 
     @Test
-    @DisplayName("id를 파라미터로 Line을 수정할 수 있다.")
+    @DisplayName("Line id를 파라미터로 Line을 수정할 수 있다.")
     void updateLine() {
         // given
         Line line = new Line(1L, "3호선", "orange");
@@ -76,7 +76,7 @@ class LineDaoTest extends DaoTest {
     }
 
     @Test
-    @DisplayName("이미 존재하는 name으로 Line을 수정할 수 없다.")
+    @DisplayName("이미 존재하는 Line name으로 Line을 수정할 수 없다.")
     void updateDuplicateNameLine() {
         // given
         Line otherLine = new Line("3호선", "orange");
@@ -88,7 +88,7 @@ class LineDaoTest extends DaoTest {
     }
 
     @Test
-    @DisplayName("id를 파라미터로 Line과 연관된 Section들을 삭제할 수 있다.")
+    @DisplayName("Line id를 파라미터로 Line과 연관된 Section들을 삭제할 수 있다.")
     void deleteLine() {
         // when
         lineDao.deleteById(1L);

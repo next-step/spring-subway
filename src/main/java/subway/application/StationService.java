@@ -25,7 +25,8 @@ public class StationService {
     }
 
     public StationResponse findStationResponseById(final Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        //TODO
+        return StationResponse.of(stationDao.findById(id).orElseThrow());
     }
 
     public List<StationResponse> findAllStationResponses() {
