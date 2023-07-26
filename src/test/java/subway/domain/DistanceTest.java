@@ -6,6 +6,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import subway.exception.SubwayIllegalArgumentException;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -41,8 +44,14 @@ class DistanceTest {
         final Distance from = new Distance(777);
         final Distance to = new Distance(777);
 
-        /* when & then */
+        /* when */
+        final Set<Distance> distances = new HashSet<>();
+        distances.add(from);
+        distances.add(to);
+
+        /* then */
         assertThat(from).isEqualTo(to);
+        assertThat(distances).hasSize(1);
     }
 
     @Test

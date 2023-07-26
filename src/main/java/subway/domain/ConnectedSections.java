@@ -244,11 +244,11 @@ public class ConnectedSections {
     }
 
     private boolean isFirstSection(final Section target) {
-        return target.isHead(getFirstSection());
+        return target.isConnectedForward(getFirstSection());
     }
 
     private boolean isLastSection(final Section target) {
-        return getLastSection().isHead(target);
+        return getLastSection().isConnectedForward(target);
     }
 
     private boolean containsAll(final Section target) {

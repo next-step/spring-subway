@@ -47,15 +47,16 @@ public class Section {
     }
 
     public Section merge(final Section target) {
-        if (!isHead(target)) {
-            throw new SubwayException("구간이 연결되어있지 않습니다.");
+        if (isConnectedForward(target)) {
+            return new Section(this.lineId, this.upStationId, target.downStationId, this.distance.add(target.distance));
+        }
+        if (isConnectedBack(target)) {
+            return new Section(this.lineId, target.downStationId, this.upStationId, target.distance.add(this.distance));
         }
 
-        return new Section(
-                this.lineId,
-                this.upStationId,
-                target.downStationId,
-                this.distance.add(target.distance)
+        throw new SubwayException(
+                "구간이 연결되어있지 않습니다. 입력 구간: (" + this.upStationId + ", " + this.downStationId + "), " +
+                        "(" + target.upStationId + ", " + target.downStationId + ")"
         );
     }
 
@@ -79,8 +80,12 @@ public class Section {
         return Objects.equals(this.downStationId, targetId);
     }
 
-    public boolean isHead(final Section target) {
+    public boolean isConnectedForward(final Section target) {
         return Objects.equals(this.downStationId, target.upStationId);
+    }
+
+    public boolean isConnectedBack(final Section target) {
+        return Objects.equals(this.upStationId, target.downStationId);
     }
 
     public Long getId() {
