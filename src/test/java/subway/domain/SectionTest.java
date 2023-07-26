@@ -88,8 +88,8 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("구간이 주어진 길이보다 길다.")
-    void isLongerThan() {
+    @DisplayName("구간이 주어진 길이보다 길지 않다.")
+    void isNotLongerThan() {
         //given
         Line lineA = new Line(1L, "A", "red");
         Station stationA = new Station(1L, "A");
@@ -98,8 +98,8 @@ class SectionTest {
         Section section = new Section(1L, lineA, stationA, stationB, 5);
 
         //when & then
-        assertThat(section.isLongerThan(3)).isTrue();
-        assertThat(section.isLongerThan(6)).isFalse();
+        assertThat(section.isNotLongerThan(5)).isTrue();
+        assertThat(section.isNotLongerThan(3)).isFalse();
     }
 
     @Test

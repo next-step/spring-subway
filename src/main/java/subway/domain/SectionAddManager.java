@@ -15,8 +15,13 @@ public class SectionAddManager {
         validateLineHasOneOf(upStation, downStation);
 
         sections.filter(hasOneOf(upStation, downStation))
-            .filter(isLongerThan(distance))
-            .orElseThrow(() -> new IllegalArgumentException("추가할 구간의 크기가 너무 큽니다."));
+            .ifPresent(section -> validateDistance(section, distance));
+    }
+
+    private void validateDistance(final Section section, final int distance) {
+        if (section.isNotLongerThan(distance)) {
+            throw new IllegalArgumentException("추가할 구간의 크기가 너무 큽니다.");
+        }
     }
 
     public Optional<Section> lookForChange(Section newSection) {
@@ -26,10 +31,6 @@ public class SectionAddManager {
 
     private Predicate<Section> hasOneOf(final Station upStation, final Station downStation) {
         return section -> section.hasUpStation(upStation) || section.hasDownStation(downStation);
-    }
-
-    private Predicate<Section> isLongerThan(final int distance) {
-        return section -> section.isLongerThan(distance);
     }
 
     private void validateLineHasOneOf(final Station upStation, final Station downStation) {

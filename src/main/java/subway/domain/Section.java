@@ -108,8 +108,8 @@ public class Section {
         return downStation.equals(station);
     }
 
-    public boolean isLongerThan(int distance) {
-        return this.distance > distance;
+    public boolean isNotLongerThan(int distance) {
+        return this.distance <= distance;
     }
 
     public Long getId() {
