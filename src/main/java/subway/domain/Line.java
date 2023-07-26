@@ -135,17 +135,6 @@ public class Line {
         }
     }
 
-    public void disconnectDownSection(final Station downStation) {
-        validateLineSize();
-
-        final Section downSection = sections.get(0).findDownSection();
-        validateSameStations(downStation, downSection);
-
-        final Section upSection = downSection.getUpSection();
-        upSection.disconnectDownSection();
-        sections.remove(downSection);
-    }
-
     public Section disconnectSection(final Station station) {
         validateLineSize();
         validateExistStation(station);
@@ -157,15 +146,6 @@ public class Line {
         if (!isStationExists(station)) {
             throw new StationException(
                     MessageFormat.format("line \"{0}\"에 station \"{1}\"이 존재하지 않습니다.", id, station.getId())
-            );
-        }
-    }
-
-    private static void validateSameStations(final Station downStation, final Section downSection) {
-        if (!downSection.getDownStation().equals(downStation)) {
-            throw new StationException(
-                    MessageFormat.format("삭제할 station \"{0}\" 은 하행의 downStation \"{1}\" 과 일치해야 합니다.",
-                            downStation, downSection.getDownStation())
             );
         }
     }
