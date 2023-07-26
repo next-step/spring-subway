@@ -16,6 +16,7 @@ import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
+import subway.exception.IllegalStationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -176,5 +177,26 @@ class SectionServiceTest {
         assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), stationId))
                 .hasMessage("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.")
                 .isInstanceOf(IllegalSectionException.class);
+    }
+
+    @DisplayName("지하철 노선에 삭제할 역이 존재하지 않아 구간 제거 실패")
+    @Test
+    void deleteSectionNotInLine() {
+        // given
+        final long stationId = 4;
+
+        final Line line = new Line(1L, "4호선", "blue");
+        final Station station1 = new Station(1L, "오이도");
+        final Station station2 = new Station(2L, "안산");
+        final Station station3 = new Station(3L, "한대앞");
+        final Section section1 = new Section(line, station1, station2, 10);
+        final Section section2 = new Section(line, station2, station3, 10);
+
+        given(sectionDao.findAll(line.getId())).willReturn(List.of(section1, section2));
+
+        // when & then
+        assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), stationId))
+                .hasMessage("해당 노선에 삭제할 역이 존재하지 않습니다.")
+                .isInstanceOf(IllegalStationException.class);
     }
 }
