@@ -1,7 +1,6 @@
 package subway.dao;
 
 import java.util.List;
-import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -39,18 +38,35 @@ public class SectionDao {
             section.getDownStationId(), section.getDistance());
     }
 
-    public Optional<Section> findLastSection(final Long lineId) {
-        String sql = "SELECT * FROM section S1 " +
-            "WHERE S1.line_id = ? " +
-            "AND NOT EXISTS(SELECT * FROM section S2 WHERE S1.down_station_id = S2.up_station_id)";
-        return jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId)
-            .stream()
-            .findAny();
+    public List<Section> findAll(final long lineId) {
+        final String sql = "SELECT s.id AS id, s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, s.distance AS distance, "
+            + "l.id AS line_id, l.name AS line_name, l.color AS line_color "
+            + "FROM section AS s "
+            + "JOIN line AS l "
+            + "ON s.line_id = l.id "
+            + "WHERE l.id = ?";
+        return jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId);
     }
 
-    public List<Section> findAll(final long lineId) {
-        final String sql = "SELECT * FROM section WHERE line_id = ?";
-        return jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId);
+    public boolean existByLineIdAndStationId(final long lineId, final long stationId) {
+        final String sql = "SELECT s.id AS id, s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, s.distance AS distance, "
+            + "l.id AS line_id, l.name AS line_name, l.color AS line_color "
+            + "FROM section AS s "
+            + "JOIN line AS l "
+            + "ON s.line_id = l.id "
+            + "WHERE l.id = ? AND (s.up_station_id = ? OR s.down_station_id = ?)";
+        return !jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId, stationId, stationId).isEmpty();
+    }
+
+    public long count(final long lineId) {
+        final String sql = "SELECT s.id AS id, s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, s.distance AS distance, "
+            + "l.id AS line_id, l.name AS line_name, l.color AS line_color "
+            + "FROM section AS s "
+            + "JOIN line AS l "
+            + "ON s.line_id = l.id "
+            + "WHERE l.id = ?";
+        return jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId)
+            .size();
     }
 
     public void update(final Section newSection) {
@@ -64,24 +80,9 @@ public class SectionDao {
         );
     }
 
-    public void deleteLastSection(final long lineId, final long stationId) {
-        final String sql = "DELETE FROM section WHERE line_id = ? AND down_station_id = ?";
-        jdbcTemplate.update(sql, lineId, stationId);
-    }
-
     public void delete(final long id) {
         final String sql = "DELETE FROM section WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
 
-    public long count(final long lineId) {
-        final String sql = "SELECT * FROM section WHERE line_id = ?";
-        return jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId)
-            .size();
-    }
-
-    public boolean existByLineIdAndStationId(final long lineId, final long stationId) {
-        final String sql = "SELECT * FROM section WHERE line_id = ? AND (up_station_id = ? OR down_station_id = ?)";
-        return !jdbcTemplate.query(sql, sectionMapper.getRowMapper(), lineId, stationId, stationId).isEmpty();
-    }
 }

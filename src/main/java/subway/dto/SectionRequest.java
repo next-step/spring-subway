@@ -1,6 +1,7 @@
 package subway.dto;
 
 import org.springframework.util.Assert;
+import subway.domain.Line;
 import subway.domain.Section;
 
 public class SectionRequest {
@@ -22,8 +23,8 @@ public class SectionRequest {
         this.distance = distance;
     }
 
-    public Section to(final long lineId) {
-        return new Section(lineId, upStationId, downStationId, distance);
+    public Section to(final Line line) {
+        return new Section(line, upStationId, downStationId, distance);
     }
 
     public long getUpStationId() {

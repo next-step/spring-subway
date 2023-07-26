@@ -44,7 +44,7 @@ class LineServiceTest {
     void saveLineTest() {
         // given
         Line line = createInitialLine();
-        Section section = new Section(1L, line.getId(), 1L, 2L, 10);
+        Section section = new Section(1L, line, 1L, 2L, 10);
         LineRequest lineRequest = convertToLineRequest(line, section);
 
         given(lineDao.findByName(line.getName())).willReturn(Optional.empty());
@@ -63,7 +63,7 @@ class LineServiceTest {
     @DisplayName("동일한 이름으로 노선을 저장하면 예외를 던진다.")
     void saveLineDuplicateNameExceptionTest() {
         Line line = createInitialLine();
-        Section section = new Section(1L, line.getId(), 1L, 2L, 10);
+        Section section = new Section(1L, line, 1L, 2L, 10);
         LineRequest lineRequest = convertToLineRequest(line, section);
 
         given(lineDao.findByName(line.getName())).willReturn(Optional.of(line));

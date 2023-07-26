@@ -33,7 +33,7 @@ public class LineService {
         );
 
         sectionDao.insert(new Section(
-                persistLine.getId(),
+                persistLine,
                 request.getUpStationId(),
                 request.getDownStationId(),
                 request.getDistance())

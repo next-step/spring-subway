@@ -6,41 +6,41 @@ import subway.exception.IllegalSectionException;
 public class Section {
 
     private final Long id;
-    private final Long lineId;
+    private final Line line;
     private final Long upStationId;
     private final Long downStationId;
     private final Integer distance;
 
-    public Section(final Long id, final Long lineId, final Long upStationId,
+    public Section(final Long id, final Line line, final Long upStationId,
         final Long downStationId, final Integer distance) {
         validateStations(upStationId, downStationId);
         validateDistance(distance);
 
         this.id = id;
-        this.lineId = lineId;
+        this.line = line;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
     }
 
-    public Section(final Long lineId, final Long upStationId, final Long downStationId,
+    public Section(final Line line, final Long upStationId, final Long downStationId,
         final Integer distance) {
-        this(null, lineId, upStationId, downStationId, distance);
+        this(null, line, upStationId, downStationId, distance);
     }
 
     public Section narrowToDownDirection(final Section downDirection) {
         int narrowedDistance = distance - downDirection.distance;
-        return new Section(id, lineId, upStationId, downDirection.getUpStationId(), narrowedDistance);
+        return new Section(id, line, upStationId, downDirection.getUpStationId(), narrowedDistance);
     }
 
     public Section narrowToUpDirection(final Section upDirection) {
         int narrowedDistance = distance - upDirection.distance;
-        return new Section(id, lineId, upDirection.getDownStationId(), downStationId, narrowedDistance);
+        return new Section(id, line, upDirection.getDownStationId(), downStationId, narrowedDistance);
     }
 
     public Section extendToUpDirection(final Section upDirection) {
         int extendedDistance = upDirection.distance + distance;
-        return new Section(id, lineId, upDirection.getUpStationId(), downStationId, extendedDistance);
+        return new Section(id, line, upDirection.getUpStationId(), downStationId, extendedDistance);
     }
 
     public boolean isDistanceLessThanOrEqualTo(final Section other) {
@@ -63,8 +63,8 @@ public class Section {
         return id;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
     }
 
     public Long getUpStationId() {
@@ -88,22 +88,22 @@ public class Section {
             return false;
         }
         Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(lineId,
-            section.lineId) && Objects.equals(upStationId, section.upStationId)
+        return Objects.equals(id, section.id) && Objects.equals(line,
+            section.line) && Objects.equals(upStationId, section.upStationId)
             && Objects.equals(downStationId, section.downStationId)
             && Objects.equals(distance, section.distance);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, lineId, upStationId, downStationId, distance);
+        return Objects.hash(id, line, upStationId, downStationId, distance);
     }
 
     @Override
     public String toString() {
         return "Section{" +
             "id=" + id +
-            ", lineId=" + lineId +
+            ", lineId=" + line +
             ", upStationId=" + upStationId +
             ", downStationId=" + downStationId +
             ", distance=" + distance +

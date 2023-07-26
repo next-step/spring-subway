@@ -64,6 +64,14 @@ public class Sections {
         throw new IllegalStationsException("종점 구간이 포함된 역이 아닙니다.");
     }
 
+    public Line getLine() {
+        return upStationMap.values()
+            .stream()
+            .map(Section::getLine)
+            .findFirst()
+            .orElseThrow(() -> new IllegalSectionException("구간이 소속된 노선이 존재하지 않습니다."));
+    }
+
     private boolean isStartStation(final long stationId) {
         return upStationMap.containsKey(stationId) && !downStationMap.containsKey(stationId);
     }

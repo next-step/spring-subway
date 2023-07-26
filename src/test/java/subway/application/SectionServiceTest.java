@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.SectionDao;
+import subway.domain.Line;
 import subway.domain.Section;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
@@ -40,8 +41,9 @@ class SectionServiceTest {
     void createSectionTest() {
         // given
         final SectionRequest sectionRequest = new SectionRequest("2", "3", 10);
-        final Section newSection = new Section(2L, 1L, 2L, 3L, 10);
-        final Section oldSection = new Section(1L, 1L, 1L, 2L, 10);
+        final Line line = createInitialLine();
+        final Section newSection = new Section(2L, line, 2L, 3L, 10);
+        final Section oldSection = new Section(1L, line, 1L, 2L, 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
         given(sectionDao.insert(any(Section.class))).willReturn(newSection);
@@ -73,7 +75,8 @@ class SectionServiceTest {
     @Test
     void createSectionWithBothExistInLineTest() {
         // given
-        final Section oldSection = new Section(1L, 1L, 1L, 2L, 10);
+        final Line line = createInitialLine();
+        final Section oldSection = new Section(1L, line, 1L, 2L, 10);
         final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
@@ -88,7 +91,8 @@ class SectionServiceTest {
     @Test
     void createSectionWithBothNotExistInLineTest() {
         // given
-        final Section oldSection = new Section(1L, 1L, 1L, 2L, 10);
+        final Line line = createInitialLine();
+        final Section oldSection = new Section(1L, line, 1L, 2L, 10);
         final SectionRequest sectionRequest = new SectionRequest("3", "4", 10);
 
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
@@ -137,7 +141,7 @@ class SectionServiceTest {
         // given
         final List<Section> sections = createSections();
         final Section deleteTarget = sections.get(0);
-        final long lineId = deleteTarget.getLineId();
+        final long lineId = deleteTarget.getLine().getId();
         final long startStationId = deleteTarget.getUpStationId();
 
         given(sectionDao.existByLineIdAndStationId(lineId, startStationId)).willReturn(true);
@@ -161,7 +165,7 @@ class SectionServiceTest {
         final Section deleteTarget = sections.get(0);
         final Section updateTarget = sections.get(1);
 
-        final long lineId = deleteTarget.getLineId();
+        final long lineId = deleteTarget.getLine().getId();
         final long deleteStationId = deleteTarget.getDownStationId();
         final Section updatedResult = createUpdateResult(deleteTarget, updateTarget);
 
@@ -179,16 +183,20 @@ class SectionServiceTest {
         verify(sectionDao).update(updatedResult);
     }
 
+    private Line createInitialLine() {
+        return new Line(1L, "1호선", "blue");
+    }
+
     private List<Section> createSections() {
-        final long lineId = 1L;
-        final Section firstSection = new Section(1L, lineId, 1L, 2L, 10);
-        final Section secondSection = new Section(2L, lineId, 2L, 3L, 10);
-        final Section thirdSection = new Section(3L, lineId, 3L, 4L, 10);
+        final Line line = createInitialLine();
+        final Section firstSection = new Section(1L, line, 1L, 2L, 10);
+        final Section secondSection = new Section(2L, line, 2L, 3L, 10);
+        final Section thirdSection = new Section(3L, line, 3L, 4L, 10);
         return Arrays.asList(firstSection, secondSection, thirdSection);
     }
 
     private Section createUpdateResult(final Section deleteTarget, final Section updateTarget) {
-        return new Section(updateTarget.getId(), updateTarget.getLineId(),
+        return new Section(updateTarget.getId(), updateTarget.getLine(),
             deleteTarget.getUpStationId(), updateTarget.getDownStationId(),
             deleteTarget.getDistance() + updateTarget.getDistance());
     }

@@ -43,35 +43,20 @@ class SectionDaoTest {
     }
 
     @Test
-    @DisplayName("노선의 하행 종점역이 연결된 구간을 반환한다.")
-    void findLastSectionTest() {
-        // given
-        Section section = initializeSection();
-        Section lastSection = extendSection(section.getLineId(), section.getDownStationId());
-
-        // when
-        Optional<Section> result = sectionDao.findLastSection(section.getLineId());
-
-        // then
-        assertThat(result)
-            .isPresent()
-            .hasValue(lastSection);
-    }
-
-    @Test
     @DisplayName("노선의 모든 구간을 반환한다.")
     void findAllTest() {
         // given
-        Section section1 = initializeSection();
-        Section section2 = extendSection(section1.getLineId(), section1.getDownStationId());
+        Section upSection = initializeSection();
+        Section downSection = extendSection(upSection.getLine(), upSection.getDownStationId());
+        long lineId = upSection.getLine().getId();
 
         // when
-        List<Section> result = sectionDao.findAll(section1.getLineId());
+        List<Section> result = sectionDao.findAll(lineId);
 
         // then
         assertThat(result)
             .hasSize(2)
-            .contains(section1, section2);
+            .contains(upSection, downSection);
     }
 
     @Test
@@ -79,31 +64,18 @@ class SectionDaoTest {
     void updateTest() {
         // given
         Section section = initializeSection();
-        Section update = new Section(section.getId(), section.getLineId(), section.getUpStationId(),
+        Section update = new Section(section.getId(), section.getLine(), section.getUpStationId(),
             section.getDownStationId(), 20);
+        long lineId = section.getLine().getId();
 
         // when
         sectionDao.update(update);
 
         // then
-        Optional<Section> result = sectionDao.findLastSection(section.getLineId());
-        assertThat(result)
-            .isPresent()
-            .hasValue(update);
-    }
-
-    @Test
-    @DisplayName("입력으로 들어온 역을 하행역으로 하는 구간을 삭제한다.")
-    void deleteLastSectionTest() {
-        // given
-        Section section = initializeSection();
-
-        // when
-        sectionDao.deleteLastSection(section.getLineId(), section.getDownStationId());
-
-        // then
-        long totalCount = sectionDao.count(section.getLineId());
-        assertThat(totalCount).isZero();
+        Optional<Section> updateResult = sectionDao.findAll(lineId).stream()
+            .filter(update::equals)
+            .findFirst();
+        assertThat(updateResult).isPresent();
     }
 
     @Test
@@ -111,12 +83,13 @@ class SectionDaoTest {
     void deleteSectionTest() {
         // given
         Section section = initializeSection();
+        long lineId = section.getLine().getId();
 
         // when
         sectionDao.delete(section.getId());
 
         // then
-        long totalCount = sectionDao.count(section.getLineId());
+        long totalCount = sectionDao.count(lineId);
         assertThat(totalCount).isZero();
     }
 
@@ -125,10 +98,11 @@ class SectionDaoTest {
     void countTest() {
         // given
         Section section = initializeSection();
-        extendSection(section.getLineId(), section.getDownStationId());
+        long lineId = section.getLine().getId();
+        extendSection(section.getLine(), section.getDownStationId());
 
         // when
-        long totalCount = sectionDao.count(section.getLineId());
+        long totalCount = sectionDao.count(lineId);
 
         // then
         assertThat(totalCount).isEqualTo(2L);
@@ -144,10 +118,10 @@ class SectionDaoTest {
         // when & then
         assertAll(
             "노선에 역 존재하는지 여부 테스트",
-            () -> assertTrue(sectionDao.existByLineIdAndStationId(section.getLineId(),
+            () -> assertTrue(sectionDao.existByLineIdAndStationId(section.getLine().getId(),
                 section.getDownStationId())),
             () -> assertFalse(
-                sectionDao.existByLineIdAndStationId(section.getLineId(), notExistStationId))
+                sectionDao.existByLineIdAndStationId(section.getLine().getId(), notExistStationId))
         );
     }
 
@@ -158,14 +132,14 @@ class SectionDaoTest {
         Station station2 = stationDao.insert(new Station("상왕십리"));
 
         return sectionDao.insert(
-            new Section(line.getId(), station1.getId(), station2.getId(), 10)
+            new Section(line, station1.getId(), station2.getId(), 10)
         );
     }
 
-    private Section extendSection(long lineId, long upStationId) {
+    private Section extendSection(Line line, long upStationId) {
         Station extendedStation = stationDao.insert(new Station("신당"));
         return sectionDao.insert(
-            new Section(lineId, upStationId, extendedStation.getId(), 10)
+            new Section(line, upStationId, extendedStation.getId(), 10)
         );
     }
 }

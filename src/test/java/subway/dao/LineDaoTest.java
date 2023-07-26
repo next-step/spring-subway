@@ -47,7 +47,7 @@ class LineDaoTest {
         Line response = lineDao.insert(lineRequest1);
 
         // then
-        assertThat(response.getId()).isNotNull();
+        assertThat(response.getId()).isPositive();
         assertThat(response.getColor()).isEqualTo(lineRequest1.getColor());
         assertThat(response.getName()).isEqualTo(lineRequest1.getName());
     }
@@ -77,9 +77,10 @@ class LineDaoTest {
         Optional<Line> result = lineDao.findById(response.getId());
 
         // then
-        assertThat(emptyResult.isEmpty()).isTrue();
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(response);
+        assertThat(emptyResult).isNotPresent();
+        assertThat(result)
+            .isPresent()
+            .hasValue(response);
     }
 
     @Test
@@ -94,8 +95,9 @@ class LineDaoTest {
 
         // then
         Optional<Line> result = lineDao.findById(update.getId());
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(update);
+        assertThat(result)
+            .isPresent()
+            .hasValue(update);
     }
 
     @Test
@@ -109,7 +111,7 @@ class LineDaoTest {
 
         // then
         Optional<Line> result = lineDao.findById(response.getId());
-        assertThat(result.isEmpty()).isTrue();
+        assertThat(result).isNotPresent();
     }
 
     @Test
@@ -123,9 +125,10 @@ class LineDaoTest {
         Optional<Line> result = lineDao.findByName(response.getName());
 
         // then
-        assertThat(emptyResult.isEmpty()).isTrue();
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(response);
+        assertThat(emptyResult).isNotPresent();
+        assertThat(result)
+            .isPresent()
+            .hasValue(response);
     }
 
     @Test
@@ -138,8 +141,8 @@ class LineDaoTest {
         Station station2 = stationDao.insert(new Station("상왕십리"));
         Station station3 = stationDao.insert(new Station("신당"));
 
-        sectionDao.insert(new Section(line.getId(), station1.getId(), station2.getId(), 10));
-        sectionDao.insert(new Section(line.getId(), station2.getId(), station3.getId(), 10));
+        sectionDao.insert(new Section(line, station1.getId(), station2.getId(), 10));
+        sectionDao.insert(new Section(line, station2.getId(), station3.getId(), 10));
 
         // when
         List<StationPair> result = lineDao.findAllStationPair(line.getId());

@@ -21,7 +21,7 @@ public class SectionService {
     @Transactional
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
         final Sections sections = new Sections(sectionDao.findAll(lineId));
-        final Section newSection = sectionRequest.to(lineId);
+        final Section newSection = sectionRequest.to(sections.getLine());
 
         if (sections.isOverlapped(newSection)) {
             updateOverlappedSection(newSection, sections);
