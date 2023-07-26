@@ -43,24 +43,23 @@ public class SectionService {
                 .orElseThrow(() -> new StationNotFoundException(request.getDownStationId()));
         Distance distance = new Distance(request.getDistance());
 
-        preProcessSaveSection(lineId, upStation, downStation, distance);
+        Optional<Section> cuttedSection =
+                preProcessSaveSection(lineId, upStation, downStation, distance);
+        cuttedSection.ifPresent(sectionDao::update);
 
-        Section section = new Section(
-                line,
-                upStation,
-                downStation,
-                distance);
-
+        Section section = new Section(line, upStation, downStation, distance);
         Section result = sectionDao.insert(section);
         return SectionResponse.from(result);
     }
 
-    private void preProcessSaveSection(Long lineId, Station upStation, Station downStation,
+    private Optional<Section> preProcessSaveSection(
+            Long lineId,
+            Station upStation,
+            Station downStation,
             Distance distance) {
+
         Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        Optional<Section> cuttedSection = sections.validateAndCutSectionIfExist(
-                upStation, downStation, distance);
-        cuttedSection.ifPresent(sectionDao::update);
+        return sections.validateAndCutSectionIfExist(upStation, downStation, distance);
     }
 
     @Transactional
