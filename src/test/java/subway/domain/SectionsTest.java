@@ -2,6 +2,7 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 import java.util.List;
 
@@ -109,7 +110,7 @@ class SectionsTest {
 
         // when, then
         assertThatCode(() -> sections.removeStation(deleteStation))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SubwayException.class)
                 .hasMessage("노선에 역이 포함되지 않을 때는 삭제할 수 없습니다.");
     }
 
@@ -128,7 +129,7 @@ class SectionsTest {
 
         // when, then
         assertThatCode(() -> sections.removeStation(deleteStation))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SubwayException.class)
                 .hasMessage("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
     }
 
@@ -143,7 +144,7 @@ class SectionsTest {
         Sections sections = new Sections(List.of(section));
 
         assertThatCode(() -> sections.addSection(section))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SubwayException.class)
                 .hasMessage("두 역 모두 기존 노선에 포함될 수 없습니다.");
     }
 
@@ -165,7 +166,7 @@ class SectionsTest {
 
         // when, then
         assertThatCode(() -> sections.addSection(section2))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SubwayException.class)
                 .hasMessage("두 역 중 하나는 기존 노선에 포함되어야 합니다");
     }
 
@@ -286,8 +287,8 @@ class SectionsTest {
 
         // when, then
         assertThatCode(() -> sections.addSection(newSection))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다. 새 구간 거리 : 10");
     }
 
     @Test

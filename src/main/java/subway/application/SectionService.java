@@ -10,6 +10,7 @@ import subway.domain.Section;
 import subway.domain.SectionsChange;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
+import subway.exception.SubwayException;
 
 @Service
 public class SectionService {
@@ -25,10 +26,13 @@ public class SectionService {
 
     @Transactional
     public void saveSection(final Long lineId, final SectionRequest request) {
-        // TODO
-        Line line = lineDao.findById(lineId).orElseThrow();
-        Station upStation = stationDao.findById(request.getUpStationId()).orElseThrow();
-        Station downStation = stationDao.findById(request.getDownStationId()).orElseThrow();
+        Line line = lineDao.findById(lineId)
+                .orElseThrow(() -> new SubwayException("노선 id가 존재하지 않습니다 : " + lineId));
+        Station upStation = stationDao.findById(request.getUpStationId())
+                .orElseThrow(() -> new SubwayException("상행역 id가 존재하지 않습니다 : " + request.getUpStationId()));
+        Station downStation = stationDao.findById(request.getDownStationId())
+                .orElseThrow(() -> new SubwayException("하행역 id가 존재하지 않습니다 : " + request.getDownStationId()));
+
         Section section = new Section(upStation, downStation, request.getDistance());
 
         Line newLine = line.addSection(section);
@@ -40,8 +44,8 @@ public class SectionService {
 
     @Transactional
     public void deleteStation(final Long lineId, final Long stationId) {
-        // TODO
-        Line line = lineDao.findById(lineId).orElseThrow();
+        Line line = lineDao.findById(lineId)
+                .orElseThrow(() -> new SubwayException("노선 id가 존재하지 않습니다 : " + lineId));
         Station station = stationDao.findById(stationId).orElseThrow();
 
         Line newLine = line.removeStation(station);

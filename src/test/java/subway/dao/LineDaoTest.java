@@ -2,9 +2,9 @@ package subway.dao;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DuplicateKeyException;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.exception.SubwayException;
 
 import java.util.List;
 
@@ -56,7 +56,9 @@ class LineDaoTest extends DaoTest {
         Line line = new Line("2호선", "orange");
 
         // when, then
-        assertThatCode(() -> lineDao.insert(line)).isInstanceOf(DuplicateKeyException.class);
+        assertThatCode(() -> lineDao.insert(line))
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("노선 이름이 이미 존재합니다 : 2호선");
     }
 
     @Test
@@ -84,7 +86,9 @@ class LineDaoTest extends DaoTest {
         Line line = new Line(1L, "3호선", "orange");
 
         // when, then
-        assertThatCode(() -> lineDao.update(line)).isInstanceOf(DuplicateKeyException.class);
+        assertThatCode(() -> lineDao.update(line))
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("노선 이름이 이미 존재합니다 : 3호선");
     }
 
     @Test

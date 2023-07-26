@@ -1,6 +1,7 @@
 package subway.dao;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,6 +12,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.exception.SubwayException;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -68,8 +70,12 @@ public class LineDao {
         params.put("name", line.getName());
         params.put("color", line.getColor());
 
-        Long lineId = insertAction.executeAndReturnKey(params).longValue();
-        return new Line(lineId, line.getName(), line.getColor());
+        try {
+            Long lineId = insertAction.executeAndReturnKey(params).longValue();
+            return new Line(lineId, line.getName(), line.getColor());
+        } catch (DuplicateKeyException e) {
+            throw new SubwayException("노선 이름이 이미 존재합니다 : " + line.getName(), e);
+        }
     }
 
     public List<Line> findAll() {
@@ -102,9 +108,13 @@ public class LineDao {
         }
     }
 
-    public void update(final Line newLine) {
+    public void update(final Line line) {
         String sql = "update LINE set name = ?, color = ? where id = ?";
-        jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
+        try {
+            jdbcTemplate.update(sql, line.getName(), line.getColor(), line.getId());
+        } catch (DuplicateKeyException e) {
+            throw new SubwayException("노선 이름이 이미 존재합니다 : " + line.getName(), e);
+        }
     }
 
     public void deleteById(final Long id) {

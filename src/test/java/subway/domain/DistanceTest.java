@@ -1,6 +1,7 @@
 package subway.domain;
 
 import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -9,15 +10,15 @@ class DistanceTest {
     @Test
     void distanceEqualToZero() {
         assertThatCode(() -> new Distance(0))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("구간의 거리는 0보다 커야 합니다.");
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("구간의 거리는 0보다 커야 합니다. : 0");
     }
 
     @Test
     void distanceLessThanZero() {
         assertThatCode(() -> new Distance(-1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("구간의 거리는 0보다 커야 합니다.");
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("구간의 거리는 0보다 커야 합니다. : -1");
     }
 
     @Test
@@ -38,8 +39,8 @@ class DistanceTest {
 
         // when, then
         assertThatCode(() -> distance1.subtract(distance2))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다. 새 구간 거리 : 10");
     }
 
     @Test
@@ -50,7 +51,7 @@ class DistanceTest {
 
         // when, then
         assertThatCode(() -> distance1.subtract(distance2))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다.");
+                .isInstanceOf(SubwayException.class)
+                .hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다. 새 구간 거리 : 11");
     }
 }

@@ -6,6 +6,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +26,10 @@ public class StationService {
     }
 
     public StationResponse findStationResponseById(final Long id) {
-        //TODO
-        return StationResponse.of(stationDao.findById(id).orElseThrow());
+        return StationResponse.of(
+                stationDao.findById(id)
+                        .orElseThrow(() -> new SubwayException("해당 역 id가 존재하지 않습니다 : " + id))
+        );
     }
 
     public List<StationResponse> findAllStationResponses() {

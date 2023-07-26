@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DuplicateKeyException;
 import subway.domain.Station;
+import subway.exception.SubwayException;
 
 import java.util.List;
 
@@ -49,7 +50,8 @@ class StationDaoTest extends DaoTest {
         Station station = new Station("잠실역");
 
         // when, then
-        assertThatCode(() -> stationDao.insert(station)).isInstanceOf(DuplicateKeyException.class);
+        assertThatCode(() -> stationDao.insert(station))
+                .isInstanceOf(SubwayException.class);
     }
 
     @Test
