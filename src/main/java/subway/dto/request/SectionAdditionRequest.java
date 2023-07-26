@@ -5,11 +5,14 @@ import javax.validation.constraints.NotNull;
 public class SectionAdditionRequest {
 
     @NotNull
-    private final Long upStationId;
+    private Long upStationId;
     @NotNull
-    private final Long downStationId;
+    private Long downStationId;
     @NotNull
-    private final Integer distance;
+    private Integer distance;
+
+    public SectionAdditionRequest() {
+    }
 
     public SectionAdditionRequest(Long upStationId, Long downStationId, Integer distance) {
         this.upStationId = upStationId;
