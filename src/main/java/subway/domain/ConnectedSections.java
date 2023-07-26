@@ -171,10 +171,7 @@ public class ConnectedSections {
      * {@link #addOnDownStation(int, Section)}와 대부분의 코드가 동일하지만 구간을 추가하는 순서만 다르다.
      */
     private SectionEditResult addOnUpStation(final int index, final Section target) {
-        final Section current = getSection(index);
-        validateDistance(current, target);
-
-        final Section subtracted = current.subtract(target);
+        final Section subtracted = getSection(index).subtract(target);
         final Section removed = connectedSections.remove(index);
         connectedSections.add(index, subtracted);
         connectedSections.add(index, target);
@@ -189,10 +186,7 @@ public class ConnectedSections {
      * {@link #addOnUpStation(int, Section)}와 대부분의 코드가 동일하지만 구간을 추가하는 순서만 다르다.
      */
     private SectionEditResult addOnDownStation(final int index, final Section target) {
-        final Section current = getSection(index);
-        validateDistance(current, target);
-
-        final Section subtracted = current.subtract(target);
+        final Section subtracted = getSection(index).subtract(target);
         final Section removed = connectedSections.remove(index);
         connectedSections.add(index, target);
         connectedSections.add(index, subtracted);
@@ -228,12 +222,6 @@ public class ConnectedSections {
     private void validateConnectedSections(final List<Section> sections, final Set<Long> stationIds) {
         if (stationIds.size() - 1 != sections.size()) {
             throw new SubwayIllegalArgumentException("구간이 모두 연결되어있지 않습니다.");
-        }
-    }
-
-    private void validateDistance(final Section current, final Section target) {
-        if (current.subtractDistance(target) <= 0) {
-            throw new SubwayIllegalArgumentException("새로운 구간의 길이는 기존 구간의 길이보다 짧아야 합니다.");
         }
     }
 

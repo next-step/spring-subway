@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import subway.domain.Distance;
 import subway.domain.Section;
 
 import javax.sql.DataSource;
@@ -26,7 +27,9 @@ public class SectionDao {
                     rs.getLong("line_id"),
                     rs.getLong("up_station_id"),
                     rs.getLong("down_station_id"),
-                    rs.getLong("distance")
+                    new Distance(
+                            rs.getInt("distance")
+                    )
             );
 
     public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
@@ -81,7 +84,7 @@ public class SectionDao {
         entry.put("line_id", section.getLineId());
         entry.put("up_station_id", section.getUpStationId());
         entry.put("down_station_id", section.getDownStationId());
-        entry.put("distance", section.getDistance());
+        entry.put("distance", section.getDistance().getValue());
 
         return entry;
     }

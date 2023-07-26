@@ -15,7 +15,7 @@ class SectionTest {
     public static final Long LINE_ID = 1L;
     public static final Long UP_STATION_ID = 1L;
     public static final Long DOWN_STATION_ID = 2L;
-    public static final Long DISTANCE = 10L;
+    public static final Distance DISTANCE_777 = new Distance(777);
 
     @Test
     @DisplayName("구간을 정상적으로 생성한다.")
@@ -23,12 +23,12 @@ class SectionTest {
         /* given */
 
         /* when */
-        Section section = new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
+        Section section = new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE_777);
 
         /* when & then */
         assertThat(section.getUpStationId()).isEqualTo(UP_STATION_ID);
         assertThat(section.getDownStationId()).isEqualTo(DOWN_STATION_ID);
-        assertThat(section.getDistance()).isEqualTo(DISTANCE);
+        assertThat(section.getDistance()).isEqualTo(DISTANCE_777);
     }
 
     @ParameterizedTest
@@ -38,39 +38,33 @@ class SectionTest {
         /* given */
 
         /* when & then */
-        assertThatThrownBy(() -> new Section(LINE_ID, upStationId, downStationId, DISTANCE)).isInstanceOf(SubwayException.class);
-    }
-
-    @Test
-    @DisplayName("길이 정보가 없는 경우 구간 생성 시 SubwayException을 던진다.")
-    void distanceExceptionWithNull() {
-        /* given */
-
-        /* when & then */
-        assertThatThrownBy(() -> new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, null)).isInstanceOf(SubwayException.class);
+        assertThatThrownBy(() -> new Section(LINE_ID, upStationId, downStationId, DISTANCE_777))
+                .isInstanceOf(SubwayException.class);
     }
 
     @ParameterizedTest
-    @ValueSource(longs = {0L, -1L})
+    @ValueSource(ints = {0, -1})
     @DisplayName("길이 정보가 0 이하일 경우 구간 생성 시 SubwayException을 던진다.")
-    void distanceExceptionWithLessThanZero(final Long distance) {
+    void distanceExceptionWithLessThanZero(final int value) {
         /* given */
 
         /* when & then */
-        assertThatThrownBy(() -> new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, distance)).isInstanceOf(SubwayException.class);
+        assertThatThrownBy(() -> new Section(LINE_ID, UP_STATION_ID, DOWN_STATION_ID, new Distance(value)))
+                .isInstanceOf(SubwayException.class);
     }
 
     @Test
     @DisplayName("구간에서 다른 구간을 뺄 수 있다.")
     void subtract() {
         /* given */
-        final Section from = new Section(1L, 11L, 13L, 777L);
-        final Section to = new Section(1L, 11L, 12L, 700L);
+        final Section from = new Section(1L, 11L, 13L, DISTANCE_777);
+        final Section to = new Section(1L, 11L, 12L, new Distance(700));
 
         /* when */
         final Section subtracted = from.subtract(to);
 
         /* then */
-        assertThat(subtracted).isEqualTo(new Section(1L, 12L, 13L, 77L));
+        assertThat(subtracted)
+                .isEqualTo(new Section(1L, 12L, 13L, new Distance(77)));
     }
 }

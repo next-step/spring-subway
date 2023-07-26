@@ -14,12 +14,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
 
+    final int DISTANCE_VALUE_77 = 77;
+    final int DISTANCE_VALUE_777 = 777;
+
     @Test
     @DisplayName("요청의 상행역과 노선에 속한 구간의 상행역이 같은 구간을 등록할 수 있다.")
     void createSectionWhenRequestUpStationExists() {
         /* given */
         final Long lineId = 2L;
-        final SectionRequest sectionRequest = new SectionRequest(24L, 26L, 66L);
+        final SectionRequest sectionRequest = new SectionRequest(24L, 26L, DISTANCE_VALUE_77);
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
@@ -40,7 +43,7 @@ class SectionIntegrationTest extends IntegrationTest {
     void createSectionWhenRequestDownStationExists() {
         /* given */
         final Long lineId = 2L;
-        final SectionRequest sectionRequest = new SectionRequest(26L, 24L, 66L);
+        final SectionRequest sectionRequest = new SectionRequest(26L, 24L, DISTANCE_VALUE_77);
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
@@ -61,11 +64,11 @@ class SectionIntegrationTest extends IntegrationTest {
     void badRequestWithGreaterThanOrEqualExistSectionDistance() {
         /* given */
         final Long lineId = 2L;
-        final SectionRequest sectionRequest1 = new SectionRequest(26L, 24L, 888L);
-        final SectionRequest sectionRequest2 = new SectionRequest(24L, 26L, 888L);
+        final SectionRequest sectionRequest1 = new SectionRequest(26L, 24L, DISTANCE_VALUE_777);
+        final SectionRequest sectionRequest2 = new SectionRequest(24L, 26L, DISTANCE_VALUE_777);
 
         /* when */
-        ExtractableResponse<Response> response1 = RestAssured // TODO: final
+        final ExtractableResponse<Response> response1 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest1)
@@ -73,7 +76,7 @@ class SectionIntegrationTest extends IntegrationTest {
                 .then().log().all()
                 .extract();
 
-        ExtractableResponse<Response> response2 = RestAssured
+        final ExtractableResponse<Response> response2 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(sectionRequest2)
@@ -95,7 +98,7 @@ class SectionIntegrationTest extends IntegrationTest {
     void createFirstSection() {
         /* given */
         final Long lineId = 1L;
-        final SectionRequest sectionRequest = new SectionRequest(10L, 11L, 777L);
+        final SectionRequest sectionRequest = new SectionRequest(10L, 11L, DISTANCE_VALUE_777);
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
@@ -116,7 +119,7 @@ class SectionIntegrationTest extends IntegrationTest {
     void createSection() {
         /* given */
         final Long lineId = 1L;
-        final SectionRequest sectionRequest = new SectionRequest(12L, 13L, 777L);
+        final SectionRequest sectionRequest = new SectionRequest(12L, 13L, DISTANCE_VALUE_777);
 
         /* when */
         ExtractableResponse<Response> response = RestAssured
@@ -136,7 +139,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("상행 역과 하행 역이 이미 노선에 모두 등록되어 있는 경우 400 Bad Request로 응답한다.")
     void badRequestWithRegisteredUpStationAndDownStationOnLine() {
         /* given */
-        final SectionRequest sectionRequest = new SectionRequest(23L, 24L, 777L);
+        final SectionRequest sectionRequest = new SectionRequest(23L, 24L, DISTANCE_VALUE_777);
         final Long lineId = 2L;
 
         /* when */
@@ -158,7 +161,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @DisplayName("상행 역과 하행 역이 모두 노선에 없는 경우 400 Bad Request로 응답한다.")
     void badRequestWithNotExistUpStationAndDownStationOnLine() {
         /* given */
-        final SectionRequest sectionRequest = new SectionRequest(12345L, 1234L, 777L);
+        final SectionRequest sectionRequest = new SectionRequest(12345L, 1234L, DISTANCE_VALUE_777);
         final Long lineId = 2L;
 
         /* when */

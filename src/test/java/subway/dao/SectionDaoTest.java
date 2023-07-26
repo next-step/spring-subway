@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import subway.domain.Distance;
 import subway.domain.Section;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +21,7 @@ class SectionDaoTest {
     @DisplayName("구간을 하나 추가한다.")
     void insert() {
         /* given */
-        final Section section = new Section(6L, 1L, 12L, 13L, 777L);
+        final Section section = new Section(6L, 1L, 12L, 13L, new Distance(777));
 
         /* when */
         final Section insert = sectionDao.insert(section);

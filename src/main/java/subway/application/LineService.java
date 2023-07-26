@@ -4,10 +4,7 @@ import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.ConnectedSections;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Station;
+import subway.domain.*;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 
@@ -35,7 +32,7 @@ public class LineService {
                         persistLine.getId(),
                         request.getUpStationId(),
                         request.getDownStationId(),
-                        request.getDistance()
+                        new Distance(request.getDistance())
                 )
         );
 

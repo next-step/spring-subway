@@ -1,6 +1,7 @@
 package subway.domain;
 
 import subway.exception.SubwayException;
+import subway.exception.SubwayIllegalArgumentException;
 
 import java.util.Objects;
 
@@ -10,9 +11,9 @@ public class Section {
     private final Long lineId;
     private final Long upStationId;
     private final Long downStationId;
-    private final Long distance;
+    private final Distance distance;
 
-    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
+    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Distance distance) {
         this(null, lineId, upStationId, downStationId, distance);
     }
 
@@ -25,9 +26,9 @@ public class Section {
             final Long lineId,
             final Long upStationId,
             final Long downStationId,
-            final Long distance
+            final Distance distance
     ) {
-        validateSectionValues(upStationId, downStationId, distance);
+        validateStationValues(upStationId, downStationId);
 
         this.id = id;
         this.lineId = lineId;
@@ -37,10 +38,12 @@ public class Section {
     }
 
     public Section subtract(final Section from) {
+        validateIsSubtractable(from);
+
         if (Objects.equals(this.upStationId, from.upStationId)) {
-            return new Section(this.lineId, from.downStationId, this.downStationId, this.distance - from.distance);
+            return new Section(this.lineId, from.downStationId, this.downStationId, this.distance.subtract(from.distance));
         }
-        return new Section(this.lineId, this.upStationId, from.upStationId, this.distance - from.distance);
+        return new Section(this.lineId, this.upStationId, from.upStationId, this.distance.subtract(from.distance));
     }
 
     public Section merge(final Section target) {
@@ -52,12 +55,12 @@ public class Section {
                 this.lineId,
                 this.upStationId,
                 target.downStationId,
-                this.distance + target.distance
+                this.distance.add(target.distance)
         );
     }
 
-    public Long subtractDistance(final Section target) {
-        return this.distance - target.distance;
+    public boolean isNotSubtractable(final Section target) {
+        return this.distance.isShorterOrEqual(target.distance);
     }
 
     public boolean isSameUpStation(final Section target) {
@@ -96,21 +99,13 @@ public class Section {
         return this.downStationId;
     }
 
-    public Long getDistance() {
+    public Distance getDistance() {
         return this.distance;
     }
 
-    private void validateSectionValues(final Long upStationId, final Long downStationId, final Long distance) {
-        validateStationValues(upStationId, downStationId);
-        validateDistanceValue(distance);
-    }
-
-    private void validateDistanceValue(final Long distance) {
-        if (distance == null) {
-            throw new SubwayException("구간 길이 정보는 입력해야 합니다.");
-        }
-        if (distance <= 0L) {
-            throw new SubwayException("구간 길이는 0보다 커야합니다.");
+    private void validateIsSubtractable(final Section from) {
+        if (isNotSubtractable(from)) {
+            throw new SubwayIllegalArgumentException("새로운 구간의 길이는 기존 구간의 길이보다 짧아야 합니다.");
         }
     }
 
