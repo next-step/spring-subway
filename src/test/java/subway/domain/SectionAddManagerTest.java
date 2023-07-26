@@ -44,7 +44,7 @@ class SectionAddManagerTest {
         Station stationC = new Station(3L, "C");
         Station stationD = new Station(4L, "D");
 
-        Section firstSection = new Section(1L, lineA, stationA, stationC, 5);
+        Section firstSection = new Section(1L, lineA, stationA, stationB, 5);
         Section secondSection = new Section(2L, lineA, stationB, stationD, 5);
         Sections sections = new Sections(List.of(firstSection, secondSection));
 
