@@ -19,7 +19,7 @@ public class LineDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-    private RowMapper<Line> rowMapper = (rs, rowNum) ->
+    private final RowMapper<Line> rowMapper = (rs, rowNum) ->
             new Line(
                     rs.getLong("id"),
                     rs.getString("name"),
@@ -51,8 +51,7 @@ public class LineDao {
 
     public void update(final Line newLine) {
         final String sql = "update LINE set name = ?, color = ? where id = ?";
-        jdbcTemplate.update(sql,
-                newLine.getName(), newLine.getColor(), newLine.getId());
+        jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
     public void deleteById(final Long lineId) {

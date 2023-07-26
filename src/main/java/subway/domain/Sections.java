@@ -1,20 +1,18 @@
 package subway.domain;
 
-import org.springframework.util.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
+import static org.springframework.util.Assert.isTrue;
 
 public class Sections {
     protected static final int MINIMUM_SIZE = 1;
     protected List<Section> sections;
 
     public Sections(final List<Section> sections) {
-        Assert.isTrue(sections.size() >= MINIMUM_SIZE, "노선에 등록된 구간은 반드시 한개 이상이어야합니다.");
+        isTrue(sections.size() >= MINIMUM_SIZE, "노선에 등록된 구간은 반드시 한 개 이상이어야합니다.");
         this.sections = new ArrayList<>(sections);
     }
 
@@ -36,30 +34,30 @@ public class Sections {
 
     private void updateIfMatchDownStation(final Section newSection, final List<Station> stations) {
         if (stations.contains(newSection.getDownStation())) {
-            final Section originSection = findOriginSectionByDownStation(newSection);
+            final Section originSection = findOriginDownStationSectionByStation(newSection.getDownStation());
             updateSection(newSection, originSection, originSection.getUpStation(), newSection.getUpStation());
         }
     }
 
     private void updateIfMatchUpStation(final Section newSection, final List<Station> stations) {
         if (stations.contains(newSection.getUpStation())) {
-            final Section originSection = findOriginSectionByUpStation(newSection);
+            final Section originSection = findOriginUpStationSectionByStation(newSection.getUpStation());
             updateSection(newSection, originSection, newSection.getDownStation(), originSection.getDownStation());
         }
     }
 
-    private Section findOriginSectionByDownStation(final Section newSection) {
+    private Section findOriginDownStationSectionByStation(final Station station) {
         return sections.stream()
-                .filter(section -> section.getDownStation().equals(newSection.getDownStation()))
+                .filter(section -> section.getDownStation().equals(station))
                 .findFirst()
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow(() -> new IllegalStateException("새로운 하행 구간과 매치되는 기존 하행 구간을 찾지 못했습니다."));
     }
 
-    private Section findOriginSectionByUpStation(final Section newSection) {
+    private Section findOriginUpStationSectionByStation(final Station station) {
         return sections.stream()
-                .filter(section -> section.getUpStation().equals(newSection.getUpStation()))
+                .filter(section -> section.getUpStation().equals(station))
                 .findFirst()
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow(() -> new IllegalStateException("새로운 상행 구간과 매치되는 기존 상행 구간을 찾지 못했습니다."));
     }
 
     private void addNewSection(final Section newSection) {
@@ -71,14 +69,59 @@ public class Sections {
                                final Station upStation,
                                final Station downStation) {
         final Line line = newSection.getLine();
-        final long distance = originSection.getDistance() - newSection.getDistance();
         sections.remove(originSection);
-        sections.add(new Section(originSection.getId(), line, upStation, downStation, new Distance(distance)));
+        sections.add(new Section(line, upStation, downStation, originSection.subtractDistance(newSection)));
     }
 
-    /**
-     * @return 구간에 포함된 순서가 보장되지 않는 노선 정보들을 리턴합니다.
-     */
+    public void deleteSection(final Station station) {
+        validateDeleteConstraint();
+        throwIfNotContain(station);
+        removeIfMatchFirstSection(station);
+        removeIfMatchLastSection(station);
+        removeIfMatchMiddleSection(station);
+    }
+
+    private void throwIfNotContain(final Station station) {
+        if (!toStations().contains(station)) {
+            throw new IllegalArgumentException("구간에서 역을 찾을 수 없습니다.");
+        }
+    }
+
+    private void removeIfMatchFirstSection(final Station station) {
+        if (getUpStations().contains(station)
+                && !getDownStations().contains(station)) {
+            sections.remove(findOriginUpStationSectionByStation(station));
+        }
+    }
+
+    private void removeIfMatchLastSection(final Station station) {
+        if (getDownStations().contains(station)
+                && !getUpStations().contains(station)) {
+            sections.remove(findOriginDownStationSectionByStation(station));
+        }
+    }
+
+    private void removeIfMatchMiddleSection(final Station station) {
+        if (getUpStations().contains(station)
+                && getDownStations().contains(station)) {
+            final Section upSection = findOriginDownStationSectionByStation(station);
+            final Section downSection = findOriginUpStationSectionByStation(station);
+            sections.remove(upSection);
+            sections.remove(downSection);
+            sections.add(new Section(
+                    upSection.getLine(),
+                    upSection.getUpStation(),
+                    downSection.getDownStation(),
+                    upSection.addDistance(downSection)));
+        }
+    }
+
+    private void validateDeleteConstraint() {
+        if (sectionLength() <= MINIMUM_SIZE) {
+            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+        }
+    }
+
     public List<Station> toStations() {
         final List<Station> stations = getUpStations();
         stations.addAll(getDownStations());
@@ -87,7 +130,6 @@ public class Sections {
 
     public List<Section> getSections() {
         return sections.stream()
-                .map(Section::new)
                 .collect(toUnmodifiableList());
     }
 
@@ -105,23 +147,6 @@ public class Sections {
 
     public int sectionLength() {
         return sections.size();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Sections sections1 = (Sections) o;
-        return Objects.equals(sections, sections1.sections);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sections);
     }
 
     @Override

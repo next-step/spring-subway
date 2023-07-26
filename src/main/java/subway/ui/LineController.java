@@ -23,18 +23,18 @@ public class LineController {
 
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody final LineCreateRequest request) {
-        final LineResponse line = lineService.saveLine(request);
+        final LineResponse line = lineService.createLineAndFirstSection(request);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping
     public ResponseEntity<List<LineResponse>> findAllLines() {
-        return ResponseEntity.ok(lineService.findLineResponses());
+        return ResponseEntity.ok(lineService.findLines());
     }
 
     @GetMapping("/{lineId}")
     public ResponseEntity<LineWithStationsResponse> findLineById(@PathVariable final Long lineId) {
-        return ResponseEntity.ok(lineService.findLineResponseById(lineId));
+        return ResponseEntity.ok(lineService.findLineWithStations(lineId));
     }
 
     @PutMapping("/{lineId}")

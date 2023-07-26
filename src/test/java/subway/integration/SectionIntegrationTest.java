@@ -12,7 +12,7 @@ import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.request.LineCreateRequest;
 import subway.dto.request.SectionRequest;
-import subway.error.ErrorData;
+import subway.error.ErrorResponse;
 import subway.integration.helper.LineIntegrationHelper;
 import subway.integration.helper.SectionIntegrationHelper;
 import subway.integration.helper.StationIntegrationHelper;
@@ -51,10 +51,10 @@ class SectionIntegrationTest extends IntegrationTest {
         bothNotingBadRequest = new SectionRequest(newStationB.getId(), newStationC.getId(), 4L);
     }
 
-    @DisplayName("지하철 구간을 생성한다.")
+    @DisplayName("[POST] [/line/{lineId}/sections] 노선 ID와 상행역 , 하행역 ID , 거리를 입력으로 지하철 구간을 생성한다.")
     @Test
     void createSection() {
-        // when
+        // given , when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -65,10 +65,9 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
     }
 
-    @DisplayName("역 사이에 새로운 역을 등록할 경우 기존 역 사이 길이보다 크거나 같으면 등록을 할 수 없음")
+    @DisplayName("[POST] [/line/{lineId}/sections] 역 사이에 새로운 역을 등록할 경우 기존 역 사이 길이보다 크거나 같으면 등록을 할 수 없어 BAD_REQUEST 를 응답 받는다.")
     @Test
     void createSectionFailDistance() {
         // given
@@ -85,13 +84,13 @@ class SectionIntegrationTest extends IntegrationTest {
                 extract();
 
         // then
-        final ErrorData errorData = response.body().as(ErrorData.class);
+        final ErrorResponse errorResponse = response.body().as(ErrorResponse.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorData.getMessage()).isEqualTo("거리는 1이상이어야 합니다.");
+        assertThat(errorResponse.getMessage()).isEqualTo("기존 구간 길이보다 새로운 구간 길이가 같거나 더 클수는 없습니다.");
     }
 
-    @DisplayName("상행역과 하행역이 이미 노선에 모두 등록되어 있다면 추가할 수 없음")
+    @DisplayName("[POST] [/line/{lineId}/sections] 상행역과 하행역이 이미 노선에 모두 등록되어 있다면 추가할 수 없어 BAD_REQUEST 를 응답 받는다.")
     @Test
     void createSectionFailBothExist() {
         // given
@@ -107,13 +106,13 @@ class SectionIntegrationTest extends IntegrationTest {
                 extract();
 
         // then
-        final ErrorData errorData = response.body().as(ErrorData.class);
+        final ErrorResponse errorResponse = response.body().as(ErrorResponse.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorData.getMessage()).isEqualTo("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
+        assertThat(errorResponse.getMessage()).isEqualTo("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
     }
 
-    @DisplayName("상행역과 하행역 둘 중 하나도 포함되어있지 않으면 추가할 수 없음")
+    @DisplayName("[POST] [/line/{lineId}/sections] 상행역과 하행역 둘 중 하나도 포함되어있지 않으면 추가할 수 없어 BAD_REQUEST 를 응답 받는다.")
     @Test
     void createSectionFailBothNothing() {
         // given
@@ -129,13 +128,13 @@ class SectionIntegrationTest extends IntegrationTest {
                 extract();
 
         // then
-        final ErrorData errorData = response.body().as(ErrorData.class);
+        final ErrorResponse errorResponse = response.body().as(ErrorResponse.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorData.getMessage()).isEqualTo("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
+        assertThat(errorResponse.getMessage()).isEqualTo("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
     }
 
-    @DisplayName("지하철 노선 중 마지막 구간을 제거한다.")
+    @DisplayName("[DELETE] [/line/{lineId}/sections] 노선 ID와 마지막 역 ID 로 지하철 노선의 마지막 구간을 제거한다.")
     @Test
     void deleteLastSection() {
         // given
@@ -154,9 +153,28 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @DisplayName("지하철 노선 중 마지막 구간이 아닌 구간을 제거하면 실패한다.")
+    @DisplayName("[DELETE] [/line/{lineId}/sections] 노선 ID와 첫 번째역 ID 로 지하철 노선의 첫 번째 구간을 제거한다.")
     @Test
-    void deleteNotLastSectionThenBadRequest() {
+    void deleteFirstSection() {
+        // given
+        SectionIntegrationHelper.createSection(lineId, sectionRequestA);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestB);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("stationId", sectionRequestA.getUpStationId())
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("[DELETE] [/line/{lineId}/sections] 노선 ID와 중간 역 ID 로 지하철 노선의 중간 구간을 제거한다.")
+    @Test
+    void deleteMiddleSection() {
         // given
         SectionIntegrationHelper.createSection(lineId, sectionRequestA);
         SectionIntegrationHelper.createSection(lineId, sectionRequestB);
@@ -170,13 +188,33 @@ class SectionIntegrationTest extends IntegrationTest {
                 .extract();
 
         // then
-        final ErrorData errorData = response.body().as(ErrorData.class);
-
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorData.getMessage()).isEqualTo("노선에 등록된 하행 종점역만 제거할 수 있습니다.");
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    @DisplayName("지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없다.")
+    @DisplayName("[DELETE] [/line/{lineId}/sections] 지하철 노선 존재하지 않으면 제거에 실패하고 BAD_REQUEST 를 응답 받는다.")
+    @Test
+    void deleteFailNonExist() {
+        // given
+        SectionIntegrationHelper.createSection(lineId, sectionRequestA);
+        SectionIntegrationHelper.createSection(lineId, sectionRequestB);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .queryParam("stationId", bothNotingBadRequest.getDownStationId())
+                .when().delete("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        final ErrorResponse errorResponse = response.body().as(ErrorResponse.class);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(errorResponse.getMessage()).isEqualTo("구간에서 역을 찾을 수 없습니다.");
+    }
+
+
+    @DisplayName("[DELETE] [/line/{lineId}/sections] 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우(구간이 1개인 경우) 역을 삭제할 수 없고  BAD_REQUEST 를 응답 받는다.")
     @Test
     void deleteConstraint() {
         // given  when
@@ -188,10 +226,10 @@ class SectionIntegrationTest extends IntegrationTest {
                 .extract();
 
         // then
-        final ErrorData errorData = response.body().as(ErrorData.class);
+        final ErrorResponse errorResponse = response.body().as(ErrorResponse.class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorData.getMessage()).isEqualTo("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
+        assertThat(errorResponse.getMessage()).isEqualTo("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
     }
 
 

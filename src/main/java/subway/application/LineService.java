@@ -11,7 +11,8 @@ import subway.dto.response.LineResponse;
 import subway.dto.response.LineWithStationsResponse;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class LineService {
@@ -31,10 +32,10 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(final LineCreateRequest request) {
+    public LineResponse createLineAndFirstSection(final LineCreateRequest request) {
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
-        sectionService.saveFirstSection(
+        sectionService.createFirstSection(
                 persistLine.getId(),
                 request.getUpStationId(),
                 request.getDownStationId(),
@@ -44,37 +45,34 @@ public class LineService {
     }
 
     @Transactional(readOnly = true)
-    public List<LineResponse> findLineResponses() {
-        return findLines().stream()
+    public List<LineResponse> findLines() {
+        return lineDao.findAll().stream()
                 .map(LineResponse::of)
-                .collect(Collectors.toList());
-    }
-
-    private List<Line> findLines() {
-        return lineDao.findAll();
+                .collect(toList());
     }
 
     @Transactional(readOnly = true)
-    public LineWithStationsResponse findLineResponseById(final Long lineId) {
-        final Line persistLine = findLineById(lineId);
-        final List<Station> stations = stationService.findStationByLineId(lineId);
-        return LineWithStationsResponse.of(persistLine, stations);
-    }
-
-    @Transactional(readOnly = true)
-    public Line findLineById(final Long lineId) {
-        return lineDao.findById(lineId)
-                .orElseThrow(() -> new IllegalStateException("노선을 찾을 수 없습니다."));
+    public LineWithStationsResponse findLineWithStations(final Long lineId) {
+        final Line line = findLineById(lineId);
+        final List<Station> stations = stationService.findInOrderStationsByLineId(lineId);
+        return LineWithStationsResponse.of(line, stations);
     }
 
     @Transactional
     public void updateLine(final Long lineId, final LineUpdateRequest lineUpdateRequest) {
-        lineDao.update(new Line(lineId, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
+        final Line line = findLineById(lineId);
+        lineDao.update(new Line(line.getId(), lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
     @Transactional
     public void deleteLineById(final Long lineId) {
-        lineDao.deleteById(lineId);
+        final Line line = findLineById(lineId);
+        lineDao.deleteById(line.getId());
+    }
+
+    private Line findLineById(final Long lineId) {
+        return lineDao.findById(lineId)
+                .orElseThrow(() -> new IllegalArgumentException("노선을 찾을 수 없습니다."));
     }
 
 }

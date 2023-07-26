@@ -13,9 +13,6 @@ public class SortedSections extends Sections {
         this.sections = sort(sections);
     }
 
-    /**
-     * @return 구간에 포함된 순서가 보장된 노선 정보들을 리턴합니다.
-     */
     @Override
     public List<Station> toStations() {
         final List<Station> result = sections.stream()
@@ -56,11 +53,11 @@ public class SortedSections extends Sections {
 
     private Section findFirstSection(final List<Section> sections,
                                      final Map<Station, Section> downStationMap) {
-        Section pivot = sections.get(0);
-        while (downStationMap.containsKey(pivot.getUpStation())) {
-            pivot = downStationMap.get(pivot.getUpStation());
+        Section firstSection = sections.get(0);
+        while (downStationMap.containsKey(firstSection.getUpStation())) {
+            firstSection = downStationMap.get(firstSection.getUpStation());
         }
-        return pivot;
+        return firstSection;
     }
 
     private List<Section> sortedSections(final Map<Station, Section> upStationMap,
@@ -72,19 +69,6 @@ public class SortedSections extends Sections {
             result.add(pivot);
         }
         return result;
-    }
-
-    public Section deleteLastSection() {
-        if (sectionLength() <= MINIMUM_SIZE) {
-            throw new IllegalArgumentException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
-        }
-        final Section lastSection = findLastSection();
-        sections.remove(lastSection);
-        return lastSection;
-    }
-
-    public boolean isLastDownStation(final Station station) {
-        return findLastSection().getDownStation().equals(station);
     }
 
     private Section findLastSection() {

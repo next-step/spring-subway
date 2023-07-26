@@ -1,41 +1,24 @@
 package subway.domain.fixture;
 
-import subway.dao.StationDao;
 import subway.domain.Station;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
 public class StationFixture {
-
-    private Station stationA;
-    private Station stationB;
-    private Station stationC;
-    private Station stationD;
-    private Station stationE;
-
-    public void init(StationDao stationDao) {
-        stationA = stationDao.insert(new Station("낙성대"));
-        stationB = stationDao.insert(new Station("사당"));
-        stationC = stationDao.insert(new Station("방배"));
-        stationD = stationDao.insert(new Station("서초"));
-        stationE = stationDao.insert(new Station("교대"));
+    public static Station createDefaultStation() {
+        return new Station("낙성대");
     }
 
-    public Station getStationA() {
-        return stationA;
+    public static Station createStation(String stationName) {
+        return new Station(stationName);
     }
 
-    public Station getStationB() {
-        return stationB;
-    }
-
-    public Station getStationC() {
-        return stationC;
-    }
-
-    public Station getStationD() {
-        return stationD;
-    }
-
-    public Station getStationE() {
-        return stationE;
+    public static List<Station> createStations(String... stationName) {
+        return Arrays.stream(stationName)
+                .map(Station::new)
+                .collect(toList());
     }
 }

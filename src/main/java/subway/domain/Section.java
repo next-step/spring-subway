@@ -1,26 +1,27 @@
 package subway.domain;
 
-import org.springframework.util.Assert;
-
 import java.util.Objects;
+
+import static org.springframework.util.Assert.isTrue;
+import static org.springframework.util.Assert.notNull;
 
 public class Section {
 
+    private final Line line;
+    private final Station upStation;
+    private final Station downStation;
+    private final Distance distance;
     private Long id;
-    private Line line;
-    private Station upStation;
-    private Station downStation;
-    private Distance distance;
 
     public Section(final Line line,
                    final Station upStation,
                    final Station downStation,
                    final Distance distance) {
-        Assert.notNull(line, "노선은 null일 수 없습니다.");
-        Assert.notNull(upStation, "상행역 null일 수 없습니다.");
-        Assert.notNull(downStation, "하행역 null일 수 없습니다.");
-        Assert.notNull(distance, "거리는 null일 수 없습니다.");
-        Assert.isTrue(!upStation.getId().equals(downStation.getId()), "상행역과 하행역은 같을 수 없습니다.");
+        notNull(line, "노선은 null일 수 없습니다.");
+        notNull(upStation, "상행역 null일 수 없습니다.");
+        notNull(downStation, "하행역 null일 수 없습니다.");
+        notNull(distance, "거리는 null일 수 없습니다.");
+        isTrue(!upStation.getId().equals(downStation.getId()), "상행역과 하행역은 같을 수 없습니다.");
         this.line = line;
         this.upStation = upStation;
         this.downStation = downStation;
@@ -33,13 +34,24 @@ public class Section {
                    final Station downStation,
                    final Distance distance) {
         this(line, upStation, downStation, distance);
+        notNull(id, "id는 필수입니다.");
         this.id = id;
     }
 
-    public Section(Section section) {
-        this(section.id, section.line, section.upStation, section.downStation, section.distance);
+    public Distance addDistance(Section section) {
+        return new Distance(this.getDistance() + section.getDistance());
     }
 
+    public Distance subtractDistance(Section section) {
+        if (getDistance() <= section.getDistance()) {
+            throw new IllegalArgumentException("기존 구간 길이보다 새로운 구간 길이가 같거나 더 클수는 없습니다.");
+        }
+        return new Distance(this.getDistance() - section.getDistance());
+    }
+
+    public boolean isNew() {
+        return id == null;
+    }
 
     public Long getId() {
         return id;
@@ -71,10 +83,6 @@ public class Section {
 
     public long getDistance() {
         return distance.getValue();
-    }
-
-    public boolean isNew() {
-        return id == null;
     }
 
     @Override

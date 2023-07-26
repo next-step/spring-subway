@@ -6,7 +6,7 @@ public class Distance {
 
     private static final long MIN_DISTANCE = 1L;
 
-    private long value;
+    private final long value;
 
     public Distance(final long distance) {
         validateDistanceValue(distance);
@@ -18,7 +18,7 @@ public class Distance {
             throw new IllegalArgumentException("거리는 " + MIN_DISTANCE + "이상이어야 합니다.");
         }
     }
-
+    
     public long getValue() {
         return value;
     }

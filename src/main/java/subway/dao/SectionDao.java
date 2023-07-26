@@ -11,6 +11,9 @@ import subway.domain.*;
 import javax.sql.DataSource;
 import java.util.List;
 
+import static java.lang.Boolean.TRUE;
+import static java.util.stream.Collectors.toList;
+
 @Repository
 public class SectionDao {
 
@@ -30,7 +33,7 @@ public class SectionDao {
                     + " INNER JOIN STATION as d ON d.id = s.down_station_id ";
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-    private RowMapper<Section> rowMapper = (rs, rowNum) -> {
+    private final RowMapper<Section> rowMapper = (rs, rowNum) -> {
         final Line line = new Line(
                 rs.getLong("line_id"),
                 rs.getString("line_name"),
@@ -78,28 +81,44 @@ public class SectionDao {
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
+    public boolean existSectionByLineId(final Long lineId) {
+        final String sql = "select count(*) > 0 from section where line_id = ? ";
+        return TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, lineId));
+    }
+
     public void deleteById(final Long sectionId) {
         final String sql = "delete from section where id = ?";
         jdbcTemplate.update(sql, sectionId);
     }
 
-    public void update(final Section section) {
-        final String sql = "update section set up_station_id = ? , down_station_id = ? , distance = ? where id = ? ";
-        jdbcTemplate.update(sql, section.getUpStationId(), section.getDownStationId(), section.getDistance(), section.getId());
+    public void updateSections(final Long lineId, final Sections sections) {
+        dirtyChecking(findAllByLineId(lineId), sections.getSections());
     }
 
-    public Section dirtyChecking(Sections beforeSections, Sections afterSections) {
-        List<Section> afterSection = afterSections.getSections();
-        List<Section> beforeSection = beforeSections.getSections();
-        afterSection.stream()
-                .filter(section -> !beforeSection.contains(section))
-                .filter(section -> !section.isNew())
-                .findAny()
-                .ifPresent(this::update);
-        return insert(afterSection.stream()
+    private void dirtyChecking(final List<Section> beforeSection, final List<Section> afterSection) {
+        deleteChecking(beforeSection, afterSection);
+        insertChecking(beforeSection, afterSection);
+    }
+
+    private void insertChecking(final List<Section> beforeSection, final List<Section> afterSection) {
+        final List<Section> insertingSections = afterSection.stream()
                 .filter(section -> !beforeSection.contains(section))
                 .filter(Section::isNew)
-                .findAny()
-                .orElseThrow(IllegalStateException::new));
+                .collect(toList());
+
+        for (Section section : insertingSections) {
+            insert(section);
+        }
     }
+
+    private void deleteChecking(final List<Section> beforeSection, final List<Section> afterSection) {
+        final List<Section> deletingSections = beforeSection.stream()
+                .filter(section -> !afterSection.contains(section))
+                .collect(toList());
+
+        for (Section section : deletingSections) {
+            deleteById(section.getId());
+        }
+    }
+
 }

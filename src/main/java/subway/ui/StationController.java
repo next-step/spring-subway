@@ -22,18 +22,18 @@ public class StationController {
     @PostMapping
     public ResponseEntity<StationResponse> createStation(
             @RequestBody final StationRequest stationRequest) {
-        final StationResponse station = stationService.saveStation(stationRequest);
+        final StationResponse station = stationService.createStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
     @GetMapping
     public ResponseEntity<List<StationResponse>> showStations() {
-        return ResponseEntity.ok().body(stationService.findAllStationResponses());
+        return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
     @GetMapping("/{stationId}")
     public ResponseEntity<StationResponse> showStation(@PathVariable final Long stationId) {
-        return ResponseEntity.ok().body(stationService.findStationResponseById(stationId));
+        return ResponseEntity.ok().body(stationService.findStation(stationId));
     }
 
     @PutMapping("/{stationId}")
