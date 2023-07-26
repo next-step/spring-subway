@@ -42,6 +42,27 @@ public class StationIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("이름이 null 이나 공백이면 지하철역을 생성할 수 없다.")
+    void createNullStationTest() {
+        // given
+        StationRequest stationRequest = new StationRequest(null);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .body(stationRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/stations")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo("역 이름은 공백이거나 비어있을 수 없습니다");
+    }
+
+    @Test
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성할 수 없다.")
     void createStationWithDuplicateName() {
         // given
