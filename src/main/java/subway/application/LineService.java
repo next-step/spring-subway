@@ -15,9 +15,18 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.exception.ErrorCode;
+import subway.exception.SectionException;
+import subway.exception.StationException;
 
 @Service
 public class LineService {
+
+    private static final String NO_STATION_EXCEPTION_MESSAGE = "삭제할 역이 존재하지 않습니다.";
+    private static final String NO_UP_STATION_EXCEPTION_MESSAGE = "새로운 구간의 상행역이 존재하지 않습니다.";
+    private static final String NO_DOWN_STATION_EXCEPTION_MESSAGE = "새로운 구간의 하행역이 존재하지 않습니다.";
+    private static final String NO_SAVED_SECTION_EXCEPTION_MESSAGE = "등록된 구간이 없습니다.";
+    private static final String NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE = "해당 노선의 구간이 존재하지 않습니다.";
 
     private final LineDao lineDao;
     private final StationDao stationDao;
@@ -56,7 +65,8 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineStationsResponse findLineResponseById(final Long id) {
         Line persistLine = findLineById(id);
-        Sections sections = sectionDao.findAllByLineId(id);
+        Sections sections = sectionDao.findAllByLineId(id)
+                .orElseThrow(() -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
         return LineStationsResponse.from(persistLine, sections.toStations());
     }
@@ -79,7 +89,8 @@ public class LineService {
     @Transactional
     public Long saveSection(final SectionRequest request, final Long lineId) {
         Section newSection = newSection(request);
-        Sections sections = sectionDao.findAllByLineId(lineId);
+        Sections sections = sectionDao.findAllByLineId(lineId)
+                .orElseThrow(() -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
         sections.validateInsert(newSection);
 
@@ -90,14 +101,19 @@ public class LineService {
         }
         sectionDao.insert(newSection, lineId);
 
-        return sectionDao.findIdByStationIdsAndLineId(
-                newSection.getUpStation().getId(), newSection.getDownStation().getId(), lineId);
+        final Long newUpStationId = newSection.getUpStation().getId();
+        final Long newDownStationId = newSection.getDownStation().getId();
+
+        return sectionDao.findIdByStationIdsAndLineId(newUpStationId, newDownStationId, lineId)
+                .orElseThrow(() -> new SectionException(ErrorCode.NO_SUCH_SECTION, NO_SAVED_SECTION_EXCEPTION_MESSAGE));
     }
 
     @Transactional
     public void deleteSectionByStationId(final Long lineId, final Long stationId) {
-        Station delete = stationDao.findById(stationId);
-        Sections sections = sectionDao.findAllByLineId(lineId);
+        final Station delete = stationDao.findById(stationId)
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_STATION_EXCEPTION_MESSAGE));
+        final Sections sections = sectionDao.findAllByLineId(lineId)
+                .orElseThrow(() -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
         sections.validateDelete(delete);
 
@@ -118,8 +134,10 @@ public class LineService {
     }
 
     private Section newSection(final SectionRequest request) {
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+        final Station upStation = stationDao.findById(request.getUpStationId())
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_UP_STATION_EXCEPTION_MESSAGE));
+        final Station downStation = stationDao.findById(request.getDownStationId())
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_DOWN_STATION_EXCEPTION_MESSAGE));
 
         return new Section(upStation, downStation, request.getDistance());
     }

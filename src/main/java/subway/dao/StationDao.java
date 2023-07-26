@@ -1,7 +1,9 @@
 package subway.dao;
 
 import java.util.List;
+import java.util.Optional;
 import javax.sql.DataSource;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -15,8 +17,7 @@ public class StationDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
-
-    private RowMapper<Station> rowMapper = (rs, rowNum) ->
+    private final RowMapper<Station> rowMapper = (rs, rowNum) ->
             new Station(
                     rs.getLong("id"),
                     rs.getString("name")
@@ -42,10 +43,14 @@ public class StationDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Station findById(final Long id) {
+    public Optional<Station> findById(final Long id) {
         String sql = "select * from STATION where id = ?";
 
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public void update(final Station newStation) {
