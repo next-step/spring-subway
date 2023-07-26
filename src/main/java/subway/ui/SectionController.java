@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.SectionService;
-import subway.dto.request.SectionRegistRequest;
+import subway.dto.request.SectionRegisterRequest;
 
 @RestController
 public class SectionController {
@@ -20,11 +20,11 @@ public class SectionController {
     }
 
     @PostMapping("/lines/{lineId}/sections")
-    public ResponseEntity<Void> registSection(
-        @RequestBody SectionRegistRequest sectionRegistRequest,
+    public ResponseEntity<Void> registerSection(
+        @RequestBody SectionRegisterRequest sectionRegisterRequest,
         @PathVariable Long lineId
     ) {
-        sectionService.registSection(sectionRegistRequest, lineId);
+        sectionService.registerSection(sectionRegisterRequest, lineId);
 
         return ResponseEntity.ok().build();
     }

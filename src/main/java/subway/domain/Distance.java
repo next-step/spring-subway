@@ -17,12 +17,16 @@ public class Distance {
         }
     }
 
-    public int compareDistance(Distance otherDistance) {
-        return Integer.compare(this.distance, otherDistance.distance);
+    public boolean isOverDistance(Distance otherDistance) {
+        return this.distance <= otherDistance.distance;
     }
 
-    public int subtract(Distance otherDistance) {
-        return this.distance - otherDistance.distance;
+    public Distance subtract(Distance otherDistance) {
+        return new Distance(this.distance - otherDistance.distance);
+    }
+
+    public Distance add(Distance otherDistance) {
+        return new Distance(this.distance + otherDistance.distance);
     }
 
     public int getDistance() {
@@ -49,7 +53,7 @@ public class Distance {
     @Override
     public String toString() {
         return "Distance{" +
-            "distance=" + distance +
-            '}';
+                "distance=" + distance +
+                '}';
     }
 }

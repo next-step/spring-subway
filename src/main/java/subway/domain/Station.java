@@ -13,6 +13,7 @@ public class Station {
     }
 
     public Station(Long id, String name) {
+        validateStation(name);
         this.id = id;
         this.name = name;
     }
@@ -56,8 +57,8 @@ public class Station {
     @Override
     public String toString() {
         return "Station{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            '}';
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
