@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
+import subway.exception.SubwayException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.integration.TestRequestUtil.createLine;
@@ -155,6 +156,7 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("두 역 중 하나는 기존 노선에 포함되어야 합니다");
     }
 
     // 32
@@ -173,6 +175,7 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("새로운 구간의 거리는 기존 노선의 거리보다 작아야 합니다. 새 구간 거리 : 15");
     }
 
     @Test
@@ -190,6 +193,7 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("구간의 상행역과 하행역이 같을 수 없습니다");
     }
 
     @Test
@@ -276,6 +280,7 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("노선에 구간이 하나일 때는 삭제할 수 없습니다.");
     }
 
     @Test
@@ -303,5 +308,6 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("노선에 역이 포함되지 않을 때는 삭제할 수 없습니다.");
     }
 }

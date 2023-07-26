@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.StationRequest;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public class LineIntegrationTest extends IntegrationTest {
     void createLineTest() {
         // given
         LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
-        
+
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -77,6 +78,7 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("노선 이름이 이미 존재합니다 : 2호선");
     }
 
     @Test
@@ -96,6 +98,7 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("구간의 상행역과 하행역이 같을 수 없습니다");
     }
 
     @Test

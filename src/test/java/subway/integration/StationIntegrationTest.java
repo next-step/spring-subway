@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ public class StationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(SubwayException.class)).hasMessage("이미 존재하는 역 이름입니다 : 강남역");
     }
 
     @Test
