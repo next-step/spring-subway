@@ -1,26 +1,32 @@
 package subway.application;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import subway.dao.SectionDao;
+import subway.domain.PathFinder;
+import subway.domain.Section;
 import subway.dto.response.PathResponse;
 import subway.dto.response.StationResponse;
 
 @Service
 public class PathService {
 
-    public PathService() {
+    private final SectionDao sectionDao;
+
+    public PathService(SectionDao sectionDao) {
+        this.sectionDao = sectionDao;
     }
 
     public PathResponse findMinimumDistancePaths(Long departureStationId, Long destinationStationId) {
-        StationResponse stationResponse1 = new StationResponse(5L, "교대역");
-        StationResponse stationResponse2 = new StationResponse(7L, "남부터미널역");
-        StationResponse stationResponse3 = new StationResponse(8L, "양재역");
-        Long distanceMinimum = 5L;
-        PathResponse pathResponse = new PathResponse(
-            List.of(stationResponse1, stationResponse2, stationResponse3),
-            distanceMinimum
-        );
+        List<Section> sections = sectionDao.findAll();
+        PathFinder pathFinder = new PathFinder(sections);
 
-        return pathResponse;
+        List<StationResponse> stations = pathFinder.findStations(departureStationId, destinationStationId).stream()
+            .map(StationResponse::of)
+            .collect(Collectors.toUnmodifiableList());
+        Long distance = pathFinder.findMinimumDistance(departureStationId, destinationStationId);
+
+        return new PathResponse(stations, distance);
     }
 }

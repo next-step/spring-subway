@@ -23,34 +23,6 @@ import subway.dto.response.StationResponse;
 @ExtendWith(MockitoExtension.class)
 public class PathControllerTest extends IntegrationTest {
 
-    /**
-     * 교대역  --- *2호선*[1] --   강남역
-     * |                        |
-     * *3호선* [2]              *신분당선* [5]
-     * |                        |
-     * 남부터미널역 -- *3호선*[3] --   양재
-     */
-
-    /**
-     * {
-     *     "stations": [
-     *         {
-     *             "id": 5,
-     *             "name": "교대역"
-     *         },
-     *         {
-     *             "id": 7,
-     *             "name": "남부터미널역"
-     *         },
-     *         {
-     *             "id": 8,
-     *             "name": "양재역"
-     *         }
-     *     ],
-     *     "distance": 5
-     * }
-     */
-
     private Long 출발역_아이디 = 5L;
     private Long 도착역_아이디 = 8L;
     private Station 교대역 = new Station(5L, "교대역");
