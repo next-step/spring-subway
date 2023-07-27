@@ -1,5 +1,6 @@
 package subway.dao;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,5 +83,9 @@ public class SectionDao {
     public void deleteBySectionId(long sectionId) {
         String deleteSql = "DELETE FROM SECTIONS AS S WHERE S.id = ?";
         jdbcTemplate.update(deleteSql, sectionId);
+    }
+
+    public List<Section> findAll() {
+        return Collections.emptyList();
     }
 }
