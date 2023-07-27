@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Path;
@@ -26,6 +27,7 @@ public class PathService {
         this.stationDao = stationDao;
     }
 
+    @Transactional(readOnly = true)
     public PathFindResponse getMinimumPath(long sourceStationId, long targetStationId) {
         Station sourceStation = getStation(sourceStationId);
         Station targetStation = getStation(targetStationId);

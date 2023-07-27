@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.domain.exception.StatusCodeException;
@@ -23,6 +24,7 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public StationResponse saveStation(StationCreateRequest stationCreateRequest) {
         stationDao.findByName(stationCreateRequest.getName())
                 .ifPresent(station -> {
@@ -35,6 +37,7 @@ public class StationService {
         return StationResponse.of(station);
     }
 
+    @Transactional(readOnly = true)
     public StationResponse findStationResponseById(long id) {
         Station station = stationDao.findById(id).orElseThrow(() -> new StatusCodeException(
                 MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id), CANNOT_FIND_STATION));
@@ -42,6 +45,7 @@ public class StationService {
         return StationResponse.of(station);
     }
 
+    @Transactional(readOnly = true)
     public List<StationResponse> findAllStationResponses() {
         List<Station> stations = stationDao.findAll();
 
@@ -50,10 +54,12 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void updateStation(long id, StationUpdateRequest stationUpdateRequest) {
         stationDao.update(new Station(id, stationUpdateRequest.getName()));
     }
 
+    @Transactional
     public void deleteStationById(long id) {
         stationDao.deleteById(id);
     }
