@@ -12,11 +12,10 @@ public class Sections {
     private final List<Section> sections;
 
     public Sections(List<Section> sections) {
-        validSections(sections);
         this.sections = sections;
     }
 
-    private void validSections(List<Section> sections) {
+    public void validSectionsLine() {
         long sectionsLinesCount = sections.stream()
             .map(Section::getLine)
             .distinct()

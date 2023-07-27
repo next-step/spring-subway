@@ -32,6 +32,7 @@ public class SectionService {
         Section section = makeSection(sectionRegisterRequest, lineId);
         Sections sections = sectionDao.findAllByLineId(lineId);
 
+        sections.validSectionsLine();
         sections.validRegisterSection(section);
 
         sectionDao.insert(section);
@@ -54,6 +55,8 @@ public class SectionService {
     public void deleteSection(Long stationId, Long lineId) {
         Sections sections = sectionDao.findAllByLineId(lineId);
         Station deleteStation = stationDao.findById(stationId);
+
+        sections.validSectionsLine();
         sections.validDeleteStation(deleteStation);
 
         Optional<Section> sectionByUpStation = sections.findSectionByUpStation(deleteStation);

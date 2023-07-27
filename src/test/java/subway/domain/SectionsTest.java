@@ -72,7 +72,8 @@ class SectionsTest {
             10
         );
 
-        assertThatThrownBy(() -> new Sections(List.of(section1, section3, otherLineSection)))
+        assertThatThrownBy(() ->
+            new Sections(List.of(section1, section3, otherLineSection)).validSectionsLine())
             .isInstanceOf(IllegalArgumentException.class);
     }
 
