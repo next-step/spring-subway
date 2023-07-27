@@ -39,8 +39,8 @@ public class LineService {
                 .ifPresent(line -> {
                     throw new IncorrectRequestException(ErrorCode.DUPLICATED_LINE_NAME, request.getName());
                 });
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         Section section = newSection(SectionRequest.of(request));
+        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         sectionDao.insert(section, persistLine.getId());
         return LineResponse.of(persistLine);
     }
