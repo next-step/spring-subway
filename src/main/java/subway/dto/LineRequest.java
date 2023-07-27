@@ -8,14 +8,11 @@ public final class LineRequest {
     private static final int MAX_NAME_LENGTH = 255;
     private static final int MAX_COLOR_LENGTH = 20;
 
-    private String name;
-    private long upStationId;
-    private long downStationId;
-    private int distance;
-    private String color;
-
-    private LineRequest() {
-    }
+    private final String name;
+    private final long upStationId;
+    private final long downStationId;
+    private final int distance;
+    private final String color;
 
     @JsonCreator
     public LineRequest(final String name,

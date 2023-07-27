@@ -7,10 +7,7 @@ public final class StationRequest {
 
     private static final int MAX_NAME_LENGTH = 255;
 
-    private String name;
-
-    private StationRequest() {
-    }
+    private final String name;
 
     @JsonCreator
     public StationRequest(final String name) {

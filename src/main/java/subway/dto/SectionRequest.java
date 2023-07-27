@@ -5,12 +5,9 @@ import subway.exception.IllegalRequestException;
 
 public final class SectionRequest {
 
-    private long upStationId;
-    private long downStationId;
-    private int distance;
-
-    private SectionRequest() {
-    }
+    private final long upStationId;
+    private final long downStationId;
+    private final int distance;
 
     @JsonCreator
     public SectionRequest(final String upStationId, final String downStationId, final int distance) {
