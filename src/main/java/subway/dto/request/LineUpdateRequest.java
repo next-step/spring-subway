@@ -9,6 +9,8 @@ public class LineUpdateRequest {
     @NotBlank
     private String color;
 
+    public LineUpdateRequest() {
+    }
 
     public LineUpdateRequest(String name, String color) {
         this.name = name;
