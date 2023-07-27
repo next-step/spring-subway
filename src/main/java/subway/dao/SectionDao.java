@@ -56,6 +56,12 @@ public class SectionDao {
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
+    public List<Section> findAll() {
+        final String sql = "select * from SECTION";
+
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
     public int delete(final Long targetSectionId) {
         final String sql = "delete from SECTION where id = ?";
 
