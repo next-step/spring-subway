@@ -12,28 +12,42 @@ public class Path {
 
     private final WeightedMultigraph<Long, DefaultWeightedEdge> graph =
             new WeightedMultigraph<>(DefaultWeightedEdge.class);
+    private GraphPath<Long, DefaultWeightedEdge> shortestPath;
 
     public Path(final List<Section> sections) {
         createVertex(sections);
         createEdgeHasWeight(sections);
     }
 
-    public List<Long> findShortestPath(final Long sourceId, final Long targetId) {
-        final DijkstraShortestPath<Long, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(this.graph);
-        final GraphPath<Long, DefaultWeightedEdge> path = dijkstraShortestPath.getPath(sourceId, targetId);
-        if (Objects.isNull(path)) {
-            throw new SubwayException("출발역과 도착역이 연결되어 있지 않습니다. 출발역 ID : " + sourceId + " 도착역 ID : " + targetId);
+    public List<Long> findShortestPathVertices(final Long sourceId, final Long targetId) {
+        if (this.shortestPath == null) {
+            this.shortestPath = getShortestPath(sourceId, targetId);
         }
-        return path.getVertexList();
+
+        return this.shortestPath.getVertexList();
     }
 
     public long findShortestPathWeight(final Long sourceId, final Long targetId) {
-        final DijkstraShortestPath<Long, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(this.graph);
-        final double pathWeight = dijkstraShortestPath.getPathWeight(sourceId, targetId);
-        if (Double.isFinite(pathWeight)) {
+        if (this.shortestPath == null) {
+            this.shortestPath = getShortestPath(sourceId, targetId);
+        }
+
+        return (long) this.shortestPath.getWeight();
+    }
+
+    public boolean isPathHasVertex(final Long sourceId, final Long targetId) {
+        return this.graph.containsVertex(sourceId) && this.graph.containsVertex(targetId);
+    }
+
+    private GraphPath<Long, DefaultWeightedEdge> getShortestPath(final Long sourceId, final Long targetId) {
+        final GraphPath<Long, DefaultWeightedEdge> path = new DijkstraShortestPath<>(this.graph)
+                .getPath(sourceId, targetId);
+
+        if (Objects.isNull(path)) {
             throw new SubwayException("출발역과 도착역이 연결되어 있지 않습니다. 출발역 ID : " + sourceId + " 도착역 ID : " + targetId);
         }
-        return (long) pathWeight;
+
+        return path;
     }
 
     private void createVertex(final List<Section> sections) {

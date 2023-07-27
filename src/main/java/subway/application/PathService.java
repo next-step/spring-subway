@@ -26,13 +26,20 @@ public class PathService {
     public PathResponse findShortestPath(final Long sourceId, final Long targetId) {
         validateSameSourceAndTarget(sourceId, targetId);
         Path path = new Path(sectionDao.findAll());
-        List<Long> shortestPathStationIds = path.findShortestPath(sourceId, targetId);
-        long shortestPathWeight = path.findShortestPathWeight(sourceId, targetId);
+        validatePathContainsSourceAndTarget(path, sourceId, targetId);
 
+        List<Long> shortestPathStationIds = path.findShortestPathVertices(sourceId, targetId);
+        long shortestPathWeight = path.findShortestPathWeight(sourceId, targetId);
         final Map<Long, Station> stations = stationDao.findAllByStationIdIn(shortestPathStationIds).stream()
                 .collect(Collectors.toMap(Station::getId, station -> station));
 
         return PathResponse.of(shortestPathStationIds, stations, shortestPathWeight);
+    }
+
+    private void validatePathContainsSourceAndTarget(final Path path, final Long sourceId, final Long targetId) {
+        if (!path.isPathHasVertex(sourceId, targetId)) {
+            throw new SubwayException("출발역과 도착역이 해당 노선도에 등록되어 있지 않습니다. 출발역 ID : " + sourceId + " 도착역 ID : " + targetId);
+        }
     }
 
     private void validateSameSourceAndTarget(final Long sourceId, final Long targetId) {
