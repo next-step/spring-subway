@@ -75,9 +75,9 @@ public class SectionDaoTest {
         Section insertSection = sectionDao.insert(new Section(station3, station4, distance), 1L);
         // then
         assertAll(
-            () -> assertThat(insertSection.getUpStation()).isEqualTo(station3),
-            () -> assertThat(insertSection.getDownStation()).isEqualTo(station4),
-            () -> assertThat(new Distance(insertSection.getDistance())).isEqualTo(distance)
+            () -> assertThat(insertSection).extracting("upStation").isEqualTo(station3),
+            () -> assertThat(insertSection).extracting("downStation").isEqualTo(station4),
+            () -> assertThat(insertSection).extracting("distance").isEqualTo(distance.getDistance())
         );
     }
 

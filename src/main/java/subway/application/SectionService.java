@@ -16,6 +16,7 @@ import subway.dto.SectionRequest;
 import subway.exception.SubwayException;
 
 @Service
+@Transactional(readOnly = true)
 public class SectionService {
 
     private final SectionDao sectionDao;

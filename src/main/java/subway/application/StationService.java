@@ -13,6 +13,7 @@ import subway.dto.StationResponse;
 import subway.exception.SubwayException;
 
 @Service
+@Transactional(readOnly = true)
 public class StationService {
 
     private final StationDao stationDao;
@@ -27,14 +28,12 @@ public class StationService {
         return StationResponse.of(station);
     }
 
-    @Transactional(readOnly = true)
     public StationResponse findStationResponseById(final Long id) {
         Station station = stationDao.findById(id)
             .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
         return StationResponse.of(station);
     }
 
-    @Transactional(readOnly = true)
     public List<StationResponse> findAllStationResponses() {
         List<Station> stations = stationDao.findAll();
 

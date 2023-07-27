@@ -65,8 +65,9 @@ public class LineController {
     public ResponseEntity<Void> createSection(@PathVariable final Long id,
         @RequestBody final SectionRequest sectionRequest) {
         sectionService.saveSection(id, sectionRequest);
-        return ResponseEntity.created(URI.create("/lines/" + id)).build();
+        return ResponseEntity.ok().build();
     }
+
 
     @DeleteMapping("/{lineId}/sections")
     public ResponseEntity<Void> deleteStation(@PathVariable final Long lineId,

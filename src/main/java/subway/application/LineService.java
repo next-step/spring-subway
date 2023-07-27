@@ -19,6 +19,7 @@ import subway.dto.LineWithStationsResponse;
 import subway.exception.SubwayException;
 
 @Service
+@Transactional(readOnly = true)
 public class LineService {
 
     private final LineDao lineDao;
@@ -47,7 +48,6 @@ public class LineService {
         return LineWithStationsResponse.of(newLine);
     }
 
-    @Transactional(readOnly = true)
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = lineDao.findAll();
         return persistLines.stream()
@@ -55,7 +55,6 @@ public class LineService {
             .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     public LineWithStationsResponse findLineResponseById(final Long id) {
         Line line = lineDao.findById(id)
             .orElseThrow(() -> new SubwayException(NOT_FOUND_LINE));

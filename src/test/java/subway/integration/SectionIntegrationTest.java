@@ -2,9 +2,9 @@ package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static subway.exception.ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE;
 import static subway.exception.ErrorCode.INVALID_DISTANCE_COMPARE;
@@ -71,7 +71,7 @@ public class SectionIntegrationTest extends IntegrationTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(OK.value());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class SectionIntegrationTest extends IntegrationTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(OK.value());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class SectionIntegrationTest extends IntegrationTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(OK.value());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class SectionIntegrationTest extends IntegrationTest {
             .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(CREATED.value());
+        assertThat(response.statusCode()).isEqualTo(OK.value());
     }
 
     @Test

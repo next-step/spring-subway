@@ -94,7 +94,7 @@ class SectionTest {
             4
         );
         // when
-        Section addSection = section.add(newSection);
+        Section addSection = section.merge(newSection);
         // then
         assertThat(addSection).isEqualTo(
             new Section(new Station("서울대입구역"), new Station("잠실역"), 14));
@@ -115,7 +115,7 @@ class SectionTest {
             4
         );
         // when & then
-        assertThatCode(() -> section.add(newSection))
+        assertThatCode(() -> section.merge(newSection))
             .isInstanceOf(SubwayException.class)
             .hasMessage(SECTION_DOES_NOT_CONTAIN_SECTION.getMessage());
     }

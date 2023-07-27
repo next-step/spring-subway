@@ -57,8 +57,8 @@ public class Section {
         return upStation.equals(station) || downStation.equals(station);
     }
 
-    public Section add(final Section newSection) {
-        if (downStation.isNotEqual(newSection.upStation)) {
+    public Section merge(final Section newSection) {
+        if (downStation.notMatch(newSection.upStation)) {
             throw new SubwayException(SECTION_DOES_NOT_CONTAIN_SECTION);
         }
         return new Section(this.upStation, newSection.downStation,

@@ -30,7 +30,7 @@ public class Station {
         return this.equals(other);
     }
 
-    public boolean isNotEqual(final Station other) {
+    public boolean notMatch(final Station other) {
         return !match(other);
     }
 
