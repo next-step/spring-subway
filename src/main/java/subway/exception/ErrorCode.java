@@ -5,9 +5,11 @@ public enum ErrorCode {
 
     INVALID_COLOR_LENGTH(400, "COL001", "색상명의 길이를 벗어났습니다."),
 
-    INVALID_NAME_LENGTH(400, "NAM001", "지하철 역명이나 노선명의 길이의 범위를 벗어났습니다."),
+    INVALID_STATION_NAME_LENGTH(400, "NAM001", "지하철 역명의 길이가 범위를 벗어났습니다."),
+    INVALID_LINE_NAME_LENGTH(400, "NAM001", "노선명의 길이가 범위를 벗어났습니다."),
 
     NO_SUCH_LINE(404, "LIN001", "존재하지 않는 노선입니다."),
+    EXISTS_LINE(400, "LIN002", "이미 존재하는 노선입니다."),
 
     EMPTY_SECTION(404, "SEC001", "구간이 존재하지 않습니다."),
     INVALID_SECTION(400, "SEC002", "삽입 시 기준역은 한 개의 역이어야 합니다."),
@@ -21,11 +23,12 @@ public enum ErrorCode {
     NO_SUCH_STATION(404, "STA002", "해당 역이 존재하지 않습니다."),
     TOO_MANY_STATION("STA003"),
     NOT_FOUND_UP_STATION_TERMINAL("STA004"),
+    EXISTS_STATION(400, "STA005", "이미 존재하는 지하철역입니다."),
 
     TOO_LONG_DISTANCE(400, "DST001", "새로운 구간의 거리는 기존 구간의 거리보다 짧아야 합니다."),
     NOT_POSITIVE_DISTANCE(400, "DST002", "거리는 양의 정수여야 합니다."),
 
-    EXISTS_DATA(400, "DB_EXISTS", "이미 존재하는 데이터입니다."),
+    DATABASE_EXISTS(500, "DB_DUPLICATE", "이미 존재하는 데이터입니다."),
     DATABASE_ERROR(500, "DB_UNKNOWN", "데이터베이스에서 알 수 없는 오류가 발생했습니다."),
     UNKNOWN_ERROR("UNKNOWN"),
     ;

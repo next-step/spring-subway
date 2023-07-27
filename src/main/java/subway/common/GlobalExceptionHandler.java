@@ -33,13 +33,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DataIntegrityViolationException.class)
     protected ErrorResponse handleDataIntegrityViolationException(
             final DataIntegrityViolationException e) {
         log.error(e.getMessage());
 
-        return ErrorResponse.of(ErrorCode.EXISTS_DATA);
+        return ErrorResponse.of(ErrorCode.DATABASE_EXISTS);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

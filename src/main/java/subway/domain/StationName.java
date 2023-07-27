@@ -17,9 +17,14 @@ public class StationName {
     }
 
     private void validate(final String value) {
-        if (value == null || value.isBlank() || MAX_LENGTH < value.length()) {
-            throw new InvalidRequestException(ErrorCode.INVALID_NAME_LENGTH, OUT_OF_RANGE_LENGTH_EXCEPTION_MESSAGE);
+        if (value == null || isInvalidLength(value)) {
+            throw new InvalidRequestException(
+                    ErrorCode.INVALID_STATION_NAME_LENGTH, OUT_OF_RANGE_LENGTH_EXCEPTION_MESSAGE);
         }
+    }
+
+    private boolean isInvalidLength(final String value) {
+        return value.isBlank() || MAX_LENGTH < value.length();
     }
 
     public String getValue() {

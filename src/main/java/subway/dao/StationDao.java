@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Station;
+import subway.domain.StationName;
 
 @Repository
 public class StationDao {
@@ -32,7 +33,6 @@ public class StationDao {
 
     public Station insert(final Station station) {
         final SqlParameterSource params = new MapSqlParameterSource()
-//                .addValue("id", station.getId())
                 .addValue("name", station.getStationName().getValue());
 
         Long id = insertAction.executeAndReturnKey(params).longValue();
@@ -56,10 +56,16 @@ public class StationDao {
         }
     }
 
+    public boolean exists(final StationName stationName) {
+        String sql = "select exists(select id from STATION where name = ?)";
+
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, stationName.getValue()));
+    }
+
     public void update(final Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
 
-        jdbcTemplate.update(sql, new Object[]{newStation.getStationName().getValue(), newStation.getId()});
+        jdbcTemplate.update(sql, newStation.getStationName().getValue(), newStation.getId());
     }
 
     public void deleteById(final Long id) {

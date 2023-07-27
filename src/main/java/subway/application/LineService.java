@@ -30,6 +30,7 @@ public class LineService {
     private static final String NO_SAVED_SECTION_EXCEPTION_MESSAGE = "등록된 구간이 없습니다.";
     private static final String NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE = "해당 노선의 구간이 존재하지 않습니다.";
     private static final String NO_LINE_EXCEPTION_MESSAGE = "존재하지 않는 노선입니다.";
+    private static final String EXISTS_LINE_EXCEPTION_MESSAGE = "이미 존재하는 노선입니다.";
 
     private final LineDao lineDao;
     private final StationDao stationDao;
@@ -43,7 +44,13 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(final LineRequest request) {
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        Line newLine = new Line(request.getName(), request.getColor());
+
+        if (lineDao.exists(newLine.getLineName())) {
+            throw new LineException(ErrorCode.EXISTS_LINE, EXISTS_LINE_EXCEPTION_MESSAGE);
+        }
+
+        Line persistLine = lineDao.insert(newLine);
         Section section = newSection(SectionRequest.of(request));
 
         sectionDao.insert(section, persistLine.getId());

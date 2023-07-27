@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
+import subway.domain.LineName;
 
 @Repository
 public class LineDao {
@@ -59,10 +60,16 @@ public class LineDao {
         }
     }
 
+    public boolean exists(final LineName lineName) {
+        String sql = "select exists(select id from LINE where name = ?)";
+
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, lineName.getValue()));
+    }
+
     public void update(final Line newLine) {
         String sql = "update LINE set name = ?, color = ? where id = ?";
 
-        jdbcTemplate.update(sql, new Object[]{newLine.getLineName().getValue(), newLine.getColor().getValue(), newLine.getId()});
+        jdbcTemplate.update(sql, newLine.getLineName().getValue(), newLine.getColor().getValue(), newLine.getId());
     }
 
     public void deleteById(final Long id) {
