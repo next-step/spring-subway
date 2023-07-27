@@ -54,14 +54,14 @@ class PathFinderTest {
 
     @Test
     @DisplayName("존재하지 않는 출발역이나 도착역을 조회 할 경우 경로 조회에 실패한다.")
-    void searchShortestPath_notExistSourceAndTarget_throwException() {
+    void searchShortestPath_notExistSourceOrTarget_throwException() {
         // given
-        Station source = new Station (1L, "교대역");
-        Station target = new Station (3L, "양재역");
+        Station existSource = new Station (1L, "교대역");
+        Station notExistTarget = new Station (5L, "종합운동장역");
         PathFinder pathFinder = new PathFinder(createInitialSections());
 
         // when & then
-        assertThatThrownBy(() -> pathFinder.searchShortestPath(source, target))
+        assertThatThrownBy(() -> pathFinder.searchShortestPath(existSource, notExistTarget))
             .hasMessage("출발역 또는 도착역이 존재하지 않습니다.")
             .isInstanceOf(IllegalStationsException.class);
     }
