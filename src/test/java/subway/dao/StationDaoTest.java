@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import subway.dao.mapper.StationRowMapper;
 import subway.domain.Station;
@@ -17,6 +18,7 @@ import subway.domain.Station;
 @DisplayName("StationDao 클래스")
 @JdbcTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 @ContextConfiguration(classes = {StationDao.class, StationRowMapper.class})
 class StationDaoTest {
 
