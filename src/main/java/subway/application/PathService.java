@@ -2,6 +2,7 @@ package subway.application;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -10,6 +11,7 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.domain.exception.StatusCodeException;
 import subway.domain.response.PathResponse;
+import subway.dto.PathFindResponse;
 
 @Service
 public class PathService {
@@ -24,14 +26,18 @@ public class PathService {
         this.stationDao = stationDao;
     }
 
-    public PathResponse getMinimumPath(long sourceStationId, long targetStationId) {
+    public PathFindResponse getMinimumPath(long sourceStationId, long targetStationId) {
         Station sourceStation = getStation(sourceStationId);
         Station targetStation = getStation(targetStationId);
 
         List<Section> sections = sectionDao.findAll();
-
         Path path = new Path(sections);
-        return path.minimumPath(sourceStation, targetStation);
+        PathResponse pathResponse = path.minimumPath(sourceStation, targetStation);
+
+        return new PathFindResponse(pathResponse.getStations().stream()
+                .map(stationResponse -> new PathFindResponse.StationResponse(stationResponse.getId(),
+                        stationResponse.getName()))
+                .collect(Collectors.toList()), pathResponse.getDistance());
     }
 
     private Station getStation(long stationId) {
