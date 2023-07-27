@@ -19,6 +19,12 @@ public class StationIntegrationSupporter {
                 .extract();
     }
 
+    public static void createStations(StationRequest ...stationRequests) {
+        for (final StationRequest stationRequest : stationRequests) {
+            createStation(stationRequest);
+        }
+    }
+
 
     public static ExtractableResponse<Response> findAllStations() {
         return given().log().all()

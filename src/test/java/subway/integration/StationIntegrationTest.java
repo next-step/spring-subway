@@ -22,25 +22,25 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void createStation() {
         // given
-        final StationRequest request = new StationRequest("강남역");
+        final StationRequest 강남역_요청 = new StationRequest("강남역");
 
         // when
-        ExtractableResponse<Response> response = StationIntegrationSupporter.createStation(request);
+        ExtractableResponse<Response> 강남역_응답 = StationIntegrationSupporter.createStation(강남역_요청);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isNotBlank();
+        assertThat(강남역_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(강남역_응답.header("Location")).isNotBlank();
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
     @Test
     void createStationWithDuplicateName() {
         // given
-        final StationRequest request = new StationRequest("강남역");
-        StationIntegrationSupporter.createStation(request);
+        final StationRequest 강남역_요청 = new StationRequest("강남역");
+        StationIntegrationSupporter.createStation(강남역_요청);
 
         // when
-        ExtractableResponse<Response> response = StationIntegrationSupporter.createStation(request);
+        ExtractableResponse<Response> response = StationIntegrationSupporter.createStation(강남역_요청);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -50,23 +50,25 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStations() {
         /// given
-        final StationRequest request1 = new StationRequest("강남역");
-        final StationRequest request2 = new StationRequest("역삼역");
+        final StationRequest 강남역_요청 = new StationRequest("강남역");
+        final StationRequest 역삼역_요청 = new StationRequest("역삼역");
 
-        ExtractableResponse<Response> createResponse1 = StationIntegrationSupporter.createStation(request1);
-        ExtractableResponse<Response> createResponse2 = StationIntegrationSupporter.createStation(request2);
+        ExtractableResponse<Response> 강남역_응답 = StationIntegrationSupporter.createStation(강남역_요청);
+        ExtractableResponse<Response> 역삼역_응답 = StationIntegrationSupporter.createStation(역삼역_요청);
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.findAllStations();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
+
+        List<Long> expectedStationIds = Stream.of(강남역_응답, 역삼역_응답)
                 .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
         List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
                 .map(StationResponse::getId)
                 .collect(Collectors.toList());
+
         assertThat(resultStationIds).containsAll(expectedStationIds);
     }
 
@@ -74,52 +76,51 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStation() {
         /// given
-        final StationRequest request = new StationRequest("강남역");
-
-        ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(request);
+        final StationRequest 강남역_요청 = new StationRequest("강남역");
+        ExtractableResponse<Response> 강남역_생성_응답 = StationIntegrationSupporter.createStation(강남역_요청);
 
         // when
-        final Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = StationIntegrationSupporter.findStation(stationId);
+        final Long 강남역_ID = Long.parseLong(강남역_생성_응답.header("Location").split("/")[2]);
+        ExtractableResponse<Response> 강남역_조회_응답 = StationIntegrationSupporter.findStation(강남역_ID);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        StationResponse stationResponse = response.as(StationResponse.class);
-        assertThat(stationResponse.getId()).isEqualTo(stationId);
+        assertThat(강남역_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
+        StationResponse 강남역_응답 = 강남역_조회_응답.as(StationResponse.class);
+        assertThat(강남역_응답.getId()).isEqualTo(강남역_ID);
     }
 
     @DisplayName("지하철역을 수정한다.")
     @Test
     void updateStation() {
         // given
-        final StationRequest request1 = new StationRequest("강남역");
+        final StationRequest 강남역_요청 = new StationRequest("강남역");
 
-        ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(request1);
+        ExtractableResponse<Response> 강남역_응답 = StationIntegrationSupporter.createStation(강남역_요청);
 
         // when
-        final String uri = createResponse.header("Location");
+        final String uri = 강남역_응답.header("Location");
 
-        final StationRequest request2 = new StationRequest("삼성역");
-        ExtractableResponse<Response> response = StationIntegrationSupporter.updateStation(uri, request2);
+        final StationRequest 강남역_수정_요청 = new StationRequest("삼성역");
+        ExtractableResponse<Response> 삼성역_응답 = StationIntegrationSupporter.updateStation(uri, 강남역_수정_요청);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(삼성역_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
     @DisplayName("지하철역을 제거한다.")
     @Test
     void deleteStation() {
         // given
-        final StationRequest request = new StationRequest("강남역");
+        final StationRequest 강남역_요청 = new StationRequest("강남역");
 
-        ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(request);
+        ExtractableResponse<Response> 강남역_생성_응답 = StationIntegrationSupporter.createStation(강남역_요청);
 
         // when
-        final String uri = createResponse.header("Location");
+        final String uri = 강남역_생성_응답.header("Location");
 
-        ExtractableResponse<Response> response = StationIntegrationSupporter.deleteStation(uri);
+        ExtractableResponse<Response> 강남역_삭제_응답 = StationIntegrationSupporter.deleteStation(uri);
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(강남역_삭제_응답.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 }
