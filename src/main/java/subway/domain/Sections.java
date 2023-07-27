@@ -5,6 +5,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.WeightedMultigraph;
 
 public class Sections {
 
@@ -146,6 +149,71 @@ public class Sections {
         return sections.stream()
             .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
             .collect(Collectors.toUnmodifiableSet());
+    }
+
+    public Distance findStationToStationDistance(Station sourceStation, Station targetStation) {
+        DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
+
+        double pathWeight = dijkstraShortestPath.getPathWeight(sourceStation, targetStation);
+
+        validPathWeight(pathWeight);
+
+        return new Distance((int) pathWeight);
+    }
+
+    private void validPathWeight(double pathWeight) {
+        if (Double.isInfinite(pathWeight)) {
+            throw new IllegalArgumentException("출발역과 도착역이 연결되어있지 않습니다.");
+        }
+        if (pathWeight == 0.0) {
+            throw new IllegalArgumentException("출발역과 도착역이 동일합니다.");
+        }
+    }
+
+    public List<Station> findStationToStationRoute(Station sourceStation, Station targetStation) {
+        DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
+
+        List<Station> shortestPath = makeShortestPath(
+            sourceStation,
+            targetStation,
+            dijkstraShortestPath
+        );
+
+        validSameSourceAndTarget(shortestPath);
+
+        return shortestPath;
+    }
+
+    private DijkstraShortestPath makeDijkstraShortestPath() {
+        WeightedMultigraph<Station, DefaultWeightedEdge> graph
+            = new WeightedMultigraph(DefaultWeightedEdge.class);
+
+        for (Section section : sections) {
+            graph.addVertex(section.getUpStation());
+            graph.addVertex(section.getDownStation());
+            graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()), section.getDistance().getDistance());
+        }
+
+        DijkstraShortestPath dijkstraShortestPath = new DijkstraShortestPath(graph);
+        return dijkstraShortestPath;
+    }
+
+    private List<Station> makeShortestPath(
+        Station sourceStation,
+        Station targetStation,
+        DijkstraShortestPath dijkstraShortestPath
+    ) {
+        try {
+            return dijkstraShortestPath.getPath(sourceStation, targetStation).getVertexList();
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("출발역과 도착역이 연결되어있지 않습니다.");
+        }
+    }
+
+    private void validSameSourceAndTarget(List<Station> shortestPath) {
+        if (shortestPath.size() == 1) {
+            throw new IllegalArgumentException("출발역과 도착역이 동일합니다.");
+        }
     }
 
     @Override

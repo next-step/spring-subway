@@ -3,6 +3,7 @@ package subway.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -163,7 +164,7 @@ class SectionsTest {
             5
         );
 
-        Assertions.assertAll(
+        assertAll(
             () -> assertThat(addSection.equals(addSection)).isTrue(),
             () -> assertThat(modifySection.equals(expectedNewSection)).isTrue()
         );
@@ -200,7 +201,7 @@ class SectionsTest {
             5
         );
         Section modifySection = sections.makeUpdateSection(addSection).get();
-        Assertions.assertAll(
+        assertAll(
             () -> assertThat(addSection.equals(addSection)).isTrue(),
             () -> assertThat(modifySection.equals(expectedNewSection)).isTrue()
         );
@@ -225,5 +226,79 @@ class SectionsTest {
     void sort() {
         List<Station> result = sections.sortStations();
         assertThat(result).containsExactly(station1, station2, station3, station4);
+    }
+
+    @Test
+    @DisplayName("두 역이 주어지면 최단 거리를 구한다.")
+    void shortPath() {
+        Line 일호선 = new Line(2L, "일호선", "파랑");
+        Section section4 = new Section(
+            4L,
+            station1,
+            station2,
+            일호선,
+            3
+        );
+        Sections allSections = new Sections(List.of(section1, section2, section3, section4));
+
+        Distance result = allSections.findStationToStationDistance(station1, station4);
+
+        assertThat(result).isEqualTo(new Distance(23));
+    }
+
+    @Test
+    @DisplayName("두 역이 주어지면 출발역으로부터 도착역까지의 경로에 있는 역 목록을 구한다.")
+    void shortPathRoute() {
+        Line 일호선 = new Line(2L, "일호선", "파랑");
+        Section section4 = new Section(
+            4L,
+            station1,
+            station3,
+            일호선,
+            3
+        );
+        Sections allSections = new Sections(List.of(section1, section2, section3, section4));
+
+        List<Station> result = allSections.findStationToStationRoute(station1, station4);
+
+        assertThat(result).isEqualTo(List.of(station1, station3, station4));
+    }
+
+    @Test
+    @DisplayName("두 역이 연결되어 있지 않은 경우 예외를 던진다.")
+    void shortPathRouteException1() {
+        Line 일호선 = new Line(2L, "일호선", "파랑");
+        Section section4 = new Section(
+            4L,
+            station5,
+            station6,
+            일호선,
+            3
+        );
+        Sections allSections = new Sections(List.of(section1, section2, section3, section4));
+
+        assertAll(
+            () -> assertThatThrownBy(() -> allSections.findStationToStationRoute(station1, station5))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("출발역과 도착역이 연결되어있지 않습니다."),
+            () -> assertThatThrownBy(() -> allSections.findStationToStationDistance(station1, station5))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("출발역과 도착역이 연결되어있지 않습니다.")
+        );
+    }
+
+    @Test
+    @DisplayName("출발역과 도착역이 동일할 경우 예외를 던진다.")
+    void shortPathRouteException2() {
+        Sections allSections = new Sections(List.of(section1, section2, section3));
+
+        assertAll(
+            () -> assertThatThrownBy(() -> allSections.findStationToStationRoute(station1, station1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("출발역과 도착역이 동일합니다."),
+            () -> assertThatThrownBy(() -> allSections.findStationToStationDistance(station1, station1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("출발역과 도착역이 동일합니다.")
+        );
     }
 }
