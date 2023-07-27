@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
@@ -62,6 +63,8 @@ public class PathServiceTest {
 
     @Mock
     private SectionDao sectionDao;
+    @Mock
+    private StationDao stationDao;
     @InjectMocks
     private PathService pathService;
 
@@ -76,9 +79,14 @@ public class PathServiceTest {
         Mockito.when(sectionDao.findAll()).thenReturn(
             List.of(교대_강남, 교대_남부터미널, 강남_양재, 남부터미널_양재)
         );
+        Mockito.when(stationDao.findById(출발역_아이디)).thenReturn(교대역);
+        Mockito.when(stationDao.findById(도착역_아이디)).thenReturn(양재역);
 
         // then
-        Assertions.assertThat(pathService.findMinimumDistancePaths(출발역_아이디, 도착역_아이디).getDistance()).isEqualTo(5L);
+        Assertions.assertThat(pathService.findMinimumDistancePaths(출발역_아이디, 도착역_아이디).getDistance()).isEqualTo(5D);
+        Mockito.verify(sectionDao).findAll();
+        Mockito.verify(stationDao).findById(출발역_아이디);
+        Mockito.verify(stationDao).findById(도착역_아이디);
     }
 
 }

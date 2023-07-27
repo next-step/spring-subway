@@ -24,42 +24,38 @@ public class PathFinderTest {
     private Section 교대_남부터미널 = new Section(3L, 교대역, 남부터미널역, 삼호선, 2);
     private Section 강남_양재 = new Section(4L, 강남역, 양재역, 신분당선, 5);
     private Section 남부터미널_양재 = new Section(5L, 남부터미널역, 양재역, 삼호선, 3);
-    private List<Section> sections;
+    private List<Section> 교대_강남_남부터미널_양재;
 
     @BeforeEach
     void setUp() {
-        sections = List.of(교대_강남, 교대_남부터미널, 강남_양재, 남부터미널_양재);
+        교대_강남_남부터미널_양재 = List.of(교대_강남, 교대_남부터미널, 강남_양재, 남부터미널_양재);
     }
 
     @Test
     @DisplayName("성공 : 객체 생성")
     void create() {
         assertThatNoException()
-            .isThrownBy(() -> new PathFinder(sections));
+            .isThrownBy(() -> new PathFinder(교대_강남_남부터미널_양재, 교대역, 양재역));
     }
 
     @Test
     @DisplayName("성공 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
     void successFindStations() {
         // when
-        출발역_아이디 = 5L;
-        도착역_아이디 = 8L;
-        PathFinder pathFinder = new PathFinder(sections);
+        PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 양재역);
 
         // then
-        assertThat(pathFinder.findStations(출발역_아이디, 도착역_아이디)).containsExactly(교대역, 남부터미널역, 양재역);
+        assertThat(pathFinder.findShortestStations()).containsExactly(교대역, 남부터미널역, 양재역);
     }
 
     @Test
-    @DisplayName("성공2 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
+    @DisplayName("성공 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
     void successFindStations2() {
         // when
-        출발역_아이디 = 6L;
-        도착역_아이디 = 8L;
-        PathFinder pathFinder = new PathFinder(sections);
+        PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 남부터미널역);
 
         // then
-        assertThat(pathFinder.findStations(출발역_아이디, 도착역_아이디)).containsExactly(강남역, 양재역);
+        assertThat(pathFinder.findShortestStations()).containsExactly(교대역, 남부터미널역);
     }
 
 }

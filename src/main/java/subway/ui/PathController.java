@@ -24,7 +24,6 @@ public class PathController {
         @RequestParam(value = "source") Long departureStationId,
         @RequestParam(value = "target") Long destinationStationId) {
 
-
         PathResponse pathResponse = pathService.findMinimumDistancePaths(departureStationId, destinationStationId);
         return new ResponseEntity<>(pathResponse, HttpStatus.OK);
     }
