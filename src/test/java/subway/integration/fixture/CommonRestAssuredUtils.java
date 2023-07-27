@@ -5,7 +5,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
-public class CommonIntegrationFixture {
+public class CommonRestAssuredUtils {
 
     public static ExtractableResponse<Response> get(String url) {
         return RestAssured.given().log().all()
