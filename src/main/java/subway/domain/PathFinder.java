@@ -1,16 +1,38 @@
 package subway.domain;
 
 import java.util.List;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.WeightedMultigraph;
 import subway.ui.dto.PathResponse;
 
 public class PathFinder {
 
+    private final List<Section> sections;
 
-    public PathFinder(List<Section> initialLines) {
-        
+    public PathFinder(List<Section> sections) {
+        this.sections = sections;
     }
 
-    public PathResponse searchShortestPath(long source, long target) {
-        return null;
+    public PathResponse searchShortestPath(Station source, Station target) {
+        WeightedMultigraph<Station, DefaultWeightedEdge> graph = new WeightedMultigraph<>(
+            DefaultWeightedEdge.class);
+
+        // 역 추가
+        graph.addVertex(sections.get(0).getUpStation());
+        sections.forEach(section -> graph.addVertex(section.getDownStation()));
+
+        // 경로 추가
+        sections.forEach(section -> {
+            graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()), section.getDistance());
+            graph.setEdgeWeight(graph.addEdge(section.getDownStation(), section.getUpStation()), section.getDistance());
+        });
+
+        DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(
+            graph);
+        List<Station> shortestPath = dijkstraShortestPath.getPath(source, target).getVertexList();
+        double distance = dijkstraShortestPath.getPathWeight(source, target);
+
+        return new PathResponse(distance, shortestPath);
     }
 }

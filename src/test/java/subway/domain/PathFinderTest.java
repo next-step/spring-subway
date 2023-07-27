@@ -7,12 +7,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 import subway.ui.dto.PathResponse;
-import subway.ui.dto.StationResponse;
 
 @DisplayName("지하철 경로 검색")
 class PathFinderTest {
@@ -56,8 +56,8 @@ class PathFinderTest {
     @DisplayName("존재하지 않는 출발역이나 도착역을 조회 할 경우 경로 조회에 실패한다.")
     void searchShortestPath_notExistSourceAndTarget_throwException() {
         // given
-        long source = 1;
-        long target= 3;
+        Station source = new Station (1L, "교대역");
+        Station target = new Station (3L, "양재역");
         PathFinder pathFinder = new PathFinder(createInitialSections());
 
         // when & then
@@ -70,19 +70,24 @@ class PathFinderTest {
     @DisplayName("출발역부터 도착역까지의 최단경로와 거리를 반환한다.")
     void searchShortestPath_returnShortestPathAndDistance() {
         // given
-        long source = 1;
-        long target= 3;
+        Station source = new Station (1L, "교대역");
+        Station middle = new Station(4L, "남부터미널역");
+        Station target = new Station (3L, "양재역");
         PathFinder pathFinder = new PathFinder(createInitialSections());
-        List<StationResponse> shortestPathStations = Arrays.asList(
-            StationResponse.of(source, "교대역"),
-            StationResponse.of(target, "앙재역")
+        List<Station> shortestPathStations = Arrays.asList(
+            source,
+            middle,
+            target
         );
 
         // when
         PathResponse response = pathFinder.searchShortestPath(source, target);
 
         // then
-        assertThat(response.getStations()).isEqualTo(shortestPathStations);
+        List<Station> actualStations = response.getStations().stream()
+            .map(stationResponse -> new Station(stationResponse.getId(), stationResponse.getName()))
+            .collect(Collectors.toList());
+        assertThat(actualStations).isEqualTo(shortestPathStations);
         assertThat(response.getDistance()).isEqualTo(5);
     }
 
@@ -90,7 +95,7 @@ class PathFinderTest {
         List<Station> stations = new ArrayList<>();
         stations.add(new Station(1L, "교대역"));
         stations.add(new Station(2L, "강남역"));
-        stations.add(new Station(3L, "앙재역"));
+        stations.add(new Station(3L, "양재역"));
         stations.add(new Station(4L, "남부터미널역"));
         return stations;
     }
