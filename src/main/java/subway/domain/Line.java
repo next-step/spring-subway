@@ -71,14 +71,10 @@ public class Line {
         return sortedStations;
     }
 
-    public Section connectSection(final Section requestSection) {
-        validateStations(requestSection.getUpStation(), requestSection.getDownStation());
+    public Optional<Section> findUpdateSection(final Section newSection) {
+        validateStations(newSection.getUpStation(), newSection.getDownStation());
         final Section upSection = sections.get(0).findUpSection();
-
-        final Section newSection = upSection.connectSection(requestSection);
-
-        sections.add(newSection);
-        return newSection;
+        return upSection.findUpdateSection(newSection);
     }
 
     private void validateStations(final Station upStation, final Station downStation) {
@@ -135,11 +131,12 @@ public class Line {
         }
     }
 
-    public Section disconnectSection(final Station station) {
+    public Section disconnectSection(final Station requestStation) {
         validateLineSize();
-        validateExistStation(station);
+        validateExistStation(requestStation);
+
         final Section upSection = sections.get(0).findUpSection();
-        return upSection.disconnectSection(station);
+        return upSection.disconnectSection(requestStation);
     }
 
     private void validateExistStation(Station station) {

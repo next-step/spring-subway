@@ -70,36 +70,38 @@ public class Section {
         if (newSection == null) {
             throw new SectionException("newSection이 존재하지 않습니다.");
         }
-
         if (upSection == null && upStation.equals(newSection.getDownStation())) {
             return Optional.empty();
         }
-
         if (downSection == null && downStation.equals(newSection.getUpStation())) {
             return Optional.empty();
         }
-
         if (upStation.equals(newSection.getUpStation())) {
-            Section updateSection = Section.builder()
-                    .upStation(upStation)
-                    .downStation(newSection.getDownStation())
-                    .distance(distance - newSection.distance)
-                    .build();
-
-            return Optional.of(updateSection);
+            return Optional.ofNullable(getUpdateUpSection(newSection));
         }
-
         if (downStation.equals(newSection.getDownStation())) {
-            Section updateSection = Section.builder()
-                    .upStation(newSection.getUpStation())
-                    .downStation(downStation)
-                    .distance(distance - newSection.distance)
-                    .build();
-
-            return Optional.of(updateSection);
+            return Optional.of(getUpdateDownSection(newSection));
         }
 
         return findUpdateSectionIfDownSectionPresent(newSection);
+    }
+
+    private Section getUpdateDownSection(Section newSection) {
+        Section updateSection = Section.builder()
+                .upStation(newSection.getUpStation())
+                .downStation(downStation)
+                .distance(distance - newSection.distance)
+                .build();
+        return updateSection;
+    }
+
+    private Section getUpdateUpSection(Section newSection) {
+        Section updateSection = Section.builder()
+                .upStation(upStation)
+                .downStation(newSection.getDownStation())
+                .distance(distance - newSection.distance)
+                .build();
+        return updateSection;
     }
 
     private Optional<Section> findUpdateSectionIfDownSectionPresent(final Section newSection) {
@@ -135,16 +137,15 @@ public class Section {
         return downSection.disconnectSection(requestStation);
     }
 
-    public Section connectDownSection(final Section requestSection) {
+    public void connectDownSection(final Section requestSection) {
         if (requestSection == null) {
             throw new SectionException("requestSection이 존재하지 않습니다.");
         }
-        if (downStation != requestSection.upStation) {
+        if (!downStation.equals(requestSection.upStation)) {
             throw new SectionException("middle Station이 달라 연결할 수 없습니다.");
         }
         this.downSection = requestSection;
         requestSection.upSection = this;
-        return downSection;
     }
 
     public Section findDownSection() {
