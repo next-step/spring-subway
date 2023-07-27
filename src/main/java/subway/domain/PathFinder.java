@@ -28,6 +28,10 @@ public class PathFinder {
     }
 
     private void validateSourceAndTarget(Station source, Station target) {
+        if (source.equals(target)) {
+            throw new IllegalStationsException("출발역과 도착역은 달라야 합니다.");
+        }
+
         if (isStationNotExist(source) || isStationNotExist(target)) {
             throw new IllegalStationsException("출발역 또는 도착역이 존재하지 않습니다.");
         }
@@ -54,6 +58,6 @@ public class PathFinder {
     }
 
     private boolean isStationNotExist(Station station) {
-        return weightedGraph.containsVertex(station);
+        return !weightedGraph.containsVertex(station);
     }
 }
