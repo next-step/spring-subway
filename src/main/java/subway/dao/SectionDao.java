@@ -60,7 +60,7 @@ public class SectionDao {
             section.getLine(), section.getDistance().getDistance());
     }
 
-    public List<Section> findAll() {
+    public Sections findAll() {
         String sql =
             "select s.id, up_station_id, down_station_id, us.name as us_name, ds.name as ds_name, line_id, l.name as l_name, l.color, distance "
                 + "from section s "
@@ -68,7 +68,7 @@ public class SectionDao {
                 + "inner join station us on (s.up_station_id = us.id) "
                 + "inner join station ds on (s.down_station_id = ds.id)";
 
-        return jdbcTemplate.query(sql, rowMapper);
+        return new Sections(jdbcTemplate.query(sql, rowMapper));
     }
 
     public Optional<Section> findById(Long id) {

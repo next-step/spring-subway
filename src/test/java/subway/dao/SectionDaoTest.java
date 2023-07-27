@@ -38,8 +38,8 @@ class SectionDaoTest {
     @Test
     @DisplayName("전체 조회 테스트")
     void findAll() {
-        List<Section> result = sectionDao.findAll();
-        assertThat(result).contains(expectedSection);
+        Sections result = sectionDao.findAll();
+        assertThat(result).isEqualTo(new Sections(List.of(expectedSection)));
     }
 
     @Test
