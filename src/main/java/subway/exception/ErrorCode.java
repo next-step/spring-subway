@@ -1,6 +1,8 @@
 package subway.exception;
 
 public enum ErrorCode {
+    INVALID_REQUEST(400, "REQ001", "비어 있는 요청 정보가 존재합니다."),
+
     INVALID_COLOR_LENGTH(400, "COL001", "색상명의 길이를 벗어났습니다."),
 
     INVALID_NAME_LENGTH(400, "NAM001", "지하철 역명이나 노선명의 길이의 범위를 벗어났습니다."),

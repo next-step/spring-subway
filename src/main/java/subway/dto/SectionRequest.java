@@ -19,6 +19,10 @@ public class SectionRequest {
         return new SectionRequest(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
     }
 
+    public boolean hasNullField() {
+        return upStationId == null || downStationId == null || distance == null;
+    }
+
     public Long getUpStationId() {
         return upStationId;
     }
