@@ -54,16 +54,11 @@ public class Section {
             station);
     }
 
-    public boolean containsDownStationOf(Section section) {
-        return this.upStation.equals(section.downStation) || this.downStation.equals(
-            section.downStation);
-    }
-
     public boolean hasSameUpStationOrDownStation(Section section) {
         return this.upStation.equals(section.upStation) || this.downStation.equals(section.downStation);
     }
 
-    public List<Section> mergeSections(Section section) {
+    public List<Section> mergeWith(Section section) {
         validateLongerDistanceThan(section);
 
         if (isOnlyUpStationMatch(section)) {

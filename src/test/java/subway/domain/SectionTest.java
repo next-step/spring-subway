@@ -1,12 +1,13 @@
 package subway.domain;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Section 클래스 테스트")
 class SectionTest {
@@ -53,15 +54,6 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("주어진 구간의 하행역을 포함하는지 확인한다.")
-    void checkContainingDownStationOfSection() {
-        Section section = new Section(lineA, stationA, stationB, 1);
-        Section targetSection = new Section(lineA, stationC, stationB, 1);
-
-        assertThat(section.containsDownStationOf(targetSection)).isTrue();
-    }
-
-    @Test
     @DisplayName("해당 역은 구간의 하행역과 같다")
     void hasDownStationSameAs() {
         Section section = new Section(lineA, stationA, stationB, 1);
@@ -69,6 +61,21 @@ class SectionTest {
         assertThat(section.hasDownStationSameAs(stationB)).isTrue();
         assertThat(section.hasDownStationSameAs(stationA)).isFalse();
     }
+    @DisplayName("상대 구역은 현재 구역과 관련있다")
+    void relatedSection() {
+        Station nothingStation = new Station(5L, "any");
+        Section section = new Section(lineA, stationB, stationC, 2);
+        Section sectionSameUpUp = new Section(lineA, stationB, nothingStation, 3);
+        Section sectionSameUpDown = new Section(lineA, nothingStation, stationB, 3);
+        Section sectionSameDownUp = new Section(lineA, stationC, nothingStation, 2);
+        Section sectionSameDownDown = new Section(lineA, nothingStation, stationC, 2);
+
+        assertThat(section.isRelated(sectionSameUpUp)).isTrue();
+        assertThat(section.isRelated(sectionSameUpDown)).isTrue();
+        assertThat(section.isRelated(sectionSameDownUp)).isTrue();
+        assertThat(section.isRelated(sectionSameDownDown)).isTrue();
+    }
+
 
     @Test
     @DisplayName("구간은 주어진 라인의 소속이다")
@@ -85,9 +92,9 @@ class SectionTest {
         Section sameLengthSection = new Section(lineA, stationA, stationB, 3);
         Section largeSection = new Section(lineA, stationA, stationB, 4);
 
-        assertThatThrownBy(() -> section.mergeSections(sameLengthSection))
+        assertThatThrownBy(() -> section.mergeWith(sameLengthSection))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> section.mergeSections(largeSection))
+        assertThatThrownBy(() -> section.mergeWith(largeSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -97,7 +104,7 @@ class SectionTest {
         Section section = new Section(lineA, stationA, stationC, 3);
         Section targetSection = new Section(lineA, stationA, stationB, 2);
 
-        List<Section> mergedSections = section.mergeSections(targetSection);
+        List<Section> mergedSections = section.mergeWith(targetSection);
 
         Section createdSection = new Section(lineA, stationB, stationC, 1);
         assertThat(mergedSections).isEqualTo(List.of(targetSection, createdSection));
@@ -109,7 +116,7 @@ class SectionTest {
         Section section = new Section(lineA, stationA, stationC, 3);
         Section targetSection = new Section(lineA, stationB, stationC, 2);
 
-        List<Section> mergedSections = section.mergeSections(targetSection);
+        List<Section> mergedSections = section.mergeWith(targetSection);
 
         Section createdSection = new Section(lineA, stationA, stationB, 1);
         assertThat(mergedSections).isEqualTo(List.of(createdSection, targetSection));
@@ -122,9 +129,9 @@ class SectionTest {
         Section bothSameSection = new Section(lineA, stationA, stationB, 2);
         Section nothingSameSection = new Section(lineA, stationC, stationD, 2);
 
-        assertThatThrownBy(() -> section.mergeSections(bothSameSection))
+        assertThatThrownBy(() -> section.mergeWith(bothSameSection))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> section.mergeSections(nothingSameSection))
+        assertThatThrownBy(() -> section.mergeWith(nothingSameSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 

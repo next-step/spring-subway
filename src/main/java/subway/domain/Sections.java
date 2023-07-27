@@ -1,10 +1,12 @@
 package subway.domain;
 
-import java.util.Collections;
+import static java.util.Collections.unmodifiableList;
+import static subway.util.CollectionUtil.toGroupByMap;
+import static subway.util.CollectionUtil.toMappedList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import subway.dto.SectionAdditionResult;
@@ -29,36 +31,23 @@ public class Sections {
     }
 
     private List<Section> sort(List<Section> values) {
-
-        Map<Station, Section> nextSectionMap = values.stream()
-                .collect(Collectors.toMap(Section::getUpStation, Function.identity()));
-
-        return reorderSections(values, nextSectionMap);
-    }
-
-    private List<Section> reorderSections(List<Section> values,
-                                          Map<Station, Section> nextSectionMap) {
+        Map<Station, Section> sectionByUpStation = toGroupByMap(unmodifiableList(values),
+            Section::getUpStation);
 
         return Stream.iterate(findFirstSection(values),
-                        section -> getNextSection(section, nextSectionMap))
-                .takeWhile(Objects::nonNull)
-                .collect(Collectors.toList());
+                section -> getNextSection(section, sectionByUpStation))
+            .takeWhile(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     private Section findFirstSection(List<Section> values) {
 
-        List<Station> downStations = extractDownStations(values);
+        List<Station> downStations = toMappedList(unmodifiableList(values), Section::getDownStation);
 
         return values.stream()
                 .filter(section -> !downStations.contains(section.getUpStation()))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("노선은 순환할 수 없습니다."));
-    }
-
-    private List<Station> extractDownStations(List<Section> values) {
-        return values.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toList());
     }
 
     private static Section getNextSection(Section section, Map<Station, Section> nextSectionMap) {
@@ -128,7 +117,7 @@ public class Sections {
 
     private SectionAdditionResult addSectionInMiddle(Section section) {
         Section foundSection = findMatchedSectionWithAnyStation(section);
-        List<Section> sectionsToAdd = foundSection.mergeSections(section);
+        List<Section> sectionsToAdd = foundSection.mergeWith(section);
 
         this.values.addAll(this.values.indexOf(foundSection), sectionsToAdd);
         this.values.remove(foundSection);
@@ -226,9 +215,7 @@ public class Sections {
     }
 
     public List<Station> getStations() {
-        List<Station> stations = values.stream()
-            .map(Section::getUpStation)
-            .collect(Collectors.toList());
+        List<Station> stations = toMappedList(unmodifiableList(values), Section::getUpStation);
         stations.add(getLast().getDownStation());
         return stations;
     }
@@ -239,10 +226,6 @@ public class Sections {
 
     private Section getLast() {
         return this.values.get(this.values.size() - 1);
-    }
-
-    public List<Section> getValues() {
-        return Collections.unmodifiableList(values);
     }
 
     @Override
