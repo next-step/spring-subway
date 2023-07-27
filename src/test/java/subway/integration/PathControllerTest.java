@@ -9,8 +9,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.domain.Line;
@@ -20,7 +18,6 @@ import subway.dto.response.PathResponse;
 import subway.dto.response.StationResponse;
 
 @DisplayName("역 사이의 최단 거리")
-@ExtendWith(MockitoExtension.class)
 public class PathControllerTest extends IntegrationTest {
 
     private Long 출발역_아이디 = 5L;
@@ -49,7 +46,7 @@ public class PathControllerTest extends IntegrationTest {
         StationResponse 최단_교대역 = new StationResponse(5L, "교대역");
         StationResponse 최단_남부터미널역 = new StationResponse(7L, "남부터미널역");
         StationResponse 최단_양재역 = new StationResponse(8L, "양재역");
-        Long 최단거리 = 5L;
+        Double 최단거리 = 5D;
         PathResponse pathResponse = new PathResponse(
             List.of(최단_교대역, 최단_남부터미널역, 최단_양재역),
             최단거리
