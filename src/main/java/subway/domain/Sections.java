@@ -48,13 +48,13 @@ public class Sections {
 
     public List<Station> sortStations() {
         List<Station> sortedStations = new ArrayList<>();
-        Map<Station, Section> sectionMapByUpStation = initSectionMapByUpStation();
+        Map<Station, Section> sectionByUpStation = initSectionByUpStation();
 
         Station nowStation = findTopStation();
         sortedStations.add(nowStation);
 
-        while (sectionMapByUpStation.containsKey(nowStation)) {
-            Section section = sectionMapByUpStation.get(nowStation);
+        while (sectionByUpStation.containsKey(nowStation)) {
+            Section section = sectionByUpStation.get(nowStation);
             sortedStations.add(section.getDownStation());
             nowStation = section.getDownStation();
         }
@@ -62,7 +62,7 @@ public class Sections {
         return Collections.unmodifiableList(sortedStations);
     }
 
-    private Map<Station, Section> initSectionMapByUpStation() {
+    private Map<Station, Section> initSectionByUpStation() {
         return sections.stream()
             .collect(Collectors.toMap(
                 Section::getUpStation,
