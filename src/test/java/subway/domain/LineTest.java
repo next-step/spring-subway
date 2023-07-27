@@ -227,4 +227,30 @@ class LineTest {
             assertLineConnectResult(line, upSection);
         }
     }
+
+    @Nested
+    @DisplayName("getSections 메소드는")
+    class GetSection_Method {
+
+        @Test
+        @DisplayName("원본 section과 다른 section 리스트를 반환한다")
+        void Return_Sections_Mut_Not_Be_Modified_Outside() {
+            // given
+            Station upStation = new Station(1L, "upStation");
+            Station middleStation = new Station(2L, "middleStation");
+            Station downStation = new Station(3L, "downStation");
+
+            int originalSectionSize = 2;
+            Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
+            Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
+
+            Line line = new Line("line", "red", new ArrayList<>(List.of(upSection, downSection)));
+
+            // when
+            line.getSections().get(0).disconnectStation(middleStation);
+
+            // then
+            assertThat(line.getSections()).hasSize(originalSectionSize);
+        }
+    }
 }
