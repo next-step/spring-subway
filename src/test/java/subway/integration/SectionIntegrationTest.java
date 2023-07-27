@@ -2,15 +2,14 @@ package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.dto.SectionRequest;
 import subway.helper.CreateHelper;
+import subway.helper.RestAssuredHelper;
 
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
@@ -27,13 +26,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest params = new SectionRequest(secondStationId, thirdStationId, 10);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{id}/sections", lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestAssuredHelper.post("/lines/" + lineId + "/sections", params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -53,13 +46,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest params = new SectionRequest(thirdStationId, secondStationId, 10);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{id}/sections", lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestAssuredHelper.post("/lines/" + lineId + "/sections", params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -76,13 +63,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest params = new SectionRequest(secondStationId, secondStationId, 10);
 
         // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/lines/{id}/sections", lineId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestAssuredHelper.post("/lines/" + lineId + "/sections", params);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -99,11 +80,8 @@ class SectionIntegrationTest extends IntegrationTest {
         CreateHelper.createSection(secondStationId, thirdStationId, lineId);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, firstStationId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestAssuredHelper.delete(
+                "/lines/" + lineId + "/sections?stationId=" + firstStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -121,11 +99,8 @@ class SectionIntegrationTest extends IntegrationTest {
         CreateHelper.createSection(secondStationId, thirdStationId, lineId);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, secondStationId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestAssuredHelper.delete(
+                "/lines/" + lineId + "/sections?stationId=" + secondStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -143,11 +118,8 @@ class SectionIntegrationTest extends IntegrationTest {
         CreateHelper.createSection(secondStationId, thirdStationId, lineId);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, thirdStationId)
-                .then().log().all()
-                .extract();
+        ExtractableResponse<Response> response = RestAssuredHelper.delete(
+                "/lines/" + lineId + "/sections?stationId=" + thirdStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
