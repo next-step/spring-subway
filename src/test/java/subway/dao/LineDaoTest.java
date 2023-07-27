@@ -71,10 +71,14 @@ public class LineDaoTest {
     @DisplayName("라인 하나를 삭제한다.")
     void insertSection() {
         // given
+        Line line = new Line("3호선", "blue");
+        Line insertLine = lineDao.insert(line);
+
         // when
-        lineDao.deleteById(1L);
+        lineDao.deleteById(insertLine.getId());
+
         // then
-        Optional<Line> selectLine = lineDao.findById(1L);
+        Optional<Line> selectLine = lineDao.findById(insertLine.getId());
         assertThat(selectLine.isEmpty()).isTrue();
     }
 }

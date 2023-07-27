@@ -54,10 +54,9 @@ public class StationDaoTest {
         // given
         Station station = new Station("구디역");
         // when
-        int beforeSize = stationDao.findAll().size();
-        stationDao.insert(station);
+        Station insertStation = stationDao.insert(station);
         // then
-        assertThat(beforeSize + 1).isEqualTo(stationDao.findAll().size());
+        assertThat(insertStation.getName()).isEqualTo(station.getName());
     }
 
 
@@ -65,12 +64,12 @@ public class StationDaoTest {
     @DisplayName("station을 삭제한다.")
     void deleteSection() {
         // given
-        Station selectStation = stationDao.findById(4L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
+        Station station = new Station("구디역");
+        Station insertStation = stationDao.insert(station);
         // when
-        stationDao.deleteById(selectStation.getId());
+        stationDao.deleteById(insertStation.getId());
         // then
-        Optional<Station> deleteStation = stationDao.findById(4L);
+        Optional<Station> deleteStation = stationDao.findById(insertStation.getId());
         assertThat(deleteStation).isEmpty();
     }
 

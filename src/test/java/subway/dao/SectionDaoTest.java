@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 import static subway.exception.ErrorCode.NOT_FOUND_SECTION;
-import static subway.exception.ErrorCode.NOT_FOUND_STATION;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,39 +43,34 @@ public class SectionDaoTest {
     @Test
     @DisplayName("section를 조회한다")
     void selectSection() {
-        Section section = sectionDao.selectSection(1L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_SECTION));
-        assertThat(section.getId()).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("section들을 조회한다")
-    void selectSections() {
         // given
-        Long lindId = 1L;
+        Station storedStation = new Station(1L, "서울대입구역");
+        Station storedStation2 = new Station(2L, "상도역");
+        Section storedSection = new Section(1L, storedStation, storedStation2, new Distance(10));
         // when
-        List<Section> sections = sectionDao.selectSections(lindId)
+        Section selectSection = sectionDao.selectSection(storedSection.getId())
             .orElseThrow(() -> new SubwayException(NOT_FOUND_SECTION));
         // then
-        assertThat(sections.size()).isEqualTo(2);
+        assertThat(storedSection.getId()).isEqualTo(selectSection.getId());
     }
 
     @Test
     @DisplayName("section을 생성한다")
     void createSection() {
         // given
-        Station station3 = stationDao.findById(3L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
-        Station station4 = stationDao.findById(4L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
+        Station station3 = new Station("신림역");
+        Station station4 = new Station("수원역");
         Distance distance = new Distance(10);
+        Station insertStation3 = stationDao.insert(station3);
+        Station insertStation4 = stationDao.insert(station4);
 
         // when
-        Section insertSection = sectionDao.insert(new Section(station3, station4, distance), 1L);
+        Section insertSection = sectionDao.insert(
+            new Section(insertStation3, insertStation4, distance), 1L);
         // then
         assertAll(
-            () -> assertThat(insertSection).extracting("upStation").isEqualTo(station3),
-            () -> assertThat(insertSection).extracting("downStation").isEqualTo(station4),
+            () -> assertThat(insertSection).extracting("upStation").isEqualTo(insertStation3),
+            () -> assertThat(insertSection).extracting("downStation").isEqualTo(insertStation4),
             () -> assertThat(insertSection).extracting("distance").isEqualTo(distance.getDistance())
         );
     }
@@ -85,15 +79,15 @@ public class SectionDaoTest {
     @DisplayName("sections들을 생성한다")
     void createSections() {
         // given
-        Station station3 = stationDao.findById(3L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
-        Station station4 = stationDao.findById(4L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
-        Station station5 = stationDao.findById(5L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
+        Station station3 = new Station("신림역");
+        Station station4 = new Station("수원역");
+        Station station5 = new Station("수원시청역");
+        Station insertStation3 = stationDao.insert(station3);
+        Station insertStation4 = stationDao.insert(station4);
+        Station insertStation5 = stationDao.insert(station5);
         List<Section> sections = List.of(
-            new Section(station3, station4, new Distance(10)),
-            new Section(station4, station5, new Distance(10))
+            new Section(insertStation3, insertStation4, new Distance(10)),
+            new Section(insertStation4, insertStation5, new Distance(10))
         );
         Long lindId = 1L;
         int beforeSize = sectionDao.selectSections(lindId).orElseThrow().size();
@@ -110,12 +104,12 @@ public class SectionDaoTest {
     @DisplayName("section을 삭제한다")
     void deleteSection() {
         // given
-        Station station3 = stationDao.findById(3L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
-        Station station4 = stationDao.findById(4L)
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
+        Station station3 = new Station("신림역");
+        Station station4 = new Station("수원역");
+        Station insertStation3 = stationDao.insert(station3);
+        Station insertStation4 = stationDao.insert(station4);
         Section insertSection = sectionDao.insert(
-            new Section(station3, station4, new Distance(10)), 1L);
+            new Section(insertStation3, insertStation4, new Distance(10)), 1L);
 
         // when
         sectionDao.deleteSections(List.of(insertSection));
