@@ -4,6 +4,7 @@ import java.util.List;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import subway.exception.IllegalStationsException;
 import subway.ui.dto.PathResponse;
 
 public class PathFinder {
@@ -27,6 +28,10 @@ public class PathFinder {
             graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()), section.getDistance());
             graph.setEdgeWeight(graph.addEdge(section.getDownStation(), section.getUpStation()), section.getDistance());
         });
+
+        if (!graph.containsVertex(source) || !graph.containsVertex(target)) {
+            throw new IllegalStationsException("출발역 또는 도착역이 존재하지 않습니다.");
+        }
 
         DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(
             graph);
