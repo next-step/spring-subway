@@ -1,8 +1,9 @@
 package subway.domain;
 
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import subway.exception.ErrorCode;
+import subway.exception.IncorrectRequestException;
 
 import java.util.List;
 
@@ -12,21 +13,17 @@ public class Path {
     private final Distance distance;
 
     public Path(List<Sections> allSections, Station source, Station target) {
+        validateDifferentSourceTarget(source, target);
+        StationGraph stationGraph = new StationGraph(allSections);
 
-        WeightedMultigraph<Station, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
-        for (Sections sections : allSections) {
-            for (Station station : sections.toStations()) {
-                graph.addVertex(station);
-            }
-            for (Section section : sections.getSections()) {
-                graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()), section.getDistance().getValue());
-            }
+        this.path = stationGraph.getPath(source, target);
+        this.distance = stationGraph.getDistance(source, target);
+    }
+
+    private void validateDifferentSourceTarget(Station source, Station target) {
+        if (source.equals(target)) {
+            throw new IncorrectRequestException(ErrorCode.SAME_SOURCE_TARGET, String.format("출발역: %s, 도착역: %s", source.getName(), target.getName()));
         }
-
-        DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
-
-        this.path = dijkstraShortestPath.getPath(source, target).getVertexList();
-        this.distance = new Distance((int) dijkstraShortestPath.getPathWeight(source, target));
     }
 
     public List<Station> getPath() {
