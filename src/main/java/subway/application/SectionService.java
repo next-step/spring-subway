@@ -1,6 +1,7 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
 import subway.domain.ConnectedSections;
 import subway.domain.Section;
@@ -19,6 +20,7 @@ public class SectionService {
         this.sectionDao = sectionDao;
     }
 
+    @Transactional
     public SectionResponse createSection(final Long lineId, final SectionRequest sectionRequest) {
         final ConnectedSections sections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
 
@@ -30,6 +32,7 @@ public class SectionService {
         return SectionResponse.of(section);
     }
 
+    @Transactional
     public void deleteSection(final Long lineId, final Long downStationId) {
         final ConnectedSections sections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
         final SectionEditResult editResult = sections.remove(downStationId);

@@ -29,7 +29,7 @@ public class StationDao {
     public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("station")
+                .withTableName("STATION")
                 .usingGeneratedKeyColumns("id");
     }
 
@@ -48,19 +48,19 @@ public class StationDao {
         final String upStationSql = "SELECT up_station.id AS id, " +
                 "up_station.name AS name " +
                 "FROM SECTION section " +
-                "LEFT JOIN Line line ON section.LINE_ID = line.ID " +
+                "LEFT JOIN LINE line ON section.LINE_ID = line.ID " +
                 "LEFT JOIN STATION up_station ON section.up_station_id = up_station.id " +
                 "WHERE line.id = ?";
 
         final String downStationSql = "SELECT down_station.id AS id, " +
                 "down_station.name AS name " +
                 "FROM SECTION section " +
-                "LEFT JOIN Line line ON section.LINE_ID = line.ID " +
+                "LEFT JOIN LINE line ON section.LINE_ID = line.ID " +
                 "LEFT JOIN STATION down_station ON section.down_station_id = down_station.id " +
                 "WHERE line.id = ?";
 
         final String sql = "SELECT id, name " +
-                "FROM (" + upStationSql + "UNION " + downStationSql + ")";
+                "FROM (" + upStationSql + ") AS `up_station` UNION (" + downStationSql + ")";
 
         return jdbcTemplate.query(sql, rowMapper, lineId, lineId);
     }
