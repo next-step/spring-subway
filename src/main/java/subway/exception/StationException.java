@@ -1,15 +1,8 @@
 package subway.exception;
 
-public class StationException extends RuntimeException {
-
-    private final ErrorCode errorCode;
+public class StationException extends CustomException {
 
     public StationException(final ErrorCode errorCode, final String message) {
-        super(message);
-        this.errorCode = errorCode;
-    }
-
-    public ErrorCode getErrorCode() {
-        return errorCode;
+        super(errorCode, message);
     }
 }

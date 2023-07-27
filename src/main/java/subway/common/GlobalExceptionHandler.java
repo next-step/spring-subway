@@ -1,13 +1,16 @@
-package subway.config;
+package subway.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.dto.ErrorResponse;
+import subway.exception.CustomException;
 import subway.exception.ErrorCode;
 import subway.exception.InvalidRequestException;
 import subway.exception.LineException;
@@ -21,45 +24,37 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({LineException.class, SectionException.class, StationException.class,
             InvalidRequestException.class})
-    protected ResponseEntity<ErrorResponse> handleSectionException(final RuntimeException e) {
+    protected ResponseEntity<ErrorResponse> handleSectionException(final CustomException e) {
         log.error(e.getMessage());
 
-        ErrorCode errorCode;
-
-        if (e instanceof LineException) {
-            errorCode = ((LineException) e).getErrorCode();
-        } else if (e instanceof SectionException) {
-            errorCode = ((SectionException) e).getErrorCode();
-        } else if (e instanceof StationException) {
-            errorCode = ((StationException) e).getErrorCode();
-        } else {
-            errorCode = ((InvalidRequestException) e).getErrorCode();
-        }
-
+        final ErrorCode errorCode = e.getErrorCode();
         final ErrorResponse errorResponse = ErrorResponse.of(errorCode);
 
         return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+    protected ErrorResponse handleDataIntegrityViolationException(
             final DataIntegrityViolationException e) {
         log.error(e.getMessage());
 
-        return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.EXISTS_DATA));
+        return ErrorResponse.of(ErrorCode.EXISTS_DATA);
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DataAccessException.class)
-    protected ResponseEntity<ErrorResponse> handleDataAccessException(final DataAccessException e) {
+    protected ErrorResponse handleDataAccessException(final DataAccessException e) {
         log.error(e.getMessage());
 
-        return ResponseEntity.internalServerError().body(ErrorResponse.of(ErrorCode.DATABASE_ERROR));
+        return ErrorResponse.of(ErrorCode.DATABASE_ERROR);
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(RuntimeException.class)
-    protected ResponseEntity<ErrorResponse> handleRuntimeException(final RuntimeException e) {
+    protected ErrorResponse handleRuntimeException(final RuntimeException e) {
         log.error(e.getMessage());
 
-        return ResponseEntity.internalServerError().body(ErrorResponse.of(ErrorCode.UNKNOWN_ERROR));
+        return ErrorResponse.of(ErrorCode.UNKNOWN_ERROR);
     }
 }
