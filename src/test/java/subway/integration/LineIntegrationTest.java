@@ -3,7 +3,6 @@ package subway.integration;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -21,30 +20,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
-    private LineRequest lineRequest1;
-    private LineRequest lineRequest2;
-
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-
-        Long gangnamId = CreateHelper.createStation("강남역");
-        Long yeoksamId = CreateHelper.createStation("역삼역");
-        Long gyodaeId = CreateHelper.createStation("교대역");
-        Long gangbyeonId = CreateHelper.createStation("강변역");
-
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600", gangnamId, yeoksamId, 10);
-        lineRequest2 = new LineRequest("구신분당선", "bg-red-600", gyodaeId, gangbyeonId, 11);
-    }
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLine() {
+        // given
+        Long gangnamId = CreateHelper.createStation("강남역");
+        Long yeoksamId = CreateHelper.createStation("역삼역");
+        
+        LineRequest sinBunDangRequest = new LineRequest("신분당선", "bg-red-600", gangnamId, yeoksamId, 10);
+        
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(sinBunDangRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -58,10 +48,15 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLineWithDuplicateName() {
         // given
+        Long gangnamId = CreateHelper.createStation("강남역");
+        Long yeoksamId = CreateHelper.createStation("역삼역");
+
+        LineRequest sinBunDangRequest = new LineRequest("신분당선", "bg-red-600", gangnamId, yeoksamId, 10);
+        
         RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(sinBunDangRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -70,7 +65,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(sinBunDangRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -83,10 +78,18 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLines() {
         // given
+        Long gangnamId = CreateHelper.createStation("강남역");
+        Long yeoksamId = CreateHelper.createStation("역삼역");
+        Long gyodaeId = CreateHelper.createStation("교대역");
+        Long gangbyeonId = CreateHelper.createStation("강변역");
+
+        LineRequest sinBunDangRequest = new LineRequest("신분당선", "bg-red-600", gangnamId, yeoksamId, 10);
+        LineRequest guSinBunDangRequest = new LineRequest("구신분당선", "bg-red-600", gyodaeId, gangbyeonId, 11);
+        
         ExtractableResponse<Response> createResponse1 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(sinBunDangRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -94,7 +97,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse2 = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest2)
+                .body(guSinBunDangRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -122,10 +125,15 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLine() {
         // given
+        Long gangnamId = CreateHelper.createStation("강남역");
+        Long yeoksamId = CreateHelper.createStation("역삼역");
+
+        LineRequest sinBunDangRequest = new LineRequest("신분당선", "bg-red-600", gangnamId, yeoksamId, 10);
+        
         ExtractableResponse<Response> createResponse = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(sinBunDangRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -149,10 +157,18 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void updateLine() {
         // given
+        Long gangnamId = CreateHelper.createStation("강남역");
+        Long yeoksamId = CreateHelper.createStation("역삼역");
+        Long gyodaeId = CreateHelper.createStation("교대역");
+        Long gangbyeonId = CreateHelper.createStation("강변역");
+
+        LineRequest sinBunDangRequest = new LineRequest("신분당선", "bg-red-600", gangnamId, yeoksamId, 10);
+        LineRequest guSinBunDangRequest = new LineRequest("구신분당선", "bg-red-600", gyodaeId, gangbyeonId, 11);
+        
         ExtractableResponse<Response> createResponse = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(sinBunDangRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -162,7 +178,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest2)
+                .body(guSinBunDangRequest)
                 .when().put("/lines/{lineId}", lineId)
                 .then().log().all()
                 .extract();
@@ -175,10 +191,15 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void deleteLine() {
         // given
+        Long gangnamId = CreateHelper.createStation("강남역");
+        Long yeoksamId = CreateHelper.createStation("역삼역");
+
+        LineRequest sinBunDangRequest = new LineRequest("신분당선", "bg-red-600", gangnamId, yeoksamId, 10);
+        
         ExtractableResponse<Response> createResponse = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest1)
+                .body(sinBunDangRequest)
                 .when().post("/lines")
                 .then().log().all().
                 extract();
