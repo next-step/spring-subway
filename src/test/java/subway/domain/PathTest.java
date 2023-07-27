@@ -58,6 +58,20 @@ class PathTest {
                     PathExceptionStatus.CANNOT_FIND_PATH.getStatus());
         }
 
+        @Test
+        @DisplayName("사이클이 있디면, 더 빠른 경로로 돌아온다")
+        void When_Cycled() {
+            // given
+            Section cycledSection = DomainFixture.Section.buildWithStations(downStation, upStation);
+            Path path = new Path(new ArrayList<>(List.of(upSection, downSection, cycledSection)));
+
+            // when
+            PathResponse result = path.minimumPath(upStation, downStation);
+
+            // then
+            assertPathResponse(result, 10, upStation, downStation);
+        }
+
         private void assertPathResponse(PathResponse pathResponse, int expectedDistance,
                 Station... exactlyExpectedStations) {
             assertThat(pathResponse.getDistance()).isEqualTo(expectedDistance);
