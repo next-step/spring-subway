@@ -33,11 +33,11 @@ public class StationDao {
     public Station insert(final Station station) {
         final SqlParameterSource params = new MapSqlParameterSource()
 //                .addValue("id", station.getId())
-                .addValue("name", station.getName().getValue());
+                .addValue("name", station.getStationName().getValue());
 
         Long id = insertAction.executeAndReturnKey(params).longValue();
 
-        return new Station(id, station.getName());
+        return new Station(id, station.getStationName());
     }
 
     public List<Station> findAll() {
@@ -59,7 +59,7 @@ public class StationDao {
     public void update(final Station newStation) {
         String sql = "update STATION set name = ? where id = ?";
 
-        jdbcTemplate.update(sql, new Object[]{newStation.getName().getValue(), newStation.getId()});
+        jdbcTemplate.update(sql, new Object[]{newStation.getStationName().getValue(), newStation.getId()});
     }
 
     public void deleteById(final Long id) {

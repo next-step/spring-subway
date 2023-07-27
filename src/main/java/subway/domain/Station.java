@@ -5,31 +5,31 @@ import java.util.Objects;
 public class Station {
 
     private Long id;
-    private Name name;
+    private final StationName stationName;
 
-    public Station(final String name) {
-        this(new Name(name));
+    public Station(final String stationName) {
+        this(new StationName(stationName));
     }
 
-    public Station(final Name name) {
-        this.name = name;
+    public Station(final StationName stationName) {
+        this.stationName = stationName;
     }
 
-    public Station(final Long id, final String name) {
-        this(id, new Name(name));
+    public Station(final Long id, final String stationName) {
+        this(id, new StationName(stationName));
     }
 
-    public Station(final Long id, final Name name) {
+    public Station(final Long id, final StationName stationName) {
+        this(stationName);
         this.id = id;
-        this.name = name;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Name getName() {
-        return name;
+    public StationName getStationName() {
+        return stationName;
     }
 
     @Override
