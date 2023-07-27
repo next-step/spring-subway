@@ -43,10 +43,10 @@ public class SectionService {
         Station downStation = stationDao.findById(sectionRegisterRequest.getDownStationId());
         Line line = lineDao.findById(lineId);
         return new Section(
-                upStation,
-                downStation,
-                line,
-                sectionRegisterRequest.getDistance()
+            upStation,
+            downStation,
+            line,
+            sectionRegisterRequest.getDistance()
         );
     }
 
@@ -65,14 +65,17 @@ public class SectionService {
     }
 
     private void deleteSectionsContainingDeleteStation(
-            Optional<Section> sectionByUpStation,
-            Optional<Section> sectionByDownStation
+        Optional<Section> sectionByUpStation,
+        Optional<Section> sectionByDownStation
     ) {
         sectionByUpStation.ifPresent(section -> sectionDao.deleteById(section.getId()));
         sectionByDownStation.ifPresent(section -> sectionDao.deleteById(section.getId()));
     }
 
-    private void makeCombineSection(Optional<Section> sectionByUpStation, Optional<Section> sectionByDownStation) {
+    private void makeCombineSection(
+        Optional<Section> sectionByUpStation,
+        Optional<Section> sectionByDownStation
+    ) {
         if (sectionByDownStation.isPresent() && sectionByUpStation.isPresent()) {
             Section newSectionUpStation = sectionByDownStation.get();
             Section newSectionDownStation = sectionByUpStation.get();

@@ -47,12 +47,12 @@ public class SectionIntegrationTest extends IntegrationTest {
     void create2() {
         // when
         ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRegisterRequest(2L, 4L, 5))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(new SectionRegisterRequest(2L, 4L, 5))
+            .when().post("/lines/1/sections")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -63,21 +63,21 @@ public class SectionIntegrationTest extends IntegrationTest {
     void createException1() {
         // given
         RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRegisterRequest(1L, 2L, 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(new SectionRegisterRequest(1L, 2L, 10))
+            .when().post("/lines/1/sections")
+            .then().log().all()
+            .extract();
 
         // when
         ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRegisterRequest(1L, 2L, 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(new SectionRegisterRequest(1L, 2L, 10))
+            .when().post("/lines/1/sections")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -88,21 +88,21 @@ public class SectionIntegrationTest extends IntegrationTest {
     void createException2() {
         // given
         RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRegisterRequest(1L, 2L, 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(new SectionRegisterRequest(1L, 2L, 10))
+            .when().post("/lines/1/sections")
+            .then().log().all()
+            .extract();
 
         // when
         ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRegisterRequest(3L, 4L, 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(new SectionRegisterRequest(3L, 4L, 10))
+            .when().post("/lines/1/sections")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -143,26 +143,26 @@ public class SectionIntegrationTest extends IntegrationTest {
     void delete2() {
         // given
         RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRegisterRequest1)
-                .when().post("/lines/1/sections")
-                .then().log().all();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(sectionRegisterRequest1)
+            .when().post("/lines/1/sections")
+            .then().log().all();
 
         RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRegisterRequest2)
-                .when().post("/lines/1/sections")
-                .then().log().all();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(sectionRegisterRequest2)
+            .when().post("/lines/1/sections")
+            .then().log().all();
 
         // when
         ExtractableResponse<Response> result = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=3")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/lines/1/sections?stationId=3")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -173,11 +173,11 @@ public class SectionIntegrationTest extends IntegrationTest {
     void deleteException1() {
         // when
         ExtractableResponse<Response> result = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=2")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/lines/1/sections?stationId=2")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -188,20 +188,20 @@ public class SectionIntegrationTest extends IntegrationTest {
     void deleteException2() {
         // given
         ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new SectionRegisterRequest(2L, 3L, 10))
-                .when().post("/lines/1/sections")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(new SectionRegisterRequest(2L, 3L, 10))
+            .when().post("/lines/1/sections")
+            .then().log().all()
+            .extract();
 
         // when
         ExtractableResponse<Response> result = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/lines/1/sections?stationId=4")
-                .then().log().all()
-                .extract();
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when().delete("/lines/1/sections?stationId=4")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(result.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());

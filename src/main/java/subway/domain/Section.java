@@ -41,11 +41,11 @@ public class Section {
         validateDistance(duplicatedSection);
 
         return new Section(
-                duplicatedSection.id,
-                this.downStation,
-                duplicatedSection.downStation,
-                this.line,
-                duplicatedSection.distance.subtract(this.distance).getDistance()
+            duplicatedSection.id,
+            this.downStation,
+            duplicatedSection.downStation,
+            this.line,
+            duplicatedSection.distance.subtract(this.distance).getDistance()
         );
     }
 
@@ -53,11 +53,11 @@ public class Section {
         validateDistance(duplicatedDownSection);
 
         return new Section(
-                duplicatedDownSection.id,
-                duplicatedDownSection.upStation,
-                this.upStation,
-                this.line,
-                duplicatedDownSection.distance.subtract(this.distance).getDistance()
+            duplicatedDownSection.id,
+            duplicatedDownSection.upStation,
+            this.upStation,
+            this.line,
+            duplicatedDownSection.distance.subtract(this.distance).getDistance()
         );
     }
 
@@ -70,10 +70,10 @@ public class Section {
     public Section combineSection(Section otherSection) {
         validateCombineSection(otherSection);
         return new Section(
-                this.upStation,
-                otherSection.downStation,
-                this.line,
-                this.distance.add(otherSection.distance).getDistance()
+            this.upStation,
+            otherSection.downStation,
+            this.line,
+            this.distance.add(otherSection.distance).getDistance()
         );
     }
 
@@ -113,10 +113,10 @@ public class Section {
         }
         Section section = (Section) o;
         return Objects.equals(id, section.id)
-                && Objects.equals(upStation, section.upStation)
-                && Objects.equals(downStation, section.downStation)
-                && Objects.equals(line, section.line)
-                && Objects.equals(distance, section.distance);
+            && Objects.equals(upStation, section.upStation)
+            && Objects.equals(downStation, section.downStation)
+            && Objects.equals(line, section.line)
+            && Objects.equals(distance, section.distance);
     }
 
     @Override
@@ -127,11 +127,11 @@ public class Section {
     @Override
     public String toString() {
         return "Section{" +
-                "id=" + id +
-                ", upStation=" + upStation +
-                ", downStation=" + downStation +
-                ", line=" + line +
-                ", distance=" + distance +
-                '}';
+            "id=" + id +
+            ", upStation=" + upStation +
+            ", downStation=" + downStation +
+            ", line=" + line +
+            ", distance=" + distance +
+            '}';
     }
 }

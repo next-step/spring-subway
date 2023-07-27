@@ -57,25 +57,25 @@ class SectionServiceTest {
         line1 = new Line(1L, "7호선", "주황");
 
         section1 = new Section(
-                1L,
-                station1,
-                station2,
-                line1,
-                10
+            1L,
+            station1,
+            station2,
+            line1,
+            10
         );
         section2 = new Section(
-                2L,
-                station2,
-                station3,
-                line1,
-                10
+            2L,
+            station2,
+            station3,
+            line1,
+            10
         );
         section3 = new Section(
-                3L,
-                station3,
-                station4,
-                line1,
-                10
+            3L,
+            station3,
+            station4,
+            line1,
+            10
         );
 
         sections = new Sections(List.of(section1, section3, section2));
@@ -87,10 +87,11 @@ class SectionServiceTest {
     @DisplayName("구간 삭제 정상 테스트: 양 옆에 구간이 있는 경우")
     void delete() {
         when(stationDao.findById(2L)).thenReturn(station2);
-        when(sectionDao.insert(section1.combineSection(section2))).thenReturn(section1.combineSection(section2));
+        when(sectionDao.insert(section1.combineSection(section2))).thenReturn(
+            section1.combineSection(section2));
 
         Assertions.assertThatNoException()
-                .isThrownBy(() -> sectionService.deleteSection(2L, 1L));
+            .isThrownBy(() -> sectionService.deleteSection(2L, 1L));
 
         verify(sectionDao).deleteById(1L);
         verify(sectionDao).deleteById(2L);
@@ -103,7 +104,7 @@ class SectionServiceTest {
         when(stationDao.findById(1L)).thenReturn(station1);
 
         Assertions.assertThatNoException()
-                .isThrownBy(() -> sectionService.deleteSection(1L, 1L));
+            .isThrownBy(() -> sectionService.deleteSection(1L, 1L));
 
         verify(sectionDao).deleteById(1L);
         verify(sectionDao, never()).insert(new Section(station1, station3, line1, 20));
@@ -115,7 +116,7 @@ class SectionServiceTest {
         when(stationDao.findById(3L)).thenReturn(station3);
 
         Assertions.assertThatNoException()
-                .isThrownBy(() -> sectionService.deleteSection(3L, 1L));
+            .isThrownBy(() -> sectionService.deleteSection(3L, 1L));
 
         verify(sectionDao).deleteById(2L);
         verify(sectionDao, never()).insert(new Section(station1, station3, line1, 20));
@@ -128,8 +129,8 @@ class SectionServiceTest {
         when(stationDao.findById(2L)).thenReturn(station2);
 
         Assertions.assertThatThrownBy(() -> sectionService.deleteSection(2L, 1L))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("구간이 1개 이하이므로 해당역을 삭제할 수 없습니다.");
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("구간이 1개 이하이므로 해당역을 삭제할 수 없습니다.");
     }
 
     @Test
@@ -138,8 +139,8 @@ class SectionServiceTest {
         when(stationDao.findById(5L)).thenReturn(station5);
 
         Assertions.assertThatThrownBy(() -> sectionService.deleteSection(5L, 1L))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("등록되지 않은 역을 제거할 수 없습니다.");
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("등록되지 않은 역을 제거할 수 없습니다.");
     }
 
     @Test
@@ -205,9 +206,9 @@ class SectionServiceTest {
 
         Assertions.assertThatThrownBy(
                 () -> sectionService.registerSection(
-                        new SectionRegisterRequest(2L, 5L, 20), 1L)
-                )
-                .isInstanceOf(IllegalArgumentException.class);
+                    new SectionRegisterRequest(2L, 5L, 20), 1L)
+            )
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -218,10 +219,10 @@ class SectionServiceTest {
         when(lineDao.findById(1L)).thenReturn(line1);
 
         Assertions.assertThatThrownBy(
-                        () -> sectionService.registerSection(
-                                new SectionRegisterRequest(1L, 2L, 10), 1L)
-                )
-                .isInstanceOf(IllegalArgumentException.class);
+                () -> sectionService.registerSection(
+                    new SectionRegisterRequest(1L, 2L, 10), 1L)
+            )
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -232,9 +233,9 @@ class SectionServiceTest {
         when(lineDao.findById(1L)).thenReturn(line1);
 
         Assertions.assertThatThrownBy(
-                        () -> sectionService.registerSection(
-                                new SectionRegisterRequest(5L, 6L, 10), 1L)
-                )
-                .isInstanceOf(IllegalArgumentException.class);
+                () -> sectionService.registerSection(
+                    new SectionRegisterRequest(5L, 6L, 10), 1L)
+            )
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }

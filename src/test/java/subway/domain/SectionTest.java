@@ -12,7 +12,7 @@ class SectionTest {
     @DisplayName("Section 생성 테스트")
     void fieldTest() {
         Assertions.assertThatNoException()
-                .isThrownBy(() -> new Section(new Station(), new Station(), new Line(), 10));
+            .isThrownBy(() -> new Section(new Station(), new Station(), new Line(), 10));
     }
 
     @Test
@@ -28,10 +28,10 @@ class SectionTest {
         Section result = section1.combineSection(section2);
 
         assertAll(
-                () -> Assertions.assertThat(result.getDistance()).isEqualTo(new Distance(20)),
-                () -> Assertions.assertThat(result.getUpStation()).isEqualTo(station1),
-                () -> Assertions.assertThat(result.getDownStation()).isEqualTo(station3),
-                () -> Assertions.assertThat(result.getLine()).isEqualTo(line)
+            () -> Assertions.assertThat(result.getDistance()).isEqualTo(new Distance(20)),
+            () -> Assertions.assertThat(result.getUpStation()).isEqualTo(station1),
+            () -> Assertions.assertThat(result.getDownStation()).isEqualTo(station3),
+            () -> Assertions.assertThat(result.getLine()).isEqualTo(line)
         );
 
     }
@@ -48,7 +48,7 @@ class SectionTest {
         Section section2 = new Section(station2, station3, line, 10);
 
         Assertions.assertThatThrownBy(() -> section1.combineSection(section2))
-                .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class);
 
     }
 }
