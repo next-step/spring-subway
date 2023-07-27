@@ -62,7 +62,8 @@ public class LineService {
     }
 
     public Line findLineById(Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id)
+                .orElseThrow(() -> new IllegalLineException(String.format("해당 id(%d)의 노선이 존재하지 않습니다.", id)));
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {

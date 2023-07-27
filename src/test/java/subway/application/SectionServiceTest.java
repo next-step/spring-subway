@@ -52,6 +52,7 @@ class SectionServiceTest {
         final Section newSection = new Section(2L, line, station2, station3, 10);
         final Section oldSection = new Section(1L, line, station1, station2, 10);
 
+        given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
         given(stationDao.findById(station2.getId())).willReturn(Optional.of(station2));
         given(stationDao.findById(station3.getId())).willReturn(Optional.of(station3));
@@ -90,6 +91,7 @@ class SectionServiceTest {
         final Station station2 = new Station(2L, "안산");
         final Section oldSection = new Section(1L, line, station1, station2, 10);
 
+        given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
         given(stationDao.findById(station1.getId())).willReturn(Optional.of(station1));
         given(stationDao.findById(station2.getId())).willReturn(Optional.of(station2));
         given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
@@ -112,7 +114,7 @@ class SectionServiceTest {
         final SectionRequest sectionRequest = new SectionRequest("3", "4", 10);
 
         given(sectionDao.findAll(line.getId())).willReturn(List.of(oldSection));
-        given(lineDao.findById(line.getId())).willReturn(line);
+        given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
         given(stationDao.findById(sectionRequest.getUpStationId())).willReturn(Optional.of(new Station(3L, "한대앞")));
         given(stationDao.findById(sectionRequest.getDownStationId())).willReturn(Optional.of(new Station(4L, "중앙")));
 

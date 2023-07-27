@@ -42,9 +42,11 @@ public class LineDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Line findById(Long id) {
-        String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    public Optional<Line> findById(Long id) {
+        String sql = "SELECT id, name, color FROM line WHERE id = ?";
+        return jdbcTemplate.query(sql, rowMapper, id)
+                .stream()
+                .findAny();
     }
 
     public void update(Line newLine) {

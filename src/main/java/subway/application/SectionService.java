@@ -11,6 +11,7 @@ import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
+import subway.exception.IllegalLineException;
 import subway.exception.IllegalStationsException;
 
 @Service
@@ -42,7 +43,8 @@ public class SectionService {
     }
 
     private Line findLine(final long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id)
+                .orElseThrow(() -> new IllegalLineException(String.format("해당 id(%d)의 노선이 존재하지 않습니다.", id)));
     }
 
     private Section insert(final Section section) {

@@ -15,6 +15,7 @@ import subway.dto.LineWithStationsResponse;
 import subway.dto.StationResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -45,7 +46,7 @@ class LineServiceTest {
         final Station station3 = new Station(3L, "안산");
         final Station station4 = new Station(4L, "한대앞");
 
-        given(lineDao.findById(lineId)).willReturn(line);
+        given(lineDao.findById(lineId)).willReturn(Optional.of(line));
         given(sectionDao.findAll(lineId)).willReturn(List.of(
                 new Section(line, station4, station1, 10),
                 new Section(line, station1, station3, 10),
