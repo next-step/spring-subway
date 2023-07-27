@@ -41,7 +41,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long secondStationId = CreateHelper.createStation("역삼역");
         final Long thirdStationId = CreateHelper.createStation("교대역");
         final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
-        CreateHelper.createSection(secondStationId, thirdStationId,  lineId);
+        CreateHelper.createSection(secondStationId, thirdStationId, lineId);
 
         final SectionRequest params = new SectionRequest(thirdStationId, secondStationId, 10);
 

@@ -3,7 +3,7 @@ package subway.dto;
 import java.util.List;
 import subway.domain.Line;
 
-public class LineStationsResponse extends LineResponse{
+public class LineStationsResponse extends LineResponse {
 
     private final List<StationResponse> stations;
 
@@ -14,7 +14,8 @@ public class LineStationsResponse extends LineResponse{
     }
 
     public static LineStationsResponse from(final Line line, final List<StationResponse> stations) {
-        return new LineStationsResponse(line.getId(), line.getLineName().getValue(), line.getColor().getValue(), stations);
+        return new LineStationsResponse(line.getId(), line.getLineName().getValue(), line.getColor().getValue(),
+                stations);
     }
 
     public List<StationResponse> getStations() {

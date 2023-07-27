@@ -26,7 +26,8 @@ public class SectionDao {
     private final RowMapper<Section> rowMapper;
     private final RowMapper<Long> idRowMapper;
 
-    public SectionDao(final NamedParameterJdbcTemplate namedJdbcTemplate, final DataSource dataSource, final StationDao stationDao) {
+    public SectionDao(final NamedParameterJdbcTemplate namedJdbcTemplate, final DataSource dataSource,
+            final StationDao stationDao) {
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("section")
@@ -35,9 +36,11 @@ public class SectionDao {
                 new Section(
                         rs.getLong("id"),
                         stationDao.findById(rs.getLong("up_station_id"))
-                                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_UP_STATION_EXCEPTION_MESSAGE)),
+                                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION,
+                                        NO_UP_STATION_EXCEPTION_MESSAGE)),
                         stationDao.findById(rs.getLong("down_station_id"))
-                                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_DOWN_STATION_EXCEPTION_MESSAGE)),
+                                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION,
+                                        NO_DOWN_STATION_EXCEPTION_MESSAGE)),
                         rs.getInt("distance")
                 );
         this.idRowMapper = (rs, rowNum) -> rs.getLong("id");
@@ -55,7 +58,8 @@ public class SectionDao {
 
     }
 
-    public Optional<Long> findIdByStationIdsAndLineId(final Long upStationId, final Long downStationId, final Long lineId) {
+    public Optional<Long> findIdByStationIdsAndLineId(final Long upStationId, final Long downStationId,
+            final Long lineId) {
         final String sql = "select id from SECTION where up_station_id = :u_id and down_station_id = :d_id and line_id = :l_id";
         final SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("u_id", upStationId)

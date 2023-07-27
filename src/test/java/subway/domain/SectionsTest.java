@@ -23,7 +23,7 @@ class SectionsTest {
         Station downStation = new Station(2L, "잠실나루역");
         Station newDownStation = new Station(1L, "강변역");
 
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
 
         Section newSection = new Section(downStation, newDownStation, 10);
@@ -39,7 +39,7 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
 
         Section newSection = new Section(newUpStation, upStation, 10);
@@ -55,7 +55,7 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
 
         Section newSection = new Section(midStation, downStation, 3);
@@ -71,7 +71,7 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
 
         Section newSection = new Section(upStation, midStation, 3);
@@ -86,9 +86,9 @@ class SectionsTest {
         Station downStation = new Station(2L, "잠실역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(upStation, downStation,  3);
+        Section newSection = new Section(upStation, downStation, 3);
 
         assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
@@ -102,9 +102,9 @@ class SectionsTest {
         Station newDownStation = new Station(3L, "구의역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(newUpStation, newDownStation,  3);
+        Section newSection = new Section(newUpStation, newDownStation, 3);
 
         assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
@@ -120,8 +120,8 @@ class SectionsTest {
         Section oldSection = new Section(upStation, downStation, 10);
         originSections.add(oldSection);
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(upStation, midStation,  3);
-        Section newSection2 = new Section(midStation, downStation,  3);
+        Section newSection = new Section(upStation, midStation, 3);
+        Section newSection2 = new Section(midStation, downStation, 3);
 
         assertEquals(sections.oldSection(newSection), oldSection);
         assertEquals(sections.oldSection(newSection2), oldSection);
@@ -139,7 +139,7 @@ class SectionsTest {
         originSections.add(oldSection);
         Sections sections = new Sections(originSections);
 
-        Section upMidSection = new Section(upStation, midStation,  3);
+        Section upMidSection = new Section(upStation, midStation, 3);
         Section midDownSection = new Section(midStation, downStation, 7);
 
         assertEquals(oldSection.cutBy(upMidSection), midDownSection);
@@ -154,9 +154,9 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(upStation, midStation,  3);
+        Section newSection = new Section(upStation, midStation, 3);
 
         assertTrue(sections.isInsertedMiddle(newSection));
     }
@@ -169,9 +169,9 @@ class SectionsTest {
         Station newDownStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(downStation, newDownStation,  3);
+        Section newSection = new Section(downStation, newDownStation, 3);
 
         assertFalse(sections.isInsertedMiddle(newSection));
     }
@@ -186,7 +186,7 @@ class SectionsTest {
         int distance = 10;
 
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
-        Section  newSection = new Section(newUpStation, newDownStation, distance);
+        Section newSection = new Section(newUpStation, newDownStation, distance);
 
         assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
@@ -201,7 +201,7 @@ class SectionsTest {
         int distance = 10;
 
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
-        Section  newSection = new Section(newUpStation, newDownStation, distance);
+        Section newSection = new Section(newUpStation, newDownStation, distance);
 
         assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
@@ -214,7 +214,7 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         Section oldSection = new Section(upStation, downStation, 10);
-        Section newSection = new Section(upStation, midStation,  10);
+        Section newSection = new Section(upStation, midStation, 10);
 
         assertThrows(SectionException.class, () -> oldSection.cutBy(newSection));
     }

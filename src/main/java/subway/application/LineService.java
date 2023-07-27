@@ -77,7 +77,8 @@ public class LineService {
     public LineStationsResponse findLineResponseById(final Long id) {
         Line persistLine = findLineById(id);
         Sections sections = sectionDao.findAllByLineId(id)
-                .orElseThrow(() -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
+                .orElseThrow(
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
         List<StationResponse> stationResponses = sections.toStations().stream()
                 .map(StationResponse::of)
@@ -106,7 +107,8 @@ public class LineService {
     public Long saveSection(final SectionRequest request, final Long lineId) {
         Section newSection = newSection(request);
         Sections sections = sectionDao.findAllByLineId(lineId)
-                .orElseThrow(() -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
+                .orElseThrow(
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
         sections.validateInsert(newSection);
 
@@ -130,7 +132,8 @@ public class LineService {
         final Station delete = stationDao.findById(stationId)
                 .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_STATION_EXCEPTION_MESSAGE));
         final Sections sections = sectionDao.findAllByLineId(lineId)
-                .orElseThrow(() -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
+                .orElseThrow(
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
         sections.validateDelete();
 

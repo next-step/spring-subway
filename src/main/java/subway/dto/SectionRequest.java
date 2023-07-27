@@ -16,7 +16,8 @@ public class SectionRequest {
     }
 
     public static SectionRequest of(final LineRequest lineRequest) {
-        return new SectionRequest(lineRequest.getUpStationId(), lineRequest.getDownStationId(), lineRequest.getDistance());
+        return new SectionRequest(lineRequest.getUpStationId(), lineRequest.getDownStationId(),
+                lineRequest.getDistance());
     }
 
     public boolean hasNullField() {

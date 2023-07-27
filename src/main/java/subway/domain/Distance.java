@@ -26,10 +26,6 @@ public class Distance {
         return this.value <= other.value;
     }
 
-    public Distance sum(final Distance other) {
-        return new Distance(this.value + other.value);
-    }
-
     public Distance subtract(final Distance other) {
         return new Distance(this.value - other.value);
     }

@@ -62,10 +62,6 @@ public class Section {
         }
     }
 
-    public boolean isInOrder(final Section other) {
-        return isSameDownStation(other.upStation);
-    }
-
     public boolean isSameUpStation(final Station station) {
         return upStation.equals(station);
     }
@@ -84,10 +80,6 @@ public class Section {
 
     public boolean shorterOrEqualTo(final Section other) {
         return distance.shorterOrEqualTo(other.distance);
-    }
-
-    public Distance distanceSum(final Section other) {
-        return this.distance.sum(other.distance);
     }
 
     public Distance distanceDifference(final Section other) {
