@@ -1,5 +1,6 @@
 package subway.application;
 
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,7 +83,7 @@ class SectionServiceTest {
     @Test
     @DisplayName("구간 삭제 정상 테스트: 양 옆에 구간이 있는 경우")
     void delete() {
-        when(stationDao.findById(2L)).thenReturn(신중동역);
+        when(stationDao.findById(2L)).thenReturn(Optional.of(신중동역));
         when(sectionDao.insert(부천시청_신중동_구간.combineSection(신중동_춘의_구간))).thenReturn(
             부천시청_신중동_구간.combineSection(신중동_춘의_구간));
 
@@ -97,7 +98,7 @@ class SectionServiceTest {
     @Test
     @DisplayName("구간 삭제 정상 테스트: 하행 종점역을 삭제하는 경우")
     void delete2() {
-        when(stationDao.findById(1L)).thenReturn(부천시청역);
+        when(stationDao.findById(1L)).thenReturn(Optional.of(부천시청역));
 
         Assertions.assertThatNoException()
             .isThrownBy(() -> sectionService.deleteSection(1L, 1L));
@@ -109,7 +110,7 @@ class SectionServiceTest {
     @Test
     @DisplayName("구간 삭제 정상 테스트: 상행 종점역을 삭제하는 경우")
     void delete3() {
-        when(stationDao.findById(3L)).thenReturn(춘의역);
+        when(stationDao.findById(3L)).thenReturn(Optional.of(춘의역));
 
         Assertions.assertThatNoException()
             .isThrownBy(() -> sectionService.deleteSection(3L, 1L));
@@ -122,7 +123,7 @@ class SectionServiceTest {
     @DisplayName("구간 삭제 예외 테스트: 구간이 하나인 노선에서 마지막 구간을 제거할 때")
     void deleteException1() {
         when(sectionDao.findAllByLineId(1L)).thenReturn(new Sections(List.of(부천시청_신중동_구간)));
-        when(stationDao.findById(2L)).thenReturn(신중동역);
+        when(stationDao.findById(2L)).thenReturn(Optional.of(신중동역));
 
         Assertions.assertThatThrownBy(() -> sectionService.deleteSection(2L, 1L))
             .isInstanceOf(IllegalArgumentException.class)
@@ -134,7 +135,7 @@ class SectionServiceTest {
     void deleteException2() {
         Station 까치울역 = new Station(5L, "까치울역");
 
-        when(stationDao.findById(5L)).thenReturn(까치울역);
+        when(stationDao.findById(5L)).thenReturn(Optional.of(까치울역));
 
         Assertions.assertThatThrownBy(() -> sectionService.deleteSection(5L, 1L))
             .isInstanceOf(IllegalArgumentException.class)
@@ -146,9 +147,9 @@ class SectionServiceTest {
     void add1() {
         Station 까치울역 = new Station(5L, "까치울역");
 
-        when(stationDao.findById(2L)).thenReturn(신중동역);
-        when(stationDao.findById(5L)).thenReturn(까치울역);
-        when(lineDao.findById(1L)).thenReturn(칠호선);
+        when(stationDao.findById(2L)).thenReturn(Optional.of(신중동역));
+        when(stationDao.findById(5L)).thenReturn(Optional.of(까치울역));
+        when(lineDao.findById(1L)).thenReturn(Optional.of(칠호선));
 
         sectionService.registerSection(new SectionRegisterRequest(2L, 5L, 3), 1L);
 
@@ -160,9 +161,9 @@ class SectionServiceTest {
     @DisplayName("구간 추가 정상 테스트: 구간 중간에 추가되는 경우(하행이 겹치는 경우)")
     void add2() {
         Station 까치울역 = new Station(5L, "까치울역");
-        when(stationDao.findById(2L)).thenReturn(신중동역);
-        when(stationDao.findById(5L)).thenReturn(까치울역);
-        when(lineDao.findById(1L)).thenReturn(칠호선);
+        when(stationDao.findById(2L)).thenReturn(Optional.of(신중동역));
+        when(stationDao.findById(5L)).thenReturn(Optional.of(까치울역));
+        when(lineDao.findById(1L)).thenReturn(Optional.of(칠호선));
 
         sectionService.registerSection(new SectionRegisterRequest(5L, 2L, 3), 1L);
 
@@ -175,9 +176,9 @@ class SectionServiceTest {
     void add3() {
         Station 까치울역 = new Station(5L, "까치울역");
 
-        when(stationDao.findById(1L)).thenReturn(부천시청역);
-        when(stationDao.findById(5L)).thenReturn(까치울역);
-        when(lineDao.findById(1L)).thenReturn(칠호선);
+        when(stationDao.findById(1L)).thenReturn(Optional.of(부천시청역));
+        when(stationDao.findById(5L)).thenReturn(Optional.of(까치울역));
+        when(lineDao.findById(1L)).thenReturn(Optional.of(칠호선));
 
         sectionService.registerSection(new SectionRegisterRequest(5L, 1L, 3), 1L);
 
@@ -191,9 +192,9 @@ class SectionServiceTest {
     void add4() {
         Station 까치울역 = new Station(5L, "까치울역");
 
-        when(stationDao.findById(3L)).thenReturn(춘의역);
-        when(stationDao.findById(5L)).thenReturn(까치울역);
-        when(lineDao.findById(1L)).thenReturn(칠호선);
+        when(stationDao.findById(3L)).thenReturn(Optional.of(춘의역));
+        when(stationDao.findById(5L)).thenReturn(Optional.of(까치울역));
+        when(lineDao.findById(1L)).thenReturn(Optional.of(칠호선));
 
         sectionService.registerSection(new SectionRegisterRequest(3L, 5L, 3), 1L);
 
@@ -207,9 +208,9 @@ class SectionServiceTest {
     void addException1() {
         Station 까치울역 = new Station(5L, "까치울역");
 
-        when(stationDao.findById(2L)).thenReturn(신중동역);
-        when(stationDao.findById(5L)).thenReturn(까치울역);
-        when(lineDao.findById(1L)).thenReturn(칠호선);
+        when(stationDao.findById(2L)).thenReturn(Optional.of(신중동역));
+        when(stationDao.findById(5L)).thenReturn(Optional.of(까치울역));
+        when(lineDao.findById(1L)).thenReturn(Optional.of(칠호선));
 
         Assertions.assertThatThrownBy(
                 () -> sectionService.registerSection(
@@ -222,9 +223,9 @@ class SectionServiceTest {
     @Test
     @DisplayName("구간 추가 예외 테스트: 기존 구간과 겹치는 경우")
     void addException2() {
-        when(stationDao.findById(1L)).thenReturn(부천시청역);
-        when(stationDao.findById(2L)).thenReturn(신중동역);
-        when(lineDao.findById(1L)).thenReturn(칠호선);
+        when(stationDao.findById(1L)).thenReturn(Optional.of(부천시청역));
+        when(stationDao.findById(2L)).thenReturn(Optional.of(신중동역));
+        when(lineDao.findById(1L)).thenReturn(Optional.of(칠호선));
 
         Assertions.assertThatThrownBy(
                 () -> sectionService.registerSection(
@@ -240,9 +241,9 @@ class SectionServiceTest {
         Station 까치울역 = new Station(5L, "까치울역");
         Station 온수역 = new Station(6L, "온수역");
 
-        when(stationDao.findById(5L)).thenReturn(까치울역);
-        when(stationDao.findById(6L)).thenReturn(온수역);
-        when(lineDao.findById(1L)).thenReturn(칠호선);
+        when(stationDao.findById(5L)).thenReturn(Optional.of(까치울역));
+        when(stationDao.findById(6L)).thenReturn(Optional.of(온수역));
+        when(lineDao.findById(1L)).thenReturn(Optional.of(칠호선));
 
         Assertions.assertThatThrownBy(
                 () -> sectionService.registerSection(

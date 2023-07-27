@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
+import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
@@ -40,9 +41,13 @@ public class SectionService {
     }
 
     private Section makeSection(SectionRegisterRequest sectionRegisterRequest, Long lineId) {
-        Station upStation = stationDao.findById(sectionRegisterRequest.getUpStationId());
-        Station downStation = stationDao.findById(sectionRegisterRequest.getDownStationId());
-        Line line = lineDao.findById(lineId);
+        Station upStation = stationDao.findById(sectionRegisterRequest.getUpStationId())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Station downStation = stationDao.findById(sectionRegisterRequest.getDownStationId())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Line line = lineDao.findById(lineId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 호선을 입력했습니다."));
+
         return new Section(
             upStation,
             downStation,
@@ -54,7 +59,8 @@ public class SectionService {
     @Transactional
     public void deleteSection(Long stationId, Long lineId) {
         Sections sections = sectionDao.findAllByLineId(lineId);
-        Station deleteStation = stationDao.findById(stationId);
+        Station deleteStation = stationDao.findById(stationId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
 
         sections.validSectionsLine();
         sections.validDeleteStation(deleteStation);
