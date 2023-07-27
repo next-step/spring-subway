@@ -39,7 +39,7 @@ public class PathFinderTest {
     }
 
     @Test
-    @DisplayName("성공 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
+    @DisplayName("성공1 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
     void successFindStations() {
         // when
         PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 양재역);
@@ -49,13 +49,33 @@ public class PathFinderTest {
     }
 
     @Test
-    @DisplayName("성공 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
+    @DisplayName("성공2 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
     void successFindStations2() {
         // when
         PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 남부터미널역);
 
         // then
         assertThat(pathFinder.findShortestStations()).containsExactly(교대역, 남부터미널역);
+    }
+
+    @Test
+    @DisplayName("성공1 : 출발역과 도착역의 최단 거리 리턴")
+    void successFindShortestDistance1() {
+        // when
+        PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 양재역);
+
+        // then
+        assertThat(pathFinder.findMinimumDistance()).isEqualTo(5D);
+    }
+
+    @Test
+    @DisplayName("성공2 : 출발역과 도착역의 최단 거리 리턴")
+    void successFindShortestDistance2() {
+        // when
+        PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 남부터미널역);
+
+        // then
+        assertThat(pathFinder.findMinimumDistance()).isEqualTo(2D);
     }
 
 }
