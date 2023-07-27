@@ -6,20 +6,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.util.CollectionUtils;
 
 public class Sections {
 
-    public static final int MIN_SECTION_COUNT = 1;
-    private final List<Section> values;
+    private final List<Section> sections;
 
     public Sections(List<Section> candidateValues) {
         validateNullOrEmpty(candidateValues);
         validateAllBelongToSameLine(candidateValues);
-        this.values = sort(candidateValues);
+        this.sections = sort(candidateValues);
 
-        validateConnectedSections(candidateValues, this.values);
+        validateConnectedSections(candidateValues, this.sections);
     }
 
     private void validateNullOrEmpty(List<Section> values) {
@@ -82,117 +83,47 @@ public class Sections {
             .collect(Collectors.toSet());
     }
 
-    public Optional<Section> add(Section section) {
-        validateSectionInLine(section);
-        validateOnlyOneStationInLine(section);
-
-        if (section.isUpperSectionOf(getFirst())) {
-            this.values.add(0, section);
-            return Optional.empty();
-        }
-
-        if (getLast().isUpperSectionOf(section)) {
-            this.values.add(section);
-            return Optional.empty();
-        }
-
-        return addSectionInMiddle(section);
-    }
-
-    private void validateSectionInLine(final Section section) {
-        if (!section.belongTo(getFirst().getLine())) {
-            throw new IllegalArgumentException("추가할 구간은 기존 노선에 포함되어야 합니다.");
-        }
-    }
-
-    private Optional<Section> addSectionInMiddle(Section section) {
-        Section mergeTarget = findMatchedSection(section);
-        List<Section> mergeResults = mergeTarget.mergeSections(section);
-
-        int insertIndex = this.values.indexOf(mergeTarget);
-        this.values.remove(mergeTarget);
-        this.values.addAll(insertIndex, mergeResults);
-
-        return findUpdatedSection(mergeResults);
-    }
-
-    private static Optional<Section> findUpdatedSection(final List<Section> mergeResults) {
-        return mergeResults.stream()
-            .filter(result -> Objects.nonNull(result.getId()))
-            .findAny();
-    }
-
-    private Section findMatchedSection(Section section) {
-        return this.values.stream()
-            .filter(value -> value.hasSameUpStationOrDownStation(section))
-            .findAny()
-            .orElseThrow(() -> new IllegalStateException("구간 추가 도중 문제가 발생했습니다."));
-    }
-
-    private void validateOnlyOneStationInLine(Section section) {
-        Station upStation = section.getUpStation();
-        Station downStation = section.getDownStation();
-
-        boolean upStationExists = this.values.stream()
-            .anyMatch(value -> value.containsStation(upStation));
-        boolean downStationExists = this.values.stream()
-            .anyMatch(value -> value.containsStation(downStation));
-
-        validateBothStationsInLine(upStationExists, downStationExists);
-        validateBothStationsNotInLine(upStationExists, downStationExists);
-    }
-
-    private void validateBothStationsInLine(final boolean upStationExists, final boolean downStationExists) {
-        if (upStationExists && downStationExists) {
-            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있습니다.");
-        }
-    }
-
-    private void validateBothStationsNotInLine(final boolean upStationExists, final boolean downStationExists) {
-        if (!upStationExists && !downStationExists) {
-            throw new IllegalArgumentException("두 역이 모두 노선에 포함되어 있지 않습니다.");
-        }
-    }
-
-    public Section removeLast(Station station) {
-        validateSize();
-        validateFinalDownStationSameAs(station);
-
-        return values.remove(values.size() - 1);
-    }
-
-    private void validateFinalDownStationSameAs(Station station) {
-        if (!getLast().hasDownStationSameAs(station)) {
-            throw new IllegalArgumentException(
-                "삭제할 역이 해당 노선의 하행종점역이 아닙니다 요청 station: " + station + " 하행 종점 구간 : " + getLast());
-        }
-    }
-
-    private void validateSize() {
-        if (values.size() <= MIN_SECTION_COUNT) {
-            throw new IllegalStateException("노선의 구간이 " + MIN_SECTION_COUNT + "개인 경우 삭제할 수 없습니다.");
-        }
-    }
-
     public List<Station> getStations() {
-        List<Station> stations = values.stream()
+        List<Station> stations = sections.stream()
             .map(Section::getUpStation)
             .collect(Collectors.toList());
         stations.add(getLast().getDownStation());
         return stations;
     }
 
+    public boolean hasStation(Station station) {
+        return getStations().contains(station);
+    }
+
+    public boolean isFirst(Station station) {
+        return getFirst().hasUpStation(station);
+    }
+
+    public boolean isLast(Station station) {
+        return getLast().hasDownStation(station);
+    }
+
+    public Optional<Section> filter(Predicate<Section> condition) {
+        return sections.stream()
+            .filter(condition)
+            .findAny();
+    }
+
+    public int getSize() {
+        return sections.size();
+    }
+
     private Section getFirst() {
-        return this.values.get(0);
+        return CollectionUtils.firstElement(sections);
     }
 
 
     private Section getLast() {
-        return this.values.get(this.values.size() - 1);
+        return CollectionUtils.lastElement(sections);
     }
 
-    public List<Section> getValues() {
-        return values;
+    public List<Section> getSections() {
+        return sections;
     }
 
     @Override
@@ -204,18 +135,18 @@ public class Sections {
             return false;
         }
         Sections sections = (Sections) o;
-        return Objects.equals(values, sections.values);
+        return Objects.equals(this.sections, sections.sections);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(values);
+        return Objects.hash(sections);
     }
 
     @Override
     public String toString() {
         return "Sections{" +
-            "values=" + values +
+            "values=" + sections +
             '}';
     }
 }

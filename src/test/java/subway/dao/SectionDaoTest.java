@@ -60,7 +60,7 @@ class SectionDaoTest {
         Section section2 = sectionDao.save(
             new Section(persistLineA, persistStationB, persistStationC, 2));
 
-        assertThat(sectionDao.findAllByLine(persistLineA))
+        assertThat(sectionDao.findAllBy(persistLineA))
             .isEqualTo(new Sections(List.of(section, section2)));
     }
 

@@ -54,7 +54,7 @@ public class SectionDao {
             .usingGeneratedKeyColumns("id");
     }
 
-    public Sections findAllByLine(Line line) {
+    public Sections findAllBy(Line line) {
         String sql =
             "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
                 + "l.name AS line_name, color AS line_color, "
@@ -92,6 +92,12 @@ public class SectionDao {
         jdbcTemplate.update("delete from SECTION where line_id = ?", line.getId());
     }
 
+    public void deleteByLineAndStation(Line line, Station station) {
+        jdbcTemplate.update(
+            "delete from SECTION where line_id = ? and (up_station_id = ? or down_station_id = ?)",
+            line.getId(), station.getId(), station.getId());
+    }
+
     public void update(Section section) {
         String sql = "update SECTION set line_id = ?, up_station_id = ?, down_station_id = ?, distance = ? where id = ?";
         jdbcTemplate.update(sql, section.getLine().getId(), section.getUpStation().getId(),
@@ -112,5 +118,9 @@ public class SectionDao {
 
         return jdbcTemplate.queryForStream(sql, rowToSectionMapper, id)
             .findAny();
+    }
+
+    public void deleteAll() {
+        jdbcTemplate.update("delete from SECTION");
     }
 }

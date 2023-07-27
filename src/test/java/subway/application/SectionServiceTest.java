@@ -1,15 +1,17 @@
 package subway.application;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -19,17 +21,17 @@ import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
 
-@SpringBootTest(classes = {SectionService.class})
+@ExtendWith(MockitoExtension.class)
 @DisplayName("SectionService 단위 테스트")
 class SectionServiceTest {
 
-    @Autowired
+    @InjectMocks
     SectionService sectionService;
-    @MockBean
+    @Mock
     LineDao lineDao;
-    @MockBean
+    @Mock
     StationDao stationDao;
-    @MockBean
+    @Mock
     SectionDao sectionDao;
 
     @Test
@@ -45,7 +47,7 @@ class SectionServiceTest {
         final SectionAdditionRequest request = new SectionAdditionRequest(
             stationA.getId(), stationC.getId(), 3);
         doReturn(Optional.of(lineA)).when(lineDao).findById(lineA.getId());
-        doReturn(sections).when(sectionDao).findAllByLine(lineA);
+        doReturn(sections).when(sectionDao).findAllBy(lineA);
         doReturn(Optional.of(stationA)).when(stationDao).findById(stationA.getId());
         doReturn(Optional.of(stationC)).when(stationDao).findById(stationC.getId());
 
@@ -69,13 +71,14 @@ class SectionServiceTest {
         final Section sectionB = new Section(2L, lineA, stationB, stationC, 5);
         final Sections sections = new Sections(List.of(sectionA, sectionB));
         doReturn(Optional.of(lineA)).when(lineDao).findById(lineA.getId());
-        doReturn(sections).when(sectionDao).findAllByLine(lineA);
-        doReturn(Optional.of(stationC)).when(stationDao).findById(stationC.getId());
+        doReturn(sections).when(sectionDao).findAllBy(lineA);
+        doReturn(Optional.of(stationB)).when(stationDao).findById(stationB.getId());
 
         //when
-        sectionService.removeLast(lineA.getId(), stationC.getId());
+        sectionService.remove(lineA.getId(), stationB.getId());
 
         //then
-        verify(sectionDao).delete(sectionB);
+        verify(sectionDao).update(any());
+        verify(sectionDao).deleteByLineAndStation(lineA, stationB);
     }
 }

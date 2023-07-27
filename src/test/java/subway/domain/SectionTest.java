@@ -12,140 +12,217 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("Section 클래스 테스트")
 class SectionTest {
-
-    Line lineA;
-    Station stationA;
-    Station stationB;
-    Station stationC;
-    Station stationD;
-
-    @BeforeEach
-    void setUp() {
-        lineA = new Line(1L, "A", "red");
-        stationA = new Station(1L, "A");
-        stationB = new Station(2L, "B");
-        stationC = new Station(3L, "C");
-        stationD = new Station(4L, "D");
-    }
-
     @Test
     @DisplayName("구간 길이는 양수여야 한다.")
     void sectionDistanceShouldBePositive() {
-        Station upStation = new Station(1L, "A");
-        Station downStation = new Station(2L, "B");
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
 
-        assertThatCode(() -> new Section(lineA, upStation, downStation, 1))
+        //when & then
+        assertThatCode(() -> new Section(1L, lineA, stationA, stationB, 1))
             .doesNotThrowAnyException();
-        assertThatThrownBy(() -> new Section(lineA, upStation, downStation, -1))
+        assertThatThrownBy(() -> new Section(1L, lineA, stationA, stationB, -1))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("상행역과 하행역은 같을 수 없다")
     void upStationAndDownStationShouldNotEqual() {
-        assertThatThrownBy(() -> new Section(lineA, stationA, stationA, 1))
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+
+        //when & then
+        assertThatThrownBy(() -> new Section(1L, lineA, stationA, stationA, 1))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("자신의 하행역과 주어진 구간의 상행역이 같은지 확인한다.")
-    void checkMyDownStationAndOtherUpStationEqual() {
-        Section section = new Section(lineA, stationA, stationB, 1);
-        Section otherSection = new Section(lineA, stationB, stationC, 1);
+    @DisplayName("해당 역은 자신의 상행역과 같다")
+    void hasUpStation() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
 
-        assertThat(section.isUpperSectionOf(otherSection)).isTrue();
-        assertThat(otherSection.isUpperSectionOf(section)).isFalse();
+        Section section = new Section(1L, lineA, stationA, stationB, 1);
+
+        //when & then
+        assertThat(section.hasUpStation(stationA)).isTrue();
+        assertThat(section.hasUpStation(stationB)).isFalse();
     }
 
     @Test
-    @DisplayName("해당 역은 구간의 하행역과 같다")
-    void hasDownStationSameAs() {
-        Section section = new Section(lineA, stationA, stationB, 1);
+    @DisplayName("해당 역은 자신의 하행역과 같다")
+    void hasDownStation() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Section section = new Section(1L, lineA, stationA, stationB, 1);
 
-        assertThat(section.hasDownStationSameAs(stationB)).isTrue();
-        assertThat(section.hasDownStationSameAs(stationA)).isFalse();
+        //when & then
+        assertThat(section.hasDownStation(stationB)).isTrue();
+        assertThat(section.hasDownStation(stationA)).isFalse();
     }
 
     @Test
-    @DisplayName("구간은 주어진 라인의 소속이다")
-    void sectionBelongToLine() {
-        Section section = new Section(lineA, stationA, stationB, 1);
+    @DisplayName("구간과 상행역 또는 하행역이 겹친다.")
+    void matchEitherStation() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
+        Station stationD = new Station(4L, "D");
 
-        assertThat(section.belongTo(lineA)).isTrue();
+        Section section = new Section(1L, lineA, stationA, stationB, 3);
+        Section upStationMatchSection = new Section(2L, lineA, stationA, stationC, 2);
+        Section noMatchSection = new Section(3L, lineA, stationC, stationD, 2);
+
+        //when & then
+        assertThat(section.matchEitherStation(upStationMatchSection)).isTrue();
+        assertThat(section.matchEitherStation(noMatchSection)).isFalse();
     }
 
     @Test
-    @DisplayName("구간이 주어진 역을 포함한다.")
-    void containsStation() {
-        Section section = new Section(lineA, stationA, stationB, 1);
+    @DisplayName("구간이 주어진 길이보다 길지 않다.")
+    void isNotLongerThan() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
 
-        assertThat(section.containsStation(stationA)).isTrue();
-        assertThat(section.containsStation(stationC)).isFalse();
+        Section section = new Section(1L, lineA, stationA, stationB, 5);
+
+        //when & then
+        assertThat(section.isNotLongerThan(5)).isTrue();
+        assertThat(section.isNotLongerThan(3)).isFalse();
     }
 
     @Test
-    @DisplayName("추가할 구간의 크기가 같거나 큰 경우 합칠 수 없다.")
-    void cannotMergeLargeOrSameLengthSection() {
-        Section section = new Section(lineA, stationA, stationC, 3);
-        Section sameLengthSection = new Section(lineA, stationA, stationB, 3);
-        Section largeSection = new Section(lineA, stationA, stationB, 4);
+    @DisplayName("주어진 구간의 길이가 같거나 긴 경우 자를 수 없다.")
+    void cannotCutByLargeOrSameLengthSection() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
 
-        assertThatThrownBy(() -> section.mergeSections(sameLengthSection))
+        Section section = new Section(1L, lineA, stationA, stationC, 3);
+        Section sameLengthSection = new Section(2L, lineA, stationA, stationB, 3);
+        Section largeSection = new Section(3L, lineA, stationA, stationB, 4);
+
+        //when & then
+        assertThatThrownBy(() -> section.cutBy(sameLengthSection))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> section.mergeSections(largeSection))
+        assertThatThrownBy(() -> section.cutBy(largeSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("구간의 상행역과 추가할 구간의 상행역이 같은 경우 합친다")
-    void mergeSameUpStationSection() {
-        Section section = new Section(lineA, stationA, stationC, 3);
-        Section targetSection = new Section(lineA, stationA, stationB, 2);
+    @DisplayName("구간의 상행역과 주어진 구간의 상행역이 같은 경우 구간의 윗부분을 잘라낸다.")
+    void cutUpperPart() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
 
-        List<Section> mergedSections = section.mergeSections(targetSection);
+        Section section = new Section(1L, lineA, stationA, stationC, 6);
+        Section targetSection = new Section(2L, lineA, stationA, stationB, 2);
 
-        Section createdSection = new Section(lineA, stationB, stationC, 1);
-        assertThat(doSectionsHaveSameFields(mergedSections.get(0), targetSection)).isTrue();
-        assertThat(doSectionsHaveSameFields(mergedSections.get(1), createdSection)).isTrue();
+        //when
+        Section actual = section.cutBy(targetSection);
+
+        //then
+        Section expected = new Section(1L, lineA, stationB, stationC, 4);
+        assertThat(actual).isEqualTo(expected);
+        assertThat(doSectionsHaveSameFields(actual, expected)).isTrue();
     }
 
     @Test
-    @DisplayName("구간의 하행역과 추가할 구간의 하행역이 같은 경우 합친다")
-    void mergeSameDownStationSection() {
-        Section section = new Section(lineA, stationA, stationC, 3);
-        Section targetSection = new Section(lineA, stationB, stationC, 2);
+    @DisplayName("구간의 하행역과 주어진 구간의 하행역이 같은 경우 구간의 아랫부분을 잘라낸다.")
+    void cutLowerPart() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
 
-        List<Section> mergedSections = section.mergeSections(targetSection);
+        Section section = new Section(1L, lineA, stationA, stationC, 6);
+        Section targetSection = new Section(2L, lineA, stationB, stationC, 2);
 
-        Section createdSection = new Section(lineA, stationA, stationB, 1);
-        assertThat(doSectionsHaveSameFields(mergedSections.get(0), createdSection)).isTrue();
-        assertThat(doSectionsHaveSameFields(mergedSections.get(1), targetSection)).isTrue();
+        //when
+        Section actual = section.cutBy(targetSection);
+
+        //then
+        Section expected = new Section(1L, lineA, stationA, stationB, 4);
+        assertThat(actual).isEqualTo(expected);
+        assertThat(doSectionsHaveSameFields(actual, expected)).isTrue();
     }
 
     @Test
-    @DisplayName("구간의 상행역, 하행역이 추가할 구간의 상행역, 하행역과 모두 같거나 모두 다른 경우 합칠 수 없다.")
-    void cannotMergeAllSameStationOrNothingSameStationSection() {
+    @DisplayName("구간의 상행역, 하행역이 주어진 구간의 상행역, 하행역과 모두 같거나 모두 다른 경우 자를 수 없다.")
+    void cannotCutByFullMatchOrNoMatchSection() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
+        Station stationD = new Station(4L, "D");
+
         Section section = new Section(lineA, stationA, stationB, 3);
-        Section bothSameSection = new Section(lineA, stationA, stationB, 2);
-        Section nothingSameSection = new Section(lineA, stationC, stationD, 2);
+        Section fullMatchSection = new Section(lineA, stationA, stationB, 2);
+        Section noMatchSection = new Section(lineA, stationC, stationD, 2);
 
-        assertThatThrownBy(() -> section.mergeSections(bothSameSection))
+        //when & then
+        assertThatThrownBy(() -> section.cutBy(fullMatchSection))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> section.mergeSections(nothingSameSection))
+        assertThatThrownBy(() -> section.cutBy(noMatchSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("구간과 상행역 또는 하행역이 겹치는지 여부를 반환한다.")
-    void hasSameUpStationOrDownStation() {
-        Section section = new Section(lineA, stationA, stationB, 3);
-        Section upStationSameSection = new Section(lineA, stationA, stationC, 2);
-        Section nothingSameSection = new Section(lineA, stationC, stationD, 2);
+    @DisplayName("구간을 연장한다.")
+    void extendBy() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
 
-        assertThat(section.hasSameUpStationOrDownStation(upStationSameSection)).isTrue();
-        assertThat(section.hasSameUpStationOrDownStation(nothingSameSection)).isFalse();
+        Section section = new Section(1L, lineA, stationA, stationB, 2);
+        Section targetSection = new Section(2L, lineA, stationB, stationC, 5);
+
+        //when
+        Section actual = section.extendBy(targetSection);
+
+        //then
+        Section expected = new Section(1L, lineA, stationA, stationC, 7);
+        assertThat(actual).isEqualTo(expected);
+        assertThat(doSectionsHaveSameFields(actual, expected)).isTrue();
     }
 
+    @Test
+    @DisplayName("구간의 하행역과 주어진 구간의 상행역이 다른 경우 연장할 수 없다.")
+    void cannotExtendByNotConnectedSection() {
+        //given
+        Line lineA = new Line(1L, "A", "red");
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Station stationC = new Station(3L, "C");
+        Station stationD = new Station(4L, "D");
+
+        Section section = new Section(1L, lineA, stationA, stationB, 2);
+        Section targetSection = new Section(2L, lineA, stationC, stationD, 5);
+
+        //when & then
+        assertThatThrownBy(() -> section.extendBy(targetSection))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 
     static boolean doSectionsHaveSameFields(Section section, Section other) {
         return Objects.equals(section.getLine(), other.getLine())

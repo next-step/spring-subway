@@ -70,7 +70,7 @@ public class LineController {
 
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam Long stationId) {
-        sectionService.removeLast(id, stationId);
+        sectionService.remove(id, stationId);
         return ResponseEntity.noContent().build();
     }
 }

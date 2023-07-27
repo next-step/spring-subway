@@ -7,6 +7,8 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
+import subway.domain.SectionAddManager;
+import subway.domain.SectionRemoveManager;
 import subway.domain.Sections;
 import subway.domain.Station;
 import subway.dto.SectionAdditionRequest;
@@ -26,38 +28,40 @@ public class SectionService {
 
     @Transactional
     public void addSection(Long id, SectionAdditionRequest request) {
-        Line line = getLineOrElseThrow(id);
-        Sections sections = sectionDao.findAllByLine(line);
-        Section section = createNewSectionBy(line, request);
+        Line line = getLineBy(id);
+        Station upStation = getStationBy(request.getUpStationId());
+        Station downStation = getStationBy(request.getDownStationId());
+        Sections sections = sectionDao.findAllBy(line);
+        int distance = request.getDistance();
 
-        sections.add(section).ifPresent(sectionDao::update);
+        SectionAddManager sectionAddManager = new SectionAddManager(sections);
+        sectionAddManager.validate(upStation, downStation, distance);
+        Section section = new Section(line, upStation, downStation, distance);
+        sectionAddManager.lookForChange(section)
+            .ifPresent(sectionDao::update);
         sectionDao.save(section);
     }
 
-    private Section createNewSectionBy(Line line, SectionAdditionRequest request) {
-        Station upStation = getStationOrElseThrow(request.getUpStationId());
-        Station downStation = getStationOrElseThrow(request.getDownStationId());
-        return new Section(line, upStation, downStation, request.getDistance());
-    }
-
     @Transactional
-    public void removeLast(Long lineId, Long stationId) {
-        Line line = getLineOrElseThrow(lineId);
-        Sections sections = sectionDao.findAllByLine(line);
-        Station station = getStationOrElseThrow(stationId);
+    public void remove(Long lineId, Long stationId) {
+        Line line = getLineBy(lineId);
+        Sections sections = sectionDao.findAllBy(line);
+        Station station = getStationBy(stationId);
 
-        Section removedSection = sections.removeLast(station);
-
-        sectionDao.delete(removedSection);
+        SectionRemoveManager sectionRemoveManager = new SectionRemoveManager(sections);
+        sectionRemoveManager.validate(station);
+        sectionRemoveManager.lookForChange(station)
+            .ifPresent(sectionDao::update);
+        sectionDao.deleteByLineAndStation(line, station);
     }
 
-    private Line getLineOrElseThrow(Long id) {
+    private Line getLineBy(Long id) {
         return lineDao.findById(id)
             .orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 
-    private Station getStationOrElseThrow(Long id) {
+    private Station getStationBy(Long id) {
         return stationDao.findById(id)
             .orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\""));
