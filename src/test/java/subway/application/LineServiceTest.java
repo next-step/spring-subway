@@ -86,7 +86,6 @@ class LineServiceTest {
 
             // then
             assertThat(exception).isNull();
-            assertThat(section1.getDownSection()).isEqualTo(section2);
         }
     }
 

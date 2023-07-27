@@ -79,22 +79,12 @@ public class LineService {
 
     public void connectSectionByStationId(final Long lineId, final CreateSectionRequest sectionRequest) {
         final Line line = getLineById(lineId);
+        final Section newSection = getNewSection(sectionRequest);
 
-        final Section section = getNewSection(sectionRequest.getUpStationId(),
-                sectionRequest.getDownStationId(),
-                sectionRequest.getDistance());
-        final Section newSection = line.connectSection(section);
+        line.findUpdateSection(newSection)
+                .ifPresent(section -> sectionDao.update(section));
 
         sectionDao.insert(newSection, line.getId());
-        updateSectionIfNotNull(newSection.getUpSection());
-        updateSectionIfNotNull(newSection.getDownSection());
-    }
-
-    public void updateSectionIfNotNull(final Section section) {
-        if (section == null) {
-            return;
-        }
-        sectionDao.update(section);
     }
 
     public void disconnectSectionByStationId(final Long lineId, final Long stationId) {
@@ -125,9 +115,10 @@ public class LineService {
         lineDao.deleteById(id);
     }
 
-    private Section getNewSection(final Long upStationId, final Long downStationId, final Integer distance) {
-        final Station upStation = getStation(upStationId);
-        final Station downStation = getStation(downStationId);
+    private Section getNewSection(final CreateSectionRequest sectionRequest) {
+        final Station upStation = getStation(sectionRequest.getUpStationId());
+        final Station downStation = getStation(sectionRequest.getDownStationId());
+        final Integer distance = sectionRequest.getDistance();
 
         return Section.builder()
                 .upStation(upStation)

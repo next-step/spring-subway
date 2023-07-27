@@ -66,28 +66,50 @@ public class Section {
         }
     }
 
-    Section connectSection(final Section requestSection) {
-        if (requestSection == null) {
-            throw new SectionException("requestSection이 존재하지 않습니다.");
+    public Optional<Section> findUpdateSection(final Section newSection) {
+        if (newSection == null) {
+            throw new SectionException("newSection이 존재하지 않습니다.");
         }
 
-        Optional<SectionConnector> sectionConnectorOptional = SectionConnector
-                .findSectionConnector(this, requestSection);
-        if (sectionConnectorOptional.isEmpty()) {
-            return connectSectionIfDownSectionPresent(requestSection);
+        if (upSection == null && upStation.equals(newSection.getDownStation())) {
+            return Optional.empty();
         }
 
-        return sectionConnectorOptional.get().connectSection(this, requestSection);
+        if (downSection == null && downStation.equals(newSection.getUpStation())) {
+            return Optional.empty();
+        }
+
+        if (upStation.equals(newSection.getUpStation())) {
+            Section updateSection = Section.builder()
+                    .upStation(upStation)
+                    .downStation(newSection.getDownStation())
+                    .distance(distance - newSection.distance)
+                    .build();
+
+            return Optional.of(updateSection);
+        }
+
+        if (downStation.equals(newSection.getDownStation())) {
+            Section updateSection = Section.builder()
+                    .upStation(newSection.getUpStation())
+                    .downStation(downStation)
+                    .distance(distance - newSection.distance)
+                    .build();
+
+            return Optional.of(updateSection);
+        }
+
+        return findUpdateSectionIfDownSectionPresent(newSection);
     }
 
-    private Section connectSectionIfDownSectionPresent(final Section requestSection) {
+    private Optional<Section> findUpdateSectionIfDownSectionPresent(final Section newSection) {
         if (downSection == null) {
             throw new SectionException(
-                    MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", requestSection)
+                    MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", newSection)
             );
         }
 
-        return downSection.connectSection(requestSection);
+        return downSection.findUpdateSection(newSection);
     }
 
     public Section disconnectSection(final Station requestStation) {
@@ -114,51 +136,15 @@ public class Section {
     }
 
     public Section connectDownSection(final Section requestSection) {
+        if (requestSection == null) {
+            throw new SectionException("requestSection이 존재하지 않습니다.");
+        }
+        if (downStation != requestSection.upStation) {
+            throw new SectionException("middle Station이 달라 연결할 수 없습니다.");
+        }
         this.downSection = requestSection;
         requestSection.upSection = this;
         return downSection;
-    }
-
-    Section connectUpSection(final Section requestSection) {
-        this.upSection = requestSection;
-        requestSection.downSection = this;
-        return requestSection;
-    }
-
-    Section connectMiddleUpSection(final Section requestSection) {
-        final Section newDownSection = Section.builder()
-                .upSection(this)
-                .downSection(this.downSection)
-                .upStation(requestSection.downStation)
-                .downStation(this.downStation)
-                .distance(this.distance - requestSection.getDistance())
-                .build();
-
-        this.downStation = requestSection.downStation;
-        if (this.downSection != null) {
-            this.downSection.upSection = newDownSection;
-        }
-        this.downSection = newDownSection;
-        this.distance = requestSection.getDistance();
-        return newDownSection;
-    }
-
-    Section connectMiddleDownSection(final Section requestSection) {
-        final Section newUpSection = Section.builder()
-                .upSection(this.upSection)
-                .downSection(this)
-                .upStation(this.upStation)
-                .downStation(requestSection.upStation)
-                .distance(this.distance - requestSection.getDistance())
-                .build();
-
-        this.upStation = requestSection.upStation;
-        if (this.upSection != null) {
-            this.upSection.downSection = newUpSection;
-        }
-        this.upSection = newUpSection;
-        this.distance = requestSection.getDistance();
-        return newUpSection;
     }
 
     public Section findDownSection() {

@@ -11,6 +11,7 @@ import subway.exception.StationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
@@ -69,26 +70,83 @@ class LineTest {
     }
 
     @Nested
-    @DisplayName("connectSection 메소드는")
-    class ConnectSection_Method {
+    @DisplayName("findUpdateSection 메소드는")
+    class FindUpdateSection_Method {
 
         @Test
-        @DisplayName("입력으로 들어온 Section의 하행 station과 line의 상행 종점 station이 일치하면, 연결을 성공한다")
-        void Connect_Success_When_Input_Down_Station_Equals_Line_Up_Station() {
+        @DisplayName("입력으로 들어온 Section의 하행 station과 line의 상행 종점 station이 일치하면, Optional.empty를 반환한다")
+        void Return_Null_When_Input_Down_Station_Equals_Line_Up_Station() {
             // given
-            Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
+            Station downStation = station2;
+            Section section2 = DomainFixture.Section.buildWithStations(downStation, station3);
 
             Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section2)));
 
-            Section requestSection = DomainFixture.Section.buildWithStations(station1, station2);
+            Section requestSection = DomainFixture.Section.buildWithStations(station1, downStation);
 
             // when
-            Exception exception = catchException(() -> line.connectSection(requestSection));
+            Optional<Section> updateSection = line.findUpdateSection(requestSection);
 
             // then
-            assertThat(exception).isNull();
-            assertThat(requestSection.getDownSection()).isEqualTo(section2);
-            assertThat(section2.getUpSection()).isEqualTo(requestSection);
+            assertThat(updateSection).isEmpty();
+        }
+
+        @Test
+        @DisplayName("입력으로 들어온 Section의 상행 station과 line의 하행 station이 일치하면, Optional.empty를 반환한다")
+        void Return_Null_When_Input_Up_Station_Equals_Line_Down_Station() {
+            // given
+            Station upStation = station2;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, upStation);
+
+            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1)));
+
+            Section requestSection = DomainFixture.Section.buildWithStations(upStation, station3);
+
+            // when
+            Optional<Section> updateSection = line.findUpdateSection(requestSection);
+
+            // then
+            assertThat(updateSection).isEmpty();
+        }
+
+        @Test
+        @DisplayName("입력으로 들어온 Section의 하행 station과 line의 중간 station이 일치하면, 갱신된 Section을 반환한다")
+        void Return_Update_Section_When_Input_Down_Station_Equals_Line_Middle_Station() {
+            // given
+            Station middleDownStation = station3;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, middleDownStation, 10);
+            Section section2 = DomainFixture.Section.buildWithStations(middleDownStation, station4, 10);
+
+            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1, section2)));
+
+            Section requestSection = DomainFixture.Section.buildWithStations(station2, middleDownStation, 5);
+
+            // when
+            Section updateSection = line.findUpdateSection(requestSection).get();
+
+            // then
+            assertThat(updateSection.getUpStation()).isEqualTo(station2);
+            assertThat(updateSection.getDownStation()).isEqualTo(middleDownStation);
+        }
+
+        @Test
+        @DisplayName("입력으로 들어온 Section의 상행 station과 line의 중간 station이 일치하면, 갱신된 Section을 반환한다")
+        void Return_Update_Section_When_Input_Up_Station_Equals_Line_Middle_Station() {
+            // given
+            Station middleUpStation = station2;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, middleUpStation, 10);
+            Section section2 = DomainFixture.Section.buildWithStations(middleUpStation, station4, 10);
+
+            Line line = new Line(1L, "line", "red", new ArrayList<>(List.of(section1, section2)));
+
+            Section requestSection = DomainFixture.Section.buildWithStations(middleUpStation, station3, 5);
+
+            // when
+            Section updateSection = line.findUpdateSection(requestSection).get();
+
+            // then
+            assertThat(updateSection.getUpStation()).isEqualTo(middleUpStation);
+            assertThat(updateSection.getDownStation()).isEqualTo(station3);
         }
 
         @Test
@@ -102,7 +160,7 @@ class LineTest {
             Section requestSection = DomainFixture.Section.buildWithStations(station1, station2, 1);
 
             // when
-            Exception exception = catchException(() -> line.connectSection(requestSection));
+            Exception exception = catchException(() -> line.findUpdateSection(requestSection));
 
             // then
             assertThat(exception).isInstanceOf(StationException.class);
@@ -119,7 +177,7 @@ class LineTest {
             Section requestSection = DomainFixture.Section.buildWithStations(station3, station4, 1);
 
             // when
-            Exception exception = catchException(() -> line.connectSection(requestSection));
+            Exception exception = catchException(() -> line.findUpdateSection(requestSection));
 
             // then
             assertThat(exception).isInstanceOf(StationException.class);
