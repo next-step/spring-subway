@@ -189,4 +189,11 @@ public final class Sections {
             return updateSection;
         }
     }
+
+    @Override
+    public String toString() {
+        return "Sections{" +
+                "sections=" + sections +
+                '}';
+    }
 }
