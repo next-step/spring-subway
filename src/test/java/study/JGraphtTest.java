@@ -3,6 +3,7 @@ package study;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
@@ -42,6 +43,40 @@ class JGraphtTest {
         List<String> shortestPath = dijkstraShortestPath.getPath("v3", "v1").getVertexList();
 
         assertThat(shortestPath).containsExactly("v3", "v2", "v1");
+    }
+
+    @Test
+    @DisplayName("Source와 Target이 연결되지 않는 경우 최단 경로는 null을 반환한다.")
+    void getDijkstraShortestPathWithNotConnectedSourceAndTarget() {
+        WeightedMultigraph<String, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
+        graph.addVertex("v1");
+        graph.addVertex("v2");
+        graph.addVertex("v3");
+        graph.addVertex("v4");
+        graph.setEdgeWeight(graph.addEdge("v1", "v2"), 2);
+        graph.setEdgeWeight(graph.addEdge("v3", "v4"), 2);
+
+        DijkstraShortestPath<String, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
+        final GraphPath<String, DefaultWeightedEdge> path = dijkstraShortestPath.getPath("v1", "v4");
+
+        assertThat(path).isNull();
+    }
+
+    @Test
+    @DisplayName("Source와 Target이 연결되지 않는 경우 최단 경로의 weight는 infinite를 반환한다.")
+    void getDijkstraShortestPathWeightWithNotConnectedSourceAndTarget() {
+        WeightedMultigraph<String, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
+        graph.addVertex("v1");
+        graph.addVertex("v2");
+        graph.addVertex("v3");
+        graph.addVertex("v4");
+        graph.setEdgeWeight(graph.addEdge("v1", "v2"), 2);
+        graph.setEdgeWeight(graph.addEdge("v3", "v4"), 2);
+
+        DijkstraShortestPath<String, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
+        final double pathWeight = dijkstraShortestPath.getPathWeight("v1", "v4");
+
+        assertThat(pathWeight).isInfinite();
     }
 
     @Test
