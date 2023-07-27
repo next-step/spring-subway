@@ -6,9 +6,9 @@ import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.Path;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.dto.LineStationsResponse;
 import subway.dto.PathResponse;
 
 import java.util.List;
@@ -38,9 +38,8 @@ public class PathService {
                 .map(sectionDao::findAllByLineId)
                 .collect(Collectors.toList());
 
-        //Path path = new Path(allSections, sourceStation, targetStation);
-        //return PathResponse(path.getPath(), path.getDistance());
-        return null;
+        Path path = new Path(allSections, sourceStation, targetStation);
+        return new PathResponse(path.getPath(), path.getDistance());
     }
 
 }
