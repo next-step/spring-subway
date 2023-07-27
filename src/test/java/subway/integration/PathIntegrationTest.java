@@ -2,6 +2,8 @@ package subway.integration;
 
 import static subway.integration.LineIntegrationSupporter.createLineByLineRequest;
 import static subway.integration.LineIntegrationSupporter.registerSectionToLine;
+import static subway.integration.PathIntegrationAssertions.assertIsNotExistStation;
+import static subway.integration.PathIntegrationAssertions.assertIsStationNotContainedPath;
 import static subway.integration.PathIntegrationAssertions.assertStationPath;
 import static subway.integration.PathIntegrationSupporter.findStationPath;
 import static subway.integration.StationIntegrationSupporter.createStation;
@@ -77,6 +79,33 @@ class PathIntegrationTest extends IntegrationTest {
 
         // then
         assertStationPath(response, 5);
+    }
+
+    @Test
+    @DisplayName("없는 station으로 요청하면, 400 BadRequest가 반환된다.")
+    void returnBadRequestWhenCannotFindStation() {
+        // given
+        long notExistStationId = 999L;
+
+        // when
+        ExtractableResponse<Response> response = findStationPath(notExistStationId, notExistStationId);
+
+        // then
+        assertIsNotExistStation(response);
+    }
+
+    @Test
+    @DisplayName("구간에 station이 포함되어 있지 않다면, 400 BadRequest가 반환된다.")
+    void returnBadRequestWhenStationDoesNotContainedPath() {
+        // given
+        long notContainedStationId = createStation(new StationCreateRequest("포함되지 않음")).body().as(StationResponse.class)
+                .getId();
+
+        // when
+        ExtractableResponse<Response> response = findStationPath(notContainedStationId, station1Request1);
+
+        // then
+        assertIsStationNotContainedPath(response);
     }
 
 }
