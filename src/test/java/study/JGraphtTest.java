@@ -62,4 +62,23 @@ class JGraphtTest {
 
         assertThat(shortestPath).containsExactly(20L, 30L, 31L, 21L);
     }
+
+    @Test
+    @DisplayName("역의 ID와 구간으로 다익스트라 알고리즘 경로의 비용 테스트")
+    void getDijkstraShortestPathWeightWithStationAndSection() {
+        WeightedMultigraph<Long, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
+        graph.addVertex(강남역.getId());
+        graph.addVertex(교대역.getId());
+        graph.addVertex(양재역.getId());
+        graph.addVertex(남부터미널역.getId());
+        for (Section section : SECTIONS) {
+            graph.setEdgeWeight(graph.addEdge(section.getUpStationId(), section.getDownStationId()),
+                    section.getDistance());
+        }
+
+        DijkstraShortestPath<Long, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
+        final long pathWeight = (long) dijkstraShortestPath.getPathWeight(강남역.getId(), 교대역.getId());
+
+        assertThat(pathWeight).isEqualTo(90);
+    }
 }
