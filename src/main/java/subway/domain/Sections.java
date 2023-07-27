@@ -44,7 +44,8 @@ public class Sections {
         return combineUnsortedSections(sections, stationToSection);
     }
 
-    private List<Section> combineUnsortedSections(final List<Section> sections, final Map<Station, Section> stationToSection) {
+    private List<Section> combineUnsortedSections(final List<Section> sections,
+            final Map<Station, Section> stationToSection) {
         List<Section> sortedSection = new ArrayList<>();
 
         Section nextSection = findByUpStation(sections, firstStation(sections));
@@ -63,7 +64,8 @@ public class Sections {
         return sections.stream()
                 .filter(section -> section.isSameUpStation(upStation))
                 .findFirst()
-                .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_DEPARTURE, CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_DEPARTURE,
+                        CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
     }
 
     private Station firstStation(final List<Section> sections) {
@@ -76,7 +78,8 @@ public class Sections {
 
         return endUpStations.stream()
                 .findFirst()
-                .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_UP_STATION_TERMINAL, CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_UP_STATION_TERMINAL,
+                        CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE));
     }
 
     private Section lastSection() {
@@ -109,6 +112,22 @@ public class Sections {
         return sections.stream()
                 .map(Section::getDownStation)
                 .collect(Collectors.toSet());
+    }
+
+    public Section connectTerminals() {
+        validateEmpty();
+
+        final Station upTerminal = sections.get(0).getUpStation();
+        final Station downTerminal = lastSection().getDownStation();
+        final int distance = totalDistance();
+
+        return new Section(upTerminal, downTerminal, distance);
+    }
+
+    private int totalDistance() {
+        return sections.stream()
+                .mapToInt(section -> section.getDistance().getValue())
+                .sum();
     }
 
     public List<Station> toStations() {
@@ -148,10 +167,24 @@ public class Sections {
         }
     }
 
+    public List<Long> getIds() {
+        return sections.stream()
+                .map(Section::getId)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public boolean hasSize(final int size) {
+        return sections.size() == size;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Sections sections1 = (Sections) o;
         return Objects.equals(sections, sections1.sections);
     }
