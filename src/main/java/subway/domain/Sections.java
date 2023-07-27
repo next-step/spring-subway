@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,19 +30,19 @@ public class Sections {
 
     private List<Section> sort(List<Section> values) {
 
-        Map<Station, Section> sectionByUpStation = createSectionByUpstation(values);
+        Map<Station, Section> nextSectionMap = values.stream()
+                .collect(Collectors.toMap(Section::getUpStation, Function.identity()));
 
-        return Stream.iterate(findFirstSection(values),
-                section -> getNextSection(section, sectionByUpStation))
-            .takeWhile(Objects::nonNull)
-            .collect(Collectors.toList());
+        return reorderSections(values, nextSectionMap);
     }
 
+    private List<Section> reorderSections(List<Section> values,
+                                          Map<Station, Section> nextSectionMap) {
 
-    //Todo: 유틸로 뺀다
-    private Map<Station, Section> createSectionByUpstation(List<Section> values) {
-        return values.stream()
-            .collect(Collectors.toMap(Section::getUpStation, Function.identity()));
+        return Stream.iterate(findFirstSection(values),
+                        section -> getNextSection(section, nextSectionMap))
+                .takeWhile(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private Section findFirstSection(List<Section> values) {
@@ -56,7 +55,6 @@ public class Sections {
                 .orElseThrow(() -> new IllegalArgumentException("노선은 순환할 수 없습니다."));
     }
 
-    //Todo: 유틸로 뺀다
     private List<Station> extractDownStations(List<Section> values) {
         return values.stream()
                 .map(Section::getDownStation)
@@ -80,12 +78,22 @@ public class Sections {
 
     public SectionAdditionResult add(Section section) {
         validateOnlyOneStationIncludedInSections(section);
-        Section relatedSection = getRelatedSection(section);
-        List<Section> mergedSection = SectionMerger.of(relatedSection, section).merge(relatedSection,section);
 
-        replace(relatedSection, mergedSection);
+        if (section.canPrecede(getFirst())) {
+            addFirst(section);
+            return new SectionAdditionResult(null, List.of(getFirst()));
+        }
 
-        return new SectionAdditionResult(relatedSection, mergedSection);
+        if (getLast().canPrecede(section)) {
+            addLast(section);
+            return new SectionAdditionResult(null, List.of(getLast()));
+        }
+
+        if (isMiddleAddableSection(section)) {
+            return addSectionInMiddle(section);
+        }
+
+        throw new IllegalStateException("예상하지 못한 경우입니다.");
     }
 
     private void validateOnlyOneStationIncludedInSections(Section section) {
@@ -105,22 +113,34 @@ public class Sections {
         }
     }
 
-    private Section getRelatedSection(Section section) {
-
-        Optional<Section> sectionOptional = this.values.stream().
-            filter(value -> value.hasSameUpStationOrDownStation(section))
-            .findAny();
-
-        return sectionOptional.orElseGet(() -> this.values.stream()
-            .filter(value -> value.isRelated(section))
-            .findAny()
-            .orElseThrow(() -> new IllegalArgumentException("연관된 구역이 없습니다.")));
+    private void addFirst(Section section) {
+        this.values.add(0, section);
     }
 
-    private void replace(Section relatedSection, List<Section> mergedSection) {
-        int relatedSectionIndex = this.values.indexOf(relatedSection);
-        this.values.remove(relatedSection);
-        this.values.addAll(relatedSectionIndex, mergedSection);
+    private void addLast(Section section) {
+        this.values.add(section);
+    }
+
+    private boolean isMiddleAddableSection(Section section) {
+        return this.values.stream()
+                .anyMatch(value -> value.hasSameUpStationOrDownStation(section));
+    }
+
+    private SectionAdditionResult addSectionInMiddle(Section section) {
+        Section foundSection = findMatchedSectionWithAnyStation(section);
+        List<Section> sectionsToAdd = foundSection.mergeSections(section);
+
+        this.values.addAll(this.values.indexOf(foundSection), sectionsToAdd);
+        this.values.remove(foundSection);
+
+        return new SectionAdditionResult(foundSection, sectionsToAdd);
+    }
+
+    private Section findMatchedSectionWithAnyStation(Section section) {
+        return this.values.stream()
+            .filter(value -> value.hasSameUpStationOrDownStation(section))
+            .findAny()
+            .orElseThrow(() -> new IllegalStateException("예상하지 못한 에러입니다."));
     }
 
     private boolean isStationExists(Station upStation) {

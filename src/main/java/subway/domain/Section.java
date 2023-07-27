@@ -45,14 +45,6 @@ public class Section {
         }
     }
 
-    public Section mergeUpWith(Section section) {
-        return new Section(this.line, section.downStation, this.downStation, this.distance - section.distance);
-    }
-
-    public Section mergeDownWith(Section section) {
-        return new Section(this.line, this.upStation, section.upStation, this.distance - section.distance);
-    }
-
     public boolean canPrecede(Section other) {
         return downStation.equals(other.upStation);
     }
@@ -71,9 +63,6 @@ public class Section {
         return this.upStation.equals(section.upStation) || this.downStation.equals(section.downStation);
     }
 
-    public boolean isRelated(Section section) {
-        return containsStation(section.upStation) || containsStation(section.downStation);
-    }
     public List<Section> mergeSections(Section section) {
         validateLongerDistanceThan(section);
 
