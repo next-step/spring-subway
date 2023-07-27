@@ -37,28 +37,12 @@ public class SectionDao {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
         params.put("line_id", lineId);
-        params.put("up_section_id", extractUpSectionId(section));
-        params.put("down_section_id", extractDownSectionId(section));
         params.put("up_station_id", section.getUpStation().getId());
         params.put("down_station_id", section.getDownStation().getId());
         params.put("distance", section.getDistance());
 
         Long id = insertAction.executeAndReturnKey(params).longValue();
         return buildSection(id, section);
-    }
-
-    private Long extractUpSectionId(Section section) {
-        if (section.getUpSection() != null) {
-            return section.getUpSection().getId();
-        }
-        return null;
-    }
-
-    private Long extractDownSectionId(Section section) {
-        if (section.getDownSection() != null) {
-            return section.getDownSection().getId();
-        }
-        return null;
     }
 
     public List<Section> findAllByLineId(Long lineId) {

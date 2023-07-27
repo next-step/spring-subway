@@ -66,7 +66,7 @@ public class Section {
         }
     }
 
-    public Optional<Section> findUpdateSection(final Section newSection) {
+    public Optional<Section> findUpdateSectionWhenConnect(final Section newSection) {
         if (newSection == null) {
             throw new SectionException("newSection이 존재하지 않습니다.");
         }
@@ -77,64 +77,77 @@ public class Section {
             return Optional.empty();
         }
         if (upStation.equals(newSection.getUpStation())) {
-            return Optional.ofNullable(getUpdateUpSection(newSection));
+            return Optional.ofNullable(getUpdateUpSectionWhenConnect(newSection));
         }
         if (downStation.equals(newSection.getDownStation())) {
-            return Optional.of(getUpdateDownSection(newSection));
+            return Optional.of(getUpdateDownSectionWhenConnect(newSection));
         }
 
-        return findUpdateSectionIfDownSectionPresent(newSection);
+        return findUpdateSectionWhenConnectIfPresent(newSection);
     }
 
-    private Section getUpdateDownSection(Section newSection) {
-        Section updateSection = Section.builder()
-                .upStation(newSection.getUpStation())
+    public Optional<Section> findUpdateSectionWhenDisconnect(Station removeStation) {
+        if (removeStation == null) {
+            throw new StationException("removeStation이 존재하지 않습니다");
+        }
+        if (upSection == null && upStation.equals(removeStation)) {
+            return Optional.empty();
+        }
+        if (downSection == null && downStation.equals(removeStation)) {
+            return Optional.empty();
+        }
+        if (upSection != null && upStation.equals(removeStation)) {
+            return Optional.ofNullable(getUpdateSectionWhenDisconnect());
+        }
+
+        return findUpdateSectionWhenDisconnectIfPresent(removeStation);
+    }
+
+    private Optional<Section> findUpdateSectionWhenDisconnectIfPresent(final Station removeStation) {
+        if (downSection == null) {
+            throw new SectionException(
+                    MessageFormat.format("line에 removeStation \"{0}\"을 제거할 수 없습니다.", removeStation)
+            );
+        }
+
+        return downSection.findUpdateSectionWhenDisconnect(removeStation);
+    }
+
+    private Section getUpdateSectionWhenDisconnect() {
+        return Section.builder()
+                .upStation(upSection.upStation)
+                .downStation(downStation)
+                .distance(distance + upSection.distance)
+                .id(id)
+                .build();
+    }
+
+    private Section getUpdateDownSectionWhenConnect(Section newSection) {
+        return Section.builder()
+                .upStation(upStation)
+                .downStation(newSection.upStation)
+                .distance(distance - newSection.distance)
+                .id(id)
+                .build();
+    }
+
+    private Section getUpdateUpSectionWhenConnect(Section newSection) {
+        return Section.builder()
+                .upStation(newSection.downStation)
                 .downStation(downStation)
                 .distance(distance - newSection.distance)
+                .id(id)
                 .build();
-        return updateSection;
     }
 
-    private Section getUpdateUpSection(Section newSection) {
-        Section updateSection = Section.builder()
-                .upStation(upStation)
-                .downStation(newSection.getDownStation())
-                .distance(distance - newSection.distance)
-                .build();
-        return updateSection;
-    }
-
-    private Optional<Section> findUpdateSectionIfDownSectionPresent(final Section newSection) {
+    private Optional<Section> findUpdateSectionWhenConnectIfPresent(final Section newSection) {
         if (downSection == null) {
             throw new SectionException(
                     MessageFormat.format("line에 requestSection \"{0}\"을 연결할 수 없습니다.", newSection)
             );
         }
 
-        return downSection.findUpdateSection(newSection);
-    }
-
-    public Section disconnectSection(final Station requestStation) {
-        if (requestStation == null) {
-            throw new StationException("requestStation이 존재하지 않습니다");
-        }
-
-        Optional<SectionDisconnector> sectionDisconnectorOptional = SectionDisconnector
-                .findSectionDisconnector(this, requestStation);
-        if (sectionDisconnectorOptional.isEmpty()) {
-            return disconnectSectionIfDownSectionPresent(requestStation);
-        }
-        return sectionDisconnectorOptional.get().disconnectSection(this, requestStation);
-    }
-
-    private Section disconnectSectionIfDownSectionPresent(final Station requestStation) {
-        if (downSection == null) {
-            throw new SectionException(
-                    MessageFormat.format("line에서 requestStation \"{0}\"을 제거할 수 없습니다.", requestStation)
-            );
-        }
-
-        return downSection.disconnectSection(requestStation);
+        return downSection.findUpdateSectionWhenConnect(newSection);
     }
 
     public void connectDownSection(final Section requestSection) {
@@ -160,33 +173,6 @@ public class Section {
             return this;
         }
         return upSection.findUpSection();
-    }
-
-    public void disconnectDownSection() {
-        if (downSection == null) {
-            throw new SectionException("downSection이 존재하지 않습니다.");
-        }
-
-        downSection.upSection = null;
-        downSection = null;
-    }
-
-    public void disconnectUpSection() {
-        if (upSection == null) {
-            throw new SectionException("upSection이 존재하지 않습니다");
-        }
-
-        upSection.downSection = null;
-        upSection = null;
-    }
-
-    public void disconnectMiddleSection() {
-        downStation = downSection.downStation;
-        distance += downSection.distance;
-
-        if (downSection.getDownSection() != null) {
-            connectDownSection(downSection.getDownSection());
-        }
     }
 
     public Long getId() {

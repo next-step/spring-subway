@@ -144,9 +144,6 @@ class LineServiceTest {
 
             // then
             assertThat(exception).isNull();
-            assertThat(section3.getUpSection().getDistance()).isEqualTo(3);
-            assertThat(section3.getUpSection().getDownStation()).isEqualTo(station3);
-            assertThat(section3.getUpSection().getUpStation()).isEqualTo(station1);
         }
     }
 }

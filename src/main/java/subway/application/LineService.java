@@ -81,7 +81,7 @@ public class LineService {
         final Line line = getLineById(lineId);
         final Section newSection = getNewSection(sectionRequest);
 
-        line.findUpdateSection(newSection)
+        line.findUpdateSectionWhenConnect(newSection)
                 .ifPresent(section -> sectionDao.update(section));
 
         sectionDao.insert(newSection, line.getId());
@@ -91,11 +91,8 @@ public class LineService {
         final Line line = getLineById(lineId);
         final Station station = getStation(stationId);
 
-        Section updateSection = line.disconnectSection(station);
-
-        if (updateSection != null) {
-            sectionDao.update(updateSection);
-        }
+        line.findUpdateSectionWhenDisconnect(station)
+                .ifPresent(section -> sectionDao.update(section));
 
         sectionDao.deleteByLineIdAndStationId(lineId, stationId);
     }
