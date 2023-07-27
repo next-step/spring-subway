@@ -27,16 +27,16 @@ public class SectionServiceTest {
 
     private Long lineId;
     private Line line;
-    private Station station1;
-    private Station station2;
-    private Station station3;
-    private Station station4;
-    private Station station5;
-    private Station station6;
-    private Section section1;
-    private Section section2;
-    private Section section3;
-    private Sections sections;
+    private Station 부천시청역;
+    private Station 신중동역;
+    private Station 춘의역;
+    private Station 부천종합운동장역;
+    private Station 까치울역;
+    private Station 온수역;
+    private Section 부천시청역_신중동역;
+    private Section 신중동역_춘의역;
+    private Section 춘의역_부천종합운동장역;
+    private Sections 부천종합운동장역_까치울역;
 
     @Mock
     private SectionDao sectionDaoMock;
@@ -52,36 +52,36 @@ public class SectionServiceTest {
         lineId = 1L;
         line = new Line(lineId, "7호선", "red");
 
-        station1 = new Station(1L, "부천시청역");
-        station2 = new Station(2L, "신중동역");
-        station3 = new Station(3L, "춘의역");
-        station4 = new Station(4L, "부천종합운동장역");
-        station5 = new Station(5L, "까치울역");
-        station6 = new Station(6L, "온수역");
+        부천시청역 = new Station(1L, "부천시청역");
+        신중동역 = new Station(2L, "신중동역");
+        춘의역 = new Station(3L, "춘의역");
+        부천종합운동장역 = new Station(4L, "부천종합운동장역");
+        까치울역 = new Station(5L, "까치울역");
+        온수역 = new Station(6L, "온수역");
 
-        section1 = new Section(
+        부천시청역_신중동역 = new Section(
             1L,
-            station1,
-            station2,
+            부천시청역,
+            신중동역,
             line,
             10
         );
-        section2 = new Section(
+        신중동역_춘의역 = new Section(
             2L,
-            station2,
-            station3,
+            신중동역,
+            춘의역,
             line,
             10
         );
-        section3 = new Section(
+        춘의역_부천종합운동장역 = new Section(
             3L,
-            station3,
-            station4,
+            춘의역,
+            부천종합운동장역,
             line,
             10
         );
 
-        sections = new Sections(List.of(section1, section3, section2));
+        부천종합운동장역_까치울역 = new Sections(List.of(부천시청역_신중동역, 춘의역_부천종합운동장역, 신중동역_춘의역));
     }
 
     @Test
@@ -90,8 +90,8 @@ public class SectionServiceTest {
         // given
         Long deletedStationId = 1L;
         Long deletedSectionId = 1L;
-        Station deletedStation = station1;
-        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
+        Station deletedStation = 부천시청역;
+        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
         when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
 
         // when
@@ -110,8 +110,8 @@ public class SectionServiceTest {
         // given
         Long deletedStationId = 4L;
         Long deletedSectionId = 3L;
-        Station deletedStation = station3;
-        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
+        Station deletedStation = 춘의역;
+        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
         when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
 
         // when
@@ -131,16 +131,16 @@ public class SectionServiceTest {
         Long deletedStationId = 3L;
         Long deletedSectionId2 = 2L;
         Long deletedSectionId3 = 3L;
-        Station deletedStation = station3;
+        Station deletedStation = 춘의역;
         Section section = new Section(
-            station2,
-            station4,
+            신중동역,
+            부천종합운동장역,
             line,
             20
         );
 
         // when
-        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
+        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
         when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
 
         // then
@@ -158,8 +158,8 @@ public class SectionServiceTest {
     void exceptionDeleteStationInOneSection() {
         // given
         Long deletedStationId = 1L;
-        Sections sections = new Sections(List.of(section1));
-        Station deletedStation = station1;
+        Sections sections = new Sections(List.of(부천시청역_신중동역));
+        Station deletedStation = 부천시청역;
 
         // when
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
@@ -177,10 +177,10 @@ public class SectionServiceTest {
     void exceptionDeleteStationNotInSections() {
         // given
         Long deletedStationId = 1L;
-        Station deletedStation = station5;
+        Station deletedStation = 까치울역;
 
         // when
-        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
+        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
         when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
 
         // then
@@ -197,7 +197,7 @@ public class SectionServiceTest {
         Long upStationID = 1L;
         Long downStationId = 2L;
         int distance = 10;
-        Sections sections = new Sections(List.of(section2, section3));
+        Sections sections = new Sections(List.of(신중동역_춘의역, 춘의역_부천종합운동장역));
         SectionRegistRequest sectionRegistRequest = new SectionRegistRequest(
             upStationID,
             downStationId,
@@ -205,8 +205,8 @@ public class SectionServiceTest {
         );
 
         // when
-        when(stationDaoMock.findById(upStationID)).thenReturn(station1);
-        when(stationDaoMock.findById(downStationId)).thenReturn(station2);
+        when(stationDaoMock.findById(upStationID)).thenReturn(부천시청역);
+        when(stationDaoMock.findById(downStationId)).thenReturn(신중동역);
         when(lineDaoMock.findById(lineId)).thenReturn(line);
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
 
@@ -226,7 +226,7 @@ public class SectionServiceTest {
         Long upStationID = 4L;
         Long downStationId = 5L;
         int distance = 10;
-        Sections sections = new Sections(List.of(section2, section3));
+        Sections sections = new Sections(List.of(신중동역_춘의역, 춘의역_부천종합운동장역));
         SectionRegistRequest sectionRegistRequest = new SectionRegistRequest(
             upStationID,
             downStationId,
@@ -234,8 +234,8 @@ public class SectionServiceTest {
         );
 
         // when
-        when(stationDaoMock.findById(upStationID)).thenReturn(station4);
-        when(stationDaoMock.findById(downStationId)).thenReturn(station5);
+        when(stationDaoMock.findById(upStationID)).thenReturn(부천종합운동장역);
+        when(stationDaoMock.findById(downStationId)).thenReturn(까치울역);
         when(lineDaoMock.findById(lineId)).thenReturn(line);
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
 
@@ -254,8 +254,8 @@ public class SectionServiceTest {
         // given
         Long upStationID = 1L;
         Long downStationId = 5L;
-        Station upStation = station1;
-        Station downStation = station5;
+        Station upStation = 부천시청역;
+        Station downStation = 까치울역;
         int distance = 11;
         SectionRegistRequest sectionRegistRequest = new SectionRegistRequest(
             upStationID,
@@ -267,7 +267,7 @@ public class SectionServiceTest {
         when(stationDaoMock.findById(upStationID)).thenReturn(upStation);
         when(stationDaoMock.findById(downStationId)).thenReturn(downStation);
         when(lineDaoMock.findById(lineId)).thenReturn(line);
-        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
+        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
 
         // then
         assertThatThrownBy(() -> sectionService.registerSection(sectionRegistRequest, lineId))
@@ -284,8 +284,8 @@ public class SectionServiceTest {
         // given
         Long upStationID = 1L;
         Long downStationId = 3L;
-        Station upStation = station1;
-        Station downStation = station3;
+        Station upStation = 부천시청역;
+        Station downStation = 춘의역;
         int distance = 5;
         SectionRegistRequest sectionRegistRequest = new SectionRegistRequest(
             upStationID,
@@ -297,7 +297,7 @@ public class SectionServiceTest {
         when(stationDaoMock.findById(upStationID)).thenReturn(upStation);
         when(stationDaoMock.findById(downStationId)).thenReturn(downStation);
         when(lineDaoMock.findById(lineId)).thenReturn(line);
-        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
+        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
 
         // then
         assertThatThrownBy(() -> sectionService.registerSection(sectionRegistRequest, lineId))
@@ -314,8 +314,8 @@ public class SectionServiceTest {
         // given
         Long upStationID = 5L;
         Long downStationId = 6L;
-        Station upStation = station5;
-        Station downStation = station6;
+        Station upStation = 까치울역;
+        Station downStation = 온수역;
         int distance = 5;
         SectionRegistRequest sectionRegistRequest = new SectionRegistRequest(
             upStationID,
@@ -327,7 +327,7 @@ public class SectionServiceTest {
         when(stationDaoMock.findById(upStationID)).thenReturn(upStation);
         when(stationDaoMock.findById(downStationId)).thenReturn(downStation);
         when(lineDaoMock.findById(lineId)).thenReturn(line);
-        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
+        when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
 
         // then
         assertThatThrownBy(() -> sectionService.registerSection(sectionRegistRequest, lineId))
