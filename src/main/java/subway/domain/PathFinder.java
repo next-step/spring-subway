@@ -13,7 +13,11 @@ public class PathFinder {
 
     private final GraphPath<Station, DefaultWeightedEdge> shortestPath;
 
-    public PathFinder(List<Section> sections, Station departureStation, Station destinationStation) {
+    public PathFinder(
+        List<Section> sections,
+        Station departureStation,
+        Station destinationStation
+    ) {
         shortestPath = findShortestPath(sections, departureStation, destinationStation);
     }
 
@@ -23,7 +27,8 @@ public class PathFinder {
         Station destinationStation
     ) {
         WeightedMultigraph<Station, DefaultWeightedEdge> graph = setWeightedMultigraph(sections);
-        DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstra = new DijkstraShortestPath<>(graph);
+        DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstra =
+            new DijkstraShortestPath<>(graph);
         return dijkstra.getPath(
             departureStation,
             destinationStation
@@ -61,8 +66,7 @@ public class PathFinder {
         WeightedMultigraph<Station, DefaultWeightedEdge> graph,
         List<Section> sections
     ) {
-        findStations(sections).stream()
-            .forEach(graph::addVertex);
+        findStations(sections).forEach(graph::addVertex);
     }
 
     private Set<Station> findStations(List<Section> sections) {
@@ -72,20 +76,10 @@ public class PathFinder {
     }
 
     public List<Station> findShortestStations() {
-        // Main Logic
-        // 최단 경로 출력
-//        System.out.println("Shortest path: " + shortestPath.getVertexList());
-//        System.out.println("Shortest path weight: " + shortestPath.getWeight());
-
-        // Test
-//        Station station1 = new Station(5L, "교대역");
-//        Station station2 = new Station(7L, "남부터미널역");
-//        Station station3 = new Station(8L, "양재역");
-//        List<Station> stations = List.of(station1, station2, station3);
         return shortestPath.getVertexList();
     }
 
-    public Double findMinimumDistance() {
+    public Double findShortestDistance() {
         return shortestPath.getWeight();
     }
 }

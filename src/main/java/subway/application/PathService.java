@@ -31,7 +31,7 @@ public class PathService {
         List<StationResponse> stations = pathFinder.findShortestStations().stream()
             .map(StationResponse::of)
             .collect(Collectors.toUnmodifiableList());
-        Double distance = pathFinder.findMinimumDistance();
+        Double distance = pathFinder.findShortestDistance();
         return new PathResponse(stations, distance);
     }
 }

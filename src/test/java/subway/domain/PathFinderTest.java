@@ -65,7 +65,7 @@ public class PathFinderTest {
         PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 양재역);
 
         // then
-        assertThat(pathFinder.findMinimumDistance()).isEqualTo(5D);
+        assertThat(pathFinder.findShortestDistance()).isEqualTo(5D);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class PathFinderTest {
         PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 남부터미널역);
 
         // then
-        assertThat(pathFinder.findMinimumDistance()).isEqualTo(2D);
+        assertThat(pathFinder.findShortestDistance()).isEqualTo(2D);
     }
 
 }
