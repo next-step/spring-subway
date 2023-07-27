@@ -16,7 +16,7 @@ import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.request.LineCreationRequest;
 import subway.dto.request.SectionAdditionRequest;
-import subway.integration.fixture.SubWayFixture;
+import subway.integration.helper.SubWayHelper;
 
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
@@ -53,12 +53,12 @@ class SectionIntegrationTest extends IntegrationTest {
         StationIntegrationTest.createInitialStations();
         LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3,
             "bg-red-600");
-        SubWayFixture.createLine(lineCreationRequest);
+        SubWayHelper.createLine(lineCreationRequest);
         SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
             stationC.getId(), 3);
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.addSectionToLine(lineA,
+        ExtractableResponse<Response> response = SubWayHelper.addSectionToLine(lineA,
             sectionAdditionRequest);
 
         // then
@@ -72,13 +72,13 @@ class SectionIntegrationTest extends IntegrationTest {
         StationIntegrationTest.createInitialStations();
         LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3,
             "bg-red-600");
-        SubWayFixture.createLine(lineCreationRequest);
+        SubWayHelper.createLine(lineCreationRequest);
         SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
             stationC.getId(), 3);
-        SubWayFixture.addSectionToLine(lineA, sectionAdditionRequest);
+        SubWayHelper.addSectionToLine(lineA, sectionAdditionRequest);
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.removeStationOfLine(lineA, stationA);
+        ExtractableResponse<Response> response = SubWayHelper.removeStationOfLine(lineA, stationA);
 
 
         // then
@@ -92,13 +92,13 @@ class SectionIntegrationTest extends IntegrationTest {
         StationIntegrationTest.createInitialStations();
         LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3,
             "bg-red-600");
-        SubWayFixture.createLine(lineCreationRequest);
+        SubWayHelper.createLine(lineCreationRequest);
         SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
             stationC.getId(), 3);
-        SubWayFixture.addSectionToLine(lineA, sectionAdditionRequest);
+        SubWayHelper.addSectionToLine(lineA, sectionAdditionRequest);
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.removeStationOfLine(lineA, stationB);
+        ExtractableResponse<Response> response = SubWayHelper.removeStationOfLine(lineA, stationB);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -111,13 +111,13 @@ class SectionIntegrationTest extends IntegrationTest {
         StationIntegrationTest.createInitialStations();
         LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3,
             "bg-red-600");
-        SubWayFixture.createLine(lineCreationRequest);
+        SubWayHelper.createLine(lineCreationRequest);
         SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
             stationC.getId(), 3);
-        SubWayFixture.addSectionToLine(lineA, sectionAdditionRequest);
+        SubWayHelper.addSectionToLine(lineA, sectionAdditionRequest);
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.removeStationOfLine(lineA, stationC);
+        ExtractableResponse<Response> response = SubWayHelper.removeStationOfLine(lineA, stationC);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

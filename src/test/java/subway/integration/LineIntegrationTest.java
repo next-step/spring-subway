@@ -15,7 +15,7 @@ import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.request.LineCreationRequest;
 import subway.dto.response.LineResponse;
-import subway.integration.fixture.SubWayFixture;
+import subway.integration.helper.SubWayHelper;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
@@ -42,7 +42,7 @@ class LineIntegrationTest extends IntegrationTest {
         lineCreationRequest1 = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.createLine(lineCreationRequest1);
+        ExtractableResponse<Response> response = SubWayHelper.createLine(lineCreationRequest1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -55,10 +55,10 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         StationIntegrationTest.createInitialStations();
         lineCreationRequest1 = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
-        SubWayFixture.createLine(lineCreationRequest1);
+        SubWayHelper.createLine(lineCreationRequest1);
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.createLine(lineCreationRequest1);
+        ExtractableResponse<Response> response = SubWayHelper.createLine(lineCreationRequest1);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -71,11 +71,11 @@ class LineIntegrationTest extends IntegrationTest {
         StationIntegrationTest.createInitialStations();
         lineCreationRequest1 = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
         lineCreationRequest2 = new LineCreationRequest("경강선", 1L, 2L, 3, "bg-red-600");
-        ExtractableResponse<Response> createResponse1 = SubWayFixture.createLine(lineCreationRequest1);
-        ExtractableResponse<Response> createResponse2 = SubWayFixture.createLine(lineCreationRequest2);
+        ExtractableResponse<Response> createResponse1 = SubWayHelper.createLine(lineCreationRequest1);
+        ExtractableResponse<Response> createResponse2 = SubWayHelper.createLine(lineCreationRequest2);
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.findAllLines();
+        ExtractableResponse<Response> response = SubWayHelper.findAllLines();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -94,11 +94,11 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         StationIntegrationTest.createInitialStations();
         lineCreationRequest1 = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
-        ExtractableResponse<Response> createResponse = SubWayFixture.createLine(lineCreationRequest1);
+        ExtractableResponse<Response> createResponse = SubWayHelper.createLine(lineCreationRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = SubWayFixture.findLine(lineId);
+        ExtractableResponse<Response> response = SubWayHelper.findLine(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -113,11 +113,11 @@ class LineIntegrationTest extends IntegrationTest {
         StationIntegrationTest.createInitialStations();
         lineCreationRequest1 = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
         lineCreationRequest2 = new LineCreationRequest("경강선", 1L, 2L, 3, "bg-red-600");
-        ExtractableResponse<Response> createResponse = SubWayFixture.createLine(lineCreationRequest1);
+        ExtractableResponse<Response> createResponse = SubWayHelper.createLine(lineCreationRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = SubWayFixture.updateLine(lineId, lineCreationRequest2);
+        ExtractableResponse<Response> response = SubWayHelper.updateLine(lineId, lineCreationRequest2);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -129,11 +129,11 @@ class LineIntegrationTest extends IntegrationTest {
         // given
         StationIntegrationTest.createInitialStations();
         lineCreationRequest1 = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
-        ExtractableResponse<Response> createResponse = SubWayFixture.createLine(lineCreationRequest1);
+        ExtractableResponse<Response> createResponse = SubWayHelper.createLine(lineCreationRequest1);
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = SubWayFixture.deleteLine(lineId);
+        ExtractableResponse<Response> response = SubWayHelper.deleteLine(lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

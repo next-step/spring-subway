@@ -1,6 +1,6 @@
-package subway.integration.fixture;
+package subway.integration.helper;
 
-import static subway.integration.fixture.CommonRestAssuredUtils.post;
+import static subway.integration.helper.CommonRestAssuredUtils.post;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,7 +10,7 @@ import subway.dto.request.LineCreationRequest;
 import subway.dto.request.SectionAdditionRequest;
 import subway.dto.request.StationRequest;
 
-public class SubWayFixture {
+public class SubWayHelper {
 
     public static ExtractableResponse<Response> createLine(LineCreationRequest lineCreationRequest) {
         return post("/lines", lineCreationRequest);

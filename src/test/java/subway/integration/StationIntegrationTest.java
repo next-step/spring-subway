@@ -14,23 +14,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.request.StationRequest;
 import subway.dto.response.StationResponse;
-import subway.integration.fixture.SubWayFixture;
+import subway.integration.helper.SubWayHelper;
 
 @DisplayName("지하철역 관련 기능")
 class StationIntegrationTest extends IntegrationTest {
 
     static void createInitialStations() {
-        SubWayFixture.createStation(new StationRequest("A"));
-        SubWayFixture.createStation(new StationRequest("B"));
-        SubWayFixture.createStation(new StationRequest("C"));
-        SubWayFixture.createStation(new StationRequest("D"));
+        SubWayHelper.createStation(new StationRequest("A"));
+        SubWayHelper.createStation(new StationRequest("B"));
+        SubWayHelper.createStation(new StationRequest("C"));
+        SubWayHelper.createStation(new StationRequest("D"));
     }
 
     @DisplayName("지하철역을 생성한다.")
     @Test
     void createStation() {
         // when
-        ExtractableResponse<Response> response = SubWayFixture.createStation(
+        ExtractableResponse<Response> response = SubWayHelper.createStation(
             new StationRequest("강남역"));
 
         // then
@@ -42,10 +42,10 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        SubWayFixture.createStation(new StationRequest("강남역"));
+        SubWayHelper.createStation(new StationRequest("강남역"));
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.createStation(
+        ExtractableResponse<Response> response = SubWayHelper.createStation(
             new StationRequest("강남역"));
 
         // then
@@ -56,14 +56,14 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStations() {
         /// given
-        ExtractableResponse<Response> createResponse1 = SubWayFixture.createStation(
+        ExtractableResponse<Response> createResponse1 = SubWayHelper.createStation(
             new StationRequest("강남역"));
 
-        ExtractableResponse<Response> createResponse2 = SubWayFixture.createStation(
+        ExtractableResponse<Response> createResponse2 = SubWayHelper.createStation(
             new StationRequest("역삼역"));
 
         // when
-        ExtractableResponse<Response> response = SubWayFixture.findAllStations();
+        ExtractableResponse<Response> response = SubWayHelper.findAllStations();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -81,12 +81,12 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStation() {
         /// given
-        ExtractableResponse<Response> createResponse = SubWayFixture.createStation(
+        ExtractableResponse<Response> createResponse = SubWayHelper.createStation(
             new StationRequest("강남역"));
 
         // when
         long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = SubWayFixture.findStationById(stationId);
+        ExtractableResponse<Response> response = SubWayHelper.findStationById(stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -98,7 +98,7 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void updateStation() {
         // given
-        ExtractableResponse<Response> createResponse = SubWayFixture.createStation(
+        ExtractableResponse<Response> createResponse = SubWayHelper.createStation(
             new StationRequest("강남역"));
 
         // when
@@ -125,12 +125,12 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void deleteStation() {
         // given
-        ExtractableResponse<Response> createResponse = SubWayFixture.createStation(
+        ExtractableResponse<Response> createResponse = SubWayHelper.createStation(
             new StationRequest("강남역"));
 
         // when
         long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = SubWayFixture.deleteStationById(stationId);
+        ExtractableResponse<Response> response = SubWayHelper.deleteStationById(stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
