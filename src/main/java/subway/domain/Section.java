@@ -154,13 +154,13 @@ public class Section {
         }
         Section section = (Section) o;
         return distance == section.distance && Objects.equals(id, section.id)
-            && Objects.equals(line, section.line) && Objects.equals(upStation,
+            && Objects.equals(line.getId(), section.line.getId()) && Objects.equals(upStation,
             section.upStation) && Objects.equals(downStation, section.downStation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, line, upStation, downStation, distance);
+        return Objects.hash(id, line.getId(), upStation, downStation, distance);
     }
 
     @Override

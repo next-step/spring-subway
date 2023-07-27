@@ -39,9 +39,7 @@ class SectionsTest {
         Sections sections = new Sections(List.of(thirdSection, secondSection, firstSection));
 
         List<Section> expectedValues = List.of(firstSection, secondSection, thirdSection);
-        List<Section> unexpectedValues = List.of(thirdSection, secondSection, firstSection);
-        assertThat(sections.getValues()).isEqualTo(expectedValues);
-        assertThat(sections.getValues()).isNotEqualTo(unexpectedValues);
+        assertThat(sections).isEqualTo(new Sections(expectedValues));
     }
 
     @Test

@@ -54,34 +54,51 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("해당 역은 구간의 하행역과 같다")
+    @DisplayName("해당 역은 구간의 상행역과 같다")
     void hasDownStationSameAs() {
+        Section section = new Section(lineA, stationA, stationB, 1);
+
+        assertThat(section.hasUpStationSameAs(stationA)).isTrue();
+        assertThat(section.hasUpStationSameAs(stationB)).isFalse();
+    }
+
+    @Test
+    @DisplayName("해당 역은 구간의 하행역과 같다")
+    void hasUpStationSameAs() {
         Section section = new Section(lineA, stationA, stationB, 1);
 
         assertThat(section.hasDownStationSameAs(stationB)).isTrue();
         assertThat(section.hasDownStationSameAs(stationA)).isFalse();
     }
-    @DisplayName("상대 구역은 현재 구역과 관련있다")
-    void relatedSection() {
-        Station nothingStation = new Station(5L, "any");
-        Section section = new Section(lineA, stationB, stationC, 2);
-        Section sectionSameUpUp = new Section(lineA, stationB, nothingStation, 3);
-        Section sectionSameUpDown = new Section(lineA, nothingStation, stationB, 3);
-        Section sectionSameDownUp = new Section(lineA, stationC, nothingStation, 2);
-        Section sectionSameDownDown = new Section(lineA, nothingStation, stationC, 2);
 
-        assertThat(section.isRelated(sectionSameUpUp)).isTrue();
-        assertThat(section.isRelated(sectionSameUpDown)).isTrue();
-        assertThat(section.isRelated(sectionSameDownUp)).isTrue();
-        assertThat(section.isRelated(sectionSameDownDown)).isTrue();
+    @Test
+    @DisplayName("구간은 주어진 역을 포함한다")
+    void ContainStation() {
+        Section section = new Section(lineA, stationA, stationB, 1);
+
+        assertThat(section.containsStation(stationA)).isTrue();
+        assertThat(section.containsStation(stationB)).isTrue();
+        assertThat(section.containsStation(stationC)).isFalse();
     }
 
+    @Test
+    @DisplayName("구간은 주어진 구간과 동일한 상행역 혹은 하행역을 가진다")
+    void hasSameUpStationOrDownStation() {
+        Section section = new Section(lineA, stationA, stationC, 1);
+        Section upSection = new Section(lineA, stationA, stationB, 1);
+        Section downSection = new Section(lineA, stationB, stationC, 1);
+        Section nothingSection = new Section(lineA, stationB, stationD, 1);
+
+        assertThat(section.hasSameUpStationOrDownStation(upSection)).isTrue();
+        assertThat(section.hasSameUpStationOrDownStation(downSection)).isTrue();
+        assertThat(section.hasSameUpStationOrDownStation(nothingSection)).isFalse();
+    }
 
     @Test
     @DisplayName("구간은 주어진 라인의 소속이다")
     void sectionBelongToLine() {
         Section section = new Section(lineA, stationA, stationB, 1);
-        
+
         assertThat(section.belongTo(lineA)).isTrue();
     }
 
