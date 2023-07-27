@@ -104,6 +104,11 @@ class SectionServiceStubTest {
             when(stationDao.findById(station4.getId())).thenReturn(Optional.of(station4));
             when(sectionDao.findAllByLineId(line1.getId())).thenReturn(sections);
             when(sectionDao.insert(
+                    new Section(2L, line1, station4, station3, new Distance(shortDistance))))
+                    .thenReturn(
+                            new Section(4L, line1, station4, station3,
+                                    new Distance(shortDistance)));
+            when(sectionDao.insert(
                     new Section(line1, station2, station4, new Distance(shortDistance))))
                     .thenReturn(
                             new Section(3L, line1, station2, station4,
@@ -120,8 +125,7 @@ class SectionServiceStubTest {
                     SectionResponse::getDownStationId,
                     SectionResponse::getDistance
             ).contains(line1.getId(), station1.getId(), station2.getId(), shortDistance);
-            verify(sectionDao, times(1)).update(
-                    new Section(2L, line1, station4, station3, new Distance(5L)));
+            verify(sectionDao, times(1)).deleteById(2L);
         }
 
         @DisplayName("추가구간의 상행역과 기존 구간의 상행역이 겹치지 않을 때 추가구간의 하행역이 하행종점역으로 삽입 성공")
@@ -182,6 +186,11 @@ class SectionServiceStubTest {
             when(stationDao.findById(station3.getId())).thenReturn(Optional.of(station3));
             when(sectionDao.findAllByLineId(line1.getId())).thenReturn(sections);
             when(sectionDao.insert(
+                    new Section(2L, line1, station2, station4, new Distance(shortDistance))))
+                    .thenReturn(
+                            new Section(3L, line1, station2, station4,
+                                    new Distance(shortDistance)));
+            when(sectionDao.insert(
                     new Section(line1, station4, station3, new Distance(shortDistance))))
                     .thenReturn(
                             new Section(3L, line1, station4, station3,
@@ -198,8 +207,7 @@ class SectionServiceStubTest {
                     SectionResponse::getDownStationId,
                     SectionResponse::getDistance
             ).contains(line1.getId(), station4.getId(), station3.getId(), shortDistance);
-            verify(sectionDao, times(1)).update(
-                    new Section(2L, line1, station2, station4, new Distance(5L)));
+            verify(sectionDao, times(1)).deleteById(2L);
         }
 
 
