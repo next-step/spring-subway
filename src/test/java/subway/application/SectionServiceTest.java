@@ -90,7 +90,7 @@ class SectionServiceTest {
                 .hasMessage("노선에 구간이 존재하면 생성할 수 없습니다.");
     }
 
-    @DisplayName("노선에 A -> B -> C 구간이 있을 때 A -> D 구간을 새로 생성하면 A -> D -> B -> C 가 된다.")
+    @DisplayName("노선 구간에서 상행 종점역에 새로운 하행역을 추가하면 새로운 하행역과 기존 하행역이 상행 - 하행역이 된다.")
     @Test
     void givenA_B_C_when_createSection_thenA_D_B_C() {
         // given
@@ -113,7 +113,7 @@ class SectionServiceTest {
         assertThat(result).hasSize(3);
     }
 
-    @DisplayName("노선에 A -> B -> C 구간이 있을 때 C -> D 구간을 새로 생성하면 A -> D -> C -> D 가 된다.")
+    @DisplayName("노선 구간에서 하행 종점역에 새로운 하행역을 추가하면 하행 종점역을 상행역 새로운 하행역을 하행역으로 하는 구간이 생성된다.")
     @Test
     void givenA_B_C_when_createSection_thenA_D_C_D() {
         // given
@@ -137,7 +137,7 @@ class SectionServiceTest {
     }
 
 
-    @DisplayName("노선에 A -> B -> C 구간이 있을 때 D -> C 구간을 새로 생성하면 A -> B -> D -> C 가 된다.")
+    @DisplayName("노선 구간에서 하행 종점역에 새로운 상행역을 추가하면 기존 하행역과 새로운 상행역이 상행 - 하행역이 된다.")
     @Test
     void givenA_B_C_when_createSection_thenA_B_D_C() {
         // given
@@ -161,7 +161,7 @@ class SectionServiceTest {
     }
 
 
-    @DisplayName("노선에 A -> B -> C 구간이 있을 때 D -> A 구간을 새로 생성하면 D -> A -> B -> C 가 된다.")
+    @DisplayName("노선 구간에서 상행 종점역에 새로운 상행역을 추가하면 새로운 상행역을 상행역으로 기존 상행 종점역을 하행역으로 하는 구간이 생성된다.")
     @Test
     void givenA_B_C_when_createSection_thenD_A_B_C() {
         // given
@@ -184,7 +184,7 @@ class SectionServiceTest {
         assertThat(result).hasSize(3);
     }
 
-    @DisplayName("노선에 A -> B -> C 구간이 있고 이미 구간에 포함된 두 A , C 역 구간을 새롭게 생성하면 예외를 던진다.")
+    @DisplayName("노선 구간에 추가하고자하는 새로운 상행 , 하행역이 이미 모두 존재하는 경우 예외를 던진다.")
     @Test
     void givenA_B_C_when_createSection_both_exist_then_throw() {
         // given
@@ -199,7 +199,7 @@ class SectionServiceTest {
                 .hasMessage("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
     }
 
-    @DisplayName("노선에 A -> B -> C 구간이 있고 구간에 아예 포함되지 않는 두 D , E 역 구간을 새롭게 생성하면 예외를 던진다.")
+    @DisplayName("노선 구간에 추가하고자하는 새로운 상행 , 하행역이 모두 존재하지 않는 경우 예외를 던진다.")
     @Test
     void givenA_B_C_when_createSection_not_exist_then_throw() {
         // given
@@ -214,7 +214,7 @@ class SectionServiceTest {
                 .hasMessage("라인에 포함되어 있는 세션 중 삽입하고자 하는 세션의 상행 , 하행 정보가 반드시 하나만 포함해야합니다.");
     }
 
-    @DisplayName("노선에 A -> B -> C 구간이 있고 기존 B -> C 구간 길이보다 더 큰 구간 길이를 가진 B -> D 구간을 새로 생성하면 예외를 던진다.")
+    @DisplayName("노선 구간에서 중간 구간에 새로운 구간을 추가하고자 할 때 중간 구간의 길이보다 추가하고자 하는 구간의 길이가 더 클 때 예외를 던진다.")
     @Test
     void givenA_B_C_when_createSection_more_distance_then_throw() {
         // given
@@ -230,7 +230,7 @@ class SectionServiceTest {
     }
 
 
-    @DisplayName("노선에 A -> B -> C 구간이 있고 C 역을 삭제하면 A -> B 구간이 된다.")
+    @DisplayName("노선 구간에서 하행 종점역에 위치한 역을 삭제하면 다음으로 오던 역이 종점역이 된다.")
     @Test
     void givenA_B_C_when_deleteSection_then_A_B() {
         // given
@@ -251,7 +251,7 @@ class SectionServiceTest {
         assertThat(result).hasSize(1);
     }
 
-    @DisplayName("D -> A -> B -> C 구간에서 D -> A ,A -> B의 구간 길이가 각각 10 , 15일 때 A 역을 삭제하면 D -> B 구간 길이가 25가 된다.")
+    @DisplayName("노선 구간에서 중간에 위치한 역을 삭제하면 제거된 역의 상행역과 하행역이 새로운 상행 - 하행 구간이 된다.")
     @Test
     void deleteSectionThenAddDistance() {
         // given
@@ -273,7 +273,7 @@ class SectionServiceTest {
                 .contains(stationD, stationB, 25L);
     }
 
-    @DisplayName("노선에 A -> B 구간이 있고 구간이 1개인 경우 구간을 삭제하려고 하면 예외를 던진다.")
+    @DisplayName("노선 구간에서 존재하는 구간이 한 개이고 구간에 포함된 역을 삭제하려고 하면 예외를 던진다.")
     @Test
     void deleteSectionIfOneSectionThenThrow() {
         // given
@@ -285,7 +285,7 @@ class SectionServiceTest {
                 .hasMessage("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
     }
 
-    @DisplayName("노선에 A -> B -> C 구간이 있고 구간에 없는 E 역을 제거하면 실패한다")
+    @DisplayName("노선 구간에서 구간에 포함되지 않는 역을 삭제하려고 하면 예외를 던진다.")
     @Test
     void deleteSectionFailBecauseOfNonExist() {
         // given
