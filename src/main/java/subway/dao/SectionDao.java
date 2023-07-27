@@ -57,6 +57,12 @@ public class SectionDao {
                 .collect(Collectors.toList());
     }
 
+    public List<Section> findAll() {
+        final String sql = "select * from SECTION";
+
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
     public List<Section> findAllByLineId(final Long lineId) {
         final String sql = "select * from SECTION where line_id = ?";
 
