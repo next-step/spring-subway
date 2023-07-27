@@ -29,6 +29,18 @@ class PathIntegrationTest extends IntegrationTest {
         assertThat(response.body().jsonPath().getLong("distance")).isEqualTo(1554);
     }
 
+    @Test
+    @DisplayName("출발역과 도착역이 같은 경우 400 Bad Request로 응답한다")
+    void badRequestWithSameSourceAndTarget() {
+        final Long sameStationId = 35L;
+
+        final ExtractableResponse<Response> response = getReadPathAPIResponse(sameStationId, sameStationId);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().jsonPath().getString("message"))
+                .isEqualTo("출발역과 도착역이 같습니다. 역 ID : " + sameStationId);
+    }
+
     private ExtractableResponse<Response> getReadPathAPIResponse(final Long source, final Long target) {
         return RestAssured.given().log().all().queryParam("source", source).queryParam("target", target)
                 .when().get("/paths")
