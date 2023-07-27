@@ -151,4 +151,44 @@ class SectionDaoTest {
             assertThat(result).isEmpty();
         }
     }
+
+    @Nested
+    @DisplayName("findAll 메소드는")
+    class FindAll_Method {
+
+        @Test
+        @DisplayName("존재하는 모든 section을 반환한다.")
+        void Return_All_Exist_Sections() {
+            // given
+            Line line = lineDao.insert(new Line("line", "red", List.of()));
+
+            List<Station> persistStationList = List.of(stationDao.insert(new Station("upStationName1")),
+                    stationDao.insert(new Station("downStationName1")),
+                    stationDao.insert(new Station("upStationName2")),
+                    stationDao.insert(new Station("downStationName2")));
+
+            Section expectedSection1 = sectionDao.insert(line.getId(),
+                    DomainFixture.Section.buildWithStations(persistStationList.get(0), persistStationList.get(1)));
+
+            Section expectedSection2 = sectionDao.insert(line.getId(),
+                    DomainFixture.Section.buildWithStations(persistStationList.get(2), persistStationList.get(3)));
+
+            // when
+            List<Section> result = sectionDao.findAll();
+
+            // then
+            assertThat(result).hasSize(2)
+                    .contains(expectedSection1, expectedSection2);
+        }
+
+        @Test
+        @DisplayName("어떠한 section도 없다면, 빈 List를 반환한다.")
+        void Return_Empty_List_When_No_Exist_Sections() {
+            // when
+            List<Section> result = sectionDao.findAll();
+
+            // then
+            assertThat(result).isEmpty();
+        }
+    }
 }

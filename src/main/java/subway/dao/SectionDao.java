@@ -1,6 +1,5 @@
 package subway.dao;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,11 @@ public class SectionDao {
             "SELECT S.*, US.id AS US_ID, US.name AS US_NAME, DS.id AS DS_ID, DS.name AS DS_NAME FROM SECTIONS AS S "
                     + "JOIN STATION AS US ON S.line_id = ? AND S.up_station_id = US.id "
                     + "JOIN STATION AS DS ON S.line_id = ? AND S.down_station_id = DS.id";
+
+    private static final String FIND_ALL_SQL =
+            "SELECT S.*, US.id AS US_ID, US.name AS US_NAME, DS.id AS DS_ID, DS.name AS DS_NAME FROM SECTIONS AS S "
+                    + "JOIN STATION AS US ON S.up_station_id = US.id "
+                    + "JOIN STATION AS DS ON S.down_station_id = DS.id";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
@@ -86,6 +90,6 @@ public class SectionDao {
     }
 
     public List<Section> findAll() {
-        return Collections.emptyList();
+        return jdbcTemplate.query(FIND_ALL_SQL, sectionRowMapper);
     }
 }
