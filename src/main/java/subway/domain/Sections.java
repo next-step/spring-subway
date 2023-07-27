@@ -18,9 +18,8 @@ public class Sections {
     private static final String CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE = "출발역에 해당되는 구간을 찾을 수 없습니다.";
     private static final String TWO_MORE_START_STATION_EXCEPTION_MESSAGE = "상행 종점역이 두 개 이상입니다.";
     private static final String CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE = "상행 종점역을 찾을 수 없습니다.";
-    private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
-    private static final String NOT_EXIST_STATION_EXCEPTION_MESSAGE = "삭제할 역이 존재하지 않습니다.";
     private static final String CANNOT_FIND_OLD_SECTION = "기존 구간을 찾을 수 없습니다.";
+    private static final int MIN_SECTIONS_COUNT = 2;
 
     private final List<Section> sections;
 
@@ -28,25 +27,10 @@ public class Sections {
         this.sections = sorted(sections);
     }
 
-    public List<Section> sectionsForRemoval(final Station station) {
+    public List<Section> findSectionsIncluding(final Station station) {
         return this.sections.stream()
                 .filter(section -> section.isSameUpStation(station) || section.isSameDownStation(station))
-                .collect(Collectors.toList());
-    }
-
-    public void validateDelete(final Station deleteStation) {
-        if (this.sections.size() <= 1) {
-            throw new SectionException(ErrorCode.AT_LEAST_ONE_SECTION, AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
-        }
-
-        if (notExistStation(deleteStation)) {
-            throw new StationException(ErrorCode.NO_SUCH_STATION, NOT_EXIST_STATION_EXCEPTION_MESSAGE);
-        }
-    }
-
-    private boolean notExistStation(Station deleteStation) {
-        return !createUpStations(this.sections).contains(deleteStation)
-                && !lastSection().isSameDownStation(deleteStation);
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private List<Section> sorted(final List<Section> sections) {
@@ -63,10 +47,10 @@ public class Sections {
     private List<Section> combineUnsortedSections(final List<Section> sections, final Map<Station, Section> stationToSection) {
         List<Section> sortedSection = new ArrayList<>();
 
-        Section nextSection = findByUpStation(sections, findFirstStation(sections));
+        Section nextSection = findByUpStation(sections, firstStation(sections));
         sortedSection.add(nextSection);
 
-        for (int i = 1; i < sections.size(); i++) {
+        while (sortedSection.size() < sections.size()) {
             Station lastDownStation = nextSection.getDownStation();
             nextSection = stationToSection.get(lastDownStation);
             sortedSection.add(nextSection);
@@ -82,7 +66,7 @@ public class Sections {
                 .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_DEPARTURE, CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
     }
 
-    private Station findFirstStation(final List<Section> sections) {
+    private Station firstStation(final List<Section> sections) {
         Set<Station> endUpStations = createUpStations(sections);
         endUpStations.removeAll(createDownStations(sections));
 
@@ -106,19 +90,6 @@ public class Sections {
         boolean containsDownStation = createDownStations(this.sections).contains(newSection.getDownStation());
 
         return containsUpStation || containsDownStation;
-    }
-
-    public Section cut(final Section oldSection, final Section newSection) {
-        validateDistance(oldSection, newSection);
-
-        Distance reducedDistance = oldSection.distanceDifference(newSection);
-
-        if (oldSection.isSameUpStation(newSection)) {
-            return new Section(newSection.getDownStation(), oldSection.getDownStation(), reducedDistance);
-        }
-
-        return new Section(oldSection.getUpStation(), newSection.getUpStation(), reducedDistance);
-
     }
 
     public Section oldSection(final Section newSection) {
@@ -159,9 +130,9 @@ public class Sections {
         validateExistOnlyOne(hasUpStation, hasDownStation);
     }
 
-    private void validateDistance(final Section oldSection, final Section newSection) {
-        if (oldSection.shorterOrEqualTo(newSection)) {
-            throw new SectionException(ErrorCode.TOO_LONG_DISTANCE, LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
+    public void validateDelete() {
+        if (sections.size() < MIN_SECTIONS_COUNT) {
+            throw new SectionException(ErrorCode.AT_LEAST_ONE_SECTION, AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
         }
     }
 

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
+import subway.domain.DeleteSections;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
@@ -112,8 +113,9 @@ public class LineService {
         if (sections.isInsertedMiddle(newSection)) {
             Section oldSection = sections.oldSection(newSection);
             sectionDao.deleteById(oldSection.getId());
-            sectionDao.insert(sections.cut(oldSection, newSection), lineId);
+            sectionDao.insert(oldSection.cutBy(newSection), lineId);
         }
+
         sectionDao.insert(newSection, lineId);
 
         final Long newUpStationId = newSection.getUpStation().getId();
@@ -124,28 +126,21 @@ public class LineService {
     }
 
     @Transactional
-    public void deleteSectionByStationId(final Long lineId, final Long stationId) {
+    public void deleteSection(final Long lineId, final Long stationId) {
         final Station delete = stationDao.findById(stationId)
                 .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_STATION_EXCEPTION_MESSAGE));
         final Sections sections = sectionDao.findAllByLineId(lineId)
                 .orElseThrow(() -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
-        sections.validateDelete(delete);
+        sections.validateDelete();
 
-        List<Section> removeSections = sections.sectionsForRemoval(delete);
-        List<Long> removeIds = removeSections.stream()
-                .map(Section::getId)
-                .collect(Collectors.toList());
+        DeleteSections deleteSections = new DeleteSections(sections.findSectionsIncluding(delete));
 
-        sectionDao.deleteAllIn(removeIds);
+        sectionDao.deleteAllIn(deleteSections.getIds());
 
-        if (isMidRemoved(removeSections)) {
-            sectionDao.insert(newSectionAfterRemoval(removeSections), lineId);
+        if (deleteSections.isKindOfMidDeletion()) {
+            sectionDao.insert(deleteSections.newSection(), lineId);
         }
-    }
-
-    private boolean isMidRemoved(final List<Section> removeSections) {
-        return removeSections.size() == 2;
     }
 
     private Section newSection(final SectionRequest request) {
@@ -155,18 +150,5 @@ public class LineService {
                 .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_DOWN_STATION_EXCEPTION_MESSAGE));
 
         return new Section(upStation, downStation, request.getDistance());
-    }
-
-    private Section newSectionAfterRemoval(final List<Section> removeSections) {
-        final Section firstSection = removeSections.get(0);
-        final Section secondSection = removeSections.get(1);
-
-        if (firstSection.isInOrder(secondSection)) {
-            return new Section(
-                    firstSection.getUpStation(), secondSection.getDownStation(), firstSection.distanceSum(secondSection));
-        }
-
-        return new Section(
-                secondSection.getUpStation(), firstSection.getDownStation(), secondSection.distanceSum(firstSection));
     }
 }

@@ -89,7 +89,7 @@ public class LineController {
             throw new InvalidRequestException(ErrorCode.INVALID_REQUEST, NOT_POSITIVE_STATION_ID_EXCEPTION_MESSAGE);
         }
 
-        lineService.deleteSectionByStationId(id, Long.parseLong(stationId));
+        lineService.deleteSection(id, Long.parseLong(stationId));
 
         return ResponseEntity.noContent().build();
     }

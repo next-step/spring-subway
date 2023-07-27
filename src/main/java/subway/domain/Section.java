@@ -7,6 +7,7 @@ import subway.exception.SectionException;
 public class Section {
 
     private static final String SAME_STATION_EXCEPTION_MESSAGE = "상행역과 하행역은 다른 역이어야 합니다.";
+    private static final String LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE = "삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다.";
 
     private Long id;
     private Station upStation;
@@ -40,6 +41,24 @@ public class Section {
     private void validateDifferent(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
             throw new SectionException(ErrorCode.SAME_SECTION, SAME_STATION_EXCEPTION_MESSAGE);
+        }
+    }
+
+    public Section cutBy(final Section newSection) {
+        validateDistance(newSection);
+
+        Distance reducedDistance = distanceDifference(newSection);
+
+        if (isSameUpStation(newSection)) {
+            return new Section(newSection.getDownStation(), getDownStation(), reducedDistance);
+        }
+
+        return new Section(getUpStation(), newSection.getUpStation(), reducedDistance);
+    }
+
+    private void validateDistance(final Section newSection) {
+        if (shorterOrEqualTo(newSection)) {
+            throw new SectionException(ErrorCode.TOO_LONG_DISTANCE, LONGER_THAN_OLDER_SECTION_EXCEPTION_MESSAGE);
         }
     }
 

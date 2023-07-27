@@ -142,8 +142,8 @@ class SectionsTest {
         Section upMidSection = new Section(upStation, midStation,  3);
         Section midDownSection = new Section(midStation, downStation, 7);
 
-        assertEquals(sections.cut(oldSection, upMidSection), midDownSection);
-        assertEquals(sections.cut(oldSection, midDownSection), upMidSection);
+        assertEquals(oldSection.cutBy(upMidSection), midDownSection);
+        assertEquals(oldSection.cutBy(midDownSection), upMidSection);
     }
 
     @DisplayName("새로운 구간을 삽입할 때 가운데에 삽입되는지 구분한다.")
@@ -213,13 +213,10 @@ class SectionsTest {
         Station midStation = new Station(2L, "잠실역");
         Station downStation = new Station(1L, "강변역");
 
-        List<Section> originSections = new ArrayList<>();
         Section oldSection = new Section(upStation, downStation, 10);
-        originSections.add(oldSection);
-        Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, midStation,  10);
 
-        assertThrows(SectionException.class, () -> sections.cut(oldSection, newSection));
+        assertThrows(SectionException.class, () -> oldSection.cutBy(newSection));
     }
 
     @DisplayName("존재하는 역을 제거하려는 경우 검증을 통과한다.")
@@ -236,9 +233,9 @@ class SectionsTest {
                 new Section(downStation, newDownStation, distance)));
 
         // when & then
-        assertDoesNotThrow(() -> sections.validateDelete(upStation));
-        assertDoesNotThrow(() -> sections.validateDelete(downStation));
-        assertDoesNotThrow(() -> sections.validateDelete(newDownStation));
+        assertDoesNotThrow(() -> new DeleteSections(sections.findSectionsIncluding(upStation)));
+        assertDoesNotThrow(() -> new DeleteSections(sections.findSectionsIncluding(downStation)));
+        assertDoesNotThrow(() -> new DeleteSections(sections.findSectionsIncluding(newDownStation)));
     }
 
     @DisplayName("존재하지 않는 역을 제거하려는 경우 예외를 던진다.")
@@ -255,8 +252,10 @@ class SectionsTest {
                 new Section(upStation, downStation, distance),
                 new Section(downStation, newDownStation, distance)));
 
+        List<Section> deleteSections = sections.findSectionsIncluding(notExistsStation);
+
         // when & then
-        assertThrows(StationException.class, () -> sections.validateDelete(notExistsStation));
+        assertThrows(StationException.class, () -> new DeleteSections(deleteSections));
     }
 
     @DisplayName("구간이 1개만 있을 때 구간을 제거하는 경우 예외를 던진다.")
@@ -270,6 +269,6 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
 
         // when & then
-        assertThrows(SectionException.class, () -> sections.validateDelete(downStation));
+        assertThrows(SectionException.class, sections::validateDelete);
     }
 }
