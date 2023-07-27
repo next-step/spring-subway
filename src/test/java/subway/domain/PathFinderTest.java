@@ -32,12 +32,13 @@ class PathFinderTest {
     @DisplayName("출발역과 도착역이 같으면 PathFinder 생성에 실패한다.")
     void createPathFinder_sameSourceAndTarget_throwException() {
         // given
-        List<Section> sections = createInitialSections();
+        Station station = new Station (1L, "교대역");
+        PathFinder pathFinder = new PathFinder(createInitialSections());
 
         // when & then
-        assertThatThrownBy(() -> new PathFinder(sections))
-            .hasMessage("출발역과 도착역은 같을 수 없습니다.")
-            .isInstanceOf(IllegalSectionException.class);
+        assertThatThrownBy(() -> pathFinder.searchShortestPath(station, station))
+            .hasMessage("출발역과 도착역은 달라야 합니다.")
+            .isInstanceOf(IllegalStationsException.class);
     }
 
     @Test
