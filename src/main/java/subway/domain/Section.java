@@ -4,11 +4,21 @@ import subway.exception.IllegalSectionException;
 
 public final class Section {
 
+    public static final Section NULL = new Section();
+
     private final Long id;
     private final Line line;
     private final Station upStation;
     private final Station downStation;
     private final Integer distance;
+
+    private Section() {
+        this.id = null;
+        this.line = null;
+        this.upStation = null;
+        this.downStation = null;
+        this.distance = null;
+    }
 
     public Section(final Long id,
                    final Line line,
@@ -71,6 +81,10 @@ public final class Section {
 
     public boolean equalsDownStation(final Section other) {
         return other.downStation.equals(this.downStation);
+    }
+
+    public boolean isNotNull() {
+        return !this.equals(NULL);
     }
 
     public Long getId() {
