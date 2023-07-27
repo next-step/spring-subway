@@ -67,4 +67,10 @@ public class SectionDao {
 
         return jdbcTemplate.update(sql, targetSectionId);
     }
+
+    public int deleteFirstOrLastStation(final Long stationId, final Long lineId) {
+        final String sql = "delete from SECTION where (up_station_id = ? or down_station_id = ?) and line_id = ?";
+
+        return jdbcTemplate.update(sql, stationId, stationId, lineId);
+    }
 }
