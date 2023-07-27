@@ -41,6 +41,19 @@ class PathIntegrationTest extends IntegrationTest {
                 .isEqualTo("출발역과 도착역이 같습니다. 역 ID : " + sameStationId);
     }
 
+    @Test
+    @DisplayName("출발역과 도착역이 연결되어 있지 않은 경우 400 Bad Request로 응답한다")
+    void badRequestWithNotConnectedSourceAndTarget() {
+        final Long source = 23L;
+        final Long target = 36L;
+
+        final ExtractableResponse<Response> response = getReadPathAPIResponse(source, target);
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().jsonPath().getString("message"))
+                .isEqualTo("출발역과 도착역이 연결되어 있지 않습니다. 출발역 ID : " + source + " 도착역 ID : " + target);
+    }
+
     private ExtractableResponse<Response> getReadPathAPIResponse(final Long source, final Long target) {
         return RestAssured.given().log().all().queryParam("source", source).queryParam("target", target)
                 .when().get("/paths")
