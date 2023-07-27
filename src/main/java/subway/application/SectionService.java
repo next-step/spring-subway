@@ -76,11 +76,11 @@ public class SectionService {
         Optional<Section> sectionByUpStation,
         Optional<Section> sectionByDownStation
     ) {
-        if (sectionByDownStation.isPresent() && sectionByUpStation.isPresent()) {
-            Section newSectionUpStation = sectionByDownStation.get();
-            Section newSectionDownStation = sectionByUpStation.get();
-            Section newSection = newSectionUpStation.combineSection(newSectionDownStation);
-            sectionDao.insert(newSection);
-        }
+        sectionByDownStation.ifPresent(
+            newSectionUpStation -> sectionByUpStation.ifPresent(
+                newSectionDownStation ->
+                    sectionDao.insert(newSectionUpStation.combineSection(newSectionDownStation))
+            )
+        );
     }
 }
