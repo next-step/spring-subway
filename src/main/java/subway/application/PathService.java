@@ -3,7 +3,7 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.Sections;
+import subway.domain.PathGraph;
 import subway.domain.Station;
 import subway.dto.PathResponse;
 
@@ -23,8 +23,8 @@ public class PathService {
         Station targetStation = stationDao.findById(targetStationId)
                 .orElseThrow();
 
-        Sections sections = new Sections(sectionDao.findAll());
+        PathGraph graph = PathGraph.of(sectionDao.findAll());
 
-        return PathResponse.of(sections.findShortestPath(sourceStation, targetStation));
+        return PathResponse.of(graph.findShortestPath(sourceStation, targetStation));
     }
 }

@@ -18,7 +18,8 @@ import static subway.util.TestRequestUtil.extractId;
 @DisplayName("경로 조회 기능 통합 테스트")
 public class PathIntegrationTest extends IntegrationTest {
     @Test
-    void name() {
+    @DisplayName("최단 경로를 탐색한다.")
+    void findShortestPath() {
         // given
         long station1Id = extractId(createStation(new StationRequest("강남역")));
         long station2Id = extractId(createStation(new StationRequest("역삼역")));

@@ -314,41 +314,4 @@ class SectionsTest {
                 new Station("잠실역")
         );
     }
-
-    @Test
-    @DisplayName("출발역과 도착역을 지정하면 최단 경로를 반환하는 기능")
-    void getShortestPath() {
-        // given
-        Station station1 = new Station("서울역");
-        Station station2 = new Station("잠실역");
-        Station station3 = new Station("상도역");
-        Station station4 = new Station("강남역");
-        Section section1_2 = new Section(station1, station2, 11);
-        Section section1_3 = new Section(station1, station3, 10);
-        Section section2_4 = new Section(station2, station4, 10);
-        Section section3_4 = new Section(station3, station4, 10);
-        Sections sections = new Sections(List.of(section1_2, section1_3, section2_4, section3_4));
-
-        // when
-        Path path = sections.findShortestPath(station1, station4);
-
-        // then
-        assertThat(path.getStations()).containsExactly(station1, station3, station4);
-        assertThat(path.getDistance()).isEqualTo(20);
-    }
-
-    @Test
-    @DisplayName("출발역과 도착역이 같으면 경로 탐색 불가능")
-    void getShortestPathSameStations() {
-        // given
-        Station station1 = new Station("서울역");
-        Station station2 = new Station("잠실역");
-        Section section1_2 = new Section(station1, station2, 11);
-        Sections sections = new Sections(List.of(section1_2));
-
-        // when, then
-        assertThatCode(() -> sections.findShortestPath(station1, station1))
-                .isInstanceOf(SubwayException.class)
-                .hasMessage(ErrorCode.PATH_SAME_STATIONS.getMessage());
-    }
 }

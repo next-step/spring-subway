@@ -1,9 +1,5 @@
 package subway.domain;
 
-import org.jgrapht.GraphPath;
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.WeightedMultigraph;
 import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
@@ -136,35 +132,6 @@ public class Sections {
                 .findAny()
                 .orElse(null);
         return start;
-    }
-
-    public Path findShortestPath(final Station sourceStation, final Station targetStation) {
-        validateSameStations(sourceStation, targetStation);
-        WeightedMultigraph<Station, DefaultWeightedEdge> graph = initializeGraph();
-        GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
-                .getPath(sourceStation, targetStation);
-
-        return new Path(path.getVertexList(), (int) path.getWeight());
-    }
-
-    private void validateSameStations(final Station sourceStation, final Station targetStation) {
-        if (sourceStation.equals(targetStation)) {
-            throw new SubwayException(ErrorCode.PATH_SAME_STATIONS);
-        }
-    }
-
-    private WeightedMultigraph<Station, DefaultWeightedEdge> initializeGraph() {
-        WeightedMultigraph<Station, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
-
-        downStationsCache.forEach(graph::addVertex);
-        graph.addVertex(findTerminalUpStation());
-
-        sections.forEach(section -> graph.setEdgeWeight(
-                graph.addEdge(section.getUpStation(), section.getDownStation()),
-                section.getDistance()
-        ));
-
-        return graph;
     }
 
     public List<Section> getSections() {
