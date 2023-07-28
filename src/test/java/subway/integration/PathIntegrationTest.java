@@ -62,7 +62,6 @@ public class PathIntegrationTest extends IntegrationTest {
         강남_양재 = new Section(4L, 강남역, 양재역, 신분당선, 5);
         남부터미널_양재 = new Section(5L, 남부터미널역, 양재역, 삼호선, 3);
 
-        // TODO : Station 과 Section 값을 DB에 넣어야 한다.
         // given
         Map<String, String> params = new HashMap<>();
         params.put("name", "교대역");
@@ -118,7 +117,6 @@ public class PathIntegrationTest extends IntegrationTest {
             .body(신분당선_강남_양재)
             .when().post("/lines")
             .then().log().all();
-//        삼호선_남부터미널_양재 = new LineRequest("3호선", "bg-red-600", 7L, 8L, 3);
         구간_남부터미널_양재 = new SectionRegistRequest(8L, 7L, 3);
         RestAssured
             .given().log().all()

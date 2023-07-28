@@ -9,19 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.integration.IntegrationTest;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-class SectionDaoTest {
+@DisplayName("SectionDaoTest")
+class SectionDaoTest extends IntegrationTest {
 
     private Section expectedSection;
 
@@ -29,7 +24,8 @@ class SectionDaoTest {
     private SectionDao sectionDao;
 
     @BeforeEach
-    void setup() {
+    public void setup() {
+        super.setUp();
         expectedSection = new Section(
             1L,
             new Station(1L, "부천시청역"),

@@ -1,11 +1,15 @@
-create table if not exists STATION
+drop table if exists section;
+drop table if exists line;
+drop table if exists station;
+
+create table if not exists station
 (
     id bigint auto_increment not null,
     name varchar(255) not null unique,
     primary key(id)
     );
 
-create table if not exists LINE
+create table if not exists line
 (
     id bigint auto_increment not null,
     name varchar(255) not null unique,
@@ -37,7 +41,6 @@ alter table section
     add constraint section_line_fk
         foreign key (line_id)
             references line (id);
-
 
 insert into line(name, color) values ('7호선', '주황');
 
