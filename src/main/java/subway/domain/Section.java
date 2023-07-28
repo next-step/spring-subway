@@ -70,10 +70,7 @@ public class Section {
         if (newSection == null) {
             throw new SectionException("newSection이 존재하지 않습니다.");
         }
-        if (upSection == null && upStation.equals(newSection.getDownStation())) {
-            return Optional.empty();
-        }
-        if (downSection == null && downStation.equals(newSection.getUpStation())) {
+        if (isEdgeConnect(newSection)) {
             return Optional.empty();
         }
         if (upStation.equals(newSection.getUpStation())) {
@@ -86,14 +83,16 @@ public class Section {
         return findUpdateSectionWhenConnectIfPresent(newSection);
     }
 
+    private boolean isEdgeConnect(final Section newSection) {
+        return upSection == null && upStation.equals(newSection.getDownStation()) ||
+                downSection == null && downStation.equals(newSection.getUpStation());
+    }
+
     public Optional<Section> findUpdateSectionWhenDisconnect(Station removeStation) {
         if (removeStation == null) {
             throw new StationException("removeStation이 존재하지 않습니다");
         }
-        if (upSection == null && upStation.equals(removeStation)) {
-            return Optional.empty();
-        }
-        if (downSection == null && downStation.equals(removeStation)) {
+        if (isEdgeDisconnect(removeStation)) {
             return Optional.empty();
         }
         if (upSection != null && upStation.equals(removeStation)) {
@@ -101,6 +100,11 @@ public class Section {
         }
 
         return findUpdateSectionWhenDisconnectIfPresent(removeStation);
+    }
+
+    private boolean isEdgeDisconnect(final Station removeStation) {
+        return upSection == null && upStation.equals(removeStation) ||
+                downSection == null && downStation.equals(removeStation);
     }
 
     private Optional<Section> findUpdateSectionWhenDisconnectIfPresent(final Station removeStation) {
