@@ -1,44 +1,51 @@
 package subway.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
+import javax.sql.DataSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import subway.domain.Section;
 
-@SpringBootTest
-@Transactional
+@JdbcTest
 class SectionDaoTest {
 
-    private static final long NEW_SECTION_ID = 8L;
-    private static final long LINE_ID = 1L;
-    private static final long UP_STATION_ID = 12L;
-    private static final long DOWN_STATION_ID = 13L;
-    private static final long DISTANCE = 777L;
+    private final SectionDao sectionDao;
 
     @Autowired
-    SectionDao sectionDao;
+    public SectionDaoTest(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
+        this.sectionDao = new SectionDao(jdbcTemplate, dataSource);
+    }
 
     @Test
     @DisplayName("구간을 하나 추가한다.")
     void insert() {
         /* given */
-        final Section section = new Section(NEW_SECTION_ID, LINE_ID, UP_STATION_ID, DOWN_STATION_ID, DISTANCE);
+        final Section section = new Section(1L, 12L, 13L, 777L);
 
         /* when */
         final Section insert = sectionDao.insert(section);
 
         /* then */
-        assertThat(insert).isEqualTo(section);
+        assertAll(
+                () -> assertThat(insert.getDownStationId()).isEqualTo(section.getDownStationId()),
+                () -> assertThat(insert.getUpStationId()).isEqualTo(section.getUpStationId()),
+                () -> assertThat(insert.getDistance()).isEqualTo(section.getDistance()),
+                () -> assertThat(insert.getLineId()).isEqualTo(section.getLineId())
+        );
     }
 
     @Test
     @DisplayName("구간을 하나 삭제한다.")
     void delete() {
         /* given */
+        this.sectionDao.insert(new Section(2L, 20L, 21L, 2L));
+        this.sectionDao.insert(new Section(2L, 21L, 22L, 2L));
+        this.sectionDao.insert(new Section(2L, 22L, 23L, 2L));
         final Long targetSectionId = 3L;
 
         /* when */
