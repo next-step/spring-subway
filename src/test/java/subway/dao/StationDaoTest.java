@@ -3,7 +3,6 @@ package subway.dao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import subway.domain.Station;
 
@@ -11,9 +10,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@JdbcTest
 @Import(StationDao.class)
-class StationDaoTest {
+class StationDaoTest extends DaoTest {
 
     @Autowired
     StationDao stationDao;
@@ -23,11 +21,11 @@ class StationDaoTest {
     void findAll() {
         /* given */
 
-
+        
         /* when */
         final List<Station> stations = stationDao.findAll();
 
         /* then */
-        assertThat(stations).hasSize(40);
+        assertThat(stations).hasSize(10);
     }
 }
