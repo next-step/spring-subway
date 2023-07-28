@@ -32,11 +32,11 @@ class PathFinderTest {
     @DisplayName("출발역과 도착역이 같으면 PathFinder 생성에 실패한다.")
     void createPathFinder_sameSourceAndTarget_throwException() {
         // given
-        Station station = new Station (1L, "교대역");
+        long stationId = 1;
         PathFinder pathFinder = new PathFinder(createInitialSections());
 
         // when & then
-        assertThatThrownBy(() -> pathFinder.searchShortestPath(station, station))
+        assertThatThrownBy(() -> pathFinder.searchShortestPath(stationId, stationId))
             .hasMessage("출발역과 도착역은 달라야 합니다.")
             .isInstanceOf(IllegalStationsException.class);
     }
@@ -57,12 +57,12 @@ class PathFinderTest {
     @DisplayName("존재하지 않는 출발역이나 도착역을 조회 할 경우 경로 조회에 실패한다.")
     void searchShortestPath_notExistSourceOrTarget_throwException() {
         // given
-        Station existSource = new Station (1L, "교대역");
-        Station notExistTarget = new Station (5L, "종합운동장역");
+        long existSourceId = 1;
+        long notExistTargetId = 5;
         PathFinder pathFinder = new PathFinder(createInitialSections());
 
         // when & then
-        assertThatThrownBy(() -> pathFinder.searchShortestPath(existSource, notExistTarget))
+        assertThatThrownBy(() -> pathFinder.searchShortestPath(existSourceId, notExistTargetId))
             .hasMessage("출발역 또는 도착역이 존재하지 않습니다.")
             .isInstanceOf(IllegalStationsException.class);
     }
@@ -75,14 +75,10 @@ class PathFinderTest {
         Station middle = new Station(4L, "남부터미널역");
         Station target = new Station (3L, "양재역");
         PathFinder pathFinder = new PathFinder(createInitialSections());
-        List<Station> shortestPathStations = Arrays.asList(
-            source,
-            middle,
-            target
-        );
+        List<Station> shortestPathStations = Arrays.asList(source, middle, target);
 
         // when
-        PathResponse response = pathFinder.searchShortestPath(source, target);
+        PathResponse response = pathFinder.searchShortestPath(source.getId(), target.getId());
 
         // then
         List<Station> actualStations = response.getStations().stream()

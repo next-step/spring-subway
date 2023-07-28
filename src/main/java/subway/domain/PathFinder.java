@@ -1,6 +1,7 @@
 package subway.domain;
 
 import java.util.List;
+import java.util.Optional;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
@@ -15,7 +16,12 @@ public class PathFinder {
         this.weightedGraph = createWeightedGraph(sections);
     }
 
-    public PathResponse searchShortestPath(Station source, Station target) {
+    public PathResponse searchShortestPath(long sourceId, long targetId) {
+        Station source = getVertex(sourceId)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
+        Station target = getVertex(targetId)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
+
         validateSourceAndTarget(source, target);
 
         DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(
@@ -30,10 +36,6 @@ public class PathFinder {
     private void validateSourceAndTarget(Station source, Station target) {
         if (source.equals(target)) {
             throw new IllegalStationsException("출발역과 도착역은 달라야 합니다.");
-        }
-
-        if (isStationNotExist(source) || isStationNotExist(target)) {
-            throw new IllegalStationsException("출발역 또는 도착역이 존재하지 않습니다.");
         }
     }
 
@@ -57,7 +59,9 @@ public class PathFinder {
         return graph;
     }
 
-    private boolean isStationNotExist(Station station) {
-        return !weightedGraph.containsVertex(station);
+    private Optional<Station> getVertex(final long stationId) {
+        return weightedGraph.vertexSet().stream()
+            .filter(station -> station.getId()==stationId)
+            .findFirst();
     }
 }
