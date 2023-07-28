@@ -47,11 +47,18 @@ public class PathFinder {
         return graph;
     }
 
+    private void addVertex(
+        WeightedMultigraph<Station, DefaultWeightedEdge> graph,
+        List<Section> sections
+    ) {
+        findStations(sections).forEach(graph::addVertex);
+    }
+
     private void setEdgeWeight(
         WeightedMultigraph<Station, DefaultWeightedEdge> graph,
         List<Section> sections
     ) {
-        for (Section section: sections) {
+        for (Section section : sections) {
             graph.setEdgeWeight(
                 graph.addEdge(
                     section.getUpStation(),
@@ -60,13 +67,6 @@ public class PathFinder {
                 section.getDistance().getDistance()
             );
         }
-    }
-
-    private void addVertex(
-        WeightedMultigraph<Station, DefaultWeightedEdge> graph,
-        List<Section> sections
-    ) {
-        findStations(sections).forEach(graph::addVertex);
     }
 
     private Set<Station> findStations(List<Section> sections) {

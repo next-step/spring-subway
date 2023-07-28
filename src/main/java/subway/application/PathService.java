@@ -22,7 +22,7 @@ public class PathService {
         this.stationDao = stationDao;
     }
 
-    public PathResponse findMinimumDistancePaths(Long departureStationId, Long destinationStationId) {
+    public PathResponse findShortestPath(Long departureStationId, Long destinationStationId) {
         List<Section> sections = sectionDao.findAll();
         Station departureStation = stationDao.findById(departureStationId);
         Station destinationStation = stationDao.findById(destinationStationId);

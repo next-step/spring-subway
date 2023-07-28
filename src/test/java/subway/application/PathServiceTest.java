@@ -81,7 +81,7 @@ public class PathServiceTest {
         Mockito.when(stationDao.findById(도착역_아이디)).thenReturn(양재역);
 
         // then
-        Assertions.assertThat(pathService.findMinimumDistancePaths(출발역_아이디, 도착역_아이디).getDistance()).isEqualTo(5D);
+        Assertions.assertThat(pathService.findShortestPath(출발역_아이디, 도착역_아이디).getDistance()).isEqualTo(5D);
         Mockito.verify(sectionDao).findAll();
         Mockito.verify(stationDao).findById(출발역_아이디);
         Mockito.verify(stationDao).findById(도착역_아이디);
