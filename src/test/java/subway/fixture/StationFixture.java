@@ -19,4 +19,8 @@ public final class StationFixture {
     public static Station 네번째역() {
         return new Station(4L, "네번째역");
     }
+
+    public static Station 다섯번째역() {
+        return new Station(5L, "다섯번째역");
+    }
 }
