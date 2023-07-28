@@ -15,14 +15,10 @@ import subway.domain.Station;
 
 class JGraphtTest {
 
-    // TODO: 리팩토링하기
     private static final Station 강남역 = new Station(20L, "강남역");
     private static final Station 교대역 = new Station(21L, "교대역");
     private static final Station 양재역 = new Station(30L, "양재역");
     private static final Station 남부터미널역 = new Station(31L, "남부터미널역");
-    private static final Line 이호선 = new Line(2L, "2호선", "#000001");
-    private static final Line 삼호선 = new Line(3L, "3호선", "#000002");
-    private static final Line 신분당선 = new Line(4L, "신분당선", "#000003");
     private static final Section 강남역_교대역_구간 = new Section(1L, 2L, 20L, 21L, 130L);
     private static final Section 강남역_양재역_구간 = new Section(2L, 4L, 20L, 30L, 30L);
     private static final Section 양재역_남부터미널역_구간 = new Section(3L, 3L, 30L, 31L, 30L);
