@@ -22,4 +22,12 @@ public class SectionFixture {
     public static Section 네번째역_다섯번째역_구간(final Line line) {
         return new Section(4L, line, StationFixture.네번째역(), StationFixture.다섯번째역(), DEFAULT_DISTANCE);
     }
+
+    public static Section 다섯번째역_여섯번째역_구간(final Line line) {
+        return new Section(5L, line, StationFixture.다섯번째역(), StationFixture.여섯번째역(), DEFAULT_DISTANCE);
+    }
+
+    public static Section 여섯번째역_일곱번째역_구간(final Line line) {
+        return new Section(6L, line, StationFixture.여섯번째역(), StationFixture.일곱번째역(), DEFAULT_DISTANCE);
+    }
 }
