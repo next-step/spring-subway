@@ -23,9 +23,11 @@ public class PathService {
     }
 
     public PathResponse findShortestPath(Long departureStationId, Long destinationStationId) {
+        Station departureStation = stationDao.findById(departureStationId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다."));
+        Station destinationStation = stationDao.findById(destinationStationId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다."));
         List<Section> sections = sectionDao.findAll();
-        Station departureStation = stationDao.findById(departureStationId);
-        Station destinationStation = stationDao.findById(destinationStationId);
 
         PathFinder pathFinder = new PathFinder(sections, departureStation, destinationStation);
         List<StationResponse> stations = pathFinder.findShortestStations().stream()

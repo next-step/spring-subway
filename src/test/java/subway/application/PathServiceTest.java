@@ -1,6 +1,9 @@
 package subway.application;
 
+import static org.mockito.Mockito.when;
+
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,17 +77,29 @@ public class PathServiceTest {
         도착역_아이디 = 8L;
 
         // when
-        Mockito.when(sectionDao.findAll()).thenReturn(
+        when(sectionDao.findAll()).thenReturn(
             List.of(교대_강남, 교대_남부터미널, 강남_양재, 남부터미널_양재)
         );
-        Mockito.when(stationDao.findById(출발역_아이디)).thenReturn(교대역);
-        Mockito.when(stationDao.findById(도착역_아이디)).thenReturn(양재역);
+        when(stationDao.findById(출발역_아이디).get()).thenReturn(교대역);
+        when(stationDao.findById(도착역_아이디).get()).thenReturn(양재역);
 
         // then
         Assertions.assertThat(pathService.findShortestPath(출발역_아이디, 도착역_아이디).getDistance()).isEqualTo(5D);
         Mockito.verify(sectionDao).findAll();
         Mockito.verify(stationDao).findById(출발역_아이디);
         Mockito.verify(stationDao).findById(도착역_아이디);
+    }
+
+    @Test
+    @DisplayName("예외 : 존재하지 않은 출발역이나 도착역을 조회 할 경우")
+    void exceptionNoStatoin() {
+        // when
+        when(stationDao.findById(5L)).thenReturn(Optional.of(교대역));
+        when(stationDao.findById(100L)).thenReturn(Optional.empty());
+
+        // then
+        Assertions.assertThatThrownBy(() -> pathService.findShortestPath(5L, 100L))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
 }

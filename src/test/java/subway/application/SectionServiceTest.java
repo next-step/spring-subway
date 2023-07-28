@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -92,7 +93,7 @@ public class SectionServiceTest {
         Long deletedSectionId = 1L;
         Station deletedStation = 부천시청역;
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
-        when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
+        when(stationDaoMock.findById(deletedStationId)).thenReturn(Optional.of(deletedStation));
 
         // when
         assertThatNoException()
@@ -112,7 +113,7 @@ public class SectionServiceTest {
         Long deletedSectionId = 3L;
         Station deletedStation = 춘의역;
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
-        when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
+        when(stationDaoMock.findById(deletedStationId)).thenReturn(Optional.of(deletedStation));
 
         // when
         assertThatNoException()
@@ -141,7 +142,7 @@ public class SectionServiceTest {
 
         // when
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
-        when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
+        when(stationDaoMock.findById(deletedStationId)).thenReturn(Optional.of(deletedStation));
 
         // then
         assertThatNoException()
@@ -163,7 +164,7 @@ public class SectionServiceTest {
 
         // when
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
-        when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
+        when(stationDaoMock.findById(deletedStationId)).thenReturn(Optional.of(deletedStation));
 
         // then
         assertThatThrownBy(() -> sectionService.deleteSection(deletedStationId, lineId))
@@ -181,7 +182,7 @@ public class SectionServiceTest {
 
         // when
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
-        when(stationDaoMock.findById(deletedStationId)).thenReturn(deletedStation);
+        when(stationDaoMock.findById(deletedStationId)).thenReturn(Optional.of(deletedStation));
 
         // then
         assertThatThrownBy(() -> sectionService.deleteSection(deletedStationId, lineId))
@@ -205,8 +206,8 @@ public class SectionServiceTest {
         );
 
         // when
-        when(stationDaoMock.findById(upStationID)).thenReturn(부천시청역);
-        when(stationDaoMock.findById(downStationId)).thenReturn(신중동역);
+        when(stationDaoMock.findById(upStationID)).thenReturn(Optional.of(부천시청역));
+        when(stationDaoMock.findById(downStationId)).thenReturn(Optional.of(신중동역));
         when(lineDaoMock.findById(lineId)).thenReturn(line);
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
 
@@ -234,8 +235,8 @@ public class SectionServiceTest {
         );
 
         // when
-        when(stationDaoMock.findById(upStationID)).thenReturn(부천종합운동장역);
-        when(stationDaoMock.findById(downStationId)).thenReturn(까치울역);
+        when(stationDaoMock.findById(upStationID)).thenReturn(Optional.of(부천종합운동장역));
+        when(stationDaoMock.findById(downStationId)).thenReturn(Optional.of(까치울역));
         when(lineDaoMock.findById(lineId)).thenReturn(line);
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(sections);
 
@@ -264,8 +265,8 @@ public class SectionServiceTest {
         );
 
         // when
-        when(stationDaoMock.findById(upStationID)).thenReturn(upStation);
-        when(stationDaoMock.findById(downStationId)).thenReturn(downStation);
+        when(stationDaoMock.findById(upStationID)).thenReturn(Optional.of(upStation));
+        when(stationDaoMock.findById(downStationId)).thenReturn(Optional.of(downStation));
         when(lineDaoMock.findById(lineId)).thenReturn(line);
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
 
@@ -294,8 +295,8 @@ public class SectionServiceTest {
         );
 
         // when
-        when(stationDaoMock.findById(upStationID)).thenReturn(upStation);
-        when(stationDaoMock.findById(downStationId)).thenReturn(downStation);
+        when(stationDaoMock.findById(upStationID)).thenReturn(Optional.of(upStation));
+        when(stationDaoMock.findById(downStationId)).thenReturn(Optional.of(downStation));
         when(lineDaoMock.findById(lineId)).thenReturn(line);
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
 
@@ -324,8 +325,8 @@ public class SectionServiceTest {
         );
 
         // when
-        when(stationDaoMock.findById(upStationID)).thenReturn(upStation);
-        when(stationDaoMock.findById(downStationId)).thenReturn(downStation);
+        when(stationDaoMock.findById(upStationID)).thenReturn(Optional.of(upStation));
+        when(stationDaoMock.findById(downStationId)).thenReturn(Optional.of(downStation));
         when(lineDaoMock.findById(lineId)).thenReturn(line);
         when(sectionDaoMock.findAllByLineId(lineId)).thenReturn(부천종합운동장역_까치울역);
 
@@ -337,4 +338,5 @@ public class SectionServiceTest {
         verify(lineDaoMock).findById(lineId);
         verify(sectionDaoMock).findAllByLineId(lineId);
     }
+
 }
