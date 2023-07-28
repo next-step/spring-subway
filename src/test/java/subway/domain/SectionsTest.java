@@ -156,4 +156,16 @@ class SectionsTest {
 
         assertThat(stations).containsExactly(stationA, stationB, stationC);
     }
+
+    @Test
+    @DisplayName("구간들의 총 거리를 가져온다")
+    void getTotalDistance() {
+        Section sectionA = new Section(lineA, stationA, stationB, 1);
+        Section sectionB = new Section(lineA, stationB, stationC, 2);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        int totalDistance = sections.getTotalDistance();
+
+        assertThat(totalDistance).isEqualTo(3);
+    }
 }

@@ -228,6 +228,12 @@ public class Sections {
         return this.values.get(this.values.size() - 1);
     }
 
+    public int getTotalDistance() {
+        return this.values.stream()
+            .mapToInt(Section::getDistance)
+            .sum();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
