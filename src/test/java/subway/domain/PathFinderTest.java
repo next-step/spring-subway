@@ -2,6 +2,7 @@ package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ public class PathFinderTest {
     private Station 강남역 = new Station(6L, "강남역");
     private Station 남부터미널역 = new Station(7L, "남부터미널역");
     private Station 양재역 = new Station(8L, "양재역");
+    private Station 부산역 = new Station(9L, "부산역");
     private Line 이호선 = new Line(2L, "2호선", "빨강");
     private Line 삼호선 = new Line(3L, "삼호선", "노랑");
     private Line 신분당선 = new Line(4L, "신분당선", "파랑");
@@ -76,6 +78,22 @@ public class PathFinderTest {
 
         // then
         assertThat(pathFinder.findShortestDistance()).isEqualTo(2D);
+    }
+
+    @Test
+    @DisplayName("예외 : 출발역과 도착역이 같은 경우 예외 발생")
+    void exceptionDepartureDestinationSameStationName() {
+        // then
+        assertThatThrownBy(() -> new PathFinder(교대_강남_남부터미널_양재, 교대역, 교대역))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("예외 : 출발역과 도착역이 연결이 되어 있지 않은 경우 예외 발생")
+    void exceptionNotConnected() {
+        // then
+        assertThatThrownBy(() -> new PathFinder(교대_강남_남부터미널_양재, 교대역, 부산역))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
 }

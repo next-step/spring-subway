@@ -18,7 +18,14 @@ public class PathFinder {
         Station departureStation,
         Station destinationStation
     ) {
+        validateStation(departureStation, destinationStation);
         shortestPath = findShortestPath(sections, departureStation, destinationStation);
+    }
+
+    private void validateStation(Station departureStation, Station destinationStation) {
+        if (departureStation.equals(destinationStation)) {
+            throw new IllegalArgumentException("중복된 역 입니다.");
+        }
     }
 
     private GraphPath<Station, DefaultWeightedEdge> findShortestPath(
@@ -29,10 +36,14 @@ public class PathFinder {
         WeightedMultigraph<Station, DefaultWeightedEdge> graph = setWeightedMultigraph(sections);
         DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstra =
             new DijkstraShortestPath<>(graph);
-        return dijkstra.getPath(
-            departureStation,
-            destinationStation
-        );
+        try {
+            return dijkstra.getPath(
+                departureStation,
+                destinationStation
+            );
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new IllegalArgumentException("연결된 노선이 없습니다.");
+        }
     }
 
     private WeightedMultigraph<Station, DefaultWeightedEdge> setWeightedMultigraph(
