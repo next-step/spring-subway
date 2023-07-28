@@ -13,10 +13,21 @@ public class PathGraph {
 
     public PathGraph(final List<Section> sections) {
         graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
-
         sections.forEach(section -> graph.addVertex(section.getDownStation()));
         sections.forEach(section -> graph.addVertex(section.getUpStation()));
         sections.forEach(section -> graph.setEdgeWeight(
+                graph.addEdge(
+                    section.getUpStation(),
+                    section.getDownStation()),
+                section.getDistance()
+            )
+        );
+    }
+
+    public PathGraph(Sections sections) {
+        graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
+        sections.getStationsCache().forEach(station -> graph.addVertex(station));
+        sections.getSections().forEach(section -> graph.setEdgeWeight(
                 graph.addEdge(
                     section.getUpStation(),
                     section.getDownStation()),

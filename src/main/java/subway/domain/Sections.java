@@ -5,7 +5,6 @@ import static subway.exception.ErrorCode.INVALID_SECTION_ALREADY_EXISTS;
 import static subway.exception.ErrorCode.INVALID_SECTION_NO_EXISTS;
 import static subway.exception.ErrorCode.NOT_FOUND_REMOVE_STATION;
 import static subway.exception.ErrorCode.NOT_FOUND_START;
-import static subway.exception.ErrorCode.NOT_FOUND_STATION;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -136,5 +135,9 @@ public class Sections {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public Set<Station> getStationsCache() {
+        return Collections.unmodifiableSet(stationsCache);
     }
 }
