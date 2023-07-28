@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.application.dto.ShortestPath;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 
@@ -68,23 +69,7 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("출발역부터 도착역까지의 최단거리를 반환한다.")
-    void searchShortestPath_returnShortestDistance() {
-        // given
-        Station source = new Station (1L, "교대역");
-        Station target = new Station (3L, "양재역");
-        PathFinder pathFinder = new PathFinder(createInitialSections());
-
-        // when
-        double shortestDistance = pathFinder.calculateShortestDistance(source.getId(),
-            target.getId());
-
-        // then
-        assertThat(shortestDistance).isEqualTo(5);
-    }
-
-    @Test
-    @DisplayName("출발역부터 도착역까지의 최단경로를 반환한다.")
+    @DisplayName("출발역부터 도착역까지의 최단경로와 경로를 반환한다.")
     void searchShortestPath_returnShortestPath() {
         // given
         Station source = new Station (1L, "교대역");
@@ -94,10 +79,11 @@ class PathFinderTest {
         List<Station> shortestPathStations = Arrays.asList(source, middle, target);
 
         // when
-        List<Station> result = pathFinder.searchShortestPath(source.getId(), target.getId());
+        ShortestPath shortestPath = pathFinder.searchShortestPath(source.getId(), target.getId());
 
         // then
-        assertThat(result).isEqualTo(shortestPathStations);
+        assertThat(shortestPath.getDistance()).isEqualTo(5);
+        assertThat(shortestPath.getStations()).isEqualTo(shortestPathStations);
     }
 
     private List<Station> createInitialStations() {

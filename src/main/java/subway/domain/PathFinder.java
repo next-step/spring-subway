@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import subway.application.dto.ShortestPath;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 
@@ -23,7 +23,7 @@ public class PathFinder {
         });
     }
 
-    public double calculateShortestDistance(long sourceId, long targetId) {
+    public ShortestPath searchShortestPath(long sourceId, long targetId) {
         Station source = getStation(sourceId);
         Station target = getStation(targetId);
 
@@ -33,21 +33,7 @@ public class PathFinder {
             createWeightedGraph(sourceId));
 
         return Optional.ofNullable(dijkstraShortestPath.getPath(source, target))
-            .map(GraphPath::getWeight)
-            .orElseThrow(() -> new IllegalSectionException("출발역과 도착역이 연결되어 있지 않습니다."));
-    }
-
-    public List<Station> searchShortestPath(long sourceId, long targetId) {
-        Station source = getStation(sourceId);
-        Station target = getStation(targetId);
-
-        validateSourceAndTarget(source, target);
-
-        DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(
-            createWeightedGraph(sourceId));
-
-        return Optional.ofNullable(dijkstraShortestPath.getPath(source, target))
-            .map(GraphPath::getVertexList)
+            .map(graphPath -> new ShortestPath(graphPath.getWeight(), graphPath.getVertexList()))
             .orElseThrow(() -> new IllegalSectionException("출발역과 도착역이 연결되어 있지 않습니다."));
     }
 
