@@ -50,7 +50,7 @@ public class PathGraph {
 
     private void validateContains(Station station) {
         if (!graph.containsVertex(station)) {
-            throw new SubwayException(ErrorCode.STATION_NOT_CONTAINED, station.getName());
+            throw new SubwayException(ErrorCode.STATION_NOT_CONTAINED, station.getId());
         }
     }
 

@@ -6,6 +6,8 @@ import subway.dao.StationDao;
 import subway.domain.PathGraph;
 import subway.domain.Station;
 import subway.dto.PathResponse;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 @Service
 public class PathService {
@@ -19,9 +21,9 @@ public class PathService {
 
     public PathResponse findShortestPath(Long sourceStationId, Long targetStationId) {
         Station sourceStation = stationDao.findById(sourceStationId)
-                .orElseThrow();
+                .orElseThrow(() -> new SubwayException(ErrorCode.STATION_ID_NO_EXIST, sourceStationId));
         Station targetStation = stationDao.findById(targetStationId)
-                .orElseThrow();
+                .orElseThrow(() -> new SubwayException(ErrorCode.STATION_ID_NO_EXIST, targetStationId));
 
         PathGraph graph = PathGraph.of(sectionDao.findAll());
 

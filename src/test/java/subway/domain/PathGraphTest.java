@@ -69,7 +69,7 @@ class PathGraphTest {
         // when, then
         assertThatCode(() -> sections.findShortestPath(station3, station2))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage(ErrorCode.STATION_NOT_CONTAINED.getMessage() + station3.getName());
+                .hasMessage(ErrorCode.STATION_NOT_CONTAINED.getMessage() + station3.getId());
     }
 
     @Test
@@ -85,6 +85,6 @@ class PathGraphTest {
         // when, then
         assertThatCode(() -> sections.findShortestPath(station1, station3))
                 .isInstanceOf(SubwayException.class)
-                .hasMessage(ErrorCode.STATION_NOT_CONTAINED.getMessage() + station3.getName());
+                .hasMessage(ErrorCode.STATION_NOT_CONTAINED.getMessage() + station3.getId());
     }
 }

@@ -13,6 +13,9 @@ import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.util.TestRequestUtil.createLine;
+import static subway.util.TestRequestUtil.createStation;
+import static subway.util.TestRequestUtil.extractId;
 
 @DisplayName("유효성 검사 통합 테스트")
 public class ValidationIntegrationTest extends IntegrationTest {
@@ -308,5 +311,49 @@ public class ValidationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().as(ExceptionResponse.class).getMessage())
                 .isEqualTo("거리는 필수 항목입니다");
+    }
+
+    @Test
+    @DisplayName("출발역이 null인 경우 오류가 발생한다.")
+    void nullSourceStation() {
+        // given
+        long station1Id = extractId(createStation(new StationRequest("강남역")));
+        long station2Id = extractId(createStation(new StationRequest("역삼역")));
+
+        createLine(new LineRequest("1호선", "green", station1Id, station2Id, 10));
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/paths?target={station1Id}", station1Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo("다음 파라미터는 필수입니다 : source");
+    }
+
+    @Test
+    @DisplayName("도착역이 null인 경우 오류가 발생한다.")
+    void nullTargetStation() {
+        // given
+        long station1Id = extractId(createStation(new StationRequest("강남역")));
+        long station2Id = extractId(createStation(new StationRequest("역삼역")));
+
+        createLine(new LineRequest("1호선", "green", station1Id, station2Id, 10));
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/paths?source={station1Id}", station1Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo("다음 파라미터는 필수입니다 : target");
     }
 }
