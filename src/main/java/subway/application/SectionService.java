@@ -1,5 +1,6 @@
 package subway.application;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
@@ -10,9 +11,11 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.dto.request.PathRequest;
 import subway.dto.request.SectionRegisterRequest;
 
 import java.util.Optional;
+import subway.dto.response.PathResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -91,5 +94,21 @@ public class SectionService {
                     sectionDao.insert(newSectionUpStation.combineSection(newSectionDownStation))
             )
         );
+    }
+
+    @Transactional
+    public PathResponse findStationToStationDistance(PathRequest pathRequest) {
+        Station sourceStation = stationDao.findById(pathRequest.getSource())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Station targetStation = stationDao.findById(pathRequest.getTarget())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Sections allSections = sectionDao.findAll();
+
+        List<Station> sourceToTargetRoute
+            = allSections.findStationToStationRoute(sourceStation, targetStation);
+        Distance sourceToTargetDistance
+            = allSections.findStationToStationDistance(sourceStation, targetStation);
+
+        return new PathResponse(sourceToTargetRoute, sourceToTargetDistance.getDistance());
     }
 }
