@@ -46,6 +46,16 @@ public class SectionDao {
         "left join STATION down_station on section.down_station_id = down_station.id " +
         "where section.line_id = ?";
 
+    public static final String selectSectionsAllSql = "select section.id as section_id, " +
+        "up_station.id as up_station_id, " +
+        "up_station.name as up_station_name, " +
+        "down_station.id as down_station_id, " +
+        "down_station.name as down_station_name, " +
+        "section.distance as section_distance " +
+        "from SECTION section " +
+        "left join STATION up_station on section.up_station_id = up_station.id " +
+        "left join STATION down_station on section.down_station_id = down_station.id ";
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
     private final ResultSetExtractor<Section> sectionExtractor = rs -> {
@@ -72,6 +82,7 @@ public class SectionDao {
         }
         return sections;
     };
+
 
     public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
@@ -149,6 +160,15 @@ public class SectionDao {
         try {
             List<Section> sections = jdbcTemplate.query(selectSectionsSql, sectionsExtractor,
                 lindId);
+            return Optional.of(sections);
+        } catch (DataIntegrityViolationException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<List<Section>> findAll() {
+        try {
+            List<Section> sections = jdbcTemplate.query(selectSectionsAllSql, sectionsExtractor);
             return Optional.of(sections);
         } catch (DataIntegrityViolationException e) {
             return Optional.empty();

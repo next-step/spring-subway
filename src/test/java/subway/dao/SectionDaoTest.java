@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import subway.domain.Distance;
+import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.exception.SubwayException;
@@ -25,6 +26,7 @@ public class SectionDaoTest {
     private SectionDao sectionDao;
 
     private StationDao stationDao;
+    private LineDao lineDao;
 
     @BeforeEach
     public void setUp() {
@@ -38,6 +40,7 @@ public class SectionDaoTest {
             .build();
         sectionDao = new SectionDao(new JdbcTemplate(dataSource), dataSource);
         stationDao = new StationDao(new JdbcTemplate(dataSource), dataSource);
+        lineDao = new LineDao(new JdbcTemplate(dataSource), dataSource);
     }
 
     @Test
@@ -116,5 +119,33 @@ public class SectionDaoTest {
         // then
         Optional<Section> section = sectionDao.selectSection(insertSection.getId());
         assertThat(section).isEmpty();
+    }
+
+    @Test
+    @DisplayName("모든 section을 조회한다")
+    void findAllSection(){
+        // given
+        int beforeSize = sectionDao.findAll().orElseThrow().size();
+
+        Station station1 = new Station("수원역");
+        Station station2 = new Station("신촌역");
+        Station station3 = new Station("망원역");
+
+        Station insertStation = stationDao.insert(station1);
+        Station insertStation2 = stationDao.insert(station2);
+        Station insertStation3 = stationDao.insert(station3);
+        
+        Section section = new Section(insertStation, insertStation2, new Distance(10));
+        Section section2= new Section(insertStation2, insertStation3, new Distance(20));
+
+        List<Section> sections = List.of(section, section2);
+        Line line = new Line("3호선", "yellow");
+        Line insertLine = lineDao.insert(line);
+
+        // when
+        sectionDao.insertSections(List.of(section, section2), insertLine.getId());
+        List<Section> allSections = sectionDao.findAll().orElseThrow();
+        // then
+        assertThat(allSections.size()).isEqualTo(beforeSize + sections.size());
     }
 }
