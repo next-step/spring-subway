@@ -1,16 +1,20 @@
 package subway.application;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
+import subway.domain.PathFinder;
 import subway.domain.Section;
 import subway.domain.SectionAddManager;
 import subway.domain.SectionRemoveManager;
 import subway.domain.Sections;
+import subway.domain.ShortestPath;
 import subway.domain.Station;
+import subway.dto.PathRequest;
 import subway.dto.SectionAdditionRequest;
 
 @Service
@@ -53,6 +57,16 @@ public class SectionService {
         sectionRemoveManager.lookForChange(station)
             .ifPresent(sectionDao::update);
         sectionDao.deleteByLineAndStation(line, station);
+    }
+
+    @Transactional(readOnly = true)
+    public ShortestPath findShortestPath(final PathRequest pathRequest) {
+        final List<Section> sections = sectionDao.findAll();
+        final Station source = getStationBy(pathRequest.getSource());
+        final Station target = getStationBy(pathRequest.getTarget());
+
+        final PathFinder pathFinder = new PathFinder(sections);
+        return pathFinder.findShortestPath(source, target);
     }
 
     private Line getLineBy(Long id) {
