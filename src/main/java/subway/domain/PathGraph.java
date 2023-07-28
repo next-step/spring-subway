@@ -11,7 +11,7 @@ public class PathGraph {
     private final WeightedMultigraph<Station, DefaultWeightedEdge> graph;
 
 
-    public PathGraph(List<Section> sections) {
+    public PathGraph(final List<Section> sections) {
         graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
 
         sections.forEach(section -> graph.addVertex(section.getDownStation()));
@@ -25,8 +25,28 @@ public class PathGraph {
         );
     }
 
-    public GraphPath<Station, DefaultWeightedEdge> createRoute(Station source, Station sink) {
-        return new DijkstraShortestPath<>(graph).getPath(source, sink);
+    public GraphPath<Station, DefaultWeightedEdge> createRoute(final Station start,
+        final Station end) {
+        validatePathConnect(start, end);
+
+        GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph).getPath(
+            start, end);
+        if (path == null) {
+            throw new IllegalArgumentException("출발점과 도착역이 연결되어 있지 않습니다.");
+        }
+        return path;
+    }
+
+    public void validatePathConnect(final Station start, final Station end) {
+        if (start.equals(end)) {
+            throw new IllegalArgumentException("출발점과 도착역이 같다면, 길을 생성할 수 없습니다.");
+        }
+        if (!graph.containsVertex(start)) {
+            throw new IllegalArgumentException("출발역이 존재하지 않습니다.");
+        }
+        if (!graph.containsVertex(end)) {
+            throw new IllegalArgumentException("도착역이 존재하지 않습니다.");
+        }
     }
 
 }
