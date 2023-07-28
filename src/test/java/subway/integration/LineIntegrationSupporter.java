@@ -5,12 +5,13 @@ import static io.restassured.RestAssured.given;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.dto.UpdateLineRequest;
-import subway.dto.CreateSectionRequest;
+import subway.dto.request.CreateLineRequest;
+import subway.dto.request.UpdateLineRequest;
+import subway.dto.request.CreateSectionRequest;
 
 class LineIntegrationSupporter {
 
-    static ExtractableResponse<Response> createLineByLineRequest(UpdateLineRequest lineRequest) {
+    static ExtractableResponse<Response> createLineByLineRequest(CreateLineRequest lineRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest)

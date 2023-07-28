@@ -1,10 +1,10 @@
-package subway.dto;
+package subway.dto.request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-public class UpdateLineRequest {
+public class CreateLineRequest {
 
     @NotBlank(message = "노선 이름을 입력해주세요.")
     private String name;
@@ -22,10 +22,10 @@ public class UpdateLineRequest {
     @Positive(message = "거리는 양수여야합니다.")
     private Integer distance;
 
-    public UpdateLineRequest() {
+    public CreateLineRequest() {
     }
 
-    public UpdateLineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
+    public CreateLineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {
         this.name = name;
         this.color = color;
         this.upStationId = upStationId;

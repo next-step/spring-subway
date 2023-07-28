@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
-import subway.dto.CreateLineRequest;
-import subway.dto.UpdateLineRequest;
-import subway.dto.LineResponse;
-import subway.dto.CreateSectionRequest;
+import subway.dto.request.CreateLineRequest;
+import subway.dto.response.CreateLineResponse;
+import subway.dto.response.FindAllLineResponse;
+import subway.dto.response.FindByIdLineResponse;
+import subway.dto.request.UpdateLineRequest;
+import subway.dto.request.CreateSectionRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -32,18 +34,18 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody @Validated CreateLineRequest createLineRequest) {
-        LineResponse line = lineService.saveLine(createLineRequest);
+    public ResponseEntity<CreateLineResponse> createLine(@RequestBody @Validated CreateLineRequest createLineRequest) {
+        CreateLineResponse line = lineService.saveLine(createLineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping
-    public ResponseEntity<List<LineResponse>> findAllLines() {
+    public ResponseEntity<List<FindAllLineResponse>> findAllLines() {
         return ResponseEntity.ok(lineService.findAllLines());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+    public ResponseEntity<FindByIdLineResponse> findLineById(@PathVariable Long id) {
         return ResponseEntity.ok(lineService.findLineById(id));
     }
 

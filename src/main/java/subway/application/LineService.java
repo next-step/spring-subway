@@ -7,11 +7,13 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.CreateLineRequest;
-import subway.dto.LineResponse;
-import subway.dto.CreateSectionRequest;
-import subway.dto.StationResponse;
-import subway.dto.UpdateLineRequest;
+import subway.dto.request.CreateLineRequest;
+import subway.dto.response.CreateLineResponse;
+import subway.dto.response.StationResponse;
+import subway.dto.response.FindAllLineResponse;
+import subway.dto.response.FindByIdLineResponse;
+import subway.dto.request.CreateSectionRequest;
+import subway.dto.request.UpdateLineRequest;
 import subway.exception.LineException;
 import subway.exception.StationException;
 
@@ -31,7 +33,7 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
-    public LineResponse saveLine(final CreateLineRequest createLineRequest) {
+    public CreateLineResponse saveLine(final CreateLineRequest createLineRequest) {
         validateDuplicateName(createLineRequest.getName());
 
         final Line persistLine = lineDao.insert(new Line(createLineRequest.getName(), createLineRequest.getColor()));
@@ -44,7 +46,7 @@ public class LineService {
                 .build();
 
         sectionDao.insert(section, persistLine.getId());
-        return LineResponse.from(persistLine, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
+        return CreateLineResponse.from(persistLine, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
     }
 
     private void validateDuplicateName(final String name) {
@@ -56,19 +58,19 @@ public class LineService {
                 });
     }
 
-    public List<LineResponse> findAllLines() {
+    public List<FindAllLineResponse> findAllLines() {
         final List<Line> lines = lineDao.findAll();
 
         return lines.stream()
-                .map(line -> LineResponse.from(line,
+                .map(line -> FindAllLineResponse.from(line,
                         stationsToStationResponses(stationDao.findAllByLineId(line.getId()))))
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLineById(final Long id) {
+    public FindByIdLineResponse findLineById(final Long id) {
         final Line line = getLineById(id);
 
-        return LineResponse.from(line, stationsToStationResponses(line.getSortedStations()));
+        return FindByIdLineResponse.from(line, stationsToStationResponses(line.getSortedStations()));
     }
 
     private List<StationResponse> stationsToStationResponses(final List<Station> stations) {

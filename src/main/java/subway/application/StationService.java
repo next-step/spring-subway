@@ -3,9 +3,11 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.StationDao;
 import subway.domain.Station;
-import subway.dto.CreateStationRequest;
-import subway.dto.StationResponse;
-import subway.dto.UpdateStationRequest;
+import subway.dto.request.CreateStationRequest;
+import subway.dto.response.CreateStationResponse;
+import subway.dto.response.FindAllStationResponse;
+import subway.dto.response.FindByIdStationResponse;
+import subway.dto.request.UpdateStationRequest;
 import subway.exception.StationException;
 
 import java.text.MessageFormat;
@@ -20,11 +22,11 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
-    public StationResponse saveStation(final CreateStationRequest createStationRequest) {
+    public CreateStationResponse saveStation(final CreateStationRequest createStationRequest) {
         validateDuplicateName(createStationRequest.getName());
 
         final Station station = stationDao.insert(new Station(createStationRequest.getName()));
-        return StationResponse.of(station);
+        return CreateStationResponse.of(station);
     }
 
     private void validateDuplicateName(final String name) {
@@ -36,18 +38,18 @@ public class StationService {
                 });
     }
 
-    public StationResponse findStationById(final Long id) {
+    public FindByIdStationResponse findStationById(final Long id) {
         final Station station = stationDao.findById(id).orElseThrow(() -> new StationException(
                 MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id)));
         
-        return StationResponse.of(station);
+        return FindByIdStationResponse.of(station);
     }
 
-    public List<StationResponse> findAllStations() {
+    public List<FindAllStationResponse> findAllStations() {
         final List<Station> stations = stationDao.findAll();
 
         return stations.stream()
-                .map(StationResponse::of)
+                .map(FindAllStationResponse::of)
                 .collect(Collectors.toList());
     }
 

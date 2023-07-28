@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.StationService;
-import subway.dto.CreateStationRequest;
-import subway.dto.StationResponse;
-import subway.dto.UpdateStationRequest;
+import subway.dto.request.CreateStationRequest;
+import subway.dto.response.CreateStationResponse;
+import subway.dto.response.FindAllStationResponse;
+import subway.dto.response.FindByIdStationResponse;
+import subway.dto.request.UpdateStationRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -28,18 +30,18 @@ public class StationController {
     }
 
     @PostMapping
-    public ResponseEntity<StationResponse> createStation(@RequestBody @Validated CreateStationRequest createStationRequest) {
-        StationResponse station = stationService.saveStation(createStationRequest);
+    public ResponseEntity<CreateStationResponse> createStation(@RequestBody @Validated CreateStationRequest createStationRequest) {
+        CreateStationResponse station = stationService.saveStation(createStationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
 
     @GetMapping
-    public ResponseEntity<List<StationResponse>> showStations() {
+    public ResponseEntity<List<FindAllStationResponse>> findAllStations() {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StationResponse> showStation(@PathVariable Long id) {
+    public ResponseEntity<FindByIdStationResponse> findStationById(@PathVariable Long id) {
         return ResponseEntity.ok().body(stationService.findStationById(id));
     }
 
