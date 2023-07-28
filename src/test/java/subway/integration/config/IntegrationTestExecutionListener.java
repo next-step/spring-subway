@@ -13,7 +13,7 @@ public class IntegrationTestExecutionListener extends AbstractTestExecutionListe
     public void beforeTestMethod(final TestContext testContext) {
         final Integer serverPort = testContext.getApplicationContext().getEnvironment().getProperty("local.server.port", Integer.class);
         if (serverPort == null) {
-            throw new IllegalStateException("localServerPort cannot be null");
+            throw new IllegalStateException("localServerPort는 null일 수 없습니다.");
         }
 
         RestAssured.port = serverPort;
@@ -23,7 +23,6 @@ public class IntegrationTestExecutionListener extends AbstractTestExecutionListe
     public void afterTestMethod(final TestContext testContext) {
         final JdbcTemplate jdbcTemplate = getJdbcTemplate(testContext);
         final List<String> truncateQueries = getTruncateQueries(jdbcTemplate);
-        System.out.println(truncateQueries);
         truncateTables(jdbcTemplate, truncateQueries);
     }
 
