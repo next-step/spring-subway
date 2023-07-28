@@ -183,4 +183,30 @@ public class PathIntegrationTest extends IntegrationTest {
         assertThat(response.body().as(ExceptionResponse.class).getMessage())
                 .isEqualTo(ErrorCode.STATION_NOT_CONTAINED.getMessage() + station3Id);
     }
+
+    @Test
+    @DisplayName("출발역, 도착역 간 경로가 존재하지 않는 경우 오류가 발생한다.")
+    void noPath() {
+        // given
+        long station1Id = extractId(createStation(new StationRequest("강남역")));
+        long station2Id = extractId(createStation(new StationRequest("역삼역")));
+        long station3Id = extractId(createStation(new StationRequest("성수역")));
+        long station4Id = extractId(createStation(new StationRequest("잠실역")));
+
+        createLine(new LineRequest("1호선", "green", station1Id, station2Id, 10));
+        createLine(new LineRequest("2호선", "green", station3Id, station4Id, 10));
+
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/paths?source={station1Id}&target={station4Id}", station1Id, station3Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.NO_PATH.getMessage());
+    }
 }

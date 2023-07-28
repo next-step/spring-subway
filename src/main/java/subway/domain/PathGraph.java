@@ -8,6 +8,7 @@ import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public class PathGraph {
     private final WeightedMultigraph<Station, DefaultWeightedEdge> graph;
@@ -22,7 +23,8 @@ public class PathGraph {
         WeightedMultigraph<Station, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
         graph.addVertex(sections.get(0).getUpStation());
         sections.stream()
-                .map(Section::getDownStation)
+                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+                .distinct()
                 .forEach(graph::addVertex);
 
         sections.forEach(section -> graph.setEdgeWeight(
@@ -43,9 +45,13 @@ public class PathGraph {
         validateContains(sourceStation);
         validateContains(targetStation);
 
-        GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
-                .getPath(sourceStation, targetStation);
-        return new Path(path.getVertexList(), (int) path.getWeight());
+        try {
+            GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
+                    .getPath(sourceStation, targetStation);
+            return new Path(path.getVertexList(), (int) path.getWeight());
+        } catch (NullPointerException e) {
+            throw new SubwayException(ErrorCode.NO_PATH, e);
+        }
     }
 
     private void validateContains(Station station) {
