@@ -2,13 +2,16 @@ package subway.ui;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.SectionService;
+import subway.dto.request.PathRequest;
 import subway.dto.request.SectionRegisterRequest;
+import subway.dto.response.PathResponse;
 
 @RestController
 public class SectionController {
@@ -38,4 +41,8 @@ public class SectionController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/path")
+    public PathResponse findSourceToTargetPath(PathRequest pathRequest) {
+        return sectionService.findStationToStationDistance(pathRequest);
+    }
 }
