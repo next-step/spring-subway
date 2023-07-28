@@ -20,8 +20,8 @@ public class PathController {
 
     @GetMapping
     public PathResponse findShortestPath(
-            @RequestParam @NotNull(message = "출발역 id는 필수입니다.") final Long source,
-            @RequestParam @NotNull(message = "도착역 id는 필수입니다.") final Long target
+            @RequestParam @NotNull final Long source,
+            @RequestParam @NotNull final Long target
     ) {
         return pathService.findShortestPath(source, target);
     }
