@@ -8,8 +8,12 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.dto.LineDataResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,18 +33,20 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(final LineRequest request) {
         Line line = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+        Station upStation = stationDao.findById(request.getUpStationId())
+                .orElseThrow(() -> new SubwayException(ErrorCode.UP_STATION_ID_NO_EXIST, request.getUpStationId()));
+        Station downStation = stationDao.findById(request.getDownStationId())
+                .orElseThrow(() -> new SubwayException(ErrorCode.DOWN_STATION_ID_NO_EXIST, request.getDownStationId()));
 
         sectionDao.insert(new Section(upStation, downStation, request.getDistance()), line.getId());
 
         return LineResponse.of(line);
     }
 
-    public List<LineResponse> findLineResponses() {
+    public List<LineDataResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(LineResponse::of)
+                .map(LineDataResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -54,11 +60,12 @@ public class LineService {
     }
 
     public Line findLineById(final Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id)
+                .orElseThrow(() -> new SubwayException(ErrorCode.LINE_ID_NO_EXIST, id));
     }
 
     @Transactional
-    public void updateLine(final Long id, final LineRequest lineUpdateRequest) {
+    public void updateLine(final Long id, final LineUpdateRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 

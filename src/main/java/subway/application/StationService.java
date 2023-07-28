@@ -6,6 +6,8 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +27,10 @@ public class StationService {
     }
 
     public StationResponse findStationResponseById(final Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        return StationResponse.of(
+                stationDao.findById(id)
+                        .orElseThrow(() -> new SubwayException(ErrorCode.STATION_ID_NO_EXIST, id))
+        );
     }
 
     public List<StationResponse> findAllStationResponses() {

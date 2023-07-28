@@ -2,7 +2,6 @@ package subway.ui;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
 import subway.application.SectionService;
+import subway.dto.LineDataResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
 import subway.dto.SectionRequest;
 
+import javax.validation.Valid;
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -34,14 +35,14 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody final LineRequest lineRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody @Valid final LineRequest lineRequest) {
         LineResponse line = lineService.saveLine(lineRequest);
 
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping
-    public ResponseEntity<List<LineResponse>> findAllLines() {
+    public ResponseEntity<List<LineDataResponse>> findAllLines() {
         return ResponseEntity.ok(lineService.findLineResponses());
     }
 
@@ -51,7 +52,7 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable final Long id, @RequestBody final LineRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable final Long id, @RequestBody @Valid final LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
@@ -63,7 +64,7 @@ public class LineController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> createSection(@PathVariable final Long id, @RequestBody final SectionRequest sectionRequest) {
+    public ResponseEntity<Void> createSection(@PathVariable final Long id, @RequestBody @Valid final SectionRequest sectionRequest) {
         sectionService.saveSection(id, sectionRequest);
         return ResponseEntity.created(URI.create("/lines/" + id + "/sections")).build();
     }
@@ -72,15 +73,5 @@ public class LineController {
     public ResponseEntity<Void> deleteSection(@PathVariable final Long lineId, @RequestParam final Long stationId) {
         sectionService.deleteStation(lineId, stationId);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Void> handleIllegalArgumentException() {
-        return ResponseEntity.badRequest().build();
     }
 }

@@ -2,7 +2,6 @@ package subway.ui;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +13,8 @@ import subway.application.StationService;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 
+import javax.validation.Valid;
 import java.net.URI;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -28,7 +27,7 @@ public class StationController {
     }
 
     @PostMapping
-    public ResponseEntity<StationResponse> createStation(@RequestBody final StationRequest stationRequest) {
+    public ResponseEntity<StationResponse> createStation(@RequestBody @Valid final StationRequest stationRequest) {
         StationResponse station = stationService.saveStation(stationRequest);
         return ResponseEntity.created(URI.create("/stations/" + station.getId())).body(station);
     }
@@ -44,7 +43,7 @@ public class StationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateStation(@PathVariable final Long id, @RequestBody final StationRequest stationRequest) {
+    public ResponseEntity<Void> updateStation(@PathVariable final Long id, @RequestBody @Valid final StationRequest stationRequest) {
         stationService.updateStation(id, stationRequest);
         return ResponseEntity.ok().build();
     }
@@ -53,10 +52,5 @@ public class StationController {
     public ResponseEntity<Void> deleteStation(@PathVariable final Long id) {
         stationService.deleteStationById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Void> handleSQLException() {
-        return ResponseEntity.badRequest().build();
     }
 }

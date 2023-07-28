@@ -7,6 +7,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("Line 도메인 단위 테스트")
 public class LineTest {
     @Test
     @DisplayName("Line에 Section을 추가하는 기능.")

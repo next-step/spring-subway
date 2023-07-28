@@ -1,5 +1,7 @@
 package subway.dao;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,12 +12,15 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class LineDao {
@@ -66,8 +71,12 @@ public class LineDao {
         params.put("name", line.getName());
         params.put("color", line.getColor());
 
-        Long lineId = insertAction.executeAndReturnKey(params).longValue();
-        return new Line(lineId, line.getName(), line.getColor());
+        try {
+            Long lineId = insertAction.executeAndReturnKey(params).longValue();
+            return new Line(lineId, line.getName(), line.getColor());
+        } catch (DuplicateKeyException e) {
+            throw new SubwayException(ErrorCode.LINE_NAME_DUPLICATE, line.getName(), e);
+        }
     }
 
     public List<Line> findAll() {
@@ -76,7 +85,7 @@ public class LineDao {
         return jdbcTemplate.query(sql, lineRowMapper);
     }
 
-    public Line findById(final Long id) {
+    public Optional<Line> findById(final Long id) {
         String sql = "select section.id as section_id, " +
                 "up_station.id as up_station_id, " +
                 "up_station.name as up_station_name, " +
@@ -92,14 +101,21 @@ public class LineDao {
                 "left join STATION down_station on section.down_station_id = down_station.id " +
                 "where section.line_id = ?";
 
-        Line line = jdbcTemplate.query(sql, extractor, id);
-
-        return line;
+        try {
+            Line line = jdbcTemplate.query(sql, extractor, id);
+            return Optional.of(line);
+        } catch (DataIntegrityViolationException e) {
+            return Optional.empty();
+        }
     }
 
-    public void update(final Line newLine) {
+    public void update(final Line line) {
         String sql = "update LINE set name = ?, color = ? where id = ?";
-        jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
+        try {
+            jdbcTemplate.update(sql, line.getName(), line.getColor(), line.getId());
+        } catch (DuplicateKeyException e) {
+            throw new SubwayException(ErrorCode.LINE_NAME_DUPLICATE, line.getName(), e);
+        }
     }
 
     public void deleteById(final Long id) {

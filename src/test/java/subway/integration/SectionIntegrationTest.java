@@ -8,15 +8,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ExceptionResponse;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
+import subway.exception.ErrorCode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static subway.integration.TestRequestUtil.createLine;
 import static subway.integration.TestRequestUtil.createStation;
 
-@DisplayName("구간 관련 기능")
+@DisplayName("구간 관련 기능 통합 테스트")
 public class SectionIntegrationTest extends IntegrationTest {
     private Long station1Id;
     private Long station2Id;
@@ -133,6 +135,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.NEW_SECTION_BOTH_MATCH.getMessage());
     }
 
     //34
@@ -155,6 +159,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.NEW_SECTION_NO_MATCH.getMessage());
     }
 
     // 32
@@ -173,6 +179,8 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.DISTANCE_VALIDATE_SUBTRACT.getMessage() + "15");
     }
 
     @Test
@@ -190,11 +198,51 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.SECTION_SAME_STATIONS.getMessage());
+    }
+
+    @Test
+    @DisplayName("상행역이 존재하지 않으면 추가할 수 없다.")
+    void createSectionTes9() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(5L, station2Id, 14);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.UP_STATION_ID_NO_EXIST.getMessage() + "5");
+    }
+
+    @Test
+    @DisplayName("하행역이 존재하지 않으면 추가할 수 없다.")
+    void createSectionTest10() {
+        // when
+        SectionRequest sectionRequest = new SectionRequest(station1Id, 5L, 14);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.DOWN_STATION_ID_NO_EXIST.getMessage() + "5");
     }
 
     @Test
     @DisplayName("노선에서 하행 종점역을 삭제할 수 있다.")
-    void removeDownStation() {
+    void removeDownTerminalStation() {
         // given
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         RestAssured
@@ -217,8 +265,32 @@ public class SectionIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("노선의 하행 종점역이 아니면 삭제할 수 없다.")
-    void removeNotDownStationBadRequest() {
+    @DisplayName("노선에서 상행 종점역을 삭제할 수 있다.")
+    void removeUpTerminalStationBadRequest() {
+        // given
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station1Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    @DisplayName("종점역이 아닌 경우에도 삭제할 수 있다.")
+    void middleStationRemoveTest() {
         // given
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         RestAssured
@@ -237,7 +309,7 @@ public class SectionIntegrationTest extends IntegrationTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -252,5 +324,36 @@ public class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.SECTION_VALIDATE_SIZE.getMessage());
+    }
+
+    @Test
+    @DisplayName("노선에서 역이 포함되지 않은 경우 역을 삭제할 수 없다.")
+    void noStationRemoveBadRequest() {
+        // given
+        ExtractableResponse<Response> station4Response = createStation(new StationRequest("몽촌토성역"));
+        Long station4Id = Long.parseLong(station4Response.header("Location").split("/")[2]);
+
+        SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
+        RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all()
+                .extract();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().delete("/lines/{lineId}/sections?stationId={stationId}", lineId, station4Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.REMOVE_SECTION_NOT_CONTAIN.getMessage());
     }
 }

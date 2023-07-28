@@ -8,9 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ExceptionResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
+import subway.dto.LineUpdateRequest;
 import subway.dto.StationRequest;
+import subway.exception.ErrorCode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static subway.integration.TestRequestUtil.createLine;
 import static subway.integration.TestRequestUtil.createStation;
 
-@DisplayName("지하철 노선 관련 기능")
+@DisplayName("지하철 노선 관련 기능 통합 테스트")
 public class LineIntegrationTest extends IntegrationTest {
     private Long station1Id;
     private Long station2Id;
@@ -44,6 +47,7 @@ public class LineIntegrationTest extends IntegrationTest {
     void createLineTest() {
         // given
         LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -59,7 +63,49 @@ public class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
+    @DisplayName("존재하지 않는 상행종점역으로 지하철 노선을 생성할 수 없다.")
+    void createLineWithNonExistUpStationTest() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", 5L, station2Id, 14);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.UP_STATION_ID_NO_EXIST.getMessage() + "5");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 하행종점역으로 지하철 노선을 생성할 수 없다.")
+    void createLineWithNonExistDownStationTest() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, 5L, 14);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(lineRequest)
+                .when().post("/lines")
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.DOWN_STATION_ID_NO_EXIST.getMessage() + "5");
+    }
+
+    @Test
+    @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성할 수 없다.")
     void createLineWithDuplicateName() {
         // given
         LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
@@ -76,6 +122,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.LINE_NAME_DUPLICATE.getMessage() + "2호선");
     }
 
     @Test
@@ -83,7 +131,6 @@ public class LineIntegrationTest extends IntegrationTest {
     void createLineWithDuplicateStation() {
         // given
         LineRequest lineRequest = new LineRequest("2호선", "green", station2Id, station2Id, 14);
-        createLine(lineRequest);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -96,6 +143,8 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.SECTION_SAME_STATIONS.getMessage());
     }
 
     @Test
@@ -150,6 +199,28 @@ public class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 id로 지하철 노선을 조회한다.")
+    void getLineNonExist() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+
+        // when
+        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/lines/{lineId}", 5L)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.LINE_ID_NO_EXIST.getMessage() + "5");
+    }
+
+    @Test
     @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
         // given
@@ -159,7 +230,7 @@ public class LineIntegrationTest extends IntegrationTest {
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
 
-        LineRequest updateRequest = new LineRequest("구신분당선", "bg-red-600");
+        LineUpdateRequest updateRequest = new LineUpdateRequest("구신분당선", "bg-red-600");
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -170,6 +241,34 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("기존에 존재하는 노선 이름으로 지하철 노선을 수정할 수 없다.")
+    void updateLineDuplicateName() {
+        // given
+        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+
+        LineRequest lineRequest2 = new LineRequest("4호선", "green", station1Id, station2Id, 14);
+        createLine(lineRequest2);
+
+        // when
+        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+
+        LineUpdateRequest updateRequest = new LineUpdateRequest("4호선", "bg-red-600");
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(updateRequest)
+                .when().put("/lines/{lineId}", lineId)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo(ErrorCode.LINE_NAME_DUPLICATE.getMessage() + "4호선");
     }
 
     @Test
