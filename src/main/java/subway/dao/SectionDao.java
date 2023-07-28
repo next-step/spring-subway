@@ -28,7 +28,7 @@ public class SectionDao {
     public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("section")
+                .withTableName("SECTION")
                 .usingGeneratedKeyColumns("id");
     }
 
