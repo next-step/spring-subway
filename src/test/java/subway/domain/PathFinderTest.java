@@ -7,12 +7,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
-import subway.ui.dto.PathResponse;
 
 @DisplayName("지하철 경로 검색")
 class PathFinderTest {
@@ -63,13 +61,30 @@ class PathFinderTest {
 
         // when & then
         assertThatThrownBy(() -> pathFinder.searchShortestPath(existSourceId, notExistTargetId))
-            .hasMessage("출발역 또는 도착역이 존재하지 않습니다.")
+            .hasMessage("존재하지 않는 역 정보입니다.")
             .isInstanceOf(IllegalStationsException.class);
     }
 
     @Test
-    @DisplayName("출발역부터 도착역까지의 최단경로와 거리를 반환한다.")
-    void searchShortestPath_returnShortestPathAndDistance() {
+    @DisplayName("출발역부터 도착역까지의 최단거리를 반환한다.")
+    void searchShortestPath_returnShortestDistance() {
+        // given
+        Station source = new Station (1L, "교대역");
+        Station middle = new Station(4L, "남부터미널역");
+        Station target = new Station (3L, "양재역");
+        PathFinder pathFinder = new PathFinder(createInitialSections());
+
+        // when
+        double shortestDistance = pathFinder.calculateShortestDistance(source.getId(),
+            target.getId());
+
+        // then
+        assertThat(shortestDistance).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("출발역부터 도착역까지의 최단경로를 반환한다.")
+    void searchShortestPath_returnShortestPath() {
         // given
         Station source = new Station (1L, "교대역");
         Station middle = new Station(4L, "남부터미널역");
@@ -78,14 +93,10 @@ class PathFinderTest {
         List<Station> shortestPathStations = Arrays.asList(source, middle, target);
 
         // when
-        PathResponse response = pathFinder.searchShortestPath(source.getId(), target.getId());
+        List<Station> result = pathFinder.searchShortestPath(source.getId(), target.getId());
 
         // then
-        List<Station> actualStations = response.getStations().stream()
-            .map(stationResponse -> new Station(stationResponse.getId(), stationResponse.getName()))
-            .collect(Collectors.toList());
-        assertThat(actualStations).isEqualTo(shortestPathStations);
-        assertThat(response.getDistance()).isEqualTo(5);
+        assertThat(result).isEqualTo(shortestPathStations);
     }
 
     private List<Station> createInitialStations() {

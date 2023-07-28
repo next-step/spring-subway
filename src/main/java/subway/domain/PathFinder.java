@@ -2,21 +2,24 @@ package subway.domain;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
 import subway.exception.IllegalStationsException;
-import subway.ui.dto.PathResponse;
 
 public class PathFinder {
 
-    private final WeightedMultigraph<Station, DefaultWeightedEdge> weightedGraph;
+    private final Set<Station> vertexes;
+    private final DijkstraShortestPath<Station, DefaultWeightedEdge> weightedGraph;
 
     public PathFinder(List<Section> sections) {
-        this.weightedGraph = createWeightedGraph(sections);
+        WeightedMultigraph<Station, DefaultWeightedEdge> weightedGraph = createWeightedGraph(sections);
+        this.vertexes = weightedGraph.vertexSet();
+        this.weightedGraph = new DijkstraShortestPath<>(weightedGraph);
     }
 
-    public PathResponse searchShortestPath(long sourceId, long targetId) {
+    public double calculateShortestDistance(long sourceId, long targetId) {
         Station source = getVertex(sourceId)
             .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
         Station target = getVertex(targetId)
@@ -24,13 +27,18 @@ public class PathFinder {
 
         validateSourceAndTarget(source, target);
 
-        DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(
-            weightedGraph);
+        return weightedGraph.getPath(source, target).getWeight();
+    }
 
-        double distance = dijkstraShortestPath.getPathWeight(source, target);
-        List<Station> shortestPath = dijkstraShortestPath.getPath(source, target).getVertexList();
+    public List<Station> searchShortestPath(long sourceId, long targetId) {
+        Station source = getVertex(sourceId)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
+        Station target = getVertex(targetId)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
 
-        return new PathResponse(distance, shortestPath);
+        validateSourceAndTarget(source, target);
+
+        return weightedGraph.getPath(source, target).getVertexList();
     }
 
     private void validateSourceAndTarget(Station source, Station target) {
@@ -60,7 +68,7 @@ public class PathFinder {
     }
 
     private Optional<Station> getVertex(final long stationId) {
-        return weightedGraph.vertexSet().stream()
+        return vertexes.stream()
             .filter(station -> station.getId()==stationId)
             .findFirst();
     }

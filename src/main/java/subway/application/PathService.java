@@ -19,6 +19,9 @@ public class PathService {
     public PathResponse findShortestPaths(long source, long target) {
         List<Section> allSections = sectionDao.findAll();
         PathFinder pathFinder = new PathFinder(allSections);
-        return pathFinder.searchShortestPath(source, target);
+        return new PathResponse(
+            pathFinder.calculateShortestDistance(source, target),
+            pathFinder.searchShortestPath(source, target)
+        );
     }
 }
