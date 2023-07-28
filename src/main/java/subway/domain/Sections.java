@@ -2,7 +2,6 @@ package subway.domain;
 
 import subway.exception.IllegalLineException;
 import subway.exception.IllegalSectionException;
-import subway.exception.IllegalStationException;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -83,16 +82,15 @@ public final class Sections {
         return Collections.unmodifiableList(stations);
     }
 
-    public void validateCanDeleteSection() {
-        if (sections.size() < MIN_SIZE_CAN_DELETE) {
-            throw new IllegalSectionException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
-        }
-    }
-
     private void validateLine(final List<Section> sections) {
         if (sections.isEmpty()) {
             throw new IllegalLineException("해당 노선은 생성되지 않았습니다.");
         }
+    }
+
+    public List<Section> disconnect(final long stationId) {
+        validateDisconnection();
+        return findDisconnectedSections(stationId);
     }
 
     private Optional<Section> connectedSection(final Section existSection,
@@ -104,6 +102,18 @@ public final class Sections {
             return Optional.of(existSection.updateUpStation(section));
         }
         return Optional.of(existSection.updateDownStation(section));
+    }
+
+    private void validateDisconnection() {
+        if (sections.size() < MIN_SIZE_CAN_DELETE) {
+            throw new IllegalSectionException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
+        }
+    }
+
+    private List<Section> findDisconnectedSections(final long stationId) {
+        return sections.stream()
+                .filter(section -> section.hasStation(stationId))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private boolean checkConnection(final Section section) {
@@ -140,53 +150,6 @@ public final class Sections {
     private void validateDistance(final Section existSection, final int distance) {
         if (!existSection.isDistanceGreaterThan(distance)) {
             throw new IllegalSectionException("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
-        }
-    }
-
-    public DisconnectResponse findDisconnectSections(final long stationId) {
-        final List<Section> sectionsToChange = findSectionsToChange(stationId);
-        validateSectionsToChange(sectionsToChange);
-        return convertToDisconnectResponse(sectionsToChange);
-    }
-
-    private void validateSectionsToChange(final List<Section> sectionsToChange) {
-        if (sectionsToChange.size() > MIN_SIZE_CAN_DELETE) {
-            throw new IllegalArgumentException("[ERROR] 노선의 구간들이 올바르게 연결되어 있지 않습니다.");
-        }
-        if (sectionsToChange.isEmpty()) {
-            throw new IllegalStationException("해당 노선에 삭제할 역이 존재하지 않습니다.");
-        }
-    }
-
-    private DisconnectResponse convertToDisconnectResponse(final List<Section> sectionsToChange) {
-        if(sectionsToChange.size() == 2) {
-            return new DisconnectResponse(sectionsToChange.get(0), sectionsToChange.get(1));
-        }
-        return new DisconnectResponse(sectionsToChange.get(0), null);
-    }
-
-    private List<Section> findSectionsToChange(final long stationId) {
-        return sections.stream()
-                .filter(section -> section.hasStation(stationId))
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    public static final class DisconnectResponse {
-
-        private final Section deleteSection;
-        private final Section updateSection;
-
-        private DisconnectResponse(final Section deleteSection, final Section updateSection) {
-            this.deleteSection = deleteSection;
-            this.updateSection = updateSection;
-        }
-
-        public Section getDeleteSection() {
-            return deleteSection;
-        }
-
-        public Section getUpdateSection() {
-            return updateSection;
         }
     }
 

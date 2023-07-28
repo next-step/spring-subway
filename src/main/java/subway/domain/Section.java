@@ -87,6 +87,10 @@ public final class Section {
         return !this.equals(NULL);
     }
 
+    public Section combine(final Section deleteSection) {
+        return new Section(id, line, deleteSection.upStation, downStation, distance + deleteSection.distance);
+    }
+
     public Long getId() {
         return id;
     }

@@ -20,7 +20,7 @@ public final class Station {
     }
 
     public boolean equalsId(final long id) {
-        return this.id == id;
+        return this.id.equals(id);
     }
 
     public Long getId() {

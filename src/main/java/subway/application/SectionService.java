@@ -5,10 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Sections;
-import subway.domain.Station;
+import subway.domain.*;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.IllegalLineException;
@@ -54,16 +51,15 @@ public class SectionService {
     @Transactional
     public void deleteSection(final long lineId, final long stationId) {
         final Sections sections = new Sections(sectionDao.findAll(lineId));
-        sections.validateCanDeleteSection();
         disconnectSection(stationId, sections);
     }
 
     private void disconnectSection(final long stationId, final Sections sections) {
-        final Sections.DisconnectResponse disconnectResponse = sections.findDisconnectSections(stationId);
-        if(disconnectResponse.getUpdateSection() != null) {
-            sectionDao.update(disconnectResponse.getUpdateSection());
+        final DisconnectedSections disconnectedSections = DisconnectedSections.of(sections.disconnect(stationId));
+        if(disconnectedSections.getUpdateSection().isNotNull()) {
+            sectionDao.update(disconnectedSections.getUpdateSection());
         }
-        sectionDao.delete(disconnectResponse.getDeleteSection());
+        sectionDao.delete(disconnectedSections.getDeleteSection());
     }
 
     private Station findStationById(final long id) {
