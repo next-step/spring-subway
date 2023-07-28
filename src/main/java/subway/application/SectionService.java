@@ -15,6 +15,7 @@ import subway.domain.Sections;
 import subway.domain.ShortestPath;
 import subway.domain.Station;
 import subway.dto.PathRequest;
+import subway.dto.PathResponse;
 import subway.dto.SectionAdditionRequest;
 
 @Service
@@ -60,13 +61,14 @@ public class SectionService {
     }
 
     @Transactional(readOnly = true)
-    public ShortestPath findShortestPath(final PathRequest pathRequest) {
+    public PathResponse findShortestPath(final PathRequest pathRequest) {
         final List<Section> sections = sectionDao.findAll();
         final Station source = getStationBy(pathRequest.getSource());
         final Station target = getStationBy(pathRequest.getTarget());
 
         final PathFinder pathFinder = new PathFinder(sections);
-        return pathFinder.findShortestPath(source, target);
+        final ShortestPath shortestPath = pathFinder.findShortestPath(source, target);
+        return PathResponse.of(shortestPath);
     }
 
     private Line getLineBy(Long id) {

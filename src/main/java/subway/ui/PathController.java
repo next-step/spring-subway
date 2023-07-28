@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import subway.application.SectionService;
 import subway.domain.ShortestPath;
 import subway.dto.PathRequest;
+import subway.dto.PathResponse;
 
 @RestController
 @RequestMapping("/paths")
@@ -21,8 +22,8 @@ public class PathController {
     }
 
     @GetMapping
-    public ResponseEntity<ShortestPath> findPath(@ModelAttribute @Valid PathRequest pathRequest) {
-        final ShortestPath shortestPath = sectionService.findShortestPath(pathRequest);
-        return ResponseEntity.ok().body(shortestPath);
+    public ResponseEntity<PathResponse> findPath(@ModelAttribute @Valid PathRequest pathRequest) {
+        final PathResponse pathResponse = sectionService.findShortestPath(pathRequest);
+        return ResponseEntity.ok().body(pathResponse);
     }
 }

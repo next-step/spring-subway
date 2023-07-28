@@ -7,11 +7,6 @@ public class ShortestPath {
     private final List<Station> stations;
     private final int distance;
 
-    public ShortestPath(final List<Station> stations, final int distance) {
-        this.stations = stations;
-        this.distance = distance;
-    }
-
     public ShortestPath(final List<Station> stations, final double distance) {
         this.stations = stations;
         validateRange(distance);
