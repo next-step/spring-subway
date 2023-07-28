@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Section {
@@ -130,6 +131,10 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public List<Station> getStations() {
+        return List.of(upStation, downStation);
     }
 
     @Override
