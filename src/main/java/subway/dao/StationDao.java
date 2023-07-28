@@ -11,6 +11,7 @@ import subway.domain.StationName;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class StationDao {
@@ -24,7 +25,6 @@ public class StationDao {
                             rs.getString("name")
                     )
             );
-
 
     public StationDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
@@ -41,6 +41,16 @@ public class StationDao {
 
     public List<Station> findAll() {
         String sql = "select * from STATION";
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
+    public List<Station> findAllByIds(final List<Long> pathStationIds) {
+        final String ids = pathStationIds.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", ", "(", ")"));
+
+        final String sql = "SELECT * FROM STATION WHERE id IN " + ids;
+
         return jdbcTemplate.query(sql, rowMapper);
     }
 

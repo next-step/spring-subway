@@ -14,28 +14,30 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class StationGraphTest {
 
-    List<Long> stations = List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L);
-    List<Section> sections = List.of(
-            new Section(1L, 1L, 1L, 2L, new Distance(16)),
-            new Section(2L, 1L, 2L, 1L, new Distance(1)),
-            new Section(3L, 1L, 1L, 3L, new Distance(9)),
-            new Section(4L, 1L, 1L, 4L, new Distance(35)),
-            new Section(5L, 2L, 2L, 4L, new Distance(12)),
-            new Section(6L, 2L, 2L, 5L, new Distance(25)),
-            new Section(7L, 3L, 3L, 4L, new Distance(15)),
-            new Section(8L, 3L, 3L, 6L, new Distance(22)),
-            new Section(9L, 3L, 4L, 5L, new Distance(14)),
-            new Section(10L, 3L, 4L, 6L, new Distance(17)),
-            new Section(11L, 3L, 4L, 7L, new Distance(19)),
-            new Section(12L, 3L, 5L, 7L, new Distance(8)),
-            new Section(13L, 3L, 6L, 7L, new Distance(14)),
-            new Section(14L, 3L, 8L, 9L, new Distance(777))
+    final DistinctSections sections = new DistinctSections(
+            List.of(
+                    new Section(1L, 1L, 1L, 2L, new Distance(16)),
+                    new Section(2L, 1L, 2L, 1L, new Distance(1)),
+                    new Section(3L, 1L, 1L, 3L, new Distance(9)),
+                    new Section(4L, 1L, 1L, 4L, new Distance(35)),
+                    new Section(5L, 2L, 2L, 4L, new Distance(12)),
+                    new Section(6L, 2L, 2L, 5L, new Distance(25)),
+                    new Section(7L, 3L, 3L, 4L, new Distance(15)),
+                    new Section(8L, 3L, 3L, 6L, new Distance(22)),
+                    new Section(9L, 3L, 4L, 5L, new Distance(14)),
+                    new Section(10L, 3L, 4L, 6L, new Distance(17)),
+                    new Section(11L, 3L, 4L, 7L, new Distance(19)),
+                    new Section(12L, 3L, 5L, 7L, new Distance(8)),
+                    new Section(13L, 3L, 6L, 7L, new Distance(14)),
+                    new Section(14L, 3L, 8L, 9L, new Distance(777))
+            )
     );
+
     StationGraph stationGraph;
 
     @BeforeEach
     void setUp() {
-        stationGraph = new StationGraph(stations, sections);
+        stationGraph = new StationGraph(sections);
     }
 
     @Test
@@ -44,35 +46,18 @@ class StationGraphTest {
         /* given */
 
         /* when & then */
-        assertDoesNotThrow(() -> new StationGraph(stations, sections));
-    }
-
-    @Test
-    @DisplayName("역이 존재하지 않는 경우 경로 생성에 실패한다.")
-    void creatFailWithNullOrEmptyStations() {
-        /* given */
-
-
-        /* when & then */
-        assertThatThrownBy(() -> new StationGraph(null, sections))
-                .isInstanceOf(SubwayIllegalArgumentException.class)
-                .hasMessage("경로 탐색을 위해 역 정보가 필요합니다.");
-        assertThatThrownBy(() -> new StationGraph(Collections.emptyList(), sections))
-                .isInstanceOf(SubwayIllegalArgumentException.class)
-                .hasMessage("경로 탐색을 위해 역 정보가 필요합니다.");
+        assertDoesNotThrow(() -> new StationGraph(sections));
     }
 
     @Test
     @DisplayName("구간이 존재하지 않는 경우 생성에 실패한다.")
     void creatFailWithNullOrEmptySections() {
         /* given */
+        final DistinctSections emptySections = new DistinctSections(Collections.emptyList());
 
 
         /* when & then */
-        assertThatThrownBy(() -> new StationGraph(stations, null))
-                .isInstanceOf(SubwayIllegalArgumentException.class)
-                .hasMessage("경로 탐색을 위해 구간 정보가 필요합니다.");
-        assertThatThrownBy(() -> new StationGraph(stations, Collections.emptyList()))
+        assertThatThrownBy(() -> new StationGraph(emptySections))
                 .isInstanceOf(SubwayIllegalArgumentException.class)
                 .hasMessage("경로 탐색을 위해 구간 정보가 필요합니다.");
     }
@@ -85,7 +70,7 @@ class StationGraphTest {
         final Long toStationId = 7L;
 
         /* when */
-        final List<Long> pathStationIds = stationGraph.getPathStationIds(fromStationId, toStationId);
+        final List<Long> pathStationIds = stationGraph.getShortestPathStationIds(fromStationId, toStationId);
 
         /* then */
         assertThat(pathStationIds).isEqualTo(List.of(1L, 2L, 4L, 7L));
@@ -99,7 +84,7 @@ class StationGraphTest {
         final Long notExistStationId = 54_321L;
 
         /* when & then */
-        assertThatThrownBy(() -> stationGraph.getPathStationIds(notExistStationId, existStationId))
+        assertThatThrownBy(() -> stationGraph.getShortestPathStationIds(notExistStationId, existStationId))
                 .isInstanceOf(SubwayIllegalArgumentException.class)
                 .hasMessage("54321번 역이 존재하지 않아 최단 경로를 구할 수 없습니다.");
     }

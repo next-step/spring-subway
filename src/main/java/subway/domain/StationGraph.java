@@ -12,38 +12,33 @@ import java.util.Objects;
 
 public class StationGraph {
 
-    private final Graph<Long, DefaultWeightedEdge> stationGraph;
+    private final Graph<Long, DefaultWeightedEdge> stationGraph
+            = new WeightedMultigraph<>(DefaultWeightedEdge.class);
 
-    public StationGraph(
-            final List<Long> stationIds,
-            final List<Section> sections
-    ) {
-        validateValueNotNullAndEmpty(stationIds, sections);
+    public StationGraph(final DistinctSections sections) {
+        validateIsNotEmptySections(sections);
 
-        this.stationGraph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
-        stationIds.forEach(stationGraph::addVertex);
-        sections.forEach(
-                section ->
-                        stationGraph.setEdgeWeight(
-                                stationGraph.addEdge(
-                                        section.getUpStationId(),
-                                        section.getDownStationId()
-                                ),
-                                section.getDistance().getValue()
-                        )
-        );
+        initGraph(sections);
     }
 
-    private void validateValueNotNullAndEmpty(final List<Long> stations, final List<Section> sections) {
-        if (stations == null || stations.isEmpty()) {
-            throw new SubwayIllegalArgumentException("경로 탐색을 위해 역 정보가 필요합니다.");
+    private void initGraph(final DistinctSections sections) {
+        sections.getSectionIds().forEach(stationGraph::addVertex);
+
+        for (Section section : sections.getSections()) {
+            stationGraph.setEdgeWeight(
+                    stationGraph.addEdge(section.getUpStationId(), section.getDownStationId()),
+                    section.getDistance().getValue()
+            );
         }
-        if (sections == null || sections.isEmpty()) {
+    }
+
+    private void validateIsNotEmptySections(final DistinctSections sections) {
+        if (sections.isEmpty()) {
             throw new SubwayIllegalArgumentException("경로 탐색을 위해 구간 정보가 필요합니다.");
         }
     }
 
-    public List<Long> getPathStationIds(final Long from, final Long to) {
+    public List<Long> getShortestPathStationIds(final Long from, final Long to) {
         return getShortestPath(from, to).getVertexList();
     }
 
