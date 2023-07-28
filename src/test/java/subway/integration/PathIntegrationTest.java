@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.dto.ExceptionResponse;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.PathResponse;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
@@ -31,10 +31,10 @@ public class PathIntegrationTest extends IntegrationTest {
         long station3Id = extractId(createStation(new StationRequest("성수역")));
         long station4Id = extractId(createStation(new StationRequest("건대입구역")));
         long line1Id = extractId(createLine(
-                new LineRequest("1호선", "green", station1Id, station2Id, 10)
+                new LineCreateRequest("1호선", "green", station1Id, station2Id, 10)
         ));
         long line2Id = extractId(createLine(
-                new LineRequest("2호선", "orange", station1Id, station3Id, 11)
+                new LineCreateRequest("2호선", "orange", station1Id, station3Id, 11)
         ));
 
         SectionRequest sectionRequest1 = new SectionRequest(station2Id, station4Id, 10);
@@ -102,7 +102,7 @@ public class PathIntegrationTest extends IntegrationTest {
         // given
         long station1Id = extractId(createStation(new StationRequest("강남역")));
         long station2Id = extractId(createStation(new StationRequest("역삼역")));
-        createLine(new LineRequest("1호선", "green", station1Id, station2Id, 10));
+        createLine(new LineCreateRequest("1호선", "green", station1Id, station2Id, 10));
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -145,7 +145,7 @@ public class PathIntegrationTest extends IntegrationTest {
         long station2Id = extractId(createStation(new StationRequest("역삼역")));
         long station3Id = extractId(createStation(new StationRequest("성수역")));
 
-        createLine(new LineRequest("1호선", "green", station1Id, station2Id, 10));
+        createLine(new LineCreateRequest("1호선", "green", station1Id, station2Id, 10));
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -168,7 +168,7 @@ public class PathIntegrationTest extends IntegrationTest {
         long station2Id = extractId(createStation(new StationRequest("역삼역")));
         long station3Id = extractId(createStation(new StationRequest("성수역")));
 
-        createLine(new LineRequest("1호선", "green", station1Id, station2Id, 10));
+        createLine(new LineCreateRequest("1호선", "green", station1Id, station2Id, 10));
 
 
         // when
@@ -193,8 +193,8 @@ public class PathIntegrationTest extends IntegrationTest {
         long station3Id = extractId(createStation(new StationRequest("성수역")));
         long station4Id = extractId(createStation(new StationRequest("잠실역")));
 
-        createLine(new LineRequest("1호선", "green", station1Id, station2Id, 10));
-        createLine(new LineRequest("2호선", "green", station3Id, station4Id, 10));
+        createLine(new LineCreateRequest("1호선", "green", station1Id, station2Id, 10));
+        createLine(new LineCreateRequest("2호선", "green", station3Id, station4Id, 10));
 
 
         // when

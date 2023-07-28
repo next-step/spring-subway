@@ -4,16 +4,16 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
 
 public class TestRequestUtil {
-    public static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+    public static ExtractableResponse<Response> createLine(LineCreateRequest lineCreateRequest) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();

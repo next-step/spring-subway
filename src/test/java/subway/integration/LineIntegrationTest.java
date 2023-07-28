@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.ExceptionResponse;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
 import subway.dto.StationRequest;
@@ -47,13 +47,13 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("지하철 노선을 생성한다.")
     void createLineTest() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 14);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
@@ -67,13 +67,13 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("존재하지 않는 상행종점역으로 지하철 노선을 생성할 수 없다.")
     void createLineWithNonExistUpStationTest() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", 5L, station2Id, 14);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", 5L, station2Id, 14);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
@@ -88,13 +88,13 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("존재하지 않는 하행종점역으로 지하철 노선을 생성할 수 없다.")
     void createLineWithNonExistDownStationTest() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, 5L, 14);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, 5L, 14);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
@@ -109,14 +109,14 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성할 수 없다.")
     void createLineWithDuplicateName() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
-        createLine(lineRequest);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 14);
+        createLine(lineCreateRequest);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
@@ -131,13 +131,13 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("노선의 두 역이 같으면, 노선을 생성할 수 없다.")
     void createLineWithDuplicateStation() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station2Id, station2Id, 14);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station2Id, station2Id, 14);
 
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .when().post("/lines")
                 .then().log().all()
                 .extract();
@@ -152,11 +152,11 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("지하철 노선 목록을 조회한다.")
     void getLines() {
         // given
-        LineRequest lineRequest1 = new LineRequest("2호선", "green", station1Id, station2Id, 14);
-        ExtractableResponse<Response> createResponse1 = createLine(lineRequest1);
+        LineCreateRequest lineCreateRequest1 = new LineCreateRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse1 = createLine(lineCreateRequest1);
 
-        LineRequest lineRequest2 = new LineRequest("3호선", "orange", station1Id, station2Id, 15);
-        ExtractableResponse<Response> createResponse2 = createLine(lineRequest2);
+        LineCreateRequest lineCreateRequest2 = new LineCreateRequest("3호선", "orange", station1Id, station2Id, 15);
+        ExtractableResponse<Response> createResponse2 = createLine(lineCreateRequest2);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -181,8 +181,8 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("지하철 노선을 조회한다.")
     void getLine() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
-        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineCreateRequest);
 
         // when
         Long lineId = extractId(createResponse);
@@ -203,8 +203,8 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("존재하지 않는 id로 지하철 노선을 조회한다.")
     void getLineNonExist() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
-        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineCreateRequest);
 
         // when
         Long lineId = extractId(createResponse);
@@ -225,8 +225,8 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("지하철 노선을 수정한다.")
     void updateLine() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
-        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineCreateRequest);
 
         // when
         Long lineId = extractId(createResponse);
@@ -248,11 +248,11 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("기존에 존재하는 노선 이름으로 지하철 노선을 수정할 수 없다.")
     void updateLineDuplicateName() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
-        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineCreateRequest);
 
-        LineRequest lineRequest2 = new LineRequest("4호선", "green", station1Id, station2Id, 14);
-        createLine(lineRequest2);
+        LineCreateRequest lineCreateRequest2 = new LineCreateRequest("4호선", "green", station1Id, station2Id, 14);
+        createLine(lineCreateRequest2);
 
         // when
         Long lineId = extractId(createResponse);
@@ -276,8 +276,8 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("지하철 노선을 제거한다.")
     void deleteLine() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
-        ExtractableResponse<Response> createResponse = createLine(lineRequest);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 14);
+        ExtractableResponse<Response> createResponse = createLine(lineCreateRequest);
 
         // when
         Long lineId = extractId(createResponse);

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.ExceptionResponse;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
 import subway.exception.ErrorCode;
@@ -44,8 +44,8 @@ public class SectionIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createStation3Response = createStation(stationRequest3);
         station3Id = extractId(createStation3Response);
 
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 15);
-        ExtractableResponse<Response> lineResponse = createLine(lineRequest);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 15);
+        ExtractableResponse<Response> lineResponse = createLine(lineCreateRequest);
         lineId = extractId(lineResponse);
     }
 

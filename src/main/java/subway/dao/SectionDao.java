@@ -10,10 +10,12 @@ import subway.domain.Section;
 import subway.domain.Station;
 
 import javax.sql.DataSource;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class SectionDao {
@@ -83,5 +85,33 @@ public class SectionDao {
     public void delete(final Section section) {
         String sql = "delete from SECTION where id= ?";
         jdbcTemplate.update(sql, section.getId());
+    }
+
+    public void delete(final List<Section> sections) {
+        String sql = "delete from SECTION where id=?";
+
+        List<Object[]> batchIds = sections.stream()
+                .map(section -> new Object[]{section.getId()})
+                .collect(Collectors.toList());
+
+        jdbcTemplate.batchUpdate(sql, batchIds);
+    }
+
+    public void insert(final List<Section> sections, final Long lineId) {
+        String sql = "insert into SECTION (up_station_id, down_station_id, line_id, distance) " +
+                "values (?, ?, ?, ?)";
+
+        int[] argumentTypes = {Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.INTEGER};
+
+        List<Object[]> batchIds = sections.stream()
+                .map(section -> new Object[]{
+                        section.getUpStation().getId(),
+                        section.getDownStation().getId(),
+                        lineId,
+                        section.getDistance()
+                })
+                .collect(Collectors.toList());
+
+        jdbcTemplate.batchUpdate(sql, batchIds, argumentTypes);
     }
 }

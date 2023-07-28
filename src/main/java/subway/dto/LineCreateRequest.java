@@ -3,7 +3,7 @@ package subway.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-public class LineRequest {
+public class LineCreateRequest {
     @NotBlank(message = "노선 이름은 공백 또는 비어있을 수 없습니다")
     private String name;
     @NotBlank(message = "노선 색상은 필수 항목입니다")
@@ -15,11 +15,11 @@ public class LineRequest {
     @NotNull(message = "거리는 필수 항목입니다")
     private Integer distance;
 
-    public LineRequest() {
+    public LineCreateRequest() {
     }
 
 
-    public LineRequest(
+    public LineCreateRequest(
             final String name,
             final String color,
             final Long upStationId,
