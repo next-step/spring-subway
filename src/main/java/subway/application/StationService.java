@@ -25,10 +25,7 @@ public class StationService {
     @Transactional
     public StationResponse saveStation(final StationRequest stationRequest) {
         String name = stationRequest.getName();
-        stationDao.findByName(name)
-                .ifPresent(station -> {
-                    throw new IncorrectRequestException(ErrorCode.DUPLICATED_STATION_NAME, name);
-                });
+        validateNotDuplicated(name);
         Station station = stationDao.insert(new Station(name));
         return StationResponse.of(station);
     }
@@ -53,5 +50,12 @@ public class StationService {
     @Transactional
     public void deleteStationById(final Long id) {
         stationDao.deleteById(id);
+    }
+
+    private void validateNotDuplicated(String name) {
+        stationDao.findByName(name)
+                .ifPresent(station -> {
+                    throw new IncorrectRequestException(ErrorCode.DUPLICATED_STATION_NAME, name);
+                });
     }
 }

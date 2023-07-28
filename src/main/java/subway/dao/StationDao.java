@@ -8,6 +8,8 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Station;
+import subway.exception.ErrorCode;
+import subway.exception.IncorrectRequestException;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -46,7 +48,11 @@ public class StationDao {
 
     public Station findById(final Long id) {
         String sql = "select * from STATION where id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new IncorrectRequestException(ErrorCode.NOT_EXIST_IN_DB, " 역 입력값: " + id);
+        }
     }
 
     public Optional<Station> findByName(final String name) {
