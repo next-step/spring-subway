@@ -1,4 +1,4 @@
-package subway.dto;
+package subway.ui.dto;
 
 import org.springframework.util.Assert;
 
@@ -18,8 +18,11 @@ public class LineRequest {
                        final long downStationId,
                        final int distance,
                        final String color) {
-        Assert.notNull(name, "이름을 입력해야 합니다.");
-        Assert.notNull(color, "색깔을 입력해야 합니다.");
+        Assert.hasText(name, "이름을 입력해야 합니다.");
+        Assert.hasText(color, "색깔을 입력해야 합니다.");
+        Assert.isTrue(name.length() <= 255, "이름 길이는 255자를 초과할 수 없습니다.");
+        Assert.isTrue(color.length() <= 20, "색상은 20자를 초과할 수 없습니다.");
+        Assert.isTrue(distance > 0, "구간 길이는 0보다 커야합니다.");
 
         this.name = name;
         this.upStationId = upStationId;

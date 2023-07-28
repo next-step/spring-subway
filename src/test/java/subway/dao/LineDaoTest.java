@@ -11,9 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Station;
-import subway.domain.StationPair;
+import subway.exception.IllegalStationsException;
+import subway.vo.StationPair;
 
 @DisplayName("라인 Dao 테스트")
 @Transactional
@@ -47,7 +46,7 @@ class LineDaoTest {
         Line response = lineDao.insert(lineRequest1);
 
         // then
-        assertThat(response.getId()).isNotNull();
+        assertThat(response.getId()).isPositive();
         assertThat(response.getColor()).isEqualTo(lineRequest1.getColor());
         assertThat(response.getName()).isEqualTo(lineRequest1.getName());
     }
@@ -77,9 +76,10 @@ class LineDaoTest {
         Optional<Line> result = lineDao.findById(response.getId());
 
         // then
-        assertThat(emptyResult.isEmpty()).isTrue();
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(response);
+        assertThat(emptyResult).isNotPresent();
+        assertThat(result)
+            .isPresent()
+            .hasValue(response);
     }
 
     @Test
@@ -94,8 +94,9 @@ class LineDaoTest {
 
         // then
         Optional<Line> result = lineDao.findById(update.getId());
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(update);
+        assertThat(result)
+            .isPresent()
+            .hasValue(update);
     }
 
     @Test
@@ -109,7 +110,7 @@ class LineDaoTest {
 
         // then
         Optional<Line> result = lineDao.findById(response.getId());
-        assertThat(result.isEmpty()).isTrue();
+        assertThat(result).isNotPresent();
     }
 
     @Test
@@ -123,30 +124,19 @@ class LineDaoTest {
         Optional<Line> result = lineDao.findByName(response.getName());
 
         // then
-        assertThat(emptyResult.isEmpty()).isTrue();
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(response);
+        assertThat(emptyResult).isNotPresent();
+        assertThat(result)
+            .isPresent()
+            .hasValue(response);
     }
 
-    @Test
-    @DisplayName("노선에 속한 모든 구간과 연관된 역 정보를 조회한다.")
-    void findAllStationPair() {
-        // given
-        Line line = lineDao.insert(lineRequest1);
-
-        Station station1 = stationDao.insert(new Station("왕십리"));
-        Station station2 = stationDao.insert(new Station("상왕십리"));
-        Station station3 = stationDao.insert(new Station("신당"));
-
-        sectionDao.insert(new Section(line.getId(), station1.getId(), station2.getId(), 10));
-        sectionDao.insert(new Section(line.getId(), station2.getId(), station3.getId(), 10));
-
-        // when
-        List<StationPair> result = lineDao.findAllStationPair(line.getId());
-
-        // then
-        assertThat(result).contains(
-            new StationPair(station1, station2), new StationPair(station2, station3)
-        );
+    private void validateDuplicateUpStation(List<StationPair> stationPairs) {
+        long distinctUpStationCount = stationPairs.stream()
+            .map(StationPair::getUpStation)
+            .distinct()
+            .count();
+        if (distinctUpStationCount != stationPairs.size()) {
+            throw new IllegalStationsException("중복된 역은 노선에 포함될 수 없습니다.");
+        }
     }
 }

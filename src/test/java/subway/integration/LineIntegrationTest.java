@@ -13,11 +13,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.RestApi;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.ui.dto.LineRequest;
+import subway.ui.dto.LineResponse;
+import subway.ui.dto.SectionRequest;
+import subway.ui.dto.StationRequest;
+import subway.ui.dto.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {

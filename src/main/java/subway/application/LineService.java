@@ -6,38 +6,39 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
-import subway.domain.StationPair;
+import subway.domain.Station;
+import subway.vo.StationPair;
 import subway.domain.Stations;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.ui.dto.LineRequest;
+import subway.ui.dto.LineResponse;
 import subway.exception.IllegalLineException;
+import subway.exception.IllegalStationsException;
 
 @Service
 public class LineService {
 
     private final LineDao lineDao;
+    private final StationDao stationDao;
     private final SectionDao sectionDao;
 
-    public LineService(final LineDao lineDao, final SectionDao sectionDao) {
+    public LineService(final LineDao lineDao, StationDao stationDao, final SectionDao sectionDao) {
         this.lineDao = lineDao;
+        this.stationDao = stationDao;
         this.sectionDao = sectionDao;
     }
 
     @Transactional
     public LineResponse saveLine(LineRequest request) {
         validateDuplicateName(request.getName());
-        final Line persistLine = lineDao.insert(
-            new Line(request.getName(), request.getColor())
-        );
+        final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
 
-        sectionDao.insert(new Section(
-                persistLine.getId(),
-                request.getUpStationId(),
-                request.getDownStationId(),
-                request.getDistance())
-        );
+        Station upStation = getStationById(request.getUpStationId());
+        Station downStation = getStationById(request.getDownStationId());
+
+        sectionDao.insert(new Section(persistLine, upStation, downStation, request.getDistance()));
 
         return LineResponse.of(persistLine);
     }
@@ -55,9 +56,20 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         final Line persistLine = findLineById(id);
-        final List<StationPair> stationPairs = lineDao.findAllStationPair(id);
+        final List<StationPair> stationPairs = getStationPairs(id);
         final Stations stations = new Stations(stationPairs);
         return LineResponse.of(persistLine, stations.getStations());
+    }
+
+    private Station getStationById(long stationId) {
+        return stationDao.findById(stationId)
+            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역입니다."));
+    }
+
+    private List<StationPair> getStationPairs(Long id) {
+        return sectionDao.findAll(id).stream()
+            .map(StationPair::of)
+            .collect(Collectors.toList());
     }
 
     public Line findLineById(Long id) {

@@ -6,42 +6,23 @@ import java.util.Map;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import subway.dao.mapper.LineMapper;
 import subway.domain.Line;
-import subway.domain.Station;
-import subway.domain.StationPair;
 
 @Repository
 public class LineDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
+    private final LineMapper lineMapper;
 
-    private final RowMapper<Line> lineRowMapper = (rs, rowNum) ->
-            new Line(
-                    rs.getLong("id"),
-                    rs.getString("name"),
-                    rs.getString("color")
-            );
-
-    private final RowMapper<StationPair> stationPairRowMapper = (rs, rowNum) ->
-            new StationPair(
-                    new Station(
-                            rs.getLong("s1_id"),
-                            rs.getString("s1_name")
-                    ),
-                    new Station(
-                            rs.getLong("s2_id"),
-                            rs.getString("s2_name")
-                    )
-            );
-
-    public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource, LineMapper lineMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("line")
                 .usingGeneratedKeyColumns("id");
+        this.lineMapper = lineMapper;
     }
 
     public Line insert(Line line) {
@@ -50,45 +31,34 @@ public class LineDao {
         params.put("name", line.getName());
         params.put("color", line.getColor());
 
-        Long lineId = insertAction.executeAndReturnKey(params).longValue();
+        long lineId = insertAction.executeAndReturnKey(params).longValue();
         return new Line(lineId, line.getName(), line.getColor());
     }
 
     public List<Line> findAll() {
-        String sql = "select id, name, color from LINE";
-        return jdbcTemplate.query(sql, lineRowMapper);
+        String sql = "SELECT id, name, color FROM line";
+        return jdbcTemplate.query(sql, lineMapper.getRowMapper());
     }
 
     public Optional<Line> findById(Long id) {
-        String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.query(sql, lineRowMapper, id)
+        String sql = "SELECT id, name, color FROM line WHERE id = ?";
+        return jdbcTemplate.query(sql, lineMapper.getRowMapper(), id)
             .stream().findAny();
     }
 
     public void update(Line newLine) {
-        String sql = "update LINE set name = ?, color = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
+        String sql = "UPDATE line SET name = ?, color = ? WHERE id = ?";
+        jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
     public void deleteById(Long id) {
-        jdbcTemplate.update("delete from Line where id = ?", id);
+        jdbcTemplate.update("DELETE FROM line WHERE id = ?", id);
     }
 
     public Optional<Line> findByName(final String name) {
-        String sql = "select * from LINE WHERE name = ?";
-        return jdbcTemplate.query(sql, lineRowMapper, name)
+        String sql = "SELECT * FROM line WHERE name = ?";
+        return jdbcTemplate.query(sql, lineMapper.getRowMapper(), name)
                 .stream()
                 .findAny();
-    }
-
-    public List<StationPair> findAllStationPair(final Long lineId) {
-        String sql = "select s1.id as s1_id, s1.name as s1_name, s2.id as s2_id, s2.name as s2_name " +
-                "from section " +
-                "join station as s1 " +
-                "on section.up_station_id = s1.id " +
-                "join station as s2 " +
-                "on section.down_station_id = s2.id " +
-                "where line_id = ?";
-        return jdbcTemplate.query(sql, stationPairRowMapper, lineId);
     }
 }

@@ -18,13 +18,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
+import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.domain.StationPair;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.StationResponse;
+import subway.ui.dto.LineRequest;
+import subway.ui.dto.LineResponse;
+import subway.ui.dto.StationResponse;
 import subway.exception.IllegalLineException;
 
 @DisplayName("라인 서비스 테스트")
@@ -38,18 +38,24 @@ class LineServiceTest {
     private LineDao lineDao;
     @Mock
     private SectionDao sectionDao;
+    @Mock
+    private StationDao stationDao;
 
     @Test
     @DisplayName("노선을 저장한다.")
     void saveLineTest() {
         // given
         Line line = createInitialLine();
-        Section section = new Section(1L, line.getId(), 1L, 2L, 10);
+        Station upStation = new Station(1L, "jamsil");
+        Station downStation = new Station(2L, "jamsilnaru");
+        Section section = new Section(1L, line, upStation, downStation, 10);
         LineRequest lineRequest = convertToLineRequest(line, section);
 
         given(lineDao.findByName(line.getName())).willReturn(Optional.empty());
         given(lineDao.insert(any(Line.class))).willReturn(line);
         given(sectionDao.insert(any(Section.class))).willReturn(section);
+        given(stationDao.findById(upStation.getId())).willReturn(Optional.of(upStation));
+        given(stationDao.findById(downStation.getId())).willReturn(Optional.of(downStation));
 
         // when
         LineResponse lineResponse = lineService.saveLine(lineRequest);
@@ -63,7 +69,9 @@ class LineServiceTest {
     @DisplayName("동일한 이름으로 노선을 저장하면 예외를 던진다.")
     void saveLineDuplicateNameExceptionTest() {
         Line line = createInitialLine();
-        Section section = new Section(1L, line.getId(), 1L, 2L, 10);
+        Station upStation = new Station(1L, "jamsil");
+        Station downStation = new Station(2L, "jamsilnaru");
+        Section section = new Section(1L, line, upStation, downStation, 10);
         LineRequest lineRequest = convertToLineRequest(line, section);
 
         given(lineDao.findByName(line.getName())).willReturn(Optional.of(line));
@@ -108,7 +116,7 @@ class LineServiceTest {
         Line line = createInitialLine();
 
         given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
-        given(lineDao.findAllStationPair(line.getId())).willReturn(createInitialStationPairs());
+        given(sectionDao.findAll(line.getId())).willReturn(createInitialSections(line));
 
         // when
         LineResponse lineResponse = lineService.findLineResponseById(line.getId());
@@ -137,18 +145,18 @@ class LineServiceTest {
         return stations;
     }
 
-    private List<StationPair> createInitialStationPairs() {
+    private List<Section> createInitialSections(Line line) {
         List<Station> stations = createInitialStations();
-        List<StationPair> stationPairs = new ArrayList<>();
-        stationPairs.add(new StationPair(stations.get(3), stations.get(0)));
-        stationPairs.add(new StationPair(stations.get(0), stations.get(2)));
-        stationPairs.add(new StationPair(stations.get(2), stations.get(1)));
-        return stationPairs;
+        List<Section> sections = new ArrayList<>();
+        sections.add(new Section(2L, line, stations.get(3), stations.get(0), 10));
+        sections.add(new Section(1L, line, stations.get(0), stations.get(2), 10));
+        sections.add(new Section(3L, line, stations.get(2), stations.get(1), 10));
+        return sections;
     }
 
     private LineRequest convertToLineRequest(Line line, Section section) {
-        return new LineRequest(line.getName(), section.getUpStationId(),
-            section.getDownStationId(), section.getDistance(), line.getColor());
+        return new LineRequest(line.getName(), section.getUpStation().getId(),
+            section.getDownStation().getId(), section.getDistance(), line.getColor());
     }
 
     private List<Long> getSortedStationIds() {

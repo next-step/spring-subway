@@ -1,6 +1,8 @@
-package subway.domain;
+package subway.vo;
 
 import java.util.Objects;
+import subway.domain.Section;
+import subway.domain.Station;
 import subway.exception.IllegalStationsException;
 
 public class StationPair {
@@ -12,6 +14,10 @@ public class StationPair {
         validate(upStation, downStation);
         this.upStation = upStation;
         this.downStation = downStation;
+    }
+
+    public static StationPair of(final Section section) {
+        return new StationPair(section.getUpStation(), section.getDownStation());
     }
 
     public boolean matchUpStation(Station other) {

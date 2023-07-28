@@ -6,28 +6,49 @@ import subway.exception.IllegalSectionException;
 public class Section {
 
     private final Long id;
-    private final Long lineId;
-    private final Long upStationId;
-    private final Long downStationId;
+    private final Line line;
+    private final Station upStation;
+    private final Station downStation;
     private final Integer distance;
 
-    public Section(final Long id, final Long lineId, final Long upStationId, final Long downStationId, final Integer distance) {
-        validateStations(upStationId, downStationId);
+    public Section(final Long id, final Line line, final Station upStation,
+        final Station downStation, final Integer distance) {
+        validateStations(upStation, downStation);
         validateDistance(distance);
 
         this.id = id;
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Integer distance) {
-        this(null, lineId, upStationId, downStationId, distance);
+    public Section(final Line line, final Station upStation, final Station downStation,
+        final Integer distance) {
+        this(null, line, upStation, downStation, distance);
     }
 
-    private void validateStations(final Long upStationId, final Long downStationId) {
-        if (upStationId.equals(downStationId)) {
+    public Section narrowToUpDirection(final Station narrowdDownStation, final int narrowAmount) {
+        int narrowedDistance = distance - narrowAmount;
+        return new Section(id, line, upStation, narrowdDownStation, narrowedDistance);
+    }
+
+    public Section narrowToDownDirection(final Station narrowedUpStation, final int narrowAmount) {
+        int narrowedDistance = distance - narrowAmount;
+        return new Section(id, line, narrowedUpStation, downStation, narrowedDistance);
+    }
+
+    public Section extendToUpDirection(final Section upDirection) {
+        int extendedDistance = upDirection.distance + distance;
+        return new Section(id, line, upDirection.getUpStation(), downStation, extendedDistance);
+    }
+
+    public boolean isDistanceLessThanOrEqualTo(final int other) {
+        return this.distance <= other;
+    }
+
+    private void validateStations(final Station upStation, final Station downStation) {
+        if (upStation.equals(downStation)) {
             throw new IllegalSectionException("상행역과 하행역은 달라야 합니다.");
         }
     }
@@ -38,36 +59,20 @@ public class Section {
         }
     }
 
-    public Section downStationId(final Section newSection) {
-        return new Section(id, lineId, upStationId, newSection.upStationId, distance - newSection.distance);
-    }
-
-    public Section upStationId(final Section newSection) {
-        return new Section(id, lineId, newSection.downStationId, downStationId, distance - newSection.distance);
-    }
-
-    public boolean isDistanceLessThanOrEqualTo(final Section other) {
-        return this.distance <= other.distance;
-    }
-
-    public boolean matchDownStationId(final long other) {
-        return downStationId == other;
-    }
-
     public Long getId() {
         return id;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public Integer getDistance() {
@@ -83,24 +88,24 @@ public class Section {
             return false;
         }
         Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(lineId,
-            section.lineId) && Objects.equals(upStationId, section.upStationId)
-            && Objects.equals(downStationId, section.downStationId)
+        return Objects.equals(id, section.id) && Objects.equals(line,
+            section.line) && Objects.equals(upStation, section.upStation)
+            && Objects.equals(downStation, section.downStation)
             && Objects.equals(distance, section.distance);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, lineId, upStationId, downStationId, distance);
+        return Objects.hash(id, line, upStation, downStation, distance);
     }
 
     @Override
     public String toString() {
         return "Section{" +
             "id=" + id +
-            ", lineId=" + lineId +
-            ", upStationId=" + upStationId +
-            ", downStationId=" + downStationId +
+            ", lineId=" + line +
+            ", upStationId=" + upStation +
+            ", downStationId=" + downStation +
             ", distance=" + distance +
             '}';
     }

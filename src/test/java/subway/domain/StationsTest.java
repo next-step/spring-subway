@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.IllegalStationsException;
+import subway.vo.StationPair;
 
 class StationsTest {
 
