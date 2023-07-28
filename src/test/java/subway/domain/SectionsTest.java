@@ -280,7 +280,8 @@ class SectionsTest {
             () -> assertThatThrownBy(() -> allSections.findSourceToTargetRoute(station1, station5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 연결되어있지 않습니다."),
-            () -> assertThatThrownBy(() -> allSections.findSourceToTargetDistance(station1, station5))
+            () -> assertThatThrownBy(
+                () -> allSections.findSourceToTargetDistance(station1, station5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 연결되어있지 않습니다.")
         );
@@ -295,7 +296,8 @@ class SectionsTest {
             () -> assertThatThrownBy(() -> allSections.findSourceToTargetRoute(station1, station1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 동일합니다."),
-            () -> assertThatThrownBy(() -> allSections.findSourceToTargetDistance(station1, station1))
+            () -> assertThatThrownBy(
+                () -> allSections.findSourceToTargetDistance(station1, station1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 동일합니다.")
         );

@@ -29,7 +29,7 @@ public class StationService {
     public StationResponse findStationResponseById(Long id) {
         return StationResponse.of(
             stationDao.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."))
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."))
         );
     }
 
