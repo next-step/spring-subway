@@ -83,7 +83,7 @@ class LineIntegrationTest extends IntegrationTest {
         List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
                 .map(it -> Long.valueOf(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
-        List<Long> resultLineIds = response.jsonPath().getList("$.", FindAllLineResponse.class).stream()
+        List<Long> resultLineIds = response.jsonPath().getList(".", FindAllLineResponse.class).stream()
                 .map(FindAllLineResponse::getId)
                 .collect(Collectors.toList());
 
@@ -192,6 +192,27 @@ class LineIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("Line의 하행 종점에 구간을 등록한다.")
+    void createSectionOnLineDownStation() {
+        // given
+        Long stationRequest1 = createStation(new CreateStationRequest("역1")).body().as(CreateStationResponse.class).getId();
+        Long stationRequest2 = createStation(new CreateStationRequest("역2")).body().as(CreateStationResponse.class).getId();
+        Long stationRequest3 = createStation(new CreateStationRequest("역3")).body().as(CreateStationResponse.class).getId();
+
+        CreateLineRequest lineRequest2 = new CreateLineRequest("노선1", "bg-green-600", stationRequest1, stationRequest2, 5);
+
+        Long lineId = createLineByLineRequest(lineRequest2).body().as(CreateLineResponse.class).getId();
+
+        CreateSectionRequest sectionRequest = new CreateSectionRequest(stationRequest2, stationRequest3, 100);
+
+        // when
+        ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Test
     @DisplayName("Line의 중간에 삽입될 Section의 상행역을 기준으로 구간을 등록할 수 있다.")
     void createSectionOnLineMiddleStationByUpStation() {
         // given
@@ -265,7 +286,7 @@ class LineIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("Line에 Station 두개가 이미 존재할 경우, 구간을 삽입할 수 없다.")
-    void cannotCreateSectionIfStationAlreadyExists() {
+    void cannotCreateSectionIfStationAllExist() {
         // given
         Long stationRequest1 = createStation(new CreateStationRequest("역1")).body().as(CreateStationResponse.class).getId();
         Long stationRequest2 = createStation(new CreateStationRequest("역2")).body().as(CreateStationResponse.class).getId();
@@ -285,6 +306,30 @@ class LineIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest3);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("Line에 Station 두개가 모두 존재하지 않을 경우, 구간을 삽입할 수 없다.")
+    void cannotCreateSectionIfStationAllNotExist() {
+        // given
+        Long stationRequest1 = createStation(new CreateStationRequest("역1")).body().as(CreateStationResponse.class).getId();
+        Long stationRequest2 = createStation(new CreateStationRequest("역2")).body().as(CreateStationResponse.class).getId();
+        Long stationRequest3 = createStation(new CreateStationRequest("역3")).body().as(CreateStationResponse.class).getId();
+        Long stationRequest4 = createStation(new CreateStationRequest("역4")).body().as(CreateStationResponse.class).getId();
+        CreateLineRequest lineRequest1 = new CreateLineRequest("노선1", "bg-red-600", stationRequest1, stationRequest2, 10);
+
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(CreateLineResponse.class).getId();
+
+        CreateSectionRequest sectionRequest1 = new CreateSectionRequest(stationRequest1, stationRequest2, 100);
+        registerSectionToLine(lineId, sectionRequest1);
+
+        CreateSectionRequest sectionRequest2 = new CreateSectionRequest(stationRequest3, stationRequest4, 1);
+
+        // when
+        ExtractableResponse<Response> response = registerSectionToLine(lineId, sectionRequest2);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -355,5 +400,46 @@ class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("Line에 Station이 존재하지 않는 경우, Station을 제거할 수 없다")
+    void cannotDeleteStationIfStationNotExist() {
+        // given
+        Long stationRequest1 = createStation(new CreateStationRequest("역1")).body().as(CreateStationResponse.class).getId();
+        Long stationRequest2 = createStation(new CreateStationRequest("역2")).body().as(CreateStationResponse.class).getId();
+        Long stationRequest3 = createStation(new CreateStationRequest("역3")).body().as(CreateStationResponse.class).getId();
+        CreateLineRequest lineRequest1 = new CreateLineRequest("노선1", "bg-red-600", stationRequest1, stationRequest2, 10);
+
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(CreateLineResponse.class).getId();
+
+        CreateSectionRequest sectionRequest1 = new CreateSectionRequest(stationRequest1, stationRequest2, 100);
+        registerSectionToLine(lineId, sectionRequest1);
+
+        // when
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest3);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("Line에 Section이 하나만 있을 경우, Station을 제거할 수 없다")
+    void cannotDeleteStationIfLineSize_1() {
+        // given
+        Long stationRequest1 = createStation(new CreateStationRequest("역1")).body().as(CreateStationResponse.class).getId();
+        Long stationRequest2 = createStation(new CreateStationRequest("역2")).body().as(CreateStationResponse.class).getId();
+        CreateLineRequest lineRequest1 = new CreateLineRequest("노선1", "bg-red-600", stationRequest1, stationRequest2, 10);
+
+        Long lineId = createLineByLineRequest(lineRequest1).body().as(CreateLineResponse.class).getId();
+
+        CreateSectionRequest sectionRequest1 = new CreateSectionRequest(stationRequest1, stationRequest2, 100);
+        registerSectionToLine(lineId, sectionRequest1);
+
+        // when
+        ExtractableResponse<Response> response = deleteSectionByLineIdAndStationId(lineId, stationRequest2);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
