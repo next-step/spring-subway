@@ -3,6 +3,7 @@ package subway.domain;
 import java.util.List;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import subway.dto.PathResponse;
 
 
 public class Path {
