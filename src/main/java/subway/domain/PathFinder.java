@@ -32,7 +32,9 @@ public class PathFinder {
         DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(
             createWeightedGraph(sourceId));
 
-        return dijkstraShortestPath.getPath(source, target).getWeight();
+        return Optional.ofNullable(dijkstraShortestPath.getPath(source, target))
+            .map(GraphPath::getWeight)
+            .orElseThrow(() -> new IllegalSectionException("출발역과 도착역이 연결되어 있지 않습니다."));
     }
 
     public List<Station> searchShortestPath(long sourceId, long targetId) {
@@ -70,12 +72,28 @@ public class PathFinder {
     private WeightedMultigraph<Station, DefaultWeightedEdge> createWeightedGraph(long stationId) {
         WeightedMultigraph<Station, DefaultWeightedEdge> graph = new WeightedMultigraph<>(
             DefaultWeightedEdge.class);
+        addVertexes(graph);
+        addStationConnectedSections(stationId, graph);
+        addRemainSections(stationId, graph);
+        return graph;
+    }
 
-        upStationMap.keySet()
-            .forEach(key -> graph.addVertex(upStationMap.get(key).getUpStation()));
-        downStationMap.keySet()
-            .forEach(key -> graph.addVertex(downStationMap.get(key).getDownStation()));
+    private void addRemainSections(long stationId, WeightedMultigraph<Station, DefaultWeightedEdge> graph) {
+        addConnectedEdges(upStationMap, stationId, graph);
+        addConnectedEdges(downStationMap, stationId, graph);
+    }
 
+    private void addConnectedEdges(Map<Long, Section> stationMap, long stationId,
+        WeightedMultigraph<Station, DefaultWeightedEdge> graph) {
+        stationMap.keySet().stream()
+            .filter(key -> key != stationId)
+            .forEach(key -> graph.setEdgeWeight(
+                graph.addEdge(stationMap.get(key).getUpStation(),
+                    stationMap.get(key).getDownStation()),
+                stationMap.get(key).getDistance()));
+    }
+
+    private void addStationConnectedSections(long stationId, WeightedMultigraph<Station, DefaultWeightedEdge> graph) {
         if (upStationMap.containsKey(stationId)) {
             Section section = upStationMap.get(stationId);
             graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()),
@@ -87,21 +105,13 @@ public class PathFinder {
             graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()),
                 section.getDistance());
         }
+    }
 
-        upStationMap.keySet().stream()
-            .filter(key -> key != stationId)
-            .forEach(key -> graph.setEdgeWeight(
-                graph.addEdge(upStationMap.get(key).getUpStation(),
-                    upStationMap.get(key).getDownStation()),
-                upStationMap.get(key).getDistance()));
-
-        downStationMap.keySet().stream()
-            .filter(key -> key != stationId)
-            .forEach(key -> graph.setEdgeWeight(
-                graph.addEdge(downStationMap.get(key).getUpStation(),
-                    downStationMap.get(key).getDownStation()),
-                downStationMap.get(key).getDistance()));
-
-        return graph;
+    private void addVertexes(WeightedMultigraph<Station, DefaultWeightedEdge> graph) {
+        upStationMap.keySet()
+            .forEach(key -> {
+                graph.addVertex(upStationMap.get(key).getUpStation());
+                graph.addVertex(upStationMap.get(key).getDownStation());
+            });
     }
 }
