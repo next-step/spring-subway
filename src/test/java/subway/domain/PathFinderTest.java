@@ -14,22 +14,34 @@ public class PathFinderTest {
 
     private Long 출발역_아이디;
     private Long 도착역_아이디;
-    private Station 교대역 = new Station(5L, "교대역");
-    private Station 강남역 = new Station(6L, "강남역");
-    private Station 남부터미널역 = new Station(7L, "남부터미널역");
-    private Station 양재역 = new Station(8L, "양재역");
-    private Station 부산역 = new Station(9L, "부산역");
-    private Line 이호선 = new Line(2L, "2호선", "빨강");
-    private Line 삼호선 = new Line(3L, "삼호선", "노랑");
-    private Line 신분당선 = new Line(4L, "신분당선", "파랑");
-    private Section 교대_강남 = new Section(2L, 교대역, 강남역, 이호선, 1);
-    private Section 교대_남부터미널 = new Section(3L, 교대역, 남부터미널역, 삼호선, 2);
-    private Section 강남_양재 = new Section(4L, 강남역, 양재역, 신분당선, 5);
-    private Section 남부터미널_양재 = new Section(5L, 남부터미널역, 양재역, 삼호선, 3);
+    private Station 교대역;
+    private Station 강남역;
+    private Station 남부터미널역;
+    private Station 양재역;
+    private Station 부산역;
+    private Line 이호선;
+    private Line 삼호선;
+    private Line 신분당선;
+    private Section 교대_강남;
+    private Section 교대_남부터미널;
+    private Section 강남_양재;
+    private Section 남부터미널_양재;
     private List<Section> 교대_강남_남부터미널_양재;
 
     @BeforeEach
     void setUp() {
+        교대역 = new Station(5L, "교대역");
+        강남역 = new Station(6L, "강남역");
+        남부터미널역 = new Station(7L, "남부터미널역");
+        양재역 = new Station(8L, "양재역");
+        부산역 = new Station(9L, "부산역");
+        이호선 = new Line(2L, "2호선", "빨강");
+        삼호선 = new Line(3L, "삼호선", "노랑");
+        신분당선 = new Line(4L, "신분당선", "파랑");
+        교대_강남 = new Section(2L, 교대역, 강남역, 이호선, 1);
+        교대_남부터미널 = new Section(3L, 교대역, 남부터미널역, 삼호선, 2);
+        강남_양재 = new Section(4L, 강남역, 양재역, 신분당선, 5);
+        남부터미널_양재 = new Section(5L, 남부터미널역, 양재역, 삼호선, 3);
         교대_강남_남부터미널_양재 = List.of(교대_강남, 교대_남부터미널, 강남_양재, 남부터미널_양재);
     }
 

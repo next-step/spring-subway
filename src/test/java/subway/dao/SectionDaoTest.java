@@ -23,9 +23,10 @@ import subway.domain.Station;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 class SectionDaoTest {
 
+    private Section expectedSection;
+
     @Autowired
     private SectionDao sectionDao;
-    private Section expectedSection;
 
     @BeforeEach
     void setup() {
