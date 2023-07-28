@@ -1,44 +1,52 @@
 package subway.domain;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 
 public class PathFinder {
 
-    private final Set<Station> vertexes;
-    private final DijkstraShortestPath<Station, DefaultWeightedEdge> weightedGraph;
+    private final Map<Long, Section> upStationMap = new HashMap<>();
+    private final Map<Long, Section> downStationMap = new HashMap<>();
 
     public PathFinder(List<Section> sections) {
-        WeightedMultigraph<Station, DefaultWeightedEdge> weightedGraph = createWeightedGraph(sections);
-        this.vertexes = weightedGraph.vertexSet();
-        this.weightedGraph = new DijkstraShortestPath<>(weightedGraph);
+        sections.forEach(section -> {
+            upStationMap.put(section.getUpStation().getId(), section);
+            downStationMap.put(section.getDownStation().getId(), section);
+        });
     }
 
     public double calculateShortestDistance(long sourceId, long targetId) {
-        Station source = getVertex(sourceId)
-            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
-        Station target = getVertex(targetId)
-            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
+        Station source = getStation(sourceId);
+        Station target = getStation(targetId);
 
         validateSourceAndTarget(source, target);
 
-        return weightedGraph.getPath(source, target).getWeight();
+        DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(
+            createWeightedGraph(sourceId));
+
+        return dijkstraShortestPath.getPath(source, target).getWeight();
     }
 
     public List<Station> searchShortestPath(long sourceId, long targetId) {
-        Station source = getVertex(sourceId)
-            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
-        Station target = getVertex(targetId)
-            .orElseThrow(() -> new IllegalStationsException("존재하지 않는 역 정보입니다."));
+        Station source = getStation(sourceId);
+        Station target = getStation(targetId);
 
         validateSourceAndTarget(source, target);
 
-        return weightedGraph.getPath(source, target).getVertexList();
+        DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(
+            createWeightedGraph(sourceId));
+
+        return Optional.ofNullable(dijkstraShortestPath.getPath(source, target))
+            .map(GraphPath::getVertexList)
+            .orElseThrow(() -> new IllegalSectionException("출발역과 도착역이 연결되어 있지 않습니다."));
     }
 
     private void validateSourceAndTarget(Station source, Station target) {
@@ -47,29 +55,53 @@ public class PathFinder {
         }
     }
 
-    private WeightedMultigraph<Station, DefaultWeightedEdge> createWeightedGraph(
-        List<Section> sections) {
+    private Station getStation(long stationId) {
+        if (upStationMap.containsKey(stationId)) {
+            return upStationMap.get(stationId).getUpStation();
+        }
+
+        if (downStationMap.containsKey(stationId)) {
+            return downStationMap.get(stationId).getDownStation();
+        }
+
+        throw new IllegalStationsException("존재하지 않는 역 정보입니다.");
+    }
+
+    private WeightedMultigraph<Station, DefaultWeightedEdge> createWeightedGraph(long stationId) {
         WeightedMultigraph<Station, DefaultWeightedEdge> graph = new WeightedMultigraph<>(
             DefaultWeightedEdge.class);
 
-        // 역 추가
-        graph.addVertex(sections.get(0).getUpStation());
-        sections.forEach(section -> graph.addVertex(section.getDownStation()));
+        upStationMap.keySet()
+            .forEach(key -> graph.addVertex(upStationMap.get(key).getUpStation()));
+        downStationMap.keySet()
+            .forEach(key -> graph.addVertex(downStationMap.get(key).getDownStation()));
 
-        // 양방향 경로 추가
-        sections.forEach(section -> {
+        if (upStationMap.containsKey(stationId)) {
+            Section section = upStationMap.get(stationId);
             graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()),
                 section.getDistance());
-            graph.setEdgeWeight(graph.addEdge(section.getDownStation(), section.getUpStation()),
+        }
+
+        if (downStationMap.containsKey(stationId)) {
+            Section section = downStationMap.get(stationId);
+            graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()),
                 section.getDistance());
-        });
+        }
+
+        upStationMap.keySet().stream()
+            .filter(key -> key != stationId)
+            .forEach(key -> graph.setEdgeWeight(
+                graph.addEdge(upStationMap.get(key).getUpStation(),
+                    upStationMap.get(key).getDownStation()),
+                upStationMap.get(key).getDistance()));
+
+        downStationMap.keySet().stream()
+            .filter(key -> key != stationId)
+            .forEach(key -> graph.setEdgeWeight(
+                graph.addEdge(downStationMap.get(key).getUpStation(),
+                    downStationMap.get(key).getDownStation()),
+                downStationMap.get(key).getDistance()));
 
         return graph;
-    }
-
-    private Optional<Station> getVertex(final long stationId) {
-        return vertexes.stream()
-            .filter(station -> station.getId()==stationId)
-            .findFirst();
     }
 }
