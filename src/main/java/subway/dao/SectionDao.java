@@ -45,6 +45,18 @@ public class SectionDao {
             section.getDownStation(), section.getDistance());
     }
 
+    public List<Section> findAll() {
+        final String sql = SECTION_FIELD_SELECT_SQL
+            + "FROM section AS s "
+            + "JOIN line AS l "
+            + "ON s.line_id = l.id "
+            + "JOIN station AS up "
+            + "ON s.up_station_id = up.id "
+            + "JOIN station AS down "
+            + "ON s.down_station_id = down.id ";
+        return jdbcTemplate.query(sql, sectionMapper.getRowMapper());
+    }
+
     public List<Section> findAllByLineId(final long lineId) {
         final String sql = SECTION_FIELD_SELECT_SQL
             + "FROM section AS s "

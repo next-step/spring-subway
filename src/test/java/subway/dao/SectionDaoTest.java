@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -36,17 +37,30 @@ class SectionDaoTest {
     @DisplayName("삽입에 성공하면 식별자가 포함된 Section 을 반환한다.")
     void insertTest() {
         // given & when
-        Section section = initializeSection();
+        Section section = initializeSingleSection();
 
         // then
         assertThat(section.getId()).isNotNull();
     }
 
     @Test
-    @DisplayName("노선의 모든 구간을 반환한다.")
+    @DisplayName("모든 구간을 조회한다.")
     void findAllTest() {
         // given
-        Section upSection = initializeSection();
+        List<Section> sections = initializeSections();
+
+        // when
+        List<Section> result = sectionDao.findAll();
+
+        // then
+        assertThat(result).isEqualTo(sections);
+    }
+
+    @Test
+    @DisplayName("노선의 모든 구간을 반환한다.")
+    void findAllByLineIdTest() {
+        // given
+        Section upSection = initializeSingleSection();
         Section downSection = extendSection(upSection.getLine(), upSection.getDownStation());
         long lineId = upSection.getLine().getId();
 
@@ -63,7 +77,7 @@ class SectionDaoTest {
     @DisplayName("식별자가 일치하는 구간을 갱신한다.")
     void updateTest() {
         // given
-        Section section = initializeSection();
+        Section section = initializeSingleSection();
         Section update = new Section(section.getId(), section.getLine(), section.getUpStation(),
             section.getDownStation(), 20);
         long lineId = section.getLine().getId();
@@ -82,7 +96,7 @@ class SectionDaoTest {
     @DisplayName("입력으로 들어온 식별자를 갖는 구간을 삭제한다.")
     void deleteSectionTest() {
         // given
-        Section section = initializeSection();
+        Section section = initializeSingleSection();
         long lineId = section.getLine().getId();
 
         // when
@@ -97,7 +111,7 @@ class SectionDaoTest {
     @DisplayName("역에 속한 구간의 개수를 반환한다.")
     void countTest() {
         // given
-        Section section = initializeSection();
+        Section section = initializeSingleSection();
         long lineId = section.getLine().getId();
         extendSection(section.getLine(), section.getDownStation());
 
@@ -113,7 +127,7 @@ class SectionDaoTest {
     void existByLineIdAndStationIdTest() {
         // given
         long notExistStationId = 999L;
-        Section section = initializeSection();
+        Section section = initializeSingleSection();
 
         // when & then
         assertAll(
@@ -125,7 +139,25 @@ class SectionDaoTest {
         );
     }
 
-    private Section initializeSection() {
+    private List<Section> initializeSections() {
+        Line lineNo2 = lineDao.insert(new Line("2호선", "green"));
+        Line lineNo3 = lineDao.insert(new Line("3호선", "orange"));
+
+        Station wangsimni = stationDao.insert(new Station("왕십리"));
+        Station sangwangsimni = stationDao.insert(new Station("상왕십리"));
+        Station sindang = stationDao.insert(new Station("신당"));
+
+        Section section1 = sectionDao.insert(
+            new Section(lineNo2, wangsimni, sangwangsimni, 10)
+        );
+        Section section2 = sectionDao.insert(
+            new Section(lineNo3, sangwangsimni, sindang, 20)
+        );
+
+        return Arrays.asList(section1, section2);
+    }
+
+    private Section initializeSingleSection() {
         Line line = lineDao.insert(new Line("2호선", "green"));
 
         Station station1 = stationDao.insert(new Station("왕십리"));
