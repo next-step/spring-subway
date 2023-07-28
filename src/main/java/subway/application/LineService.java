@@ -64,7 +64,8 @@ public class LineService {
     }
 
     public Line findLineById(Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("해당 노선이 존재하지 않습니다."));
     }
 
     @Transactional
