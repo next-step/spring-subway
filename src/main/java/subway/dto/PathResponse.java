@@ -6,8 +6,11 @@ import subway.domain.Station;
 
 public class PathResponse {
 
-    private final List<Station> stations;
-    private final int distance;
+    private List<Station> stations;
+    private int distance;
+
+    private PathResponse() {
+    }
 
     public PathResponse(final List<Station> stations, final int distance) {
         this.stations = stations;
