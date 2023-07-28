@@ -43,6 +43,10 @@ public class LineSections {
         return sections.remove(station);
     }
 
+    public List<Station> getAllStations() {
+        return this.sections.getStations();
+    }
+
     public Line getLine() {
         return line;
     }

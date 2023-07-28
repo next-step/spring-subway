@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Section 클래스 테스트")
+@DisplayName("Section 단위 테스트")
 class SectionTest {
 
     Line lineA;
