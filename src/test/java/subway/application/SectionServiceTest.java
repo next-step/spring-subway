@@ -55,7 +55,7 @@ class SectionServiceTest {
         final SectionRequest sectionRequest = new SectionRequest(String.valueOf(upStation.getId()),
             String.valueOf(downStation.getId()), 10);
 
-        given(sectionDao.findAll(1L)).willReturn(sections);
+        given(sectionDao.findAllByLineId(1L)).willReturn(sections);
         given(sectionDao.insert(any(Section.class))).willReturn(newSection);
         given(stationDao.findById(upStation.getId())).willReturn(Optional.of(upStation));
         given(stationDao.findById(downStation.getId())).willReturn(Optional.of(downStation));
@@ -99,7 +99,7 @@ class SectionServiceTest {
         final Section oldSection = new Section(1L, line, upStation, downStation, 10);
         final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
 
-        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
+        given(sectionDao.findAllByLineId(1L)).willReturn(List.of(oldSection));
         given(stationDao.findById(upStation.getId())).willReturn(Optional.of(upStation));
         given(stationDao.findById(downStation.getId())).willReturn(Optional.of(downStation));
 
@@ -127,7 +127,7 @@ class SectionServiceTest {
 
         given(stationDao.findById(notExistStation1.getId())).willReturn(Optional.of(notExistStation1));
         given(stationDao.findById(notExistStation2.getId())).willReturn(Optional.of(notExistStation2));
-        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
+        given(sectionDao.findAllByLineId(1L)).willReturn(List.of(oldSection));
 
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
@@ -178,7 +178,7 @@ class SectionServiceTest {
 
         given(sectionDao.existByLineIdAndStationId(lineId, startStationId)).willReturn(true);
         given(sectionDao.count(lineId)).willReturn(3L);
-        given(sectionDao.findAll(lineId)).willReturn(sections);
+        given(sectionDao.findAllByLineId(lineId)).willReturn(sections);
         doNothing().when(sectionDao).delete(deleteTarget.getId());
 
         // when & then
@@ -203,7 +203,7 @@ class SectionServiceTest {
 
         given(sectionDao.existByLineIdAndStationId(lineId, deleteStationId)).willReturn(true);
         given(sectionDao.count(lineId)).willReturn((long) sections.size());
-        given(sectionDao.findAll(lineId)).willReturn(sections);
+        given(sectionDao.findAllByLineId(lineId)).willReturn(sections);
         doNothing().when(sectionDao).delete(deleteTarget.getId());
         doNothing().when(sectionDao).update(updatedResult);
 

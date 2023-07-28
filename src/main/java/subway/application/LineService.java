@@ -67,7 +67,7 @@ public class LineService {
     }
 
     private List<StationPair> getStationPairs(Long id) {
-        return sectionDao.findAll(id).stream()
+        return sectionDao.findAllByLineId(id).stream()
             .map(StationPair::of)
             .collect(Collectors.toList());
     }

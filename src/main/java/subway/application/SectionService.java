@@ -30,7 +30,7 @@ public class SectionService {
         final Station upStation = getStationById(sectionRequest.getUpStationId());
         final Station downStation = getStationById(sectionRequest.getDownStationId());
 
-        final Sections sections = new Sections(sectionDao.findAll(lineId));
+        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         final SectionParam params = new SectionParam(lineId, upStation, downStation,
             sectionRequest.getDistance());
 
@@ -46,7 +46,7 @@ public class SectionService {
         validateLineInStation(lineId, stationId);
         validateSectionInLine(lineId);
 
-        final Sections sections = new Sections(sectionDao.findAll(lineId));
+        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
 
         if (sections.isLastStation(stationId)) {
             deleteLastSection(stationId, sections);

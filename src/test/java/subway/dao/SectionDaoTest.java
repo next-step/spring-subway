@@ -51,7 +51,7 @@ class SectionDaoTest {
         long lineId = upSection.getLine().getId();
 
         // when
-        List<Section> result = sectionDao.findAll(lineId);
+        List<Section> result = sectionDao.findAllByLineId(lineId);
 
         // then
         assertThat(result)
@@ -72,7 +72,7 @@ class SectionDaoTest {
         sectionDao.update(update);
 
         // then
-        Optional<Section> updateResult = sectionDao.findAll(lineId).stream()
+        Optional<Section> updateResult = sectionDao.findAllByLineId(lineId).stream()
             .filter(update::equals)
             .findFirst();
         assertThat(updateResult).isPresent();

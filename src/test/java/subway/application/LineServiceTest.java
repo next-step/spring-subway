@@ -116,7 +116,7 @@ class LineServiceTest {
         Line line = createInitialLine();
 
         given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
-        given(sectionDao.findAll(line.getId())).willReturn(createInitialSections(line));
+        given(sectionDao.findAllByLineId(line.getId())).willReturn(createInitialSections(line));
 
         // when
         LineResponse lineResponse = lineService.findLineResponseById(line.getId());

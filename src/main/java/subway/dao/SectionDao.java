@@ -45,7 +45,7 @@ public class SectionDao {
             section.getDownStation(), section.getDistance());
     }
 
-    public List<Section> findAll(final long lineId) {
+    public List<Section> findAllByLineId(final long lineId) {
         final String sql = SECTION_FIELD_SELECT_SQL
             + "FROM section AS s "
             + "JOIN line AS l "
