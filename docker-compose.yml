@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  database:
+    image: mariadb:10.5
+    container_name: spring-subway-mariadb
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      TZ: Asia/Seoul
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: spring_subway
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    command: ["mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
