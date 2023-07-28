@@ -12,8 +12,7 @@ import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
-import subway.exception.IllegalLineException;
-import subway.exception.IllegalStationsException;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,7 +62,7 @@ public class LineService {
 
     public Line findLineById(Long id) {
         return lineDao.findById(id)
-                .orElseThrow(() -> new IllegalLineException(String.format("해당 id(%d)의 노선이 존재하지 않습니다.", id)));
+                .orElseThrow(() -> new SubwayException(String.format("해당 id(%d)의 노선이 존재하지 않습니다.", id)));
     }
 
     public void updateLine(Long id, LineRequest lineUpdateRequest) {
@@ -77,14 +76,14 @@ public class LineService {
     private void validateName(final String name) {
         lineDao.findByName(name)
                 .ifPresent(line -> {
-                    throw new IllegalLineException("노선 이름은 중복될 수 없습니다.");
+                    throw new SubwayException("노선 이름은 중복될 수 없습니다.");
                 });
     }
 
     private Station findStation(final long id) {
         return stationDao.findById(id)
                 .orElseThrow(() ->
-                        new IllegalStationsException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
+                        new SubwayException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
                 );
     }
 }

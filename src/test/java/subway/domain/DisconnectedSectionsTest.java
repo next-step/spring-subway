@@ -3,7 +3,7 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.exception.IllegalStationException;
+import subway.exception.SubwayException;
 import subway.fixture.LineFixture;
 import subway.fixture.SectionFixture;
 
@@ -50,7 +50,7 @@ class DisconnectedSectionsTest {
         // when & then
         assertThatThrownBy(() -> DisconnectedSections.of(sections))
                 .hasMessage("해당 노선에 삭제할 역이 존재하지 않습니다.")
-                .isInstanceOf(IllegalStationException.class);
+                .isInstanceOf(SubwayException.class);
     }
 
     @DisplayName("이상한 sections로 DisconnectedSections 생성에 실패한다.")

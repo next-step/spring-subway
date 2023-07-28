@@ -3,7 +3,7 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.exception.IllegalSectionException;
+import subway.exception.SubwayException;
 import subway.fixture.LineFixture;
 import subway.fixture.SectionFixture;
 import subway.fixture.StationFixture;
@@ -51,7 +51,7 @@ class SectionsTest {
 
         // when & then
         assertThatThrownBy(() -> 신분당선_구간들.findConnectedSection(첫번째역_두번째역_구간))
-                .isInstanceOf(IllegalSectionException.class)
+                .isInstanceOf(SubwayException.class)
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
 
@@ -64,7 +64,7 @@ class SectionsTest {
 
         // when & then
         assertThatThrownBy(() -> 신분당선_구간들.findConnectedSection(SectionFixture.여섯번째역_일곱번째역_구간(신분당선)))
-                .isInstanceOf(IllegalSectionException.class)
+                .isInstanceOf(SubwayException.class)
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
 
@@ -81,7 +81,7 @@ class SectionsTest {
 
         // when & then
         assertThatThrownBy(() -> 신분당선_구간들.findConnectedSection(첫번째역_여섯번째역_구간))
-                .isInstanceOf(IllegalSectionException.class)
+                .isInstanceOf(SubwayException.class)
                 .hasMessage("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
     }
 
@@ -174,7 +174,7 @@ class SectionsTest {
         // when & then
         assertThatThrownBy(() -> 신분당선_구간들.disconnect(StationFixture.첫번째역().getId()))
                 .hasMessage("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.")
-                .isInstanceOf(IllegalSectionException.class);
+                .isInstanceOf(SubwayException.class);
     }
 
     private Sections create_신분당선_구간들() {

@@ -9,27 +9,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class SubwayControllerAdvice {
 
-    @ExceptionHandler(IllegalSectionException.class)
+    @ExceptionHandler(SubwayException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse illegalSectionExceptionHandler(IllegalSectionException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler(IllegalLineException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse illegalLineExceptionHandler(IllegalLineException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler(IllegalStationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse illegalStationExceptionHandler(IllegalStationException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler(IllegalStationsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse illegalStationsExceptionHandler(IllegalStationsException exception) {
+    public ErrorResponse illegalSubwayExceptionHandler(SubwayException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 

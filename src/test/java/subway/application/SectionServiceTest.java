@@ -14,9 +14,7 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
-import subway.exception.IllegalLineException;
-import subway.exception.IllegalSectionException;
-import subway.exception.IllegalStationException;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +76,7 @@ class SectionServiceTest {
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(lineId, sectionRequest))
                 .hasMessage("해당 노선은 생성되지 않았습니다.")
-                .isInstanceOf(IllegalLineException.class);
+                .isInstanceOf(SubwayException.class);
 
     }
 
@@ -100,7 +98,7 @@ class SectionServiceTest {
         final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
         assertThatThrownBy(() -> sectionService.saveSection(1L, sectionRequest))
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
-                .isInstanceOf(IllegalSectionException.class);
+                .isInstanceOf(SubwayException.class);
     }
 
     @DisplayName("새로운 구간의 상행 및 하행 역이 모두 해당 노선에 등록되지 않아서 구간 생성 실패")
@@ -121,7 +119,7 @@ class SectionServiceTest {
         // when & then
         assertThatThrownBy(() -> sectionService.saveSection(line.getId(), sectionRequest))
                 .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.")
-                .isInstanceOf(IllegalSectionException.class);
+                .isInstanceOf(SubwayException.class);
     }
 
     @DisplayName("하행 마지막 구간 삭제 성공")
@@ -178,7 +176,7 @@ class SectionServiceTest {
         // when & then
         assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), stationId))
                 .hasMessage("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.")
-                .isInstanceOf(IllegalSectionException.class);
+                .isInstanceOf(SubwayException.class);
     }
 
     @DisplayName("지하철 노선에 삭제할 역이 존재하지 않아 구간 제거 실패")
@@ -199,6 +197,6 @@ class SectionServiceTest {
         // when & then
         assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), stationId))
                 .hasMessage("해당 노선에 삭제할 역이 존재하지 않습니다.")
-                .isInstanceOf(IllegalStationException.class);
+                .isInstanceOf(SubwayException.class);
     }
 }

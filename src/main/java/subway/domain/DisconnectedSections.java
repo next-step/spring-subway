@@ -1,7 +1,7 @@
 package subway.domain;
 
 
-import subway.exception.IllegalStationException;
+import subway.exception.SubwayException;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public final class DisconnectedSections {
             throw new IllegalArgumentException("[ERROR] 노선의 구간들이 올바르게 연결되어 있지 않습니다.");
         }
         if (sections.isEmpty()) {
-            throw new IllegalStationException("해당 노선에 삭제할 역이 존재하지 않습니다.");
+            throw new SubwayException("해당 노선에 삭제할 역이 존재하지 않습니다.");
         }
     }
 

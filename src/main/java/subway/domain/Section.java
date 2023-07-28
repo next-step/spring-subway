@@ -1,6 +1,6 @@
 package subway.domain;
 
-import subway.exception.IllegalSectionException;
+import subway.exception.SubwayException;
 
 import java.util.Objects;
 
@@ -43,13 +43,13 @@ public final class Section {
 
     private void validateStations(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
-            throw new IllegalSectionException("상행역과 하행역은 같을 수 없습니다.");
+            throw new SubwayException("상행역과 하행역은 같을 수 없습니다.");
         }
     }
 
     private void validateDistance(final int distance) {
         if (distance <= 0) {
-            throw new IllegalSectionException("구간 길이는 0보다 커야합니다.");
+            throw new SubwayException("구간 길이는 0보다 커야합니다.");
         }
     }
 

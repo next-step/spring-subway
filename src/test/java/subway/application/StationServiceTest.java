@@ -10,7 +10,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-import subway.exception.IllegalStationException;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +55,7 @@ class StationServiceTest {
         // when & then
         assertThatThrownBy(() -> stationService.saveStation(stationRequest))
                 .hasMessage("중복된 이름(" + stationRequest.getName() + ")의 역이 존재합니다.")
-                .isInstanceOf(IllegalStationException.class);
+                .isInstanceOf(SubwayException.class);
     }
 
     @DisplayName("역을 조회하는 데 성공한다.")
@@ -85,7 +85,7 @@ class StationServiceTest {
         // when & then
         assertThatThrownBy(() -> stationService.findStationById(stationId))
                 .hasMessage(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", stationId))
-                .isInstanceOf(IllegalStationException.class);
+                .isInstanceOf(SubwayException.class);
     }
 
     @DisplayName("모든 역을 조회하는 데 성공한다.")

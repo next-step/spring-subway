@@ -1,7 +1,6 @@
 package subway.domain;
 
-import subway.exception.IllegalLineException;
-import subway.exception.IllegalSectionException;
+import subway.exception.SubwayException;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -84,7 +83,7 @@ public final class Sections {
 
     private void validateLine(final List<Section> sections) {
         if (sections.isEmpty()) {
-            throw new IllegalLineException("해당 노선은 생성되지 않았습니다.");
+            throw new SubwayException("해당 노선은 생성되지 않았습니다.");
         }
     }
 
@@ -106,7 +105,7 @@ public final class Sections {
 
     private void validateDisconnection() {
         if (sections.size() < MIN_SIZE_CAN_DELETE) {
-            throw new IllegalSectionException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
+            throw new SubwayException("노선에 구간이 최소 2개가 있어야 삭제가 가능합니다.");
         }
     }
 
@@ -125,7 +124,7 @@ public final class Sections {
 
     private void validateStations(final boolean isUpStationExists, final boolean isDownStationExists) {
         if (isUpStationExists == isDownStationExists) {
-            throw new IllegalSectionException("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
+            throw new SubwayException("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
         }
     }
 
@@ -149,7 +148,7 @@ public final class Sections {
 
     private void validateDistance(final Section existSection, final int distance) {
         if (!existSection.isDistanceGreaterThan(distance)) {
-            throw new IllegalSectionException("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
+            throw new SubwayException("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
         }
     }
 

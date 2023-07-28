@@ -6,7 +6,7 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-import subway.exception.IllegalStationException;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ public class StationService {
     private void validateByName(final String name) {
         stationDao.findByName(name)
                 .ifPresent(station -> {
-                    throw new IllegalStationException(String.format("중복된 이름(%s)의 역이 존재합니다.", name));
+                    throw new SubwayException(String.format("중복된 이름(%s)의 역이 존재합니다.", name));
                 });
     }
 
@@ -41,7 +41,7 @@ public class StationService {
     private Station findStation(final long id) {
         return stationDao.findById(id)
                 .orElseThrow(() ->
-                        new IllegalStationException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
+                        new SubwayException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
                 );
     }
 

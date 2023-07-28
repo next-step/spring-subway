@@ -2,7 +2,7 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.exception.IllegalSectionException;
+import subway.exception.SubwayException;
 import subway.fixture.LineFixture;
 import subway.fixture.SectionFixture;
 import subway.fixture.StationFixture;
@@ -34,7 +34,7 @@ class SectionTest {
         // when & then
         assertThatThrownBy(() -> new Section(신분당선, 첫번째역, 두번째역, 0))
                 .hasMessage("구간 길이는 0보다 커야합니다.")
-                .isInstanceOf(IllegalSectionException.class);
+                .isInstanceOf(SubwayException.class);
     }
 
     @DisplayName("상행 및 하행역이 같아 section 생성에 실패한다.")
@@ -47,6 +47,6 @@ class SectionTest {
         // when & then
         assertThatThrownBy(() -> new Section(신분당선, 첫번째역, 첫번째역, SectionFixture.DEFAULT_DISTANCE))
                 .hasMessage("상행역과 하행역은 같을 수 없습니다.")
-                .isInstanceOf(IllegalSectionException.class);
+                .isInstanceOf(SubwayException.class);
     }
 }
