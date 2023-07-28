@@ -105,9 +105,9 @@ public class SectionService {
         Sections allSections = sectionDao.findAll();
 
         List<Station> sourceToTargetRoute
-            = allSections.findStationToStationRoute(sourceStation, targetStation);
+            = allSections.findSourceToTargetRoute(sourceStation, targetStation);
         Distance sourceToTargetDistance
-            = allSections.findStationToStationDistance(sourceStation, targetStation);
+            = allSections.findSourceToTargetDistance(sourceStation, targetStation);
 
         return new PathResponse(sourceToTargetRoute, sourceToTargetDistance.getDistance());
     }

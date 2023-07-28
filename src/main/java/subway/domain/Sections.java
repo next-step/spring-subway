@@ -151,7 +151,7 @@ public class Sections {
             .collect(Collectors.toUnmodifiableSet());
     }
 
-    public Distance findStationToStationDistance(Station sourceStation, Station targetStation) {
+    public Distance findSourceToTargetDistance(Station sourceStation, Station targetStation) {
         DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
 
         double pathWeight = dijkstraShortestPath.getPathWeight(sourceStation, targetStation);
@@ -170,7 +170,7 @@ public class Sections {
         }
     }
 
-    public List<Station> findStationToStationRoute(Station sourceStation, Station targetStation) {
+    public List<Station> findSourceToTargetRoute(Station sourceStation, Station targetStation) {
         DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
 
         List<Station> shortestPath = makeShortestPath(

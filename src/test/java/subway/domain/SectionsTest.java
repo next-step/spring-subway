@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -241,7 +240,7 @@ class SectionsTest {
         );
         Sections allSections = new Sections(List.of(section1, section2, section3, section4));
 
-        Distance result = allSections.findStationToStationDistance(station1, station4);
+        Distance result = allSections.findSourceToTargetDistance(station1, station4);
 
         assertThat(result).isEqualTo(new Distance(23));
     }
@@ -259,7 +258,7 @@ class SectionsTest {
         );
         Sections allSections = new Sections(List.of(section1, section2, section3, section4));
 
-        List<Station> result = allSections.findStationToStationRoute(station1, station4);
+        List<Station> result = allSections.findSourceToTargetRoute(station1, station4);
 
         assertThat(result).isEqualTo(List.of(station1, station3, station4));
     }
@@ -278,10 +277,10 @@ class SectionsTest {
         Sections allSections = new Sections(List.of(section1, section2, section3, section4));
 
         assertAll(
-            () -> assertThatThrownBy(() -> allSections.findStationToStationRoute(station1, station5))
+            () -> assertThatThrownBy(() -> allSections.findSourceToTargetRoute(station1, station5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 연결되어있지 않습니다."),
-            () -> assertThatThrownBy(() -> allSections.findStationToStationDistance(station1, station5))
+            () -> assertThatThrownBy(() -> allSections.findSourceToTargetDistance(station1, station5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 연결되어있지 않습니다.")
         );
@@ -293,10 +292,10 @@ class SectionsTest {
         Sections allSections = new Sections(List.of(section1, section2, section3));
 
         assertAll(
-            () -> assertThatThrownBy(() -> allSections.findStationToStationRoute(station1, station1))
+            () -> assertThatThrownBy(() -> allSections.findSourceToTargetRoute(station1, station1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 동일합니다."),
-            () -> assertThatThrownBy(() -> allSections.findStationToStationDistance(station1, station1))
+            () -> assertThatThrownBy(() -> allSections.findSourceToTargetDistance(station1, station1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 동일합니다.")
         );
