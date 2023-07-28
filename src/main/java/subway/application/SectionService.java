@@ -1,5 +1,6 @@
 package subway.application;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,10 +11,8 @@ import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.SectionCreateType;
-import subway.domain.SectionDeleteType;
 import subway.domain.Sections;
 import subway.domain.Station;
-import subway.domain.vo.SectionDeleteVo;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 import subway.exception.LineNotFoundException;
@@ -70,17 +69,10 @@ public class SectionService {
     @Transactional
     public void deleteSection(Long lineId, Long stationId) {
         Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        SectionDeleteVo deleteVo = findSectionDeleteVo(stationId, sections);
-        deleteVo.getDeleteSections().forEach(section -> sectionDao.deleteById(section.getId()));
-        deleteVo.getCombinedSection().ifPresent(sectionDao::insert);
+        List<Section> deleteSections = sections.findDeleteSections(stationId);
+        Optional<Section> combinedSection = sections.findCombinedSection(stationId);
+
+        deleteSections.forEach(section -> sectionDao.deleteById(section.getId()));
+        combinedSection.ifPresent(sectionDao::insert);
     }
-
-    private static SectionDeleteVo findSectionDeleteVo(Long stationId, Sections sections) {
-        SectionDeleteType deleteType = SectionDeleteType.of(sections, stationId);
-        Optional<Section> upSection = sections.findByDownStationId(stationId);
-        Optional<Section> downSection = sections.findByUpStationId(stationId);
-
-        return deleteType.deleteAndCombineSections(upSection, downSection);
-    }
-
 }

@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 public class Sections {
 
-    private static final int MINIMUM_DELETE_SIZE = 2;
     private final List<Section> sections;
 
     public Sections(List<Section> sections) {
@@ -94,8 +93,26 @@ public class Sections {
         return sections.isEmpty();
     }
 
-    public int size() {
-        return sections.size();
+    public List<Section> findDeleteSections(Long stationId) {
+        Optional<Section> upSection = findByDownStationId(stationId);
+        Optional<Section> downSection = findByUpStationId(stationId);
+        SectionDeleteType deleteType = SectionDeleteType.of(
+                sections.size(),
+                upSection.isPresent(),
+                downSection.isPresent());
+
+        return deleteType.findDeleteSections(upSection.orElse(null), downSection.orElse(null));
+    }
+
+    public Optional<Section> findCombinedSection(Long stationId) {
+        Optional<Section> upSection = findByDownStationId(stationId);
+        Optional<Section> downSection = findByUpStationId(stationId);
+        SectionDeleteType deleteType = SectionDeleteType.of(
+                sections.size(),
+                upSection.isPresent(),
+                downSection.isPresent());
+
+        return deleteType.findCombinedSection(upSection.orElse(null), downSection.orElse(null));
     }
 
     public List<Section> getSections() {
