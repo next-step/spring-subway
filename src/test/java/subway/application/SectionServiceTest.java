@@ -1,5 +1,6 @@
 package subway.application;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -19,6 +20,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.dto.PathRequest;
 import subway.dto.SectionAdditionRequest;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,5 +82,50 @@ class SectionServiceTest {
         //then
         verify(sectionDao).update(any());
         verify(sectionDao).deleteByLineAndStation(lineA, stationB);
+    }
+
+    @Test
+    @DisplayName("최단 경로 조회시 요청한 출발역이 존재하지 않는 경우 예외를 던진다.")
+    void findShortestPathWithInvalidSource() {
+        //given
+        final Station stationA = new Station(1L, "stationA");
+        final Station stationB = new Station(2L, "stationB");
+        final Long invalidStationId = 3L;
+        final Line lineA = new Line(1L, "lineA", "#ff0000");
+
+        final Section sectionA = new Section(1L, lineA, stationA, stationB, 5);
+        final List<Section> sections = List.of(sectionA);
+
+        doReturn(sections).when(sectionDao).findAll();
+        doReturn(Optional.empty()).when(stationDao).findById(invalidStationId);
+
+        final PathRequest pathRequest = new PathRequest(invalidStationId, stationB.getId());
+
+        //when & then
+        assertThatThrownBy(() -> sectionService.findShortestPath(pathRequest))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("최단 경로 조회시 요청한 도착역이 존재하지 않는 경우 예외를 던진다.")
+    void findShortestPathWithInvalidTarget() {
+        //given
+        final Station stationA = new Station(1L, "stationA");
+        final Station stationB = new Station(2L, "stationB");
+        final Long invalidStationId = 3L;
+        final Line lineA = new Line(1L, "lineA", "#ff0000");
+
+        final Section sectionA = new Section(1L, lineA, stationA, stationB, 5);
+        final List<Section> sections = List.of(sectionA);
+
+        doReturn(sections).when(sectionDao).findAll();
+        doReturn(Optional.of(stationB)).when(stationDao).findById(stationB.getId());
+        doReturn(Optional.empty()).when(stationDao).findById(invalidStationId);
+
+        final PathRequest pathRequest = new PathRequest(stationB.getId(), invalidStationId);
+
+        //when & then
+        assertThatThrownBy(() -> sectionService.findShortestPath(pathRequest))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }
