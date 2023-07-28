@@ -41,5 +41,4 @@ public class PathService {
         Path path = new Path(allSections, sourceStation, targetStation);
         return new PathResponse(path.getPath(), path.getDistance());
     }
-
 }
