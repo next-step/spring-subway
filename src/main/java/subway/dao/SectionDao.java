@@ -16,11 +16,12 @@ public class SectionDao {
 
     private static final String FIND_ALL_BY_LINE_ID_SQL =
             "SELECT S.*," +
-                    "(SELECT US.id FROM STATION AS US WHERE S.line_id = ? AND S.up_station_id = US.id) AS US_ID," +
-                    "(SELECT US.name FROM STATION AS US WHERE S.line_id = ? AND S.up_station_id = US.id) AS US_NAME," +
-                    "(SELECT DS.id FROM STATION AS DS WHERE S.line_id = ? AND S.down_station_id = DS.id) AS DS_ID," +
-                    "(SELECT DS.name FROM STATION AS DS WHERE S.line_id = ? AND S.down_station_id = DS.id) AS DS_NAME " +
-                    "FROM SECTIONS AS S";
+                    "(SELECT US.id FROM STATION AS US WHERE S.up_station_id = US.id) AS US_ID," +
+                    "(SELECT US.name FROM STATION AS US WHERE S.up_station_id = US.id) AS US_NAME," +
+                    "(SELECT DS.id FROM STATION AS DS WHERE S.down_station_id = DS.id) AS DS_ID," +
+                    "(SELECT DS.name FROM STATION AS DS WHERE S.down_station_id = DS.id) AS DS_NAME " +
+                    "FROM SECTIONS AS S " +
+                    "where line_id = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
@@ -47,7 +48,7 @@ public class SectionDao {
     }
 
     public List<Section> findAllByLineId(Long lineId) {
-        return jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId, lineId, lineId, lineId);
+        return jdbcTemplate.query(FIND_ALL_BY_LINE_ID_SQL, sectionRowMapper, lineId);
     }
 
     private Section buildSection(Long sectionId, Section section) {
