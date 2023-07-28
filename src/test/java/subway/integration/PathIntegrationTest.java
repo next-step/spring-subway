@@ -1,8 +1,8 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.fixture.TestFixture.createLine;
-import static subway.fixture.TestFixture.createSection;
+import static subway.helper.TestHelper.createLine;
+import static subway.helper.TestHelper.createSection;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -15,14 +15,13 @@ import subway.dto.LineRequest;
 import subway.dto.PathResponse;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
-import subway.fixture.TestFixture;
+import subway.helper.TestHelper;
 
 public class PathIntegrationTest extends IntegrationTest {
 
     private Long station1Id;
     private Long station2Id;
     private Long station3Id;
-    private Long lineId;
 
     @BeforeEach
     public void setUp() {
@@ -31,16 +30,16 @@ public class PathIntegrationTest extends IntegrationTest {
         StationRequest stationRequest2 = new StationRequest("교대역");
         StationRequest stationRequest3 = new StationRequest("고속터미널");
 
-        ExtractableResponse<Response> station1 = TestFixture.createStation(stationRequest);
+        ExtractableResponse<Response> station1 = TestHelper.createStation(stationRequest);
         station1Id = Long.parseLong(station1.header("Location").split("/")[2]);
-        ExtractableResponse<Response> station2 = TestFixture.createStation(stationRequest2);
+        ExtractableResponse<Response> station2 = TestHelper.createStation(stationRequest2);
         station2Id = Long.parseLong(station2.header("Location").split("/")[2]);
-        ExtractableResponse<Response> station3 = TestFixture.createStation(stationRequest3);
+        ExtractableResponse<Response> station3 = TestHelper.createStation(stationRequest3);
         station3Id = Long.parseLong(station3.header("Location").split("/")[2]);
 
         LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 15);
         ExtractableResponse<Response> lineResponse = createLine(lineRequest);
-        lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
+        Long lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         createSection(sectionRequest, lineId);
     }
@@ -64,7 +63,7 @@ public class PathIntegrationTest extends IntegrationTest {
         PathResponse pathResponse = response.body().as(PathResponse.class);
         assertThat(pathResponse.getStations())
             .extracting("id").containsExactly(station1Id, station2Id, station3Id);
-        assertThat(pathResponse).extracting("distance").isEqualTo(30);
+        assertThat(pathResponse).extracting("distance").isEqualTo(30L);
     }
 
 

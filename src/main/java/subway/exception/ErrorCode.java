@@ -23,8 +23,13 @@ public enum ErrorCode {
     NOT_FOUND_STATION(NOT_FOUND, "찾는 역이 존재하지 않습니다"),
     NOT_FOUND_START(NOT_FOUND, "스타트 지점인 구간이 없습니다."),
     NOT_FOUND_LINE(NOT_FOUND, "찾는 노선이 존재하지 않습니다"),
-    NOT_FOUND_SECTION(NOT_FOUND, "찾는 구간이 존재하지 않습니다");
+    NOT_FOUND_SECTION(NOT_FOUND, "찾는 구간이 존재하지 않습니다"),
 
+    NOT_CONNECTED_BETWEEN_START_AND_END_PATH(BAD_REQUEST, "출발점과 도착역이 연결되어 있지 않습니다."),
+
+    SAME_START_END_PATH_POINT(BAD_REQUEST, "출발점과 도착역이 같다면, 길을 생성할 수 없습니다."),
+    NOT_FOUND_START_PATH_POINT(NOT_FOUND, "출발역이 존재하지 않습니다."),
+    NOT_FOUND_END_PATH_POINT(NOT_FOUND, "도착역이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

@@ -156,7 +156,7 @@ public class SectionDao {
         }
     }
 
-    public Optional<List<Section>> selectSections(Long lindId) {
+    public Optional<List<Section>> selectSections(final Long lindId) {
         try {
             List<Section> sections = jdbcTemplate.query(selectSectionsSql, sectionsExtractor,
                 lindId);

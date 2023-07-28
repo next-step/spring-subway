@@ -10,12 +10,13 @@ public class Path {
 
     private final PathGraph graph;
 
-    public Path(List<Section> sections) {
+
+    public Path(final Sections sections) {
         graph = new PathGraph(sections);
     }
 
-    public Path(Sections sections) {
-        graph = new PathGraph(sections);
+    public Path(final List<Section> sections) {
+        this(new Sections(sections));
     }
 
     public PathResponse createPath(final Station start, final Station end) {

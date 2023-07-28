@@ -138,6 +138,6 @@ public class Sections {
     }
 
     public Set<Station> getStationsCache() {
-        return Collections.unmodifiableSet(stationsCache);
+        return stationsCache;
     }
 }

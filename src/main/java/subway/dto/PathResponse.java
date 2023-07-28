@@ -24,7 +24,7 @@ public class PathResponse {
         return stations;
     }
 
-    public double getDistance() {
+    public Long getDistance() {
         return distance;
     }
 }

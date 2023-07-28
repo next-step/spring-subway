@@ -21,13 +21,11 @@ import subway.exception.SubwayException;
 
 public class LineDaoTest {
 
-    private DataSource dataSource;
-
     private LineDao lineDao;
 
     @BeforeEach
     public void setUp() {
-        dataSource = new EmbeddedDatabaseBuilder()
+        DataSource dataSource = new EmbeddedDatabaseBuilder()
             .generateUniqueName(true)
             .setType(H2)
             .setScriptEncoding("UTF-8")

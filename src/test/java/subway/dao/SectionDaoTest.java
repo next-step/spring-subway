@@ -21,8 +21,6 @@ import subway.exception.SubwayException;
 
 public class SectionDaoTest {
 
-    private DataSource dataSource;
-
     private SectionDao sectionDao;
 
     private StationDao stationDao;
@@ -30,7 +28,7 @@ public class SectionDaoTest {
 
     @BeforeEach
     public void setUp() {
-        dataSource = new EmbeddedDatabaseBuilder()
+        DataSource dataSource = new EmbeddedDatabaseBuilder()
             .generateUniqueName(true)
             .setType(H2)
             .setScriptEncoding("UTF-8")

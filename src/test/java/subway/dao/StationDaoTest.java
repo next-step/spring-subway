@@ -18,13 +18,11 @@ import subway.exception.SubwayException;
 @SpringBootTest
 public class StationDaoTest {
 
-    private DataSource dataSource;
-
     private StationDao stationDao;
 
     @BeforeEach
     public void setUp() {
-        dataSource = new EmbeddedDatabaseBuilder()
+        DataSource dataSource = new EmbeddedDatabaseBuilder()
             .generateUniqueName(true)
             .setType(H2)
             .setScriptEncoding("UTF-8")

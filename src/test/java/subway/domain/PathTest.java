@@ -1,10 +1,15 @@
 package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static subway.exception.ErrorCode.NOT_CONNECTED_BETWEEN_START_AND_END_PATH;
+import static subway.exception.ErrorCode.NOT_FOUND_END_PATH_POINT;
+import static subway.exception.ErrorCode.NOT_FOUND_START_PATH_POINT;
+import static subway.exception.ErrorCode.SAME_START_END_PATH_POINT;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 public class PathTest {
 
@@ -38,8 +43,8 @@ public class PathTest {
 
         // when & then
         assertThatCode(() -> path.createPath(서울대입구역, 서울대입구역2))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("출발점과 도착역이 같다면, 길을 생성할 수 없습니다.");
+            .isInstanceOf(SubwayException.class)
+            .hasMessage(SAME_START_END_PATH_POINT.getMessage());
     }
 
     @Test
@@ -54,10 +59,10 @@ public class PathTest {
         Section section = new Section(서울대입구역, 신대방역, new Distance(10));
         Section section2 = new Section(오이도역, 신당역, new Distance(10));
         // when & then
-        Path path = new Path(List.of(section,section2));
+        Path path = new Path(List.of(section, section2));
         assertThatCode(() -> path.createPath(서울대입구역, 오이도역))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("출발점과 도착역이 연결되어 있지 않습니다.");
+            .isInstanceOf(SubwayException.class)
+            .hasMessage(NOT_CONNECTED_BETWEEN_START_AND_END_PATH.getMessage());
     }
 
     @Test
@@ -74,8 +79,8 @@ public class PathTest {
         Path path = new Path(List.of(section));
         // when & then
         assertThatCode(() -> path.createPath(대림역, 신대방역))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("출발역이 존재하지 않습니다.");
+            .isInstanceOf(SubwayException.class)
+            .hasMessage(NOT_FOUND_START_PATH_POINT.getMessage());
     }
 
     @Test
@@ -91,7 +96,7 @@ public class PathTest {
         Path path = new Path(List.of(section));
         // when & then
         assertThatCode(() -> path.createPath(서울대입구역, 대림역))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("도착역이 존재하지 않습니다.");
+            .isInstanceOf(SubwayException.class)
+            .hasMessage(NOT_FOUND_END_PATH_POINT.getMessage());
     }
 }

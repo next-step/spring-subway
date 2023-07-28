@@ -22,7 +22,7 @@ public class PathService {
     private final SectionDao sectionDao;
     private final StationDao stationDao;
 
-    public PathService(SectionDao sectionDao, StationDao stationDao) {
+    public PathService(final SectionDao sectionDao, final StationDao stationDao) {
         this.sectionDao = sectionDao;
         this.stationDao = stationDao;
     }
@@ -40,7 +40,6 @@ public class PathService {
             .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
 
         PathResponse pathResponse = path.createPath(startStation, endStation);
-
         return pathResponse;
     }
 }

@@ -1,62 +1,56 @@
 package subway.domain;
 
-import java.util.List;
+import static subway.exception.ErrorCode.NOT_CONNECTED_BETWEEN_START_AND_END_PATH;
+import static subway.exception.ErrorCode.NOT_FOUND_START_PATH_POINT;
+import static subway.exception.ErrorCode.SAME_START_END_PATH_POINT;
+
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import subway.exception.ErrorCode;
+import subway.exception.SubwayException;
 
 public class PathGraph {
 
     private final WeightedMultigraph<Station, DefaultWeightedEdge> graph;
 
-
-    public PathGraph(final List<Section> sections) {
+    public PathGraph(final Sections sections) {
         graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
-        sections.forEach(section -> graph.addVertex(section.getDownStation()));
-        sections.forEach(section -> graph.addVertex(section.getUpStation()));
-        sections.forEach(section -> graph.setEdgeWeight(
-                graph.addEdge(
-                    section.getUpStation(),
-                    section.getDownStation()),
-                section.getDistance()
-            )
-        );
-    }
-
-    public PathGraph(Sections sections) {
-        graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
-        sections.getStationsCache().forEach(station -> graph.addVertex(station));
+        sections.getStationsCache().forEach(graph::addVertex);
         sections.getSections().forEach(section -> graph.setEdgeWeight(
                 graph.addEdge(
                     section.getUpStation(),
-                    section.getDownStation()),
+                    section.getDownStation()
+                ),
                 section.getDistance()
             )
         );
     }
 
-    public GraphPath<Station, DefaultWeightedEdge> createRoute(final Station start,
-        final Station end) {
+    public GraphPath<Station, DefaultWeightedEdge> createRoute(
+        final Station start,
+        final Station end
+    ) {
         validatePathConnect(start, end);
 
-        GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph).getPath(
-            start, end);
+        GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
+            .getPath(start, end);
         if (path == null) {
-            throw new IllegalArgumentException("출발점과 도착역이 연결되어 있지 않습니다.");
+            throw new SubwayException(NOT_CONNECTED_BETWEEN_START_AND_END_PATH);
         }
         return path;
     }
 
-    public void validatePathConnect(final Station start, final Station end) {
+    private void validatePathConnect(final Station start, final Station end) {
         if (start.equals(end)) {
-            throw new IllegalArgumentException("출발점과 도착역이 같다면, 길을 생성할 수 없습니다.");
+            throw new SubwayException(SAME_START_END_PATH_POINT);
         }
         if (!graph.containsVertex(start)) {
-            throw new IllegalArgumentException("출발역이 존재하지 않습니다.");
+            throw new SubwayException(NOT_FOUND_START_PATH_POINT);
         }
         if (!graph.containsVertex(end)) {
-            throw new IllegalArgumentException("도착역이 존재하지 않습니다.");
+            throw new SubwayException(ErrorCode.NOT_FOUND_END_PATH_POINT);
         }
     }
 

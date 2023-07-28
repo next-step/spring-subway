@@ -18,7 +18,7 @@ public class PathGraphTest {
         List<Section> sections = List.of(section);
 
         // when &then
-        assertThatCode(() -> new PathGraph(sections))
+        assertThatCode(() -> new PathGraph(new Sections(sections)))
             .doesNotThrowAnyException();
     }
     

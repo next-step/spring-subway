@@ -1,18 +1,17 @@
-package subway.fixture;
+package subway.helper;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.springframework.http.MediaType;
 import subway.dto.LineRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
 
-public class TestFixture {
+public class TestHelper {
 
-    public static ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+    public static ExtractableResponse<Response> createLine(final LineRequest lineRequest) {
         return RestAssured
             .given().log().all()
             .contentType(APPLICATION_JSON_VALUE)
@@ -22,7 +21,7 @@ public class TestFixture {
             .extract();
     }
 
-    public static ExtractableResponse<Response> createStation(StationRequest stationRequest) {
+    public static ExtractableResponse<Response> createStation(final StationRequest stationRequest) {
         return RestAssured
             .given().log().all()
             .contentType(APPLICATION_JSON_VALUE)
@@ -32,7 +31,8 @@ public class TestFixture {
             .extract();
     }
 
-    public static ExtractableResponse<Response> createSection(SectionRequest sectionRequest, Long lineId) {
+    public static ExtractableResponse<Response> createSection(final SectionRequest sectionRequest,
+        final Long lineId) {
         return RestAssured
             .given().log().all()
             .contentType(APPLICATION_JSON_VALUE)

@@ -11,8 +11,8 @@ import static subway.exception.ErrorCode.INVALID_DISTANCE_COMPARE;
 import static subway.exception.ErrorCode.INVALID_SECTION_ALREADY_EXISTS;
 import static subway.exception.ErrorCode.INVALID_SECTION_NO_EXISTS;
 import static subway.exception.ErrorCode.SAME_UP_AND_DOWN_STATION;
-import static subway.fixture.TestFixture.createLine;
-import static subway.fixture.TestFixture.createStation;
+import static subway.helper.TestHelper.createLine;
+import static subway.helper.TestHelper.createStation;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
