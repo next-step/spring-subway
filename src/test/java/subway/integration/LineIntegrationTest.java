@@ -13,6 +13,7 @@ import subway.fixture.LineRequestFixture;
 import subway.fixture.SectionRequestFixture;
 import subway.fixture.StationFixture;
 import subway.fixture.StationRequestFixture;
+import subway.integration.config.IntegrationTest;
 import subway.integration.supporter.LineIntegrationSupporter;
 import subway.integration.supporter.SectionIntegrationSupporter;
 import subway.integration.supporter.StationIntegrationSupporter;
@@ -24,7 +25,8 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 노선 관련 기능")
-class LineIntegrationTest extends IntegrationTest {
+@IntegrationTest
+class LineIntegrationTest {
 
     @DisplayName("지하철 노선을 생성한다.")
     @Test

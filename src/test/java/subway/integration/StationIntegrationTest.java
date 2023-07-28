@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.integration.config.IntegrationTest;
 import subway.integration.supporter.StationIntegrationSupporter;
 
 import java.util.List;
@@ -16,7 +17,8 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철역 관련 기능")
-class StationIntegrationTest extends IntegrationTest {
+@IntegrationTest
+class StationIntegrationTest {
 
     @DisplayName("지하철역을 생성한다.")
     @Test
