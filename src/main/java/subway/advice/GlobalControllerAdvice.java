@@ -14,9 +14,6 @@ class GlobalControllerAdvice {
 
     @ExceptionHandler(SubwayException.class)
     ResponseEntity<ErrorResponse> catchSubwayException(SubwayException exception) {
-        System.out.println("여기");
-
-        exception.printStackTrace();
         return ResponseEntity.badRequest().body(new ErrorResponse(exception.getMessage()));
     }
 
@@ -31,10 +28,7 @@ class GlobalControllerAdvice {
     }
 
     @ExceptionHandler(Exception.class)
-    ResponseEntity<ErrorResponse> catchInternalServerException(Exception e) {
-        System.out.println("여기");
-        System.out.println("e = " + e.getStackTrace());
-        e.printStackTrace();
+    ResponseEntity<ErrorResponse> catchInternalServerException() {
         return ResponseEntity.internalServerError().body(new ErrorResponse("서버 내부에서 오류가 발생하였습니다."));
     }
 }
