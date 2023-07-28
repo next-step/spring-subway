@@ -15,7 +15,7 @@ public class CreateSectionRequest {
     @Positive(message = "거리는 양수여야합니다.")
     private Integer distance;
 
-    public CreateSectionRequest() {
+    private CreateSectionRequest() {
     }
 
     public CreateSectionRequest(Long upStationId, Long downStationId, Integer distance) {

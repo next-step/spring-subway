@@ -22,7 +22,7 @@ public class CreateLineRequest {
     @Positive(message = "거리는 양수여야합니다.")
     private Integer distance;
 
-    public CreateLineRequest() {
+    private CreateLineRequest() {
     }
 
     public CreateLineRequest(String name, String color, Long upStationId, Long downStationId, Integer distance) {

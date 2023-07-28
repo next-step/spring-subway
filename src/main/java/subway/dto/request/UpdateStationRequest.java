@@ -7,7 +7,7 @@ public class UpdateStationRequest {
     @NotBlank(message = "역 이름을 입력해주세요.")
     private String name;
 
-    public UpdateStationRequest() {
+    private UpdateStationRequest() {
     }
 
     public UpdateStationRequest(String name) {
