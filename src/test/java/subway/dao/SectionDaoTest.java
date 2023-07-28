@@ -6,6 +6,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +33,16 @@ class SectionDaoTest extends DaoTest {
 
         // then
         assertThat(byId.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("모든 Section을 탐색한다.")
+    void findAll() {
+        // when
+        List<Section> sections = sectionDao.findAll();
+
+        // then
+        assertThat(sections).hasSize(2);
     }
 
     @Test

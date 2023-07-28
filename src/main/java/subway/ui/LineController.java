@@ -25,7 +25,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/lines")
 public class LineController {
-
     private final LineService lineService;
     private final SectionService sectionService;
 

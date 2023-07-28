@@ -100,7 +100,7 @@ public class Sections {
         return new Sections(newSections);
     }
 
-    private void validateContainStation(Station station) {
+    private void validateContainStation(final Station station) {
         if (notContains(station)) {
             throw new SubwayException(ErrorCode.REMOVE_SECTION_NOT_CONTAIN);
         }
@@ -138,15 +138,19 @@ public class Sections {
         return start;
     }
 
-    public Path findShortestPath(Station sourceStation, Station targetStation) {
-        if (sourceStation.equals(targetStation)) {
-            throw new SubwayException(ErrorCode.PATH_SAME_STATIONS);
-        }
+    public Path findShortestPath(final Station sourceStation, final Station targetStation) {
+        validateSameStations(sourceStation, targetStation);
         WeightedMultigraph<Station, DefaultWeightedEdge> graph = initializeGraph();
         GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
                 .getPath(sourceStation, targetStation);
 
         return new Path(path.getVertexList(), (int) path.getWeight());
+    }
+
+    private void validateSameStations(final Station sourceStation, final Station targetStation) {
+        if (sourceStation.equals(targetStation)) {
+            throw new SubwayException(ErrorCode.PATH_SAME_STATIONS);
+        }
     }
 
     private WeightedMultigraph<Station, DefaultWeightedEdge> initializeGraph() {

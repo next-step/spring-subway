@@ -11,6 +11,7 @@ import subway.domain.Station;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class SectionDao {
                 .usingGeneratedKeyColumns("id");
     }
 
-    public Optional<Section> findById(Long id) {
+    public Optional<Section> findById(final Long id) {
         String sql = "select section.id as section_id, " +
                 "up_station.id as up_station_id, " +
                 "up_station.name as up_station_name, " +
@@ -51,6 +52,20 @@ public class SectionDao {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    public List<Section> findAll() {
+        String sql = "select section.id as section_id, " +
+                "up_station.id as up_station_id, " +
+                "up_station.name as up_station_name, " +
+                "down_station.id as down_station_id, " +
+                "down_station.name as down_station_name, " +
+                "section.distance as section_distance " +
+                "from SECTION section " +
+                "left join STATION up_station on section.up_station_id = up_station.id " +
+                "left join STATION down_station on section.down_station_id = down_station.id";
+
+        return jdbcTemplate.query(sql, rowMapper);
     }
 
     public Section insert(final Section section, final Long lineId) {
