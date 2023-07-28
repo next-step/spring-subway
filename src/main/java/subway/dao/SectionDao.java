@@ -70,6 +70,19 @@ public class SectionDao {
         return new Sections(values);
     }
 
+    public List<Section> findAll() {
+        String sql =
+            "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
+                + "l.name AS line_name, color AS line_color, "
+                + "us.name AS up_station_name, "
+                + "ds.name AS down_station_name "
+                + "from SECTION s join LINE l on s.line_id = l.id "
+                + "join STATION us on up_station_id = us.id "
+                + "join STATION ds on down_station_id = ds.id";
+
+        return jdbcTemplate.query(sql, rowToSectionMapper);
+    }
+
     public Section save(Section section) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
