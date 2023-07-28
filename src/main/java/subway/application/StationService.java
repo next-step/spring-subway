@@ -5,9 +5,8 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.request.CreateStationRequest;
 import subway.dto.response.CreateStationResponse;
-import subway.dto.response.FindAllStationResponse;
-import subway.dto.response.FindByIdStationResponse;
 import subway.dto.request.UpdateStationRequest;
+import subway.dto.response.FindStationResponse;
 import subway.exception.StationException;
 
 import java.text.MessageFormat;
@@ -38,18 +37,18 @@ public class StationService {
                 });
     }
 
-    public FindByIdStationResponse findStationById(final Long id) {
+    public FindStationResponse findStationById(final Long id) {
         final Station station = stationDao.findById(id).orElseThrow(() -> new StationException(
                 MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id)));
         
-        return FindByIdStationResponse.of(station);
+        return FindStationResponse.of(station);
     }
 
-    public List<FindAllStationResponse> findAllStations() {
+    public List<FindStationResponse> findAllStations() {
         final List<Station> stations = stationDao.findAll();
 
         return stations.stream()
-                .map(FindAllStationResponse::of)
+                .map(FindStationResponse::of)
                 .collect(Collectors.toList());
     }
 

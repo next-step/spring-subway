@@ -1,6 +1,5 @@
 package subway.integration;
 
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +11,7 @@ import subway.dto.request.CreateStationRequest;
 import subway.dto.request.UpdateLineRequest;
 import subway.dto.response.CreateLineResponse;
 import subway.dto.response.CreateStationResponse;
-import subway.dto.response.FindAllLineResponse;
-import subway.dto.response.StationResponse;
+import subway.dto.response.FindLineResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,8 +81,8 @@ class LineIntegrationTest extends IntegrationTest {
         List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
                 .map(it -> Long.valueOf(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
-        List<Long> resultLineIds = response.jsonPath().getList(".", FindAllLineResponse.class).stream()
-                .map(FindAllLineResponse::getId)
+        List<Long> resultLineIds = response.jsonPath().getList(".", FindLineResponse.class).stream()
+                .map(FindLineResponse::getId)
                 .collect(Collectors.toList());
 
         // then

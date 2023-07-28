@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import subway.dto.request.CreateStationRequest;
 import subway.dto.request.UpdateStationRequest;
-import subway.dto.response.StationResponse;
+import subway.dto.response.FindStationResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,8 +61,8 @@ class StationIntegrationTest extends IntegrationTest {
         List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
                 .map(it -> Long.valueOf(it.header("Location").split("/")[2]))
                 .collect(Collectors.toList());
-        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
-                .map(StationResponse::getId)
+        List<Long> resultStationIds = response.jsonPath().getList(".", FindStationResponse.class).stream()
+                .map(FindStationResponse::getId)
                 .collect(Collectors.toList());
         
         // then
@@ -81,7 +81,7 @@ class StationIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.getStationByStationId(stationId);
-        StationResponse stationResponse = response.as(StationResponse.class);
+        FindStationResponse stationResponse = response.as(FindStationResponse.class);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());

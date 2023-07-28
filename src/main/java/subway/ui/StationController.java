@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import subway.application.StationService;
 import subway.dto.request.CreateStationRequest;
 import subway.dto.response.CreateStationResponse;
-import subway.dto.response.FindAllStationResponse;
-import subway.dto.response.FindByIdStationResponse;
 import subway.dto.request.UpdateStationRequest;
+import subway.dto.response.FindStationResponse;
 
 import java.net.URI;
 import java.util.List;
@@ -36,12 +35,12 @@ public class StationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FindAllStationResponse>> findAllStations() {
+    public ResponseEntity<List<FindStationResponse>> findAllStations() {
         return ResponseEntity.ok().body(stationService.findAllStations());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FindByIdStationResponse> findStationById(@PathVariable Long id) {
+    public ResponseEntity<FindStationResponse> findStationById(@PathVariable Long id) {
         return ResponseEntity.ok().body(stationService.findStationById(id));
     }
 

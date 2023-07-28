@@ -9,9 +9,8 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.request.CreateLineRequest;
 import subway.dto.response.CreateLineResponse;
-import subway.dto.response.StationResponse;
-import subway.dto.response.FindAllLineResponse;
-import subway.dto.response.FindByIdLineResponse;
+import subway.dto.response.FindStationResponse;
+import subway.dto.response.FindLineResponse;
 import subway.dto.request.CreateSectionRequest;
 import subway.dto.request.UpdateLineRequest;
 import subway.exception.LineException;
@@ -46,7 +45,7 @@ public class LineService {
                 .build();
 
         sectionDao.insert(section, persistLine.getId());
-        return CreateLineResponse.from(persistLine, List.of(StationResponse.of(upStation), StationResponse.of(downStation)));
+        return CreateLineResponse.from(persistLine, List.of(FindStationResponse.of(upStation), FindStationResponse.of(downStation)));
     }
 
     private void validateDuplicateName(final String name) {
@@ -58,24 +57,24 @@ public class LineService {
                 });
     }
 
-    public List<FindAllLineResponse> findAllLines() {
+    public List<FindLineResponse> findAllLines() {
         final List<Line> lines = lineDao.findAll();
 
         return lines.stream()
-                .map(line -> FindAllLineResponse.from(line,
+                .map(line -> FindLineResponse.from(line,
                         stationsToStationResponses(stationDao.findAllByLineId(line.getId()))))
                 .collect(Collectors.toList());
     }
 
-    public FindByIdLineResponse findLineById(final Long id) {
+    public FindLineResponse findLineById(final Long id) {
         final Line line = getLineById(id);
 
-        return FindByIdLineResponse.from(line, stationsToStationResponses(line.getSortedStations()));
+        return FindLineResponse.from(line, stationsToStationResponses(line.getSortedStations()));
     }
 
-    private List<StationResponse> stationsToStationResponses(final List<Station> stations) {
+    private List<FindStationResponse> stationsToStationResponses(final List<Station> stations) {
         return stations.stream()
-                .map(StationResponse::of)
+                .map(FindStationResponse::of)
                 .collect(Collectors.toList());
     }
 

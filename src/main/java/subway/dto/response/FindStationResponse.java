@@ -2,17 +2,17 @@ package subway.dto.response;
 
 import subway.domain.Station;
 
-public class FindByIdStationResponse {
+public class FindStationResponse {
     private Long id;
     private String name;
 
-    public FindByIdStationResponse(Long id, String name) {
+    public FindStationResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public static FindByIdStationResponse of(Station station) {
-        return new FindByIdStationResponse(station.getId(), station.getName());
+    public static FindStationResponse of(Station station) {
+        return new FindStationResponse(station.getId(), station.getName());
     }
 
     public Long getId() {
