@@ -1,7 +1,7 @@
 package subway.exception;
 
 public class ErrorResponse {
-    String message;
+    private String message;
 
     public ErrorResponse() {
     }

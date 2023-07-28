@@ -27,8 +27,7 @@ public class StationService {
 
     @Transactional(readOnly = true)
     public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\"")));
+        return StationResponse.of(getStationById(id));
     }
 
     @Transactional(readOnly = true)
@@ -48,5 +47,11 @@ public class StationService {
     @Transactional
     public void deleteStationById(Long id) {
         stationDao.deleteById(id);
+    }
+
+    private Station getStationById(Long id) {
+        return stationDao.findById(id)
+            .orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\""));
     }
 }

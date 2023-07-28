@@ -1,5 +1,7 @@
 package subway.application;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
@@ -12,9 +14,6 @@ import subway.domain.Station;
 import subway.dto.request.LineCreationRequest;
 import subway.dto.request.LineUpdateRequest;
 import subway.dto.response.LineResponse;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class LineService {
@@ -80,7 +79,13 @@ public class LineService {
 
     @Transactional
     public void deleteLineById(Long id) {
+        Line line = getLineById(id);
+        sectionDao.deleteAllByLine(line);
         lineDao.deleteById(id);
     }
 
+    private Line getLineById(Long id) {
+        return lineDao.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
+    }
 }

@@ -1,20 +1,21 @@
-package subway.vo;
+package subway.dto;
 
 import java.util.List;
+import java.util.Optional;
 import subway.domain.Section;
 
 public class SectionAdditionResult {
 
-    List<Section> sectionToRemove;
+    Section sectionToRemove;
     List<Section> sectionsToAdd;
 
-    public SectionAdditionResult(List<Section> sectionToRemove, List<Section> sectionsToAdd) {
+    public SectionAdditionResult(Section sectionToRemove, List<Section> sectionsToAdd) {
         this.sectionToRemove = sectionToRemove;
         this.sectionsToAdd = sectionsToAdd;
     }
 
-    public List<Section> getSectionToRemove() {
-        return sectionToRemove;
+    public Optional<Section> getSectionToRemove() {
+        return Optional.ofNullable(sectionToRemove);
     }
 
     public List<Section> getSectionsToAdd() {

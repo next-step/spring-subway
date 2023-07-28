@@ -1,5 +1,6 @@
 package subway.ui;
 
+import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody LineCreationRequest lineCreationRequest) {
+    public ResponseEntity<LineResponse> createLine(@RequestBody @Valid LineCreationRequest lineCreationRequest) {
         LineResponse line = lineService.saveLine(lineCreationRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
@@ -42,7 +43,7 @@ public class LineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineUpdateRequest lineUpdateRequest) {
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody @Valid LineUpdateRequest lineUpdateRequest) {
         lineService.updateLine(id, lineUpdateRequest);
         return ResponseEntity.ok().build();
     }
@@ -54,7 +55,7 @@ public class LineController {
     }
 
     @PostMapping("/{id}/sections")
-    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody SectionAdditionRequest sectionRequest) {
+    public ResponseEntity<Void> addSection(@PathVariable Long id, @RequestBody @Valid SectionAdditionRequest sectionRequest) {
         sectionsService.addSection(id, sectionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

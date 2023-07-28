@@ -4,10 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.vo.SectionAdditionResult;
+import subway.dto.SectionAdditionResult;
 
 class SectionsAddTest {
 
@@ -56,7 +57,7 @@ class SectionsAddTest {
         Section createdSection = new Section(lineA, stationC, stationD, 2);
         assertThat(sectionAdditionResult.getSectionsToAdd()).isEqualTo(
             List.of(targetSection, createdSection));
-        assertThat(sectionAdditionResult.getSectionToRemove()).isEqualTo(List.of(secondSection));
+        assertThat(sectionAdditionResult.getSectionToRemove()).isEqualTo(Optional.of(secondSection));
         assertThat(sections).isEqualTo(
             new Sections(List.of(firstSection, targetSection, createdSection)));
     }
@@ -74,7 +75,7 @@ class SectionsAddTest {
         Section createdSection = new Section(lineA, stationB, stationC, 2);
         assertThat(sectionAdditionResult.getSectionsToAdd()).isEqualTo(
             List.of(createdSection, targetSection));
-        assertThat(sectionAdditionResult.getSectionToRemove()).isEqualTo(List.of(secondSection));
+        assertThat(sectionAdditionResult.getSectionToRemove()).isEqualTo(Optional.of(secondSection));
         assertThat(sections).isEqualTo(
             new Sections(List.of(firstSection, createdSection, targetSection)));
     }

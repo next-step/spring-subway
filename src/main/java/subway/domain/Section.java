@@ -23,20 +23,8 @@ public class Section {
         this.distance = distance;
     }
 
-    private void validateStationsNotEqual(Station upStation, Station downStation) {
-        if (upStation.equals(downStation)) {
-            throw new IllegalArgumentException(
-                "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
-                    + downStation);
-        }
-    }
-
     public Section(Line line, Station upStation, Station downStation, int distance) {
         this(null, line, upStation, downStation, distance);
-    }
-
-    public Section(Station upStation, Station downStation, int distance) {
-        this(null, null, upStation, downStation, distance);
     }
 
     public Section(Line line, Section section) {
@@ -49,6 +37,14 @@ public class Section {
         }
     }
 
+    private void validateStationsNotEqual(Station upStation, Station downStation) {
+        if (upStation.equals(downStation)) {
+            throw new IllegalArgumentException(
+                "구간의 상행역과 하행역은 같을 수 없습니다. upStation: " + upStation + ", downStation: "
+                    + downStation);
+        }
+    }
+
     public boolean canPrecede(Section other) {
         return downStation.equals(other.upStation);
     }
@@ -58,17 +54,11 @@ public class Section {
             station);
     }
 
-    public boolean containsDownStationOf(Section section) {
-        return this.upStation.equals(section.downStation) || this.downStation.equals(
-            section.downStation);
-    }
-
     public boolean hasSameUpStationOrDownStation(Section section) {
         return this.upStation.equals(section.upStation) || this.downStation.equals(section.downStation);
     }
 
-    public List<Section> mergeSections(Section section) {
-
+    public List<Section> mergeWith(Section section) {
         validateLongerDistanceThan(section);
 
         if (isOnlyUpStationMatch(section)) {
@@ -80,6 +70,12 @@ public class Section {
         }
 
         throw new IllegalArgumentException("추가할 구간의 상행역 하행역이 모두 같거나 모두 다를 수 없습니다. 기존 구간: " + this + " 추가할 구간: " + section);
+    }
+
+    private void validateLongerDistanceThan(Section section) {
+        if (this.distance <= section.getDistance()) {
+            throw new IllegalArgumentException("기존 구간의 길이가 같거나 작습니다");
+        }
     }
 
     private boolean isOnlyUpStationMatch(Section section) {
@@ -108,14 +104,20 @@ public class Section {
         return mergedSections;
     }
 
-    private void validateLongerDistanceThan(Section section) {
-        if (this.distance <= section.getDistance()) {
-            throw new IllegalArgumentException("기존 구간의 길이가 같거나 작습니다");
+    public Section removeMiddleStation(Section section) {
+        if (!this.downStation.equals(section.upStation)) {
+            throw new IllegalArgumentException("이어지지 않은 구간입니다. 현재 구간: " + this + " 상대 구간: " + section);
         }
+
+        return new Section(this.line, this.upStation, section.downStation, this.distance + section.distance);
     }
 
     public boolean hasDownStationSameAs(Station station) {
         return station.equals(this.downStation);
+    }
+
+    public boolean hasUpStationSameAs(Station station) {
+        return station.equals(this.upStation);
     }
 
     public boolean belongTo(Line line) {
@@ -152,13 +154,13 @@ public class Section {
         }
         Section section = (Section) o;
         return distance == section.distance && Objects.equals(id, section.id)
-            && Objects.equals(line, section.line) && Objects.equals(upStation,
+            && Objects.equals(line.getId(), section.line.getId()) && Objects.equals(upStation,
             section.upStation) && Objects.equals(downStation, section.downStation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, line, upStation, downStation, distance);
+        return Objects.hash(id, line.getId(), upStation, downStation, distance);
     }
 
     @Override

@@ -2,7 +2,6 @@ package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -18,6 +16,7 @@ import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.request.LineCreationRequest;
 import subway.dto.request.SectionAdditionRequest;
+import subway.integration.helper.SubWayHelper;
 
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
@@ -52,51 +51,73 @@ class SectionIntegrationTest extends IntegrationTest {
     void addSectionToLine() {
         // given
         StationIntegrationTest.createInitialStations();
-        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
-        LineIntegrationTest.createLine(lineCreationRequest);
+        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3,
+            "bg-red-600");
+        SubWayHelper.createLine(lineCreationRequest);
         SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
             stationC.getId(), 3);
 
         // when
-        ExtractableResponse<Response> response = addSectionToLine(sectionAdditionRequest);
+        ExtractableResponse<Response> response = SubWayHelper.addSectionToLine(lineA,
+            sectionAdditionRequest);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    private ExtractableResponse<Response> addSectionToLine(
-        SectionAdditionRequest sectionAdditionRequest) {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .body(sectionAdditionRequest)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .pathParam("id", lineA.getId())
-            .when()
-            .post("/lines/{id}/sections")
-            .then().log().all()
-            .extract();
-        return response;
-    }
-
-    @DisplayName("지하철 노선의 구간을 제거한다.")
+    @DisplayName("지하철 노선의 첫 역을 제거한다.")
     @Test
-    void removeSectionOfLine() {
+    void removeFirstStationOfLine() {
         // given
         StationIntegrationTest.createInitialStations();
-        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3, "bg-red-600");
-        LineIntegrationTest.createLine(lineCreationRequest);
+        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3,
+            "bg-red-600");
+        SubWayHelper.createLine(lineCreationRequest);
         SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
             stationC.getId(), 3);
-        addSectionToLine(sectionAdditionRequest);
+        SubWayHelper.addSectionToLine(lineA, sectionAdditionRequest);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-            .given().log().all()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .pathParam("id", lineA.getId())
-            .param("stationId", stationC.getId())
-            .when().delete("/lines/{id}/sections")
-            .then().log().all().
-            extract();
+        ExtractableResponse<Response> response = SubWayHelper.removeStationOfLine(lineA, stationA);
+
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 노선의 중간 역을 제거한다.")
+    @Test
+    void removeMiddleStationOfLine() {
+        // given
+        StationIntegrationTest.createInitialStations();
+        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3,
+            "bg-red-600");
+        SubWayHelper.createLine(lineCreationRequest);
+        SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
+            stationC.getId(), 3);
+        SubWayHelper.addSectionToLine(lineA, sectionAdditionRequest);
+
+        // when
+        ExtractableResponse<Response> response = SubWayHelper.removeStationOfLine(lineA, stationB);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("지하철 노선의 마지막 역을 제거한다.")
+    @Test
+    void removeLastStationOfLine() {
+        // given
+        StationIntegrationTest.createInitialStations();
+        LineCreationRequest lineCreationRequest = new LineCreationRequest("신분당선", 1L, 2L, 3,
+            "bg-red-600");
+        SubWayHelper.createLine(lineCreationRequest);
+        SectionAdditionRequest sectionAdditionRequest = new SectionAdditionRequest(stationB.getId(),
+            stationC.getId(), 3);
+        SubWayHelper.addSectionToLine(lineA, sectionAdditionRequest);
+
+        // when
+        ExtractableResponse<Response> response = SubWayHelper.removeStationOfLine(lineA, stationC);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

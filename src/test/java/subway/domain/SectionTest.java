@@ -1,12 +1,13 @@
 package subway.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Section 클래스 테스트")
 class SectionTest {
@@ -53,17 +54,17 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("주어진 구간의 하행역을 포함하는지 확인한다.")
-    void checkContainingDownStationOfSection() {
+    @DisplayName("해당 역은 구간의 상행역과 같다")
+    void hasDownStationSameAs() {
         Section section = new Section(lineA, stationA, stationB, 1);
-        Section targetSection = new Section(lineA, stationC, stationB, 1);
 
-        assertThat(section.containsDownStationOf(targetSection)).isTrue();
+        assertThat(section.hasUpStationSameAs(stationA)).isTrue();
+        assertThat(section.hasUpStationSameAs(stationB)).isFalse();
     }
 
     @Test
     @DisplayName("해당 역은 구간의 하행역과 같다")
-    void hasDownStationSameAs() {
+    void hasUpStationSameAs() {
         Section section = new Section(lineA, stationA, stationB, 1);
 
         assertThat(section.hasDownStationSameAs(stationB)).isTrue();
@@ -71,10 +72,33 @@ class SectionTest {
     }
 
     @Test
+    @DisplayName("구간은 주어진 역을 포함한다")
+    void ContainStation() {
+        Section section = new Section(lineA, stationA, stationB, 1);
+
+        assertThat(section.containsStation(stationA)).isTrue();
+        assertThat(section.containsStation(stationB)).isTrue();
+        assertThat(section.containsStation(stationC)).isFalse();
+    }
+
+    @Test
+    @DisplayName("구간은 주어진 구간과 동일한 상행역 혹은 하행역을 가진다")
+    void hasSameUpStationOrDownStation() {
+        Section section = new Section(lineA, stationA, stationC, 1);
+        Section upSection = new Section(lineA, stationA, stationB, 1);
+        Section downSection = new Section(lineA, stationB, stationC, 1);
+        Section nothingSection = new Section(lineA, stationB, stationD, 1);
+
+        assertThat(section.hasSameUpStationOrDownStation(upSection)).isTrue();
+        assertThat(section.hasSameUpStationOrDownStation(downSection)).isTrue();
+        assertThat(section.hasSameUpStationOrDownStation(nothingSection)).isFalse();
+    }
+
+    @Test
     @DisplayName("구간은 주어진 라인의 소속이다")
     void sectionBelongToLine() {
         Section section = new Section(lineA, stationA, stationB, 1);
-        
+
         assertThat(section.belongTo(lineA)).isTrue();
     }
 
@@ -85,9 +109,9 @@ class SectionTest {
         Section sameLengthSection = new Section(lineA, stationA, stationB, 3);
         Section largeSection = new Section(lineA, stationA, stationB, 4);
 
-        assertThatThrownBy(() -> section.mergeSections(sameLengthSection))
+        assertThatThrownBy(() -> section.mergeWith(sameLengthSection))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> section.mergeSections(largeSection))
+        assertThatThrownBy(() -> section.mergeWith(largeSection))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -97,7 +121,7 @@ class SectionTest {
         Section section = new Section(lineA, stationA, stationC, 3);
         Section targetSection = new Section(lineA, stationA, stationB, 2);
 
-        List<Section> mergedSections = section.mergeSections(targetSection);
+        List<Section> mergedSections = section.mergeWith(targetSection);
 
         Section createdSection = new Section(lineA, stationB, stationC, 1);
         assertThat(mergedSections).isEqualTo(List.of(targetSection, createdSection));
@@ -109,7 +133,7 @@ class SectionTest {
         Section section = new Section(lineA, stationA, stationC, 3);
         Section targetSection = new Section(lineA, stationB, stationC, 2);
 
-        List<Section> mergedSections = section.mergeSections(targetSection);
+        List<Section> mergedSections = section.mergeWith(targetSection);
 
         Section createdSection = new Section(lineA, stationA, stationB, 1);
         assertThat(mergedSections).isEqualTo(List.of(createdSection, targetSection));
@@ -122,10 +146,30 @@ class SectionTest {
         Section bothSameSection = new Section(lineA, stationA, stationB, 2);
         Section nothingSameSection = new Section(lineA, stationC, stationD, 2);
 
-        assertThatThrownBy(() -> section.mergeSections(bothSameSection))
+        assertThatThrownBy(() -> section.mergeWith(bothSameSection))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> section.mergeSections(nothingSameSection))
+        assertThatThrownBy(() -> section.mergeWith(nothingSameSection))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("구간의 하행역이 연결할 구간의 상행역과 다르면 중간역을 삭제할 수 없다.")
+    void cannotRemoveMiddleStationWithDifferentCurDownAndNextUpStation() {
+        Section sectionA = new Section(lineA, stationA, stationB, 3);
+        Section sectionC = new Section(lineA, stationC, stationD, 2);
+
+        assertThatThrownBy(() -> sectionA.removeMiddleStation(sectionC))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("현재구간과 상대구간의 중간 역을 삭제한다")
+    void removeMiddleStation() {
+        Section sectionA = new Section(lineA, stationA, stationB, 3);
+        Section sectionB = new Section(lineA, stationB, stationC, 2);
+
+        Section expectedSection = new Section(lineA, stationA, stationC, 5);
+        assertThat(sectionA.removeMiddleStation(sectionB)).isEqualTo(expectedSection);
     }
 
 }

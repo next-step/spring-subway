@@ -4,11 +4,12 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.dto.SectionRemovalResult;
 
 class SectionsTest {
 
@@ -38,9 +39,7 @@ class SectionsTest {
         Sections sections = new Sections(List.of(thirdSection, secondSection, firstSection));
 
         List<Section> expectedValues = List.of(firstSection, secondSection, thirdSection);
-        List<Section> unexpectedValues = List.of(thirdSection, secondSection, firstSection);
-        assertThat(sections.getValues()).isEqualTo(expectedValues);
-        assertThat(sections.getValues()).isNotEqualTo(unexpectedValues);
+        assertThat(sections).isEqualTo(new Sections(expectedValues));
     }
 
     @Test
@@ -76,6 +75,18 @@ class SectionsTest {
     }
 
     @Test
+    @DisplayName("삭제할 역이 구간들 내에 없는경우 삭제할 수 없다")
+    void cannotRemoveStationNotInSections() {
+        Station stationA = new Station(1L, "A");
+        Station stationB = new Station(2L, "B");
+        Section section = new Section(lineA, stationA, stationB, 1);
+        Sections sections = new Sections(List.of(section));
+
+        assertThatThrownBy(() -> sections.remove(stationC))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     @DisplayName("구간이 1개인 경우 구간을 삭제할 수 없다")
     void cannotRemoveOneSizeSections() {
         Station stationA = new Station(1L, "A");
@@ -83,35 +94,66 @@ class SectionsTest {
         Section section = new Section(lineA, stationA, stationB, 1);
         Sections sections = new Sections(List.of(section));
 
-        assertThatThrownBy(() -> sections.removeLast(stationB))
+        assertThatThrownBy(() -> sections.remove(stationB))
             .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    @DisplayName("주어진 역이 노선의 하행 종점역이 아니면 구간을 삭제할 수 없다")
-    void cannotRemoveSectionIfNotFinalDownStation() {
+    @DisplayName("첫 구간을 삭제한다")
+    void removeFirst() {
         Section sectionA = new Section(lineA, stationA, stationB, 1);
         Section sectionB = new Section(lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
-        assertThatThrownBy(() -> sections.removeLast(stationA))
-            .isInstanceOf(IllegalArgumentException.class);
+         SectionRemovalResult sectionRemovalResult = sections.remove(stationA);
+
+        Sections expectedSections = new Sections(List.of(sectionB));
+        assertThat(sections).isEqualTo(expectedSections);
+        assertThat(sectionRemovalResult.getSectionToAdd()).isEmpty();
+        assertThat(sectionRemovalResult.getSectionToRemove()).containsExactly(sectionA);
+    }
+
+    @Test
+    @DisplayName("중간 구간을 삭제한다")
+    void removeMiddle() {
+        Section sectionA = new Section(lineA, stationA, stationB, 1);
+        Section sectionB = new Section(lineA, stationB, stationC, 2);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        SectionRemovalResult sectionRemovalResult = sections.remove(stationB);
+
+        int sumOfDistances = sectionA.getDistance() + sectionB.getDistance();
+        Section expectedSectionToAdd = new Section(lineA, stationA, stationC, sumOfDistances);
+        Sections expectedSections = new Sections(List.of(expectedSectionToAdd));
+        assertThat(sections).isEqualTo(expectedSections);
+        assertThat(sectionRemovalResult.getSectionToRemove()).containsExactly(sectionA, sectionB);
+        assertThat(sectionRemovalResult.getSectionToAdd()).isEqualTo(Optional.of(expectedSectionToAdd));
     }
 
     @Test
     @DisplayName("마지막 구간을 삭제한다")
     void removeLast() {
-        Station stationA = new Station(1L, "A");
-        Station stationB = new Station(2L, "B");
-        Station stationC = new Station(3L, "C");
         Section sectionA = new Section(lineA, stationA, stationB, 1);
         Section sectionB = new Section(lineA, stationB, stationC, 1);
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
-        Section removedSection = sections.removeLast(stationC);
+        SectionRemovalResult sectionRemovalResult = sections.remove(stationC);
 
         Sections expectedSections = new Sections(List.of(sectionA));
         assertThat(sections).isEqualTo(expectedSections);
-        assertThat(removedSection).isEqualTo(sectionB);
+        assertThat(sectionRemovalResult.getSectionToRemove()).containsExactly(sectionB);
+        assertThat(sectionRemovalResult.getSectionToAdd()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("구간들의 역 목록을 순서대로 가져온다")
+    void getStationOfSections() {
+        Section sectionA = new Section(lineA, stationA, stationB, 1);
+        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        List<Station> stations = sections.getStations();
+
+        assertThat(stations).containsExactly(stationA, stationB, stationC);
     }
 }

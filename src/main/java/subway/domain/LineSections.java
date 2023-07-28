@@ -2,7 +2,8 @@ package subway.domain;
 
 import java.util.List;
 import java.util.Objects;
-import subway.vo.SectionAdditionResult;
+import subway.dto.SectionAdditionResult;
+import subway.dto.SectionRemovalResult;
 
 public class LineSections {
 
@@ -16,6 +17,10 @@ public class LineSections {
         validateAllSectionsBelongToThisLine();
     }
 
+    public LineSections(Line line, Section section) {
+        this(line, new Sections(List.of(section)));
+    }
+
     private void validateAllSectionsBelongToThisLine() {
         if (!this.sections.isSectionsAllBelongTo(this.line)) {
             throw new IllegalArgumentException(
@@ -23,16 +28,19 @@ public class LineSections {
         }
     }
 
-    public LineSections(Line line, Section section) {
-        this(line, new Sections(List.of(section)));
-    }
-
     public SectionAdditionResult add(Section section) {
-        return sections.add(new Section(this.line, section));
+        validateSectionInLine(section);
+        return sections.add(section);
     }
 
-    public Section removeLast(Station station) {
-        return sections.removeLast(station);
+    private void validateSectionInLine(Section section) {
+        if (!section.belongTo(this.line)) {
+            throw new IllegalArgumentException("추가할 구간은 다른 노선에 속해있습니다. 현재 노선: " + line + " 추가할 구간: " + section);
+        }
+    }
+
+    public SectionRemovalResult remove(Station station) {
+        return sections.remove(station);
     }
 
     public Line getLine() {
