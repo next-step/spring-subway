@@ -20,8 +20,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.integration.TestRequestUtil.createLine;
-import static subway.integration.TestRequestUtil.createStation;
+import static subway.util.TestRequestUtil.createLine;
+import static subway.util.TestRequestUtil.createStation;
+import static subway.util.TestRequestUtil.extractId;
 
 @DisplayName("지하철 노선 관련 기능 통합 테스트")
 public class LineIntegrationTest extends IntegrationTest {
@@ -36,10 +37,10 @@ public class LineIntegrationTest extends IntegrationTest {
         StationRequest stationRequest2 = new StationRequest("서울대입구역");
 
         ExtractableResponse<Response> createStation1Response = createStation(stationRequest1);
-        station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+        station1Id = extractId(createStation1Response);
 
         ExtractableResponse<Response> createStation2Response = createStation(stationRequest2);
-        station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+        station2Id = extractId(createStation2Response);
     }
 
     @Test
@@ -168,7 +169,7 @@ public class LineIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+                .map(it -> extractId(it))
                 .collect(Collectors.toList());
         List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
                 .map(LineResponse::getId)
@@ -184,7 +185,7 @@ public class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = createLine(lineRequest);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        Long lineId = extractId(createResponse);
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -206,7 +207,7 @@ public class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = createLine(lineRequest);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        Long lineId = extractId(createResponse);
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -228,7 +229,7 @@ public class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = createLine(lineRequest);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        Long lineId = extractId(createResponse);
 
         LineUpdateRequest updateRequest = new LineUpdateRequest("구신분당선", "bg-red-600");
         ExtractableResponse<Response> response = RestAssured
@@ -254,7 +255,7 @@ public class LineIntegrationTest extends IntegrationTest {
         createLine(lineRequest2);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        Long lineId = extractId(createResponse);
 
         LineUpdateRequest updateRequest = new LineUpdateRequest("4호선", "bg-red-600");
         ExtractableResponse<Response> response = RestAssured
@@ -279,7 +280,7 @@ public class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = createLine(lineRequest);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        Long lineId = extractId(createResponse);
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .when().delete("/lines/{lineId}", lineId)

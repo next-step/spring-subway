@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.integration.TestRequestUtil.createStation;
+import static subway.util.TestRequestUtil.createStation;
+import static subway.util.TestRequestUtil.extractId;
 
 @DisplayName("지하철역 관련 기능 통합 테스트")
 public class StationIntegrationTest extends IntegrationTest {
@@ -84,7 +85,7 @@ public class StationIntegrationTest extends IntegrationTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+                .map(it -> extractId(it))
                 .collect(Collectors.toList());
         List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
                 .map(StationResponse::getId)
@@ -101,7 +102,7 @@ public class StationIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = createStation(stationRequest);
 
         // when
-        Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        Long stationId = extractId(createResponse);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
                 .get("/stations/{stationId}", stationId)
@@ -122,7 +123,6 @@ public class StationIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse = createStation(stationRequest);
 
         // when
-        Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .when()
                 .get("/stations/{stationId}", 5L)

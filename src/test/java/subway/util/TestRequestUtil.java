@@ -1,4 +1,4 @@
-package subway.integration;
+package subway.util;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -26,5 +26,9 @@ public class TestRequestUtil {
                 .when().post("/stations")
                 .then().log().all()
                 .extract();
+    }
+
+    public static long extractId(ExtractableResponse<Response> createStation1Response) {
+        return Long.parseLong(createStation1Response.header("Location").split("/")[2]);
     }
 }
