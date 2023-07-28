@@ -54,7 +54,7 @@
         - [x] 하행역이 상행 종점역이 아닌 경우 원래 구간과 거리 비교
 - [x] LineRequest에서 정렬된 stations를 반환
 
-### Step 3
+### Step 3. 구간 제거 기능 심화
 
 - [x] 마지막 역 외에도 삭제할 수 있도록 변경
     - [x] 구간이 하나인 노선에서 역 제거하면 오류
@@ -67,6 +67,36 @@
     ```
     - [x] 이미 역이 포함된 구간이 존재하면 삭제 오류
 - [x] 노선 삭제 시 연관된 구간 모두 삭제
+
+### Step 4. 경로 조회 기능
+
+- [ ] 역 간 최단 경로를 조회하는 기능 추가
+    - request
+      ```shell
+      GET /paths?source={source_station_id}&target={target_station_id}
+      ```
+    - example response
+        ```json
+        {
+            "stations": [
+                {
+                    "id": 1,
+                    "name": "교대역"
+                },
+                {
+                    "id": 4,
+                    "name": "남부터미널역"
+                },
+                {
+                    "id": 3,
+                   "name": "양재역"
+                }
+            ],
+            "distance": 5
+        }
+        ```
+    - `jgrapht` 라이브러리 이용
+- [ ] 데이터베이스 설정을 프로덕션과 테스트를 다르게 합니다
 
 ## 커밋 컨벤션
 
