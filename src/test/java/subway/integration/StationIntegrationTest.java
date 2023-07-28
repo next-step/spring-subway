@@ -1,24 +1,26 @@
 package subway.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static subway.exception.ErrorCode.DUPLICATED_STATION_NAME;
+import static subway.fixture.TestFixture.createStation;
+
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static subway.integration.TestRequestUtil.createStation;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import subway.dto.StationRequest;
+import subway.dto.StationResponse;
+import subway.exception.ErrorResponse;
 
 @DisplayName("지하철역 관련 기능")
 public class StationIntegrationTest extends IntegrationTest {
+
     @Test
     @DisplayName("지하철역을 생성한다.")
     void createStationTest() {
@@ -27,12 +29,12 @@ public class StationIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(stationRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then().log().all()
-                .extract();
+            .body(stationRequest)
+            .contentType(APPLICATION_JSON_VALUE)
+            .when()
+            .post("/stations")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -48,16 +50,19 @@ public class StationIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(stationRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/stations")
-                .then()
-                .log().all()
-                .extract();
+            .body(stationRequest)
+            .contentType(APPLICATION_JSON_VALUE)
+            .when()
+            .post("/stations")
+            .then()
+            .log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ErrorResponse.class)
+            .getMessage())
+            .isEqualTo(DUPLICATED_STATION_NAME.getMessage());
     }
 
     @Test
@@ -72,19 +77,20 @@ public class StationIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations")
-                .then().log().all()
-                .extract();
+            .when()
+            .get("/stations")
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         List<Long> expectedStationIds = Stream.of(createResponse1, createResponse2)
-                .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
-                .collect(Collectors.toList());
-        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class).stream()
-                .map(StationResponse::getId)
-                .collect(Collectors.toList());
+            .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
+            .collect(Collectors.toList());
+        List<Long> resultStationIds = response.jsonPath().getList(".", StationResponse.class)
+            .stream()
+            .map(StationResponse::getId)
+            .collect(Collectors.toList());
         assertThat(resultStationIds).containsAll(expectedStationIds);
     }
 
@@ -99,10 +105,10 @@ public class StationIntegrationTest extends IntegrationTest {
         // when
         Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .get("/stations/{stationId}", stationId)
-                .then().log().all()
-                .extract();
+            .when()
+            .get("/stations/{stationId}", stationId)
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -121,12 +127,12 @@ public class StationIntegrationTest extends IntegrationTest {
         StationRequest updateRequest = new StationRequest("역삼역");
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(updateRequest)
-                .when()
-                .put(uri)
-                .then().log().all()
-                .extract();
+            .contentType(APPLICATION_JSON_VALUE)
+            .body(updateRequest)
+            .when()
+            .put(uri)
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -142,10 +148,10 @@ public class StationIntegrationTest extends IntegrationTest {
         // when
         String uri = createResponse.header("Location");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when()
-                .delete(uri)
-                .then().log().all()
-                .extract();
+            .when()
+            .delete(uri)
+            .then().log().all()
+            .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());

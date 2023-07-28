@@ -1,5 +1,10 @@
 package subway.application;
 
+import static subway.exception.ErrorCode.NOT_FOUND_LINE;
+import static subway.exception.ErrorCode.NOT_FOUND_STATION;
+
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
@@ -10,51 +15,50 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import subway.dto.LineWithStationsResponse;
+import subway.exception.SubwayException;
 
 @Service
+@Transactional(readOnly = true)
 public class LineService {
+
     private final LineDao lineDao;
     private final SectionDao sectionDao;
     private final StationDao stationDao;
 
-    public LineService(final LineDao lineDao, final SectionDao sectionDao, final StationDao stationDao) {
+    public LineService(final LineDao lineDao, final SectionDao sectionDao,
+        final StationDao stationDao) {
         this.lineDao = lineDao;
         this.sectionDao = sectionDao;
         this.stationDao = stationDao;
     }
 
     @Transactional
-    public LineResponse saveLine(final LineRequest request) {
+    public LineWithStationsResponse saveLine(final LineRequest request) {
         Line line = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+        Station upStation = stationDao.findById(request.getUpStationId())
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
+        Station downStation = stationDao.findById(request.getDownStationId())
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
+        Section section = new Section(upStation, downStation, request.getDistance());
 
-        sectionDao.insert(new Section(upStation, downStation, request.getDistance()), line.getId());
+        Line newLine = line.addSections(section);
+        sectionDao.insert(section, line.getId());
 
-        return LineResponse.of(line);
+        return LineWithStationsResponse.of(newLine);
     }
 
     public List<LineResponse> findLineResponses() {
-        List<Line> persistLines = findLines();
+        List<Line> persistLines = lineDao.findAll();
         return persistLines.stream()
-                .map(LineResponse::of)
-                .collect(Collectors.toList());
+            .map(LineResponse::of)
+            .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
-        return lineDao.findAll();
-    }
-
-    public LineResponse findLineResponseById(final Long id) {
-        Line line = findLineById(id);
-        return LineResponse.of(line);
-    }
-
-    public Line findLineById(final Long id) {
-        return lineDao.findById(id);
+    public LineWithStationsResponse findLineResponseById(final Long id) {
+        Line line = lineDao.findById(id)
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_LINE));
+        return LineWithStationsResponse.of(line);
     }
 
     @Transactional
@@ -64,6 +68,9 @@ public class LineService {
 
     @Transactional
     public void deleteLineById(final Long id) {
+        Line line = lineDao.findById(id)
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_LINE));
+        sectionDao.deleteSections(line.getSections().getSections());
         lineDao.deleteById(id);
     }
 }
