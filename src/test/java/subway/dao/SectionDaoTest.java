@@ -34,7 +34,7 @@ public class SectionDaoTest {
             .setScriptEncoding("UTF-8")
             .ignoreFailedDrops(true)
             .addScript("schema.sql")
-            .addScripts("test.sql")
+            .addScripts("dao-test.sql")
             .build();
         sectionDao = new SectionDao(new JdbcTemplate(dataSource), dataSource);
         stationDao = new StationDao(new JdbcTemplate(dataSource), dataSource);

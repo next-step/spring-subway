@@ -9,13 +9,11 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import subway.domain.Station;
 import subway.exception.SubwayException;
 
-@SpringBootTest
 public class StationDaoTest {
 
     private StationDao stationDao;
@@ -28,7 +26,7 @@ public class StationDaoTest {
             .setScriptEncoding("UTF-8")
             .ignoreFailedDrops(true)
             .addScript("schema.sql")
-            .addScripts("test.sql")
+            .addScripts("dao-test.sql")
             .build();
         stationDao = new StationDao(new JdbcTemplate(dataSource), dataSource);
     }

@@ -31,7 +31,7 @@ public class LineDaoTest {
             .setScriptEncoding("UTF-8")
             .ignoreFailedDrops(true)
             .addScript("schema.sql")
-            .addScripts("test.sql")
+            .addScripts("dao-test.sql")
             .build();
         lineDao = new LineDao(new JdbcTemplate(dataSource), dataSource);
     }
