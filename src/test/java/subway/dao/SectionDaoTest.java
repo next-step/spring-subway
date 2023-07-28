@@ -24,21 +24,26 @@ class SectionDaoTest {
     @Autowired
     private SectionDao sectionDao;
 
-    private Section section1;
-    private Section section2;
-
     @Autowired
     private LineDao lineDao;
 
     @Autowired
     private StationDao stationDao;
 
+    private Section section1;
+    private Section section2;
+
+    private Line line;
+    private Station station1;
+    private Station station2;
+    private Station station3;
+
     @BeforeEach
     void setUp() {
-        Line line = lineDao.findById(1L).get();
-        Station station1 = stationDao.findById(1L).get();
-        Station station2 = stationDao.findById(2L).get();
-        Station station3 = stationDao.findById(3L).get();
+        line = lineDao.insert(new Line("8호선", "#000001"));
+        station1 = stationDao.insert(new Station("암사"));
+        station2 = stationDao.insert(new Station("모란"));
+        station3 = stationDao.insert(new Station("시장"));
 
         section1 = new Section(line, station1, station2, new Distance(10L));
         section2 = new Section(line, station2, station3, new Distance(10L));
@@ -47,7 +52,7 @@ class SectionDaoTest {
     @DisplayName("노선아이디와 상행역아이디와 하행역아이디와 거리를 가지고 구간을 생성한다.")
     @Test
     void insert_success() {
-        // given  when
+        // when
         Section result = sectionDao.insert(section1);
 
         // then
@@ -65,11 +70,10 @@ class SectionDaoTest {
     @Test
     void existByLineIdTrue() {
         // given
-        long lineId = 1L;
         sectionDao.insert(section1);
 
         // when
-        boolean result = sectionDao.existByLineId(lineId);
+        boolean result = sectionDao.existByLineId(line.getId());
 
         // then
         assertThat(result).isTrue();
@@ -78,11 +82,8 @@ class SectionDaoTest {
     @DisplayName("구간 테이블에 특정 노선의 구간이 있는지 여부 반환 - false")
     @Test
     void existByLineIdFalse() {
-        // given
-        long lineId = 1L;
-
         // when
-        boolean result = sectionDao.existByLineId(lineId);
+        boolean result = sectionDao.existByLineId(line.getId());
 
         // then
         assertThat(result).isFalse();
@@ -92,12 +93,11 @@ class SectionDaoTest {
     @Test
     void findAllByLineId() {
         // given
-        long lineId = 1L;
         Section result1 = sectionDao.insert(section1);
         Section result2 = sectionDao.insert(section2);
 
         //  when
-        List<Section> sections = sectionDao.findAllByLineId(lineId);
+        List<Section> sections = sectionDao.findAllByLineId(line.getId());
 
         // then
         assertThat(sections).hasSize(2);
@@ -108,7 +108,6 @@ class SectionDaoTest {
     @Test
     void deleteById() {
         // given
-        long lineId = 1L;
         sectionDao.insert(section1);
         Section result = sectionDao.insert(section2);
 
@@ -116,6 +115,6 @@ class SectionDaoTest {
         assertDoesNotThrow(() -> sectionDao.deleteById(result.getId()));
 
         // then
-        assertThat(sectionDao.findAllByLineId(lineId)).hasSize(1);
+        assertThat(sectionDao.findAllByLineId(line.getId())).hasSize(1);
     }
 }

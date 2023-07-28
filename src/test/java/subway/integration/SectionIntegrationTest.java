@@ -122,20 +122,8 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteLastStationOfLine() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest1)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
-        ExtractableResponse<Response> createResposne2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest2)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
+        postSection(lineId, sectionRequest1);
+        postSection(lineId, sectionRequest2);
 
         // when
 
@@ -154,20 +142,8 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteFirstStationOfLine() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest1)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
-        ExtractableResponse<Response> createResposne2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest2)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
+        postSection(lineId, sectionRequest1);
+        postSection(lineId, sectionRequest2);
 
         // when
 
@@ -186,20 +162,8 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteMiddleStationOfLine() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest1)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
-        ExtractableResponse<Response> createResposne2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest2)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
+        postSection(lineId, sectionRequest1);
+        postSection(lineId, sectionRequest2);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -240,13 +204,7 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteNotStationOfLineThenFail() {
         // given
-        ExtractableResponse<Response> createResponse1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sectionRequest1)
-                .when().post("/lines/{lineId}/sections", lineId)
-                .then().log().all().
-                extract();
+        postSection(lineId, sectionRequest1);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -260,73 +218,47 @@ class SectionIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
+    private ExtractableResponse<Response> postSection(Long lineId, SectionRequest sectionRequest) {
+        return RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(sectionRequest)
+                .when().post("/lines/{lineId}/sections", lineId)
+                .then().log().all().
+                extract();
+    }
+
     private void setUpStationsAndLine() {
-        stationId1 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new StationRequest("강남"))
-                .when().post("/stations")
-                .then().log().all()
-                .extract()
-                .as(StationResponse.class)
-                .getId();
-        stationId2 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new StationRequest("역삼"))
-                .when().post("/stations")
-                .then().log().all()
-                .extract()
-                .as(StationResponse.class)
-                .getId();
-        stationId3 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new StationRequest("선릉"))
-                .when().post("/stations")
-                .then().log().all()
-                .extract()
-                .as(StationResponse.class)
-                .getId();
-        stationId4 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new StationRequest("삼성"))
-                .when().post("/stations")
-                .then().log().all()
-                .extract()
-                .as(StationResponse.class)
-                .getId();
-        stationId5 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new StationRequest("종합운동장"))
-                .when().post("/stations")
-                .then().log().all()
-                .extract()
-                .as(StationResponse.class)
-                .getId();
-        stationId6 = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new StationRequest("잠실새내"))
-                .when().post("/stations")
-                .then().log().all()
-                .extract()
-                .as(StationResponse.class)
-                .getId();
+        stationId1 = postStation("st1");
+        stationId2 = postStation("st2");
+        stationId3 = postStation("st3");
+        stationId4 = postStation("st4");
+        stationId5 = postStation("st5");
+        stationId6 = postStation("st6");
 
         lineId = RestAssured
-                .given().log().all()
+                .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(new LineRequest("3호선", "#555555", stationId1, stationId2, 10L))
                 .when().post("/lines")
-                .then().log().all()
+                .then()
                 .extract()
                 .as(LineResponse.class)
                 .getId();
 
         sectionRequest1 = new SectionRequest(stationId2, stationId3, 10L);
         sectionRequest2 = new SectionRequest(stationId3, stationId4, 10L);
+    }
+
+    private static Long postStation(String name) {
+        return RestAssured
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new StationRequest(name))
+                .when().post("/stations")
+                .then()
+                .extract()
+                .as(StationResponse.class)
+                .getId();
     }
 }
