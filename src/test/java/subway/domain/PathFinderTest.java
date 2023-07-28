@@ -40,13 +40,15 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("출발역과 도착역이 연결 되어 있지 않으면 PathFinder 를 생성에 실패한다.")
+    @DisplayName("출발역과 도착역이 연결 되어 있지 않으면 PathFinder 생성에 실패한다.")
     void createPathFinder_notConnectedSourceAndTarget_throwException() {
         // given
-        List<Section> sections = createInitialSections();
+        Station source = new Station(1L, "교대역");
+        Station target = new Station(4L, "남부터미널역");
+        PathFinder pathFinder = new PathFinder(createNotConnectedSections());
 
         // when & then
-        assertThatThrownBy(() -> new PathFinder(sections))
+        assertThatThrownBy(() -> pathFinder.searchShortestPath(source.getId(), target.getId()))
             .hasMessage("출발역과 도착역이 연결되어 있지 않습니다.")
             .isInstanceOf(IllegalSectionException.class);
     }
@@ -70,7 +72,6 @@ class PathFinderTest {
     void searchShortestPath_returnShortestDistance() {
         // given
         Station source = new Station (1L, "교대역");
-        Station middle = new Station(4L, "남부터미널역");
         Station target = new Station (3L, "양재역");
         PathFinder pathFinder = new PathFinder(createInitialSections());
 
@@ -129,9 +130,23 @@ class PathFinderTest {
          * 남부터미널역  --- *3호선* ---   양재
          */
         sections.add(new Section(1L, lines.get(0), stations.get(0), stations.get(1), 10));
-        sections.add(new Section(1L, lines.get(1), stations.get(1), stations.get(2), 10));
-        sections.add(new Section(1L, lines.get(2), stations.get(0), stations.get(3), 2));
-        sections.add(new Section(1L, lines.get(2), stations.get(3), stations.get(2), 3));
+        sections.add(new Section(2L, lines.get(1), stations.get(1), stations.get(2), 10));
+        sections.add(new Section(3L, lines.get(2), stations.get(0), stations.get(3), 2));
+        sections.add(new Section(4L, lines.get(2), stations.get(3), stations.get(2), 3));
+        return sections;
+    }
+
+    private List<Section> createNotConnectedSections() {
+        List<Line> lines = createInitialLines();
+        List<Station> stations = createInitialStations();
+        List<Section> sections = new ArrayList<>();
+
+        /**
+         * 교대역    --- *2호선* ---   강남역
+         * 남부터미널역  --- *3호선* ---   양재
+         */
+        sections.add(new Section(1L,lines.get(0), stations.get(0), stations.get(1), 10));
+        sections.add(new Section(1L,lines.get(2), stations.get(2), stations.get(3), 10));
         return sections;
     }
 }
