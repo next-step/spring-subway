@@ -87,4 +87,22 @@ class PathGraphTest {
                 .isInstanceOf(SubwayException.class)
                 .hasMessage(ErrorCode.STATION_NOT_CONTAINED.getMessage() + station3.getId());
     }
+
+    @Test
+    @DisplayName("경로가 존재하지 않는 경우 오류")
+    void noPath() {
+        // given
+        Station station1 = new Station(1L, "서울역");
+        Station station2 = new Station(2L, "잠실역");
+        Station station3 = new Station(3L, "강남역");
+        Station station4 = new Station(4L, "옥수역");
+        Section section1_2 = new Section(station1, station2, 11);
+        Section section3_4 = new Section(station3, station4, 11);
+        
+        PathGraph sections = PathGraph.of(List.of(section1_2, section3_4));
+
+        // when, then
+        assertThatCode(() -> sections.findShortestPath(station1, station4))
+                .isInstanceOf(SubwayException.class);
+    }
 }
