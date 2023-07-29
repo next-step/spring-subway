@@ -11,6 +11,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.dto.StationCreateRequest;
+import subway.dto.StationResponse;
 import subway.dto.StationUpdateRequest;
 
 @DisplayName("지하철역 관련 기능")
@@ -24,10 +25,10 @@ class StationIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.createStation(
-                new StationCreateRequest(stationName));
+            new StationCreateRequest(stationName));
 
         // then
-        assertIsStationCreated(response);
+        assertIsStationCreated(response, new StationResponse(response.jsonPath().getLong("id"), stationName));
     }
 
     @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
@@ -39,7 +40,7 @@ class StationIntegrationTest extends IntegrationTest {
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.createStation(
-                new StationCreateRequest(stationName));
+            new StationCreateRequest(stationName));
 
         // then
         assertIsDuplicatedStationName(response);
@@ -49,14 +50,21 @@ class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStations() {
         /// given
-        StationIntegrationSupporter.createStation(new StationCreateRequest("강남역"));
-        StationIntegrationSupporter.createStation(new StationCreateRequest("역삼역"));
+        StationResponse expectedGangnamStationResponse =
+            new StationResponse(
+                StationIntegrationSupporter.createStation(new StationCreateRequest("강남역")).jsonPath().getLong("id")
+                , "강남역");
+
+        StationResponse expectedYeoksamStationResponse =
+            new StationResponse(
+                StationIntegrationSupporter.createStation(new StationCreateRequest("역삼역")).jsonPath().getLong("id")
+                , "역삼역");
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.findAllStation();
 
         // then
-        assertIsStationFound(response, 2);
+        assertIsStationFound(response, expectedGangnamStationResponse, expectedYeoksamStationResponse);
     }
 
     @DisplayName("지하철역을 조회한다.")
@@ -64,12 +72,13 @@ class StationIntegrationTest extends IntegrationTest {
     void getStation() {
         /// given
         long stationId = Long.parseLong(createStationAndGetLocation("강남역").split("/")[2]);
+        StationResponse stationResponse = new StationResponse(stationId, "강남역");
 
         // when
         ExtractableResponse<Response> response = StationIntegrationSupporter.getStationByStationId(stationId);
 
         // then
-        assertIsStationFound(response);
+        assertIsStationFound(response, stationResponse);
     }
 
     @DisplayName("지하철역을 수정한다.")
@@ -103,7 +112,8 @@ class StationIntegrationTest extends IntegrationTest {
 
     private String createStationAndGetLocation(String stationName) {
         ExtractableResponse<Response> createResponse = StationIntegrationSupporter.createStation(
-                new StationCreateRequest(stationName));
+            new StationCreateRequest(stationName));
         return createResponse.header("Location");
     }
+
 }

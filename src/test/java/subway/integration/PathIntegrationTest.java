@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.dto.LineCreateRequest;
 import subway.dto.LineResponse;
+import subway.dto.PathFindResponse;
 import subway.dto.SectionCreateRequest;
 import subway.dto.StationCreateRequest;
 import subway.dto.StationResponse;
@@ -33,7 +34,10 @@ class PathIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = findStationPath(sourceStationId, targetStationId);
 
         // then
-        assertStationPath(response, 3);
+        assertStationPath(response, 15,
+            SinbundangLine.expectedGangnamStationResponse,
+            SinbundangLine.expectedSindorimStationResponse,
+            SinbundangLine.expectedYeokgokStationResponse);
     }
 
     @Test
@@ -47,7 +51,12 @@ class PathIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = findStationPath(sourceStationId, targetStationId);
 
         // then
-        assertStationPath(response, 5);
+        assertStationPath(response, 25,
+            SinbundangLine.expectedGangnamStationResponse,
+            SinbundangLine.expectedSindorimStationResponse,
+            SinbundangLine.expectedYeokgokStationResponse,
+            SecondLine.expectedJamsilStationResponse,
+            SecondLine.expectedBucheonStationResponse);
     }
 
     @Test
@@ -81,8 +90,11 @@ class PathIntegrationTest extends IntegrationTest {
     private static final class SinbundangLine {
 
         private static long gangnamStationId;
+        private static PathFindResponse.StationResponse expectedGangnamStationResponse;
         private static long sindorimStationId;
+        private static PathFindResponse.StationResponse expectedSindorimStationResponse;
         private static long yeokgokStationId;
+        private static PathFindResponse.StationResponse expectedYeokgokStationResponse;
         private static long id;
 
     }
@@ -90,7 +102,9 @@ class PathIntegrationTest extends IntegrationTest {
     private static final class SecondLine {
 
         private static long bucheonStationId;
+        private static PathFindResponse.StationResponse expectedBucheonStationResponse;
         private static long jamsilStationId;
+        private static PathFindResponse.StationResponse expectedJamsilStationResponse;
         private static long id;
 
     }
@@ -102,14 +116,29 @@ class PathIntegrationTest extends IntegrationTest {
 
         SinbundangLine.gangnamStationId = createStation(new StationCreateRequest("강남")).body().as(StationResponse.class)
             .getId();
-        SinbundangLine.sindorimStationId = createStation(new StationCreateRequest("신도림")).body().as(StationResponse.class)
+        SinbundangLine.expectedGangnamStationResponse = new PathFindResponse.StationResponse(
+            SinbundangLine.gangnamStationId, "강남");
+
+        SinbundangLine.sindorimStationId = createStation(new StationCreateRequest("신도림")).body()
+            .as(StationResponse.class)
             .getId();
+        SinbundangLine.expectedSindorimStationResponse = new PathFindResponse.StationResponse(
+            SinbundangLine.sindorimStationId, "신도림");
+
         SinbundangLine.yeokgokStationId = createStation(new StationCreateRequest("역곡")).body().as(StationResponse.class)
             .getId();
+        SinbundangLine.expectedYeokgokStationResponse = new PathFindResponse.StationResponse(
+            SinbundangLine.yeokgokStationId, "역곡");
+
         SecondLine.bucheonStationId = createStation(new StationCreateRequest("부천")).body().as(StationResponse.class)
             .getId();
+        SecondLine.expectedBucheonStationResponse = new PathFindResponse.StationResponse(
+            SecondLine.bucheonStationId, "부천");
+
         SecondLine.jamsilStationId = createStation(new StationCreateRequest("잠실")).body().as(StationResponse.class)
             .getId();
+        SecondLine.expectedJamsilStationResponse = new PathFindResponse.StationResponse(
+            SecondLine.jamsilStationId, "잠실");
 
         SinbundangLine.id = createLineByLineRequest(
             new LineCreateRequest("신분당선", "bg-red-600", SinbundangLine.gangnamStationId,

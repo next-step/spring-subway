@@ -20,6 +20,7 @@ import static subway.integration.StationIntegrationSupporter.createStation;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = createLineByLineRequest(SinbundangLine.createRequest);
 
         // then
-        assertIsLineCreated(response);
+        assertIsLineCreated(response, SinbundangLine.getExpectedLineResponse(response));
     }
 
     @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
@@ -60,14 +61,16 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLines() {
         // given
-        createLineByLineRequest(SinbundangLine.createRequest);
-        createLineByLineRequest(SecondLine.createRequest);
+        LineResponse sinbundangLineExpectedResponse = SinbundangLine.getExpectedLineResponse(
+            createLineByLineRequest(SinbundangLine.createRequest));
+        LineResponse secondLineExpectedResponse = SecondLine.getExpectedLineResponse(
+            createLineByLineRequest(SecondLine.createRequest));
 
         // when
         ExtractableResponse<Response> response = findAllLines();
 
         // then
-        assertIsLineFound(response, 2);
+        assertIsLineFound(response, sinbundangLineExpectedResponse, secondLineExpectedResponse);
     }
 
     @DisplayName("지하철 노선을 조회한다.")
@@ -75,14 +78,14 @@ class LineIntegrationTest extends IntegrationTest {
     void getLine() {
         // given
         ExtractableResponse<Response> createResponse = createLineByLineRequest(SinbundangLine.createRequest);
-
-        long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        LineResponse sinbundangLineResponse = SinbundangLine.getExpectedLineResponse(createResponse);
+        long lineId = sinbundangLineResponse.getId();
 
         // when
         ExtractableResponse<Response> response = getLineByLineId(lineId);
 
         // then
-        assertIsLineFound(response);
+        assertIsLineFound(response, sinbundangLineResponse);
     }
 
     @DisplayName("지하철 노선을 수정한다.")
@@ -314,15 +317,23 @@ class LineIntegrationTest extends IntegrationTest {
 
         SinbundangLine.gangnamStationId = createStation(new StationCreateRequest("강남")).body().as(StationResponse.class)
             .getId();
+        SinbundangLine.gangnamStationResponse = new StationResponse(SinbundangLine.gangnamStationId, "강남");
+
         SinbundangLine.sindorimStationId = createStation(new StationCreateRequest("신도림")).body()
             .as(StationResponse.class).getId();
+        SinbundangLine.sindorimStationResponse = new StationResponse(SinbundangLine.sindorimStationId, "신도림");
+
         SecondLine.bucheonStationId = createStation(new StationCreateRequest("부천")).body().as(StationResponse.class)
             .getId();
+        SecondLine.bucheonStationResponse = new StationResponse(SecondLine.bucheonStationId, "부천");
+
         SecondLine.jamsilStationId = createStation(new StationCreateRequest("잠실")).body().as(StationResponse.class)
             .getId();
+        SecondLine.jamsilStationResponse = new StationResponse(SecondLine.jamsilStationId, "잠실");
 
         SinbundangLine.createRequest = new LineCreateRequest("신분당선", "bg-red-600", SinbundangLine.gangnamStationId,
             SinbundangLine.sindorimStationId, 10);
+
         SecondLine.createRequest = new LineCreateRequest("2호선", "bg-green-600", SecondLine.bucheonStationId,
             SecondLine.jamsilStationId, 5);
     }
@@ -331,7 +342,14 @@ class LineIntegrationTest extends IntegrationTest {
 
         private static LineCreateRequest createRequest;
         private static long gangnamStationId;
+        private static StationResponse gangnamStationResponse;
         private static long sindorimStationId;
+        private static StationResponse sindorimStationResponse;
+
+        private static LineResponse getExpectedLineResponse(ExtractableResponse<Response> response) {
+            return new LineResponse(response.jsonPath().getLong("id"), createRequest.getName(),
+                createRequest.getColor(), List.of(gangnamStationResponse, sindorimStationResponse));
+        }
 
     }
 
@@ -339,7 +357,15 @@ class LineIntegrationTest extends IntegrationTest {
 
         private static LineCreateRequest createRequest;
         private static long bucheonStationId;
+        private static StationResponse bucheonStationResponse;
         private static long jamsilStationId;
+        private static StationResponse jamsilStationResponse;
+
+
+        private static LineResponse getExpectedLineResponse(ExtractableResponse<Response> response) {
+            return new LineResponse(response.jsonPath().getLong("id"), createRequest.getName(),
+                createRequest.getColor(), List.of(bucheonStationResponse, jamsilStationResponse));
+        }
 
     }
 

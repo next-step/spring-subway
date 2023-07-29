@@ -18,18 +18,14 @@ class PathIntegrationAssertions {
         throw new UnsupportedOperationException("Cannot invoke constructor \"PathIntegrationAssertions()\"");
     }
 
-    static void assertStationPath(ExtractableResponse<Response> response, int stationSize) {
+    static void assertStationPath(ExtractableResponse<Response> response, int distance,
+        PathFindResponse.StationResponse... exactlyExpected) {
+
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         PathFindResponse pathFindResponse = response.as(PathFindResponse.class);
-        assertThat(pathFindResponse.getDistance()).isInstanceOf(Number.class);
-        assertThat(pathFindResponse.getStations()).hasSize(stationSize);
-        pathFindResponse.getStations().forEach(
-                stationResponse -> {
-                    assertThat(stationResponse.getId()).isInstanceOf(Number.class);
-                    assertThat(stationResponse.getName()).isNotEmpty().isInstanceOf(String.class);
-                }
-        );
+        assertThat(pathFindResponse.getDistance()).isEqualTo(distance);
+        assertThat(pathFindResponse.getStations()).containsExactly(exactlyExpected);
     }
 
     static void assertIsNotExistStation(ExtractableResponse<Response> response) {
