@@ -6,8 +6,11 @@ import subway.dto.response.StationResponse;
 
 public class ShortestSubwayPath {
 
-    private final List<StationResponse> stations;
-    private final double distance;
+    private List<StationResponse> stations;
+    private double distance;
+
+    public ShortestSubwayPath() {
+    }
 
     public ShortestSubwayPath(List<Station> stations, double distance) {
         this.stations = StationResponse.listOf(stations);

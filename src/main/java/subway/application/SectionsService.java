@@ -1,5 +1,6 @@
 package subway.application;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
@@ -8,8 +9,10 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.LineSections;
 import subway.domain.Section;
+import subway.domain.SubwayPath;
 import subway.dto.SectionRemovalResult;
 import subway.domain.Station;
+import subway.dto.ShortestSubwayPath;
 import subway.dto.request.SectionAdditionRequest;
 import subway.dto.SectionAdditionResult;
 
@@ -54,6 +57,16 @@ public class SectionsService {
 
         sectionRemovalResult.getSectionToRemove().forEach(sectionDao::delete);
         sectionRemovalResult.getSectionToAdd().ifPresent(sectionDao::save);
+    }
+
+    @Transactional
+    public ShortestSubwayPath calculateShortestSubwayPath(Long sourceStationId, Long targetStationId) {
+        Station sourceStation = getStationById(sourceStationId);
+        Station targetStation = getStationById(targetStationId);
+        List<LineSections> subway = sectionDao.findAll();
+
+        SubwayPath subwayPath = new SubwayPath(subway);
+        return subwayPath.calculateShortestPath(sourceStation, targetStation);
     }
 
     private Line getLineById(Long id) {
