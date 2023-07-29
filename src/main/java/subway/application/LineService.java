@@ -12,8 +12,6 @@ import subway.dto.response.LineCreateResponse;
 import subway.dto.response.LineFindResponse;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,13 +51,8 @@ public class LineService {
 
     @Transactional
     public LineFindResponse findLine(final Long lineId) {
-        final Map<Long, Station> stationById = stationDao.findAllByLineId(lineId).stream()
-                .collect(Collectors.toMap(Station::getId, Function.identity()));
-
         final ConnectedSections connectedSections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
-        final List<Station> stations = connectedSections.getSortedStationIds().stream()
-                .map(stationById::get)
-                .collect(Collectors.toList());
+        final List<Station> stations = stationDao.findAllByIds(connectedSections.getConnectedStationIds());
 
         return LineFindResponse.of(lineDao.findById(lineId), stations);
     }

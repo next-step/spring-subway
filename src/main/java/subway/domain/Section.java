@@ -64,14 +64,6 @@ public class Section {
         return this.distance.isShorterOrEqual(target.distance);
     }
 
-    public boolean isSameUpStation(final Section target) {
-        return Objects.equals(this.upStationId, target.upStationId);
-    }
-
-    public boolean isSameDownStation(final Section target) {
-        return Objects.equals(this.downStationId, target.downStationId);
-    }
-
     public boolean isSameUpStationId(final Long targetId) {
         return Objects.equals(this.upStationId, targetId);
     }

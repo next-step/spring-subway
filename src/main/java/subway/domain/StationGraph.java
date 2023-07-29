@@ -7,35 +7,21 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
 import subway.exception.SubwayIllegalArgumentException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class StationGraph {
 
     private final Graph<Long, DefaultWeightedEdge> stationGraph
             = new WeightedMultigraph<>(DefaultWeightedEdge.class);
 
-    public StationGraph(final DistinctSections sections) {
+    public StationGraph(final List<Section> sections) {
         validateIsNotEmptySections(sections);
 
-        initGraph(sections);
-    }
-
-    private void initGraph(final DistinctSections sections) {
-        sections.getSectionIds().forEach(stationGraph::addVertex);
-
-        for (Section section : sections.getSections()) {
-            stationGraph.setEdgeWeight(
-                    stationGraph.addEdge(section.getUpStationId(), section.getDownStationId()),
-                    section.getDistance().getValue()
-            );
-        }
-    }
-
-    private void validateIsNotEmptySections(final DistinctSections sections) {
-        if (sections.isEmpty()) {
-            throw new SubwayIllegalArgumentException("경로 탐색을 위해 구간 정보가 필요합니다.");
-        }
+        initVertices(sections);
+        initEdges(sections);
     }
 
     public List<Long> getShortestPathStationIds(final Long from, final Long to) {
@@ -44,6 +30,24 @@ public class StationGraph {
 
     public Distance getShortestPathDistance(final Long from, final Long to) {
         return new Distance(getShortestPath(from, to).getWeight());
+    }
+
+    private void initVertices(final List<Section> sections) {
+        final Set<Long> sectionIds = new HashSet<>();
+        for (Section section : sections) {
+            sectionIds.add(section.getUpStationId());
+            sectionIds.add(section.getDownStationId());
+        }
+        sectionIds.forEach(stationGraph::addVertex);
+    }
+
+    private void initEdges(final List<Section> sections) {
+        for (Section section : sections) {
+            stationGraph.setEdgeWeight(
+                    stationGraph.addEdge(section.getUpStationId(), section.getDownStationId()),
+                    section.getDistance().getValue()
+            );
+        }
     }
 
     private GraphPath<Long, DefaultWeightedEdge> getShortestPath(final Long from, final Long to) {
@@ -58,6 +62,12 @@ public class StationGraph {
         }
 
         return shortestPath;
+    }
+
+    private void validateIsNotEmptySections(final List<Section> sections) {
+        if (sections.isEmpty()) {
+            throw new SubwayIllegalArgumentException("경로 탐색을 위해 구간 정보가 필요합니다.");
+        }
     }
 
     private void validateFromStationToStationIsNotSame(final Long from, final Long to) {

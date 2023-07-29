@@ -14,23 +14,21 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class StationGraphTest {
 
-    final DistinctSections sections = new DistinctSections(
-            List.of(
-                    new Section(1L, 1L, 1L, 2L, new Distance(16)),
-                    new Section(2L, 1L, 2L, 1L, new Distance(1)),
-                    new Section(3L, 1L, 1L, 3L, new Distance(9)),
-                    new Section(4L, 1L, 1L, 4L, new Distance(35)),
-                    new Section(5L, 2L, 2L, 4L, new Distance(12)),
-                    new Section(6L, 2L, 2L, 5L, new Distance(25)),
-                    new Section(7L, 3L, 3L, 4L, new Distance(15)),
-                    new Section(8L, 3L, 3L, 6L, new Distance(22)),
-                    new Section(9L, 3L, 4L, 5L, new Distance(14)),
-                    new Section(10L, 3L, 4L, 6L, new Distance(17)),
-                    new Section(11L, 3L, 4L, 7L, new Distance(19)),
-                    new Section(12L, 3L, 5L, 7L, new Distance(8)),
-                    new Section(13L, 3L, 6L, 7L, new Distance(14)),
-                    new Section(14L, 3L, 8L, 9L, new Distance(777))
-            )
+    final List<Section> sections = List.of(
+            new Section(1L, 1L, 1L, 2L, new Distance(16)),
+            new Section(2L, 1L, 2L, 1L, new Distance(1)),
+            new Section(3L, 1L, 1L, 3L, new Distance(9)),
+            new Section(4L, 1L, 1L, 4L, new Distance(35)),
+            new Section(5L, 2L, 2L, 4L, new Distance(12)),
+            new Section(6L, 2L, 2L, 5L, new Distance(25)),
+            new Section(7L, 3L, 3L, 4L, new Distance(15)),
+            new Section(8L, 3L, 3L, 6L, new Distance(22)),
+            new Section(9L, 3L, 4L, 5L, new Distance(14)),
+            new Section(10L, 3L, 4L, 6L, new Distance(17)),
+            new Section(11L, 3L, 4L, 7L, new Distance(19)),
+            new Section(12L, 3L, 5L, 7L, new Distance(8)),
+            new Section(13L, 3L, 6L, 7L, new Distance(14)),
+            new Section(14L, 3L, 8L, 9L, new Distance(777))
     );
 
     StationGraph stationGraph;
@@ -53,7 +51,7 @@ class StationGraphTest {
     @DisplayName("구간이 존재하지 않는 경우 생성에 실패한다.")
     void creatFailWithNullOrEmptySections() {
         /* given */
-        final DistinctSections emptySections = new DistinctSections(Collections.emptyList());
+        final List<Section> emptySections = Collections.emptyList();
 
 
         /* when & then */
