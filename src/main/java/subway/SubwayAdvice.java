@@ -21,7 +21,8 @@ public class SubwayAdvice {
 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<ErrorResponse> handleSQLException(SQLException e) {
-        ErrorResponse response = new ErrorResponse("Invalid SQL Error Caught.");
+        ErrorCode errorCode = ErrorCode.UNKNOWN_DB_ERROR;
+        ErrorResponse response = new ErrorResponse(errorCode.getCode(), errorCode.getDescription());
         logger.error(EXCEPTION_INFO, e.getMessage(), e.getStackTrace());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
@@ -29,14 +30,15 @@ public class SubwayAdvice {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(IncorrectRequestException e) {
         ErrorCode errorCode = e.getErrorCode();
-        ErrorResponse response = new ErrorResponse(e.getMessage());
+        ErrorResponse response = new ErrorResponse(errorCode.getCode(), e.getMessage());
         logger.error(EXCEPTION_INFO, e.getMessage(), e.getStackTrace());
         return ResponseEntity.status(HttpStatus.valueOf(errorCode.getStatus())).body(response);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        ErrorResponse response = new ErrorResponse("Unexpected Error Caught.");
+        ErrorCode errorCode = ErrorCode.UNKNOWN_SERVER_ERROR;
+        ErrorResponse response = new ErrorResponse(errorCode.getCode(), errorCode.getDescription());
         logger.error(EXCEPTION_INFO, e.getMessage(), e.getStackTrace());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
