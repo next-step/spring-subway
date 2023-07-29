@@ -1,21 +1,22 @@
-package subway.integration;
+package subway.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import subway.integration.helper.LineHelper;
-import subway.integration.helper.SectionHelper;
-import subway.integration.helper.StationHelper;
+import subway.acceptance.helper.LineHelper;
+import subway.acceptance.helper.RestHelper;
+import subway.acceptance.helper.SectionHelper;
+import subway.acceptance.helper.StationHelper;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("경로 관련 기능 인수 테스트")
-class PathIntegrationTest extends IntegrationTest {
+class PathAcceptanceTest extends AcceptanceTest {
 
     @Override
     @BeforeEach
@@ -35,14 +36,8 @@ class PathIntegrationTest extends IntegrationTest {
         final Long target = 7L;
 
         /* when */
-        final ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .queryParam("source", source)
-                .queryParam("target", target)
-                .when().get("/paths")
-                .then().log().all()
-                .extract();
+        final ExtractableResponse<Response> response
+                = RestHelper.get("/paths", Map.of("source", source, "target", target));
 
         /* then */
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -63,9 +58,9 @@ class PathIntegrationTest extends IntegrationTest {
     }
 
     private void setUpLines() {
-        LineHelper.createLine("1호선", 1L, 2L, 16, "남색");
-        LineHelper.createLine("2호선", 2L, 4L, 12, "초록색");
-        LineHelper.createLine("3호선", 3L, 4L, 15, "주황색");
+        LineHelper.createLine("1호선", "남색", 1L, 2L, 16);
+        LineHelper.createLine("2호선", "초록색", 2L, 4L, 12);
+        LineHelper.createLine("3호선", "주황색", 3L, 4L, 15);
     }
 
     private void setUpSections() {

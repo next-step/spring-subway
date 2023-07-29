@@ -1,10 +1,10 @@
-package subway.integration.helper;
+package subway.acceptance.helper;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import subway.dto.request.StationCreateRequest;
 
-import static subway.integration.helper.RestHelper.post;
+import static subway.acceptance.helper.RestHelper.post;
 
 public class StationHelper {
 
