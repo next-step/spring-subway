@@ -74,22 +74,22 @@ public class Sections {
         validateSize();
         validateContainStation(station);
 
-        List<Section> newSections = new ArrayList<>(this.sections);
+        List<Section> originalSections = new ArrayList<>(this.sections);
         Optional<Section> sectionByUpStation = sections.stream()
             .filter(section -> section.getUpStation().match(station))
-            .peek(newSections::remove)
+            .peek(originalSections::remove)
             .findAny();
 
         Optional<Section> sectionByDownStation = sections.stream()
             .filter(section -> section.getDownStation().match(station))
-            .peek(newSections::remove)
+            .peek(originalSections::remove)
             .findAny();
 
         if (sectionByUpStation.isPresent() && sectionByDownStation.isPresent()) {
             Section mergeSection = sectionByDownStation.get().merge(sectionByUpStation.get());
-            newSections.add(mergeSection);
+            originalSections.add(mergeSection);
         }
-        return new Sections(newSections);
+        return new Sections(originalSections);
     }
 
     private void validateSize() {

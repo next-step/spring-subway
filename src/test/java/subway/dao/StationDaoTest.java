@@ -1,35 +1,25 @@
 package subway.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 import static subway.exception.ErrorCode.NOT_FOUND_STATION;
 
 import java.util.Optional;
-import javax.sql.DataSource;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Station;
 import subway.exception.SubwayException;
 
+@JdbcTest
+@Sql({"classpath:schema.sql", "classpath:test-data.sql"})
+@Import(StationDao.class)
 public class StationDaoTest {
 
+    @Autowired
     private StationDao stationDao;
-
-    @BeforeEach
-    public void setUp() {
-        DataSource dataSource = new EmbeddedDatabaseBuilder()
-            .generateUniqueName(true)
-            .setType(H2)
-            .setScriptEncoding("UTF-8")
-            .ignoreFailedDrops(true)
-            .addScript("schema.sql")
-            .addScripts("dao-test.sql")
-            .build();
-        stationDao = new StationDao(new JdbcTemplate(dataSource), dataSource);
-    }
 
 
     @Test

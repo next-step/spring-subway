@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS SECTION cascade;
+DROP TABLE IF EXISTS LINE cascade;
+DROP TABLE IF EXISTS STATION cascade ;
+
 create table if not exists STATION
 (
     id bigint auto_increment not null,
