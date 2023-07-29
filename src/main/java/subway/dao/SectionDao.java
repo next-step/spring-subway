@@ -81,6 +81,10 @@ public class SectionDao {
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
+    public List<Section> findAll() {
+        return jdbcTemplate.query(ROW_MAPPER_BASE_SQL, rowMapper);
+    }
+
     public boolean existSectionByLineId(final Long lineId) {
         final String sql = "select count(*) > 0 from section where line_id = ? ";
         return TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, lineId));
@@ -121,4 +125,8 @@ public class SectionDao {
         }
     }
 
+    public void deleteAll() {
+        final String sql = "delete from section";
+        jdbcTemplate.update(sql);
+    }
 }
