@@ -152,8 +152,9 @@ public class Sections {
     }
 
     public Distance findSourceToTargetDistance(Station sourceStation, Station targetStation) {
-        DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
+        validSameSourceAndTarget(sourceStation, targetStation);
 
+        DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
         double pathWeight = dijkstraShortestPath.getPathWeight(sourceStation, targetStation);
 
         validPathWeight(pathWeight);
@@ -165,12 +166,11 @@ public class Sections {
         if (Double.isInfinite(pathWeight)) {
             throw new IllegalArgumentException("출발역과 도착역이 연결되어있지 않습니다.");
         }
-        if (pathWeight == 0.0) {
-            throw new IllegalArgumentException("출발역과 도착역이 동일합니다.");
-        }
     }
 
     public List<Station> findSourceToTargetRoute(Station sourceStation, Station targetStation) {
+        validSameSourceAndTarget(sourceStation, targetStation);
+
         DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
 
         List<Station> shortestPath = makeShortestPath(
@@ -179,9 +179,13 @@ public class Sections {
             dijkstraShortestPath
         );
 
-        validSameSourceAndTarget(shortestPath);
-
         return shortestPath;
+    }
+
+    private void validSameSourceAndTarget(Station sourceStation, Station targetStation) {
+        if (sourceStation.equals(targetStation)) {
+            throw new IllegalArgumentException("출발역과 도착역이 동일합니다.");
+        }
     }
 
     private DijkstraShortestPath makeDijkstraShortestPath() {
@@ -209,12 +213,6 @@ public class Sections {
             return dijkstraShortestPath.getPath(sourceStation, targetStation).getVertexList();
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("출발역과 도착역이 연결되어있지 않습니다.");
-        }
-    }
-
-    private void validSameSourceAndTarget(List<Station> shortestPath) {
-        if (shortestPath.size() == 1) {
-            throw new IllegalArgumentException("출발역과 도착역이 동일합니다.");
         }
     }
 
