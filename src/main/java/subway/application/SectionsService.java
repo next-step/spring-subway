@@ -9,12 +9,12 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.LineSections;
 import subway.domain.Section;
-import subway.domain.SubwayPath;
-import subway.dto.SectionRemovalResult;
 import subway.domain.Station;
+import subway.domain.Subway;
+import subway.dto.SectionAdditionResult;
+import subway.dto.SectionRemovalResult;
 import subway.dto.ShortestSubwayPath;
 import subway.dto.request.SectionAdditionRequest;
-import subway.dto.SectionAdditionResult;
 
 @Service
 public class SectionsService {
@@ -63,10 +63,10 @@ public class SectionsService {
     public ShortestSubwayPath calculateShortestSubwayPath(Long sourceStationId, Long targetStationId) {
         Station sourceStation = getStationById(sourceStationId);
         Station targetStation = getStationById(targetStationId);
-        List<LineSections> subway = sectionDao.findAll();
+        List<Section> allSections = sectionDao.findAll();
 
-        SubwayPath subwayPath = new SubwayPath(subway);
-        return subwayPath.calculateShortestPath(sourceStation, targetStation);
+        Subway subway = new Subway(allSections);
+        return subway.calculateShortestPath(sourceStation, targetStation);
     }
 
     private Line getLineById(Long id) {

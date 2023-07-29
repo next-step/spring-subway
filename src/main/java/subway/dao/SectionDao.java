@@ -1,10 +1,8 @@
 package subway.dao;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -71,7 +69,7 @@ public class SectionDao {
         return new LineSections(line, new Sections(values));
     }
 
-    public List<LineSections> findAll(){
+    public List<Section> findAll(){
         String sql = "select s.id AS section_id, line_id, up_station_id, down_station_id, distance, "
             + "l.name AS line_name, color AS line_color, "
             + "us.name AS up_station_name, "
@@ -80,19 +78,8 @@ public class SectionDao {
             + "join STATION us on up_station_id = us.id "
             + "join STATION ds on down_station_id = ds.id ";
 
-        List<Section> values = jdbcTemplate.query(sql, rowToSectionMapper);
-       return mapToLineSections(values);
+        return jdbcTemplate.query(sql, rowToSectionMapper);
     }
-
-    private List<LineSections> mapToLineSections(List<Section> values) {
-        Map<Line, List<Section>> lineSectionsMap = new HashMap<>();
-        values.forEach(section -> lineSectionsMap.computeIfAbsent(section.getLine(), k -> new ArrayList<>()).add(section));
-
-        return lineSectionsMap.entrySet().stream()
-            .map(entry -> new LineSections(entry.getKey(), new Sections(entry.getValue())))
-            .collect(Collectors.toList());
-    }
-
 
     public Section save(Section section) {
         Map<String, Object> params = new HashMap<>();
