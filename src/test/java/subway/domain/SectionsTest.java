@@ -267,7 +267,7 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("두 역이 연결되어 있지 않은 경우 예외를 던진다.")
+    @DisplayName("두 역의 최단 거리를 구할 때 두 역이 연결되어 있지 않은 경우 예외를 던진다.")
     void shortPathRouteException1() {
         Line 일호선 = new Line(2L, "일호선", "파랑");
         Section 까치울_온수_일호선_구간 = new Section(
@@ -280,30 +280,47 @@ class SectionsTest {
         Sections allSections = new Sections(
             List.of(부천시청_신중동_구간, 신중동_춘의_구간, 춘의_부천종합운동장_구간, 까치울_온수_일호선_구간));
 
-        assertAll(
-            () -> assertThatThrownBy(() -> allSections.findSourceToTargetRoute(부천시청역, 까치울역))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("출발역과 도착역이 연결되어있지 않습니다."),
-            () -> assertThatThrownBy(
-                () -> allSections.findSourceToTargetDistance(부천시청역, 까치울역))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("출발역과 도착역이 연결되어있지 않습니다.")
-        );
+        assertThatThrownBy(() -> allSections.findSourceToTargetDistance(부천시청역, 까치울역))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("출발역과 도착역이 연결되어있지 않습니다.");
     }
 
     @Test
-    @DisplayName("출발역과 도착역이 동일할 경우 예외를 던진다.")
+    @DisplayName("두 역의 최단 경로를 구할 때 두 역이 연결되어 있지 않은 경우 예외를 던진다.")
     void shortPathRouteException2() {
+        Line 일호선 = new Line(2L, "일호선", "파랑");
+        Section 까치울_온수_일호선_구간 = new Section(
+            4L,
+            까치울역,
+            온수역,
+            일호선,
+            3
+        );
+        Sections allSections = new Sections(
+            List.of(부천시청_신중동_구간, 신중동_춘의_구간, 춘의_부천종합운동장_구간, 까치울_온수_일호선_구간));
+
+        assertThatThrownBy(() -> allSections.findSourceToTargetRoute(부천시청역, 까치울역))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("출발역과 도착역이 연결되어있지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("두 역의 최단 거리를 구할 때 출발역과 도착역이 동일할 경우 예외를 던진다.")
+    void shortPathRouteException3() {
         Sections 전체_구간 = new Sections(List.of(부천시청_신중동_구간, 신중동_춘의_구간, 춘의_부천종합운동장_구간));
 
-        assertAll(
-            () -> assertThatThrownBy(() -> 전체_구간.findSourceToTargetRoute(부천시청역, 부천시청역))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("출발역과 도착역이 동일합니다."),
-            () -> assertThatThrownBy(
-                () -> 전체_구간.findSourceToTargetDistance(부천시청역, 부천시청역))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("출발역과 도착역이 동일합니다.")
-        );
+        assertThatThrownBy(() -> 전체_구간.findSourceToTargetDistance(부천시청역, 부천시청역))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("출발역과 도착역이 동일합니다.");
+    }
+
+    @Test
+    @DisplayName("두 역의 최단 경로를 구할 때 출발역과 도착역이 동일할 경우 예외를 던진다.")
+    void shortPathRouteException4() {
+        Sections 전체_구간 = new Sections(List.of(부천시청_신중동_구간, 신중동_춘의_구간, 춘의_부천종합운동장_구간));
+
+        assertThatThrownBy(() -> 전체_구간.findSourceToTargetRoute(부천시청역, 부천시청역))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("출발역과 도착역이 동일합니다.");
     }
 }
