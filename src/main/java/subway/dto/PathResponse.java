@@ -7,20 +7,21 @@ import subway.domain.Station;
 
 public class PathResponse {
 
-    private final List<Station> stations;
+    private final List<StationResponse> stations;
     private final Long distance;
 
-    public PathResponse(final List<Station> stations, final Long distance) {
+    public PathResponse(final List<StationResponse> stations, final Long distance) {
         this.stations = stations;
         this.distance = distance;
     }
 
 
     public static PathResponse of(GraphPath<Station, DefaultWeightedEdge> route) {
-        return new PathResponse(route.getVertexList(), (long) route.getWeight());
+        return new PathResponse(StationResponse.of(route.getVertexList()),
+            (long) route.getWeight());
     }
 
-    public List<Station> getStations() {
+    public List<StationResponse> getStations() {
         return stations;
     }
 

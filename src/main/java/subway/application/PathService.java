@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.Path;
+import subway.domain.PathGraph;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
@@ -29,17 +29,16 @@ public class PathService {
 
     @Transactional
     public PathResponse createPath(final Long sourceId, final Long targetId) {
-
-        List<Section> sections = sectionDao.findAll()
-            .orElseThrow(() -> new SubwayException(NOT_FOUND_SECTION));
-        Path path = new Path(new Sections(sections));
-
         Station startStation = stationDao.findById(sourceId)
             .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
         Station endStation = stationDao.findById(targetId)
             .orElseThrow(() -> new SubwayException(NOT_FOUND_STATION));
 
-        PathResponse pathResponse = path.createPath(startStation, endStation);
+        List<Section> sections = sectionDao.findAll()
+            .orElseThrow(() -> new SubwayException(NOT_FOUND_SECTION));
+
+        PathGraph pathGraph = new PathGraph(new Sections(sections));
+        PathResponse pathResponse = pathGraph.createPath(startStation, endStation);
         return pathResponse;
     }
 }
