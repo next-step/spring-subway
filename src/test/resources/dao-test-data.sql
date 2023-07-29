@@ -27,7 +27,8 @@ create table SECTION
     primary key (id),
     foreign key (line_id) references LINE (id) on delete cascade,
     foreign key (up_station_id) references STATION (id) on delete cascade,
-    foreign key (down_station_id) references STATION (id) on delete cascade
+    foreign key (down_station_id) references STATION (id) on delete cascade,
+    unique (line_id, up_station_id, down_station_id)
 );
 
 insert into STATION(name)
