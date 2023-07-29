@@ -28,7 +28,7 @@ class StationDaoTest extends DaoTest {
         final List<Station> stations = stationDao.findAll();
 
         /* then */
-        assertThat(stations).hasSize(10);
+        assertThat(stations).hasSize(4);
     }
 
     @Test

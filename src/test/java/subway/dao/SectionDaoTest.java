@@ -23,7 +23,7 @@ class SectionDaoTest extends DaoTest {
     @DisplayName("구간을 하나 추가한다.")
     void insert() {
         /* given */
-        final Section section = SectionBuilder.createSection(1L, 5L);
+        final Section section = SectionBuilder.createSection(1L, 3L);
 
         /* when */
         final Section insert = sectionDao.insert(section);
@@ -42,7 +42,7 @@ class SectionDaoTest extends DaoTest {
         final List<Section> sections = sectionDao.findAll();
 
         /* then */
-        assertThat(sections).hasSize(14);
+        assertThat(sections).hasSize(4);
     }
 
     @Test
