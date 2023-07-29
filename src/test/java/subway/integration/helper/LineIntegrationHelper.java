@@ -22,4 +22,20 @@ public class LineIntegrationHelper {
         return new Line(lineResponse.getId(), lineResponse.getName(), lineResponse.getColor());
     }
 
+    public static Line createLine(final String name,
+                                  final String color,
+                                  final Long upStationId,
+                                  final Long downStationId,
+                                  final long distance) {
+        final ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new LineCreateRequest(name, color, upStationId, downStationId, distance))
+                .when().post("/lines")
+                .then().log().all().
+                extract();
+        final LineResponse lineResponse = response.body().as(LineResponse.class);
+        return new Line(lineResponse.getId(), lineResponse.getName(), lineResponse.getColor());
+    }
+
 }

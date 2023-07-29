@@ -17,5 +17,4 @@ public class SectionIntegrationHelper {
                 .then().log().all().
                 extract();
     }
-
 }
