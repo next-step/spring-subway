@@ -22,43 +22,12 @@ import subway.dto.StationResponse;
 @DisplayName("지하철 노선들의 경로 관련 기능")
 class PathIntegrationTest extends IntegrationTest {
 
-
-    private long station1Request1;
-    private long station1Request2;
-    private long station1Request3;
-    private long station2Request1;
-    private long station2Request2;
-    private long createdLine1;
-    private long createdLine2;
-
-    @Override
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-
-        station1Request1 = createStation(new StationCreateRequest("강남")).body().as(StationResponse.class).getId();
-        station1Request2 = createStation(new StationCreateRequest("신도림")).body().as(StationResponse.class).getId();
-        station1Request3 = createStation(new StationCreateRequest("역곡")).body().as(StationResponse.class).getId();
-        station2Request1 = createStation(new StationCreateRequest("부천")).body().as(StationResponse.class).getId();
-        station2Request2 = createStation(new StationCreateRequest("잠실")).body().as(StationResponse.class).getId();
-
-        createdLine1 = createLineByLineRequest(
-                new LineCreateRequest("신분당선", "bg-red-600", station1Request1, station1Request2, 10)).as(
-                LineResponse.class).getId();
-        registerSectionToLine(createdLine1, new SectionCreateRequest(station1Request2, station1Request3, 5));
-
-        createdLine2 = createLineByLineRequest(
-                new LineCreateRequest("2호선", "bg-green-600", station2Request1, station2Request2, 5)).as(
-                LineResponse.class).getId();
-        registerSectionToLine(createdLine2, new SectionCreateRequest(station2Request2, station1Request3, 5));
-    }
-
     @Test
     @DisplayName("하나의 노선에 포함된, 지하철 노선들의 경로를 조회할 수 있다.")
     void findStationPathInOneLine() {
         // given
-        long sourceStationId = station1Request1;
-        long targetStationId = station1Request3;
+        long sourceStationId = SinbundangLine.gangnamStationId;
+        long targetStationId = SinbundangLine.yeokgokStationId;
 
         // when
         ExtractableResponse<Response> response = findStationPath(sourceStationId, targetStationId);
@@ -71,8 +40,8 @@ class PathIntegrationTest extends IntegrationTest {
     @DisplayName("여러개의 노선에 포함된 지하철 노선들의 경로를 조회할 수 있다.")
     void findStationPathInManyLine() {
         // given
-        long sourceStationId = station1Request1;
-        long targetStationId = station2Request1;
+        long sourceStationId = SinbundangLine.gangnamStationId;
+        long targetStationId = SecondLine.bucheonStationId;
 
         // when
         ExtractableResponse<Response> response = findStationPath(sourceStationId, targetStationId);
@@ -99,13 +68,63 @@ class PathIntegrationTest extends IntegrationTest {
     void returnBadRequestWhenStationDoesNotContainedPath() {
         // given
         long notContainedStationId = createStation(new StationCreateRequest("포함되지 않음")).body().as(StationResponse.class)
-                .getId();
+            .getId();
 
         // when
-        ExtractableResponse<Response> response = findStationPath(notContainedStationId, station1Request1);
+        ExtractableResponse<Response> response = findStationPath(notContainedStationId,
+            SinbundangLine.gangnamStationId);
 
         // then
         assertIsStationNotContainedPath(response);
+    }
+
+    private static final class SinbundangLine {
+
+        private static long gangnamStationId;
+        private static long sindorimStationId;
+        private static long yeokgokStationId;
+        private static long id;
+
+    }
+
+    private static final class SecondLine {
+
+        private static long bucheonStationId;
+        private static long jamsilStationId;
+        private static long id;
+
+    }
+
+    @Override
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+
+        SinbundangLine.gangnamStationId = createStation(new StationCreateRequest("강남")).body().as(StationResponse.class)
+            .getId();
+        SinbundangLine.sindorimStationId = createStation(new StationCreateRequest("신도림")).body().as(StationResponse.class)
+            .getId();
+        SinbundangLine.yeokgokStationId = createStation(new StationCreateRequest("역곡")).body().as(StationResponse.class)
+            .getId();
+        SecondLine.bucheonStationId = createStation(new StationCreateRequest("부천")).body().as(StationResponse.class)
+            .getId();
+        SecondLine.jamsilStationId = createStation(new StationCreateRequest("잠실")).body().as(StationResponse.class)
+            .getId();
+
+        SinbundangLine.id = createLineByLineRequest(
+            new LineCreateRequest("신분당선", "bg-red-600", SinbundangLine.gangnamStationId,
+                SinbundangLine.sindorimStationId, 10)).as(
+            LineResponse.class).getId();
+        registerSectionToLine(SinbundangLine.id, new SectionCreateRequest(SinbundangLine.sindorimStationId,
+            SinbundangLine.yeokgokStationId, 5));
+
+        SecondLine.id = createLineByLineRequest(
+            new LineCreateRequest("2호선", "bg-green-600", SecondLine.bucheonStationId, SecondLine.jamsilStationId,
+                5)).as(
+            LineResponse.class).getId();
+
+        registerSectionToLine(
+            SecondLine.id, new SectionCreateRequest(SecondLine.jamsilStationId, SinbundangLine.yeokgokStationId, 5));
     }
 
 }

@@ -38,10 +38,10 @@ class StationServiceTest {
         @DisplayName("중복된 이름의 station이 요청되면, StatusCodeException을 던진다.")
         void Throw_StatusCodeException_If_Duplicated_Station_Name() {
             // given
-            Station station = new Station("exists");
+            Station existsStation = new Station("exists");
             StationCreateRequest stationCreateRequest = new StationCreateRequest("exists");
 
-            when(stationDao.findByName(station.getName())).thenReturn(Optional.of(station));
+            when(stationDao.findByName(existsStation.getName())).thenReturn(Optional.of(existsStation));
 
             // when
             Exception exception = catchException(() -> stationService.saveStation(stationCreateRequest));

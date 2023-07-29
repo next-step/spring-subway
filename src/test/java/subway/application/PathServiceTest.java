@@ -38,17 +38,13 @@ class PathServiceTest {
     @DisplayName("getMinimumPath 메소드는")
     class GetMinimumPath_Method {
 
-        Station upStation = new Station(1L, "upStation");
-        Station middleStation = new Station(2L, "middleStation");
-        Station downStation = new Station(3L, "downStation");
-
-        Section upSection = DomainFixture.Section.buildWithStations(upStation, middleStation);
-        Section downSection = DomainFixture.Section.buildWithStations(middleStation, downStation);
-
         @Test
         @DisplayName("stationId에 해당하는 Station을 찾을 수 없으면, StatusCodeException을 던진다.")
         void Throw_StatusCodeException_CannotFind_Matched_Station() {
             // given
+            Station upStation = new Station(1L, "upStation");
+            Station downStation = new Station(3L, "downStation");
+
             when(stationDao.findById(anyLong())).thenReturn(Optional.empty());
 
             // when
