@@ -10,13 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import subway.domain.Line;
 import subway.domain.LineSections;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
 
-@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 class SectionDaoTest {
 
@@ -72,11 +74,9 @@ class SectionDaoTest {
         Section section2 = sectionDao.save(new Section(lineB, stationB, stationC, 2));
         Section section3 = sectionDao.save(new Section(lineB, stationC, stationD, 3));
 
-        List<LineSections> lineSections = sectionDao.findAll();
-        LineSections lineSectionsA = new LineSections(lineA, section);
-        LineSections lineSectionsB = new LineSections(lineB, new Sections(List.of(section2, section3)));
+        List<Section> allSections = sectionDao.findAll();
 
-        assertThat(lineSections).contains(lineSectionsA, lineSectionsB);
+        assertThat(allSections).contains(section, section2, section3);
     }
 
 
