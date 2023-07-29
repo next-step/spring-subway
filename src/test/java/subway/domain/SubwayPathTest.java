@@ -46,7 +46,7 @@ class SubwayPathTest {
      */
     @Test
     @DisplayName("지하철 최단경로를 계산한다")
-    void getShortestDistance() {
+    void calculateShortestPath() {
         LineSections lineSectionsA = new LineSections(lineA,
             new Section(1L, lineA, stationA, stationB, 10));
         LineSections lineSectionsB = new LineSections(lineB,
@@ -66,8 +66,8 @@ class SubwayPathTest {
     }
 
     @Test
-    @DisplayName("path 없음")
-    void noPath() {
+    @DisplayName("경로가 존재하지 않으면 최단경로를 계산할 수 없다")
+    void cannotCalculateShortestPathIfPathDoesNotExist() {
         LineSections lineSectionsA = new LineSections(lineA,
             new Section(1L, lineA, stationA, stationB, 10));
         LineSections lineSectionsC = new LineSections(lineC,
@@ -79,10 +79,30 @@ class SubwayPathTest {
             IllegalArgumentException.class);
     }
 
-    /*
-    source station 없음
-    dest station 없음
-    source-dest가 같음 -> 1 station , distance 0
-    해당 부분을 검증해볼것
-     */
+    @Test
+    @DisplayName("출발역과 도착역이 같으면 제자리 경로를 계산한다")
+    void calculateShortestPathBothSameSourceAndDestination() {
+        LineSections lineSectionsA = new LineSections(lineA,
+            new Section(1L, lineA, stationA, stationB, 10));
+
+        SubwayPath subwayPath = new SubwayPath(List.of(lineSectionsA));
+
+        assertThat(subwayPath.calculateShortestPath(stationA, stationA).getStations()).containsExactly(stationA);
+        assertThat(subwayPath.calculateShortestPath(stationA, stationA).getDistance()).isEqualTo(0d);
+    }
+
+    @Test
+    @DisplayName("등록되지 않은 출발, 도착역으로는 경로를 계산할 수 없다.")
+    void cannotCalculateShortestPathWithUnregisteredStation() {
+        LineSections lineSectionsA = new LineSections(lineA,
+            new Section(1L, lineA, stationA, stationB, 10));
+        Station unregisteredStation = StationFixture.createStation("none");
+
+        SubwayPath subwayPath = new SubwayPath(List.of(lineSectionsA));
+
+        assertThatThrownBy(() -> subwayPath.calculateShortestPath(unregisteredStation, stationA))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> subwayPath.calculateShortestPath(stationA, unregisteredStation))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 }
