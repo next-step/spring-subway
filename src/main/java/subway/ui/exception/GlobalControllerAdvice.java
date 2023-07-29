@@ -36,7 +36,7 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleIllegalException(Exception e) {
         return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
     }
 
