@@ -1,16 +1,19 @@
 package subway.dao;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Station;
 import subway.domain.StationName;
+import subway.exception.SubwayDataAccessException;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -33,14 +36,19 @@ public class StationDao {
                 .usingGeneratedKeyColumns("id");
     }
 
-    public Station insert(Station station) {
-        SqlParameterSource params = new BeanPropertySqlParameterSource(station);
-        Long id = insertAction.executeAndReturnKey(params).longValue();
-        return new Station(id, station.getName());
+    public Station insert(final Station station) {
+        try {
+            final Long id = insertAction.executeAndReturnKey(getStationParams(station)).longValue();
+
+            return new Station(id, station.getName());
+        } catch (Exception e) {
+            throw new SubwayDataAccessException("이미 존재하는 역 이름입니다. 입력한 이름: " + station.getName().getValue(), e);
+        }
     }
 
     public List<Station> findAll() {
-        String sql = "select * from STATION";
+        final String sql = "select * from STATION";
+
         return jdbcTemplate.query(sql, rowMapper);
     }
 
@@ -54,39 +62,35 @@ public class StationDao {
         return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public List<Station> findAllByLineId(final Long lineId) {
-        final String upStationSql = "SELECT up_station.id AS id, " +
-                "up_station.name AS name " +
-                "FROM SECTION section " +
-                "LEFT JOIN LINE line ON section.LINE_ID = line.ID " +
-                "LEFT JOIN STATION up_station ON section.up_station_id = up_station.id " +
-                "WHERE line.id = ?";
+    public Optional<Station> findById(final Long id) {
+        try {
+            final String sql = "select * from STATION where id = ?";
 
-        final String downStationSql = "SELECT down_station.id AS id, " +
-                "down_station.name AS name " +
-                "FROM SECTION section " +
-                "LEFT JOIN LINE line ON section.LINE_ID = line.ID " +
-                "LEFT JOIN STATION down_station ON section.down_station_id = down_station.id " +
-                "WHERE line.id = ?";
-
-        final String sql = "SELECT id, name " +
-                "FROM (" + upStationSql + ") AS `up_station` UNION (" + downStationSql + ")";
-
-        return jdbcTemplate.query(sql, rowMapper, lineId, lineId);
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        } catch (final EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
-    public Station findById(Long id) {
-        String sql = "select * from STATION where id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    public void update(final Station newStation) {
+        final int affectedRowCount = jdbcTemplate.update("update STATION set name = ? where id = ?", newStation.getName().getValue(), newStation.getId());
+        if (affectedRowCount == 0) {
+            throw new SubwayDataAccessException("역이 존재하지 않습니다. 입력한 식별자: " + newStation.getId());
+        }
+
     }
 
-    public void update(Station newStation) {
-        String sql = "update STATION set name = ? where id = ?";
-        jdbcTemplate.update(sql, newStation.getName().getValue(), newStation.getId());
+    public void deleteById(final Long id) {
+        final int affectedRowCount = jdbcTemplate.update("delete from STATION where id = ?", id);
+        if (affectedRowCount == 0) {
+            throw new SubwayDataAccessException("역이 존재하지 않습니다. 입력한 식별자: " + id);
+        }
     }
 
-    public void deleteById(Long id) {
-        String sql = "delete from STATION where id = ?";
-        jdbcTemplate.update(sql, id);
+    private Map<String, Object> getStationParams(final Station station) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("name", station.getName().getValue());
+
+        return params;
     }
 }

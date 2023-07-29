@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import subway.domain.Section;
 import subway.domain.builder.SectionBuilder;
+import subway.exception.SubwayDataAccessException;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Import(SectionDao.class)
 class SectionDaoTest extends DaoTest {
@@ -31,19 +33,6 @@ class SectionDaoTest extends DaoTest {
     }
 
     @Test
-    @DisplayName("구간을 하나 삭제한다.")
-    void delete() {
-        /* given */
-        final Long targetSectionId = 3L;
-
-        /* when */
-        final int result = sectionDao.delete(targetSectionId);
-
-        /* then */
-        assertThat(result).isEqualTo(1);
-    }
-
-    @Test
     @DisplayName("모든 구간을 가져온다.")
     void findAll() {
         /* given */
@@ -54,5 +43,17 @@ class SectionDaoTest extends DaoTest {
 
         /* then */
         assertThat(sections).hasSize(14);
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 구간 이름을 추가할 경우 SubwayDataAccessException을 던진다.")
+    void insertFailWithDuplicateName() {
+        /* given */
+        final Section Section = SectionBuilder.createSection(1L, 1L, 2L);
+
+        /* when & then */
+        assertThatThrownBy(() -> sectionDao.insert(Section))
+                .isExactlyInstanceOf(SubwayDataAccessException.class)
+                .hasMessage("이미 존재하는 구간입니다. 입력한 노선 식별자: 1, 상행역 식별자: 1, 하행역 식별자: 2");
     }
 }

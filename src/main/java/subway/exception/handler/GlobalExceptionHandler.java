@@ -18,10 +18,10 @@ public class GlobalExceptionHandler {
         return new ExceptionResponse(exception.getMessage());
     }
 
-    @ExceptionHandler(SQLException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleSQLException(final SQLException exception) {
         exception.printStackTrace();
-        return new ExceptionResponse("올바르지 않은 데이터 접근입니다.");
+        return new ExceptionResponse("서버 내부에 예외가 발생했습니다.");
     }
 }

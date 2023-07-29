@@ -1,6 +1,5 @@
 package subway.domain;
 
-import subway.exception.SubwayException;
 import subway.exception.SubwayIllegalArgumentException;
 
 import java.util.Objects;
@@ -54,7 +53,7 @@ public class Section {
             return new Section(this.lineId, target.downStationId, this.upStationId, target.distance.add(this.distance));
         }
 
-        throw new SubwayException(
+        throw new SubwayIllegalArgumentException(
                 "구간이 연결되어있지 않습니다. 입력 구간: (" + this.upStationId + ", " + this.downStationId + "), " +
                         "(" + target.upStationId + ", " + target.downStationId + ")"
         );
@@ -108,7 +107,7 @@ public class Section {
 
     private void validateStationValues(final Long upStationId, final Long downStationId) {
         if (upStationId == null || downStationId == null) {
-            throw new SubwayException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
+            throw new SubwayIllegalArgumentException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
         }
     }
 

@@ -10,6 +10,7 @@ import subway.dto.request.LineCreateRequest;
 import subway.dto.request.LineUpdateRequest;
 import subway.dto.response.LineCreateResponse;
 import subway.dto.response.LineFindResponse;
+import subway.exception.SubwayDataAccessException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,8 +44,9 @@ public class LineService {
 
     @Transactional
     public List<LineFindResponse> findAllLines() {
-        final List<Line> persistLines = lineDao.findAll();
-        return persistLines.stream()
+        final List<Line> lines = lineDao.findAll();
+
+        return lines.stream()
                 .map(line -> findLine(line.getId()))
                 .collect(Collectors.toList());
     }
@@ -54,7 +56,10 @@ public class LineService {
         final ConnectedSections connectedSections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
         final List<Station> stations = stationDao.findAllByIds(connectedSections.getConnectedStationIds());
 
-        return LineFindResponse.of(lineDao.findById(lineId), stations);
+        final Line line = lineDao.findById(lineId)
+                .orElseThrow(() -> new SubwayDataAccessException("존재하지 않는 노선입니다. 입력한 식별자: " + lineId));
+
+        return LineFindResponse.of(line, stations);
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package subway.dao;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
@@ -7,6 +8,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Distance;
 import subway.domain.Section;
+import subway.exception.SubwayDataAccessException;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -39,10 +41,15 @@ public class SectionDao {
                 .usingGeneratedKeyColumns("id");
     }
 
-    public Section insert(Section section) {
-        final Long sectionId = insertAction.executeAndReturnKey(generateEntry(section)).longValue();
+    public Section insert(final Section section) {
+        try {
+            final Long sectionId = insertAction.executeAndReturnKey(generateEntry(section)).longValue();
 
-        return new Section(sectionId, section);
+            return new Section(sectionId, section);
+        } catch (DuplicateKeyException e) {
+            throw new SubwayDataAccessException("이미 존재하는 구간입니다. 입력한 노선 식별자: " + section.getLineId() +
+                    ", 상행역 식별자: " + section.getUpStationId() + ", 하행역 식별자: " + section.getDownStationId());
+        }
     }
 
     public List<Section> insertAll(final List<Section> sections) {
@@ -67,12 +74,6 @@ public class SectionDao {
         final String sql = "select * from SECTION where line_id = ?";
 
         return jdbcTemplate.query(sql, rowMapper, lineId);
-    }
-
-    public int delete(final Long sectionId) {
-        final String sql = "delete from SECTION where id = ?";
-
-        return jdbcTemplate.update(sql, sectionId);
     }
 
     public int[] deleteAll(final List<Long> sectionIds) {

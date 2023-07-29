@@ -1,8 +1,12 @@
 package subway.exception;
 
-public class SubwayException extends RuntimeException {
+public abstract class SubwayException extends RuntimeException {
 
-    public SubwayException(final String message) {
+    protected SubwayException(final String message) {
         super(message);
+    }
+
+    protected SubwayException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

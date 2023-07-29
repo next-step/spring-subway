@@ -8,6 +8,7 @@ import subway.dto.request.StationCreateRequest;
 import subway.dto.request.StationUpdateRequest;
 import subway.dto.response.StationCreateResponse;
 import subway.dto.response.StationFindResponse;
+import subway.exception.SubwayDataAccessException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,13 +28,16 @@ public class StationService {
     }
 
     @Transactional
-    public StationFindResponse findStation(Long id) {
-        return StationFindResponse.of(stationDao.findById(id));
+    public StationFindResponse findStation(final Long id) {
+        final Station station = stationDao.findById(id)
+                .orElseThrow(() -> new SubwayDataAccessException("존재하지 않는 역입니다. 입력한 식별자: " + id));
+
+        return StationFindResponse.of(station);
     }
 
     @Transactional
     public List<StationFindResponse> findAllStation() {
-        List<Station> stations = stationDao.findAll();
+        final List<Station> stations = stationDao.findAll();
 
         return stations.stream()
                 .map(StationFindResponse::of)
