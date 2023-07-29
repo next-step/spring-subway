@@ -1,6 +1,7 @@
 package subway.dto.response;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import subway.domain.Station;
 
@@ -32,5 +33,22 @@ public class StationResponse {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof StationResponse)) {
+            return false;
+        }
+        StationResponse that = (StationResponse) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

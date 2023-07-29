@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.domain.fixture.LineFixture;
 import subway.domain.fixture.StationFixture;
+import subway.dto.response.StationResponse;
 
 @DisplayName("SubwayPath 단위 테스트")
 class SubwayPathTest {
@@ -59,8 +60,8 @@ class SubwayPathTest {
         SubwayPath subwayPath = new SubwayPath(
             List.of(lineSectionsA, lineSectionsB, lineSectionsC, lineSectionsD));
 
-        assertThat(subwayPath.calculateShortestPath(stationC, stationA).getStations()).containsExactly(stationC,
-            stationD, stationA);
+        assertThat(subwayPath.calculateShortestPath(stationC, stationA).getStations()).isEqualTo(StationResponse.listOf(List.of(stationC,
+            stationD, stationA)));
 
         assertThat(subwayPath.calculateShortestPath(stationC, stationA).getDistance()).isEqualTo(13);
     }
@@ -87,7 +88,8 @@ class SubwayPathTest {
 
         SubwayPath subwayPath = new SubwayPath(List.of(lineSectionsA));
 
-        assertThat(subwayPath.calculateShortestPath(stationA, stationA).getStations()).containsExactly(stationA);
+        assertThat(subwayPath.calculateShortestPath(stationA, stationA).getStations()).containsExactly(
+            StationResponse.of(stationA));
         assertThat(subwayPath.calculateShortestPath(stationA, stationA).getDistance()).isEqualTo(0d);
     }
 
