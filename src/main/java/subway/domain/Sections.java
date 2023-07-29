@@ -210,7 +210,9 @@ public class Sections {
         DijkstraShortestPath dijkstraShortestPath
     ) {
         try {
-            return dijkstraShortestPath.getPath(sourceStation, targetStation).getVertexList();
+            return Collections.unmodifiableList(
+                dijkstraShortestPath.getPath(sourceStation, targetStation).getVertexList()
+            );
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("출발역과 도착역이 연결되어있지 않습니다.");
         }
