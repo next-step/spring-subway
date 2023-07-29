@@ -13,11 +13,6 @@ import static subway.domain.fixture.SectionFixture.createSection;
 import static subway.domain.fixture.StationFixture.createStation;
 
 class PathGraphTest {
-
-    private Line lineA;
-    private Line lineB;
-    private Line lineC;
-
     private Station stationA;
     private Station stationB;
     private Station stationC;
@@ -46,9 +41,9 @@ class PathGraphTest {
 
     @BeforeEach
     void setUp() {
-        lineA = createLine("2호선");
-        lineB = createLine("3호선");
-        lineC = createLine("7호선");
+        Line lineA = createLine("2호선");
+        Line lineB = createLine("3호선");
+        Line lineC = createLine("7호선");
 
         stationA = createStation(1L, "낙성대");
         stationB = createStation(2L, "사당");

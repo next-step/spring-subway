@@ -95,6 +95,11 @@ public class SectionDao {
         jdbcTemplate.update(sql, sectionId);
     }
 
+    public void deleteAll() {
+        final String sql = "delete from section";
+        jdbcTemplate.update(sql);
+    }
+
     public void updateSections(final Long lineId, final Sections sections) {
         dirtyChecking(findAllByLineId(lineId), sections.getSections());
     }
@@ -123,10 +128,5 @@ public class SectionDao {
         for (Section section : deletingSections) {
             deleteById(section.getId());
         }
-    }
-
-    public void deleteAll() {
-        final String sql = "delete from section";
-        jdbcTemplate.update(sql);
     }
 }

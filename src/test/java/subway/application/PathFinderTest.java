@@ -91,7 +91,7 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("전체 구간에 대한 정보가 주어졌을 때 시작역부터 도착역까지 가장 짦은 거리로 갈 수 있는 역 목록을 반환한다.")
+    @DisplayName("시작역부터 도착역까지 가장 짦은 거리로 갈 수 있는 역 목록을 반환한다.")
     void getShortPathTest() {
         // given
         final PathFindRequest request = new PathFindRequest(stationF.getId(), stationD.getId());
@@ -109,7 +109,7 @@ class PathFinderTest {
 
 
     @Test
-    @DisplayName("전체 구간에 대한 정보가 주어졌을 때 시작역과 도착역이 같은 경우 예외를 던진다.")
+    @DisplayName("시작역과 도착역이 같은 경우 예외를 던진다.")
     void SourceEqualsTargetThenThrow() {
         // given
         final PathFindRequest request = new PathFindRequest(stationA.getId(), stationA.getId());
@@ -121,7 +121,7 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("전체 구간에 대한 정보가 주어졌을 때 시작역과 도착역이 연결되어 있지 않은 경우 예외를 던진다.")
+    @DisplayName("시작역과 도착역이 연결되어 있지 않은 예외를 던진다.")
     void SourceNotConnectionTargetThenThrow() {
         // given
         Station station = stationDao.insert(createStation("어린이 대공원역"));
@@ -134,7 +134,7 @@ class PathFinderTest {
     }
 
     @Test
-    @DisplayName("전체 구간에 대한 정보가 주어졌을 때 시작역과 도착역이 연결되어 있지 않은 경우 예외를 던진다.")
+    @DisplayName("경로 조회 하고자하는 역이 없는 경우 예외를 던진다.")
     void SourceOrTargetNotFoundThenThrow() {
         // given
         Station station = stationDao.insert(createStation("어린이 대공원역"));

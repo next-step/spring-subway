@@ -1,6 +1,5 @@
 package subway.domain;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,12 +11,6 @@ import static subway.domain.fixture.SectionFixture.createSection;
 import static subway.domain.fixture.StationFixture.createStation;
 
 class WholeSectionTest {
-
-
-    @BeforeEach
-    void setUp() {
-
-    }
 
     @Test
     @DisplayName("전체 구간을 담은 WholeSection 에서 전체 역과 구간이 조회되는지 확인한다.")
