@@ -1,5 +1,6 @@
 package subway.domain;
 
+import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
@@ -7,6 +8,7 @@ import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
 import java.util.List;
+import java.util.Optional;
 
 public class StationGraph {
 
@@ -44,18 +46,32 @@ public class StationGraph {
     }
 
     public List<Station> getPath(Station source, Station target) {
+        GraphPath<Station, DefaultWeightedEdge> path = getPathOptional(source, target)
+                .orElseThrow(() -> notConnectedException(source, target));
+        return path.getVertexList();
+    }
+
+    private Optional<GraphPath<Station, DefaultWeightedEdge>> getPathOptional(Station source, Station target) {
         try {
-            return shortestPath.getPath(source, target).getVertexList();
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new IncorrectRequestException(
-                    ErrorCode.NO_CONNECTED_PATH,
-                    String.format("출발역: %s, 도착역: %s", source.getName(), target.getName())
-            );
+            return Optional.ofNullable(shortestPath.getPath(source, target));
+        } catch (IllegalArgumentException e) {
+            throw notConnectedException(source, target);
         }
     }
 
     public Distance getDistance(Station source, Station target) {
-        return new Distance((int) shortestPath.getPathWeight(source, target));
+        double distance = shortestPath.getPathWeight(source, target);
+        if (distance == Double.POSITIVE_INFINITY) {
+            throw notConnectedException(source, target);
+        }
+        return new Distance((int) distance);
+    }
+
+    private IncorrectRequestException notConnectedException(Station source, Station target) {
+        return new IncorrectRequestException(
+                ErrorCode.NO_CONNECTED_PATH,
+                String.format("출발역: %s, 도착역: %s", source.getName(), target.getName())
+        );
     }
 
 }
