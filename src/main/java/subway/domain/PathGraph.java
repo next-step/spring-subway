@@ -26,9 +26,9 @@ public class PathGraph {
 
     private void initializeEdges(List<Section> edges) {
         edges.forEach(section -> graph.setEdgeWeight(
-                        graph.addEdge(section.getUpStation(), section.getDownStation()),
-                        section.getDistance()
-                )
+                graph.addEdge(section.getUpStation(), section.getDownStation()),
+                section.getDistance()
+            )
         );
     }
 
@@ -48,7 +48,7 @@ public class PathGraph {
         validatePathConnect(start, end);
 
         GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
-                .getPath(start, end);
+            .getPath(start, end);
         if (path == null) {
             throw new SubwayException(NOT_CONNECTED_BETWEEN_START_AND_END_PATH);
         }
@@ -70,5 +70,4 @@ public class PathGraph {
     private boolean notContainsVertex(final Station station) {
         return !graph.containsVertex(station);
     }
-
 }
