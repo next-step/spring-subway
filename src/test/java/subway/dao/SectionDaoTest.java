@@ -1,7 +1,8 @@
 package subway.dao;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,30 @@ class SectionDaoTest {
         Section section = sectionDao.save(new Section(lineA, stationA, stationB, 2));
         Section section2 = sectionDao.save(new Section(lineA, stationB, stationC, 2));
 
-        Assertions.assertThat(sectionDao.findAllByLine(lineA)).isEqualTo(new LineSections(lineA, new Sections(List.of(section, section2))));
+        assertThat(sectionDao.findAllByLine(lineA)).isEqualTo(new LineSections(lineA, new Sections(List.of(section, section2))));
     }
+
+    @Test
+    @DisplayName("모든 노선 구간 구간을 불러온다")
+    void findAll() {
+
+        Line lineB = new Line(2L, "B", "blue");
+        lineDao.insert(lineA);
+        lineDao.insert(lineB);
+        stationDao.insert(stationA);
+        stationDao.insert(stationB);
+        stationDao.insert(stationC);
+        stationDao.insert(stationD);
+        Section section = sectionDao.save(new Section(lineA, stationA, stationB, 2));
+        Section section2 = sectionDao.save(new Section(lineB, stationB, stationC, 2));
+        Section section3 = sectionDao.save(new Section(lineB, stationC, stationD, 3));
+
+        List<LineSections> lineSections = sectionDao.findAll();
+        LineSections lineSectionsA = new LineSections(lineA, section);
+        LineSections lineSectionsB = new LineSections(lineB, new Sections(List.of(section2, section3)));
+
+        assertThat(lineSections).contains(lineSectionsA, lineSectionsB);
+    }
+
+
 }
