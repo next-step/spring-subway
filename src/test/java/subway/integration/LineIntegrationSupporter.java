@@ -5,12 +5,13 @@ import static io.restassured.RestAssured.given;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
-import subway.dto.LineRequest;
-import subway.dto.SectionRequest;
+import subway.dto.request.CreateLineRequest;
+import subway.dto.request.UpdateLineRequest;
+import subway.dto.request.CreateSectionRequest;
 
 class LineIntegrationSupporter {
 
-    static ExtractableResponse<Response> createLineByLineRequest(LineRequest lineRequest) {
+    static ExtractableResponse<Response> createLineByLineRequest(CreateLineRequest lineRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest)
@@ -35,7 +36,7 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> updateLineByLineId(Long lineId, LineRequest lineRequest) {
+    static ExtractableResponse<Response> updateLineByLineId(Long lineId, UpdateLineRequest lineRequest) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(lineRequest)
@@ -51,7 +52,7 @@ class LineIntegrationSupporter {
                 .extract();
     }
 
-    static ExtractableResponse<Response> registerSectionToLine(Long lineId, SectionRequest sectionRequest) {
+    static ExtractableResponse<Response> registerSectionToLine(Long lineId, CreateSectionRequest sectionRequest) {
         return given().log().all()
                 .body(sectionRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

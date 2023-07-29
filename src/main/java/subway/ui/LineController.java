@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.LineService;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
-import subway.dto.SectionRequest;
+import subway.dto.request.CreateLineRequest;
+import subway.dto.response.CreateLineResponse;
+import subway.dto.response.FindLineResponse;
+import subway.dto.request.UpdateLineRequest;
+import subway.dto.request.CreateSectionRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -31,24 +33,24 @@ public class LineController {
     }
 
     @PostMapping
-    public ResponseEntity<LineResponse> createLine(@RequestBody @Validated LineRequest lineRequest) {
-        LineResponse line = lineService.saveLine(lineRequest);
+    public ResponseEntity<CreateLineResponse> createLine(@RequestBody @Validated CreateLineRequest createLineRequest) {
+        CreateLineResponse line = lineService.saveLine(createLineRequest);
         return ResponseEntity.created(URI.create("/lines/" + line.getId())).body(line);
     }
 
     @GetMapping
-    public ResponseEntity<List<LineResponse>> findAllLines() {
+    public ResponseEntity<List<FindLineResponse>> findAllLines() {
         return ResponseEntity.ok(lineService.findAllLines());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LineResponse> findLineById(@PathVariable Long id) {
+    public ResponseEntity<FindLineResponse> findLineById(@PathVariable Long id) {
         return ResponseEntity.ok(lineService.findLineById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody @Validated LineRequest lineUpdateRequest) {
-        lineService.updateLine(id, lineUpdateRequest);
+    public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody @Validated UpdateLineRequest updateLineRequest) {
+        lineService.updateLine(id, updateLineRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -60,9 +62,9 @@ public class LineController {
 
     @PostMapping("/{lineId}/sections")
     public ResponseEntity<Void> createSection(@PathVariable("lineId") Long lineId,
-            @RequestBody @Validated SectionRequest sectionRequest) {
+            @RequestBody @Validated CreateSectionRequest createSectionRequest) {
 
-        lineService.connectSectionByStationId(lineId, sectionRequest);
+        lineService.connectSectionByStationId(lineId, createSectionRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

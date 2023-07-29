@@ -18,7 +18,7 @@ public class Line {
     private final String color;
     private final List<Section> sections;
 
-    public Line(Long id, String name, String color, List<Section> sections) {
+    public Line(final Long id, final String name, final String color, final List<Section> sections) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -26,11 +26,11 @@ public class Line {
         initSectionConnection(this.sections);
     }
 
-    public Line(Long id, String name, String color) {
+    public Line(final Long id, final String name, final String color) {
         this(id, name, color, new ArrayList<>());
     }
 
-    public Line(String name, String color) {
+    public Line(final String name, final String color) {
         this(null, name, color, new ArrayList<>());
     }
 
@@ -46,7 +46,7 @@ public class Line {
         return color;
     }
 
-    private void initSectionConnection(List<Section> sections) {
+    private void initSectionConnection(final List<Section> sections) {
         for (Section currentSection : sections) {
             Optional<Section> downSection = sections.stream()
                     .filter(section -> currentSection.getDownStation().equals(section.getUpStation())).findFirst();
@@ -56,12 +56,12 @@ public class Line {
     }
 
     public List<Station> getSortedStations() {
-        Section section = sections.get(0).findUpSection();
+        final Section section = sections.get(0).findUpSection();
         return getSortedStations(section);
     }
 
     private List<Station> getSortedStations(Section section) {
-        List<Station> sortedStations = new ArrayList<>();
+        final List<Station> sortedStations = new ArrayList<>();
         while (section.getDownSection() != null) {
             sortedStations.add(section.getUpStation());
             section = section.getDownSection();
@@ -71,35 +71,44 @@ public class Line {
         return sortedStations;
     }
 
-    public Section connectSection(Section requestSection) {
-        validateStations(requestSection.getUpStation(), requestSection.getDownStation());
-        Section upSection = sections.get(0).findUpSection();
-
-        Section newSection = upSection.connectSection(requestSection);
-
-        sections.add(newSection);
-        return newSection;
+    public Optional<Section> findUpdateSectionWhenConnect(final Section newSection) {
+        validateStations(newSection.getUpStation(), newSection.getDownStation());
+        final Section upSection = sections.get(0).findUpSection();
+        return upSection.findUpdateSectionWhenConnect(newSection);
     }
 
-    private void validateStations(Station upStation, Station downStation) {
-        boolean isUpStationExists = sections.stream()
-                .anyMatch(section -> isStationExists(upStation, section));
-        boolean isDownStationExists = sections.stream()
-                .anyMatch(section -> isStationExists(downStation, section));
+    private void validateStations(final Station upStation, final Station downStation) {
+        final boolean isUpStationExists = isStationExists(upStation);
+        final boolean isDownStationExists = isStationExists(downStation);
 
         validateExistStations(upStation, downStation, isUpStationExists, isDownStationExists);
     }
 
-    private boolean isStationExists(Station station, Section section) {
+    private boolean isStationExists(Station station) {
+        return sections.stream()
+                .anyMatch(section -> isStationExists(station, section));
+    }
+
+    private boolean isStationExists(final Station station, final Section section) {
         return section.getUpStation().equals(station) || section.getDownStation().equals(station);
     }
 
-    private void validateExistStations(Station upStation, Station downStation, boolean isUpStationExists, boolean isDownStationExists) {
+    private void validateExistStations(
+            final Station upStation,
+            final Station downStation,
+            final boolean isUpStationExists,
+            final boolean isDownStationExists
+    ) {
         validateAllExistStations(upStation, downStation, isUpStationExists, isDownStationExists);
         validateAllNotExistStations(upStation, downStation, isUpStationExists, isDownStationExists);
     }
 
-    private void validateAllNotExistStations(Station upStation, Station downStation, boolean isUpStationExists, boolean isDownStationExists) {
+    private void validateAllNotExistStations(
+            final Station upStation,
+            final Station downStation,
+            final boolean isUpStationExists,
+            final boolean isDownStationExists
+    ) {
         if (!isDownStationExists && !isUpStationExists) {
             throw new StationException(
                     MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재하지 않습니다.",
@@ -108,7 +117,12 @@ public class Line {
         }
     }
 
-    private void validateAllExistStations(Station upStation, Station downStation, boolean isUpStationExists, boolean isDownStationExists) {
+    private void validateAllExistStations(
+            final Station upStation,
+            final Station downStation,
+            final boolean isUpStationExists,
+            final boolean isDownStationExists
+    ) {
         if (isDownStationExists && isUpStationExists) {
             throw new StationException(
                     MessageFormat.format("upStation \"{0}\" 과 downStation \"{1}\"이 line\"{2}\"에 모두 존재합니다.",
@@ -117,23 +131,18 @@ public class Line {
         }
     }
 
-    public void disconnectDownSection(Station downStation) {
+    public Optional<Section> findUpdateSectionWhenDisconnect(Station newStation) {
         validateLineSize();
+        validateExistStation(newStation);
 
-        Section downSection = sections.get(0).findDownSection();
-        validateSameStations(downStation, downSection);
-
-        Section upSection = downSection.getUpSection();
-        upSection.disconnectDownSection();
-
-        sections.remove(downSection);
+        final Section upSection = sections.get(0).findUpSection();
+        return upSection.findUpdateSectionWhenDisconnect(newStation);
     }
 
-    private static void validateSameStations(Station downStation, Section downSection) {
-        if (!downSection.getDownStation().equals(downStation)) {
+    private void validateExistStation(Station station) {
+        if (!isStationExists(station)) {
             throw new StationException(
-                    MessageFormat.format("삭제할 station \"{0}\" 은 하행의 downStation \"{1}\" 과 일치해야 합니다.",
-                            downStation, downSection.getDownStation())
+                    MessageFormat.format("line \"{0}\"에 station \"{1}\"이 존재하지 않습니다.", id, station.getId())
             );
         }
     }
@@ -155,15 +164,5 @@ public class Line {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Line{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", sections=" + sections +
-                '}';
     }
 }

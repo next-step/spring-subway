@@ -1,4 +1,4 @@
-package subway.dto;
+package subway.dto.response;
 
 public class ErrorResponse {
     private String message;

@@ -3,8 +3,10 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.StationDao;
 import subway.domain.Station;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.dto.request.CreateStationRequest;
+import subway.dto.response.CreateStationResponse;
+import subway.dto.request.UpdateStationRequest;
+import subway.dto.response.FindStationResponse;
 import subway.exception.StationException;
 
 import java.text.MessageFormat;
@@ -15,18 +17,18 @@ import java.util.stream.Collectors;
 public class StationService {
     private final StationDao stationDao;
 
-    public StationService(StationDao stationDao) {
+    public StationService(final StationDao stationDao) {
         this.stationDao = stationDao;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        validateDuplicateName(stationRequest.getName());
+    public CreateStationResponse saveStation(final CreateStationRequest createStationRequest) {
+        validateDuplicateName(createStationRequest.getName());
 
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
-        return StationResponse.of(station);
+        final Station station = stationDao.insert(new Station(createStationRequest.getName()));
+        return CreateStationResponse.of(station);
     }
 
-    private void validateDuplicateName(String name) {
+    private void validateDuplicateName(final String name) {
         stationDao.findByName(name)
                 .ifPresent(station -> {
                     throw new StationException(
@@ -35,26 +37,26 @@ public class StationService {
                 });
     }
 
-    public StationResponse findStationById(Long id) {
-        Station station = stationDao.findById(id).orElseThrow(() -> new StationException(
+    public FindStationResponse findStationById(final Long id) {
+        final Station station = stationDao.findById(id).orElseThrow(() -> new StationException(
                 MessageFormat.format("station id \"{0}\"에 해당하는 station이 없습니다.", id)));
         
-        return StationResponse.of(station);
+        return FindStationResponse.of(station);
     }
 
-    public List<StationResponse> findAllStations() {
-        List<Station> stations = stationDao.findAll();
+    public List<FindStationResponse> findAllStations() {
+        final List<Station> stations = stationDao.findAll();
 
         return stations.stream()
-                .map(StationResponse::of)
+                .map(FindStationResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public void updateStation(Long id, StationRequest stationRequest) {
-        stationDao.update(new Station(id, stationRequest.getName()));
+    public void updateStation(final Long id, final UpdateStationRequest updateStationRequest) {
+        stationDao.update(new Station(id, updateStationRequest.getName()));
     }
 
-    public void deleteStationById(Long id) {
+    public void deleteStationById(final Long id) {
         stationDao.deleteById(id);
     }
 }

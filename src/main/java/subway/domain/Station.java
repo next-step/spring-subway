@@ -6,12 +6,12 @@ public class Station {
     private final Long id;
     private final String name;
 
-    public Station(Long id, String name) {
+    public Station(final Long id, final String name) {
         this.id = id;
         this.name = name;
     }
 
-    public Station(String name) {
+    public Station(final String name) {
         this.id = null;
         this.name = name;
     }
@@ -35,13 +35,5 @@ public class Station {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Station{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
     }
 }

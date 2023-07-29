@@ -9,7 +9,7 @@ import subway.DomainFixture;
 import subway.exception.SectionException;
 import subway.exception.StationException;
 
-import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
@@ -136,7 +136,7 @@ class SectionTest {
             Section section2 = DomainFixture.Section.buildWithStations(station3, station4);
 
             // when
-            Exception exception = catchException(() -> section1.connectSection(section2));
+            Exception exception = catchException(() -> section1.connectDownSection(section2));
 
             // then
             assertThat(exception).isInstanceOf(SectionException.class);
@@ -150,7 +150,7 @@ class SectionTest {
             Section nullSection = null;
 
             // when
-            Exception exception = catchException(() -> section.connectSection(nullSection));
+            Exception exception = catchException(() -> section.connectDownSection(nullSection));
 
             // then
             assertThat(exception).isInstanceOf(SectionException.class);
@@ -179,37 +179,41 @@ class SectionTest {
     }
 
     @Nested
-    @DisplayName("disconnectDownSection 메소드는")
-    class DisconnectDownSection_Method {
+    @DisplayName("findUpdateSectionWhenDisconnect 메소드는")
+    class FindUpdateSectionWhenDisconnect_Method {
 
         @Test
-        @DisplayName("호출되면, DownSection과 연결을 해제한다")
-        void Disconnect_DownSection() {
+        @DisplayName("removeStation이 null이라면, StationException을 던진다")
+        void Throw_Exception_When_Null_Remove_Station() {
             // given
+            Station removeStation = null;
             Section section1 = DomainFixture.Section.buildWithStations(station1, station2);
             Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
 
             section1.connectDownSection(section2);
 
             // when
-            section1.disconnectDownSection();
+            Exception exception = catchException(() -> section1.findUpdateSectionWhenDisconnect(removeStation));
 
             // then
-            assertThat(section1.getDownSection()).isNull();
-            assertThat(section2.getUpSection()).isNull();
+            assertThat(exception).isInstanceOf(StationException.class);
         }
 
         @Test
-        @DisplayName("downSection이 null 이라면, SectionException을 던진다")
-        void Throw_SectionException_When_Null_DownSection() {
+        @DisplayName("removeStation이 line의 상행 종점 Station과 일치한다면, 갱신되는 Section은 없다")
+        void Return_Null_When_Remove_Station_Equals_Line_Up_Station() {
             // given
-            Section section = DomainFixture.Section.buildWithStations(station1, station2);
+            Station removeStation = station1;
+            Section section1 = DomainFixture.Section.buildWithStations(removeStation, station2);
+            Section section2 = DomainFixture.Section.buildWithStations(station2, station3);
+
+            section1.connectDownSection(section2);
 
             // when
-            Exception exception = catchException(section::disconnectDownSection);
+            Optional<Section> updateSection = section1.findUpdateSectionWhenDisconnect(removeStation);
 
             // then
-            assertThat(exception).isInstanceOf(SectionException.class);
+            assertThat(updateSection).isEmpty();
         }
     }
 
@@ -255,82 +259,79 @@ class SectionTest {
     }
 
     @Nested
-    @DisplayName("connectSection 메소드는")
-    class ConnectSection_Method {
+    @DisplayName("findUpdateSectionWhenConnect 메소드는")
+    class FindUpdateSectionWhenConnect_Method {
 
         @Test
-        @DisplayName("중간 위치에 상행 Station을 기준으로 Section을 삽입한다")
-        void Connect_Section_By_UpStation_On_Middle() {
+        @DisplayName("중간 위치에 상행 Station을 기준으로 갱신된 Section을 반환한다")
+        void Return_Update_Section_By_UpStation_On_Middle() {
             // given
-            Section section1 = DomainFixture.Section.buildWithStations(station1, station2, 10);
-            Section section3 = DomainFixture.Section.buildWithStations(station2, station4, 10);
+            Station upStation = station2;
+            Station downStation = station3;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, upStation, 10);
+            Section section3 = DomainFixture.Section.buildWithStations(upStation, station4, 10);
 
             section1.connectDownSection(section3);
 
-            Section section2 = DomainFixture.Section.buildWithStations(station2, station3, 9);
+            Section section2 = DomainFixture.Section.buildWithStations(upStation, downStation, 9);
 
             // when
-            section1.connectSection(section2);
-            section1 = section1.findUpSection();
+            Optional<Section> updateSection = section1.findUpdateSectionWhenConnect(section2);
 
             // then
-            assertSectionConnectedStatus(section1, List.of(station1, station2, station3, station4));
+            assertThat(updateSection.get().getUpStation()).isEqualTo(downStation);
+            assertThat(updateSection.get().getDownStation()).isEqualTo(station4);
         }
 
         @Test
-        @DisplayName("중간 위치에 하행 Station을 기준으로 Section을 삽입한다")
-        void Connect_Section_By_DownStation_On_Middle() {
+        @DisplayName("중간 위치에 하행 Station을 기준으로 갱신된 Section을 반환한다")
+        void Return_Update_Section_By_DownStation_On_Middle() {
             // given
-            Section section1 = DomainFixture.Section.buildWithStations(station1, station3, 10);
-            Section section3 = DomainFixture.Section.buildWithStations(station3, station4, 10);
+            Station upStation = station2;
+            Station downStation = station3;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, downStation, 10);
+            Section section3 = DomainFixture.Section.buildWithStations(downStation, station4, 10);
 
             section1.connectDownSection(section3);
 
-            Section section2 = DomainFixture.Section.buildWithStations(station2, station3, 9);
+            Section section2 = DomainFixture.Section.buildWithStations(upStation, downStation, 9);
 
             // when
-            section1.connectSection(section2);
-            section1 = section1.findUpSection();
+            Optional<Section> updateSection = section1.findUpdateSectionWhenConnect(section2);
 
             // then
-            assertSectionConnectedStatus(section1, List.of(station1, station2, station3, station4));
+            assertThat(updateSection.get().getUpStation()).isEqualTo(station1);
+            assertThat(updateSection.get().getDownStation()).isEqualTo(upStation);
         }
 
         @Test
-        @DisplayName("상행 끝 지점에 Section을 삽입한다")
-        void Connect_Section_By_DownStation_On_Up() {
+        @DisplayName("상행 종점에 Section을 추가할 경우, 갱신되는 Section은 없다")
+        void Return_Null_By_DownStation_On_Up() {
             // given
-            Section section2 = DomainFixture.Section.buildWithStations(station2, station3, 10);
-            Section section3 = DomainFixture.Section.buildWithStations(station3, station4, 10);
-
-            section2.connectDownSection(section3);
-
-            Section section1 = DomainFixture.Section.buildWithStations(station1, station2, 100);
+            Station downStation = station2;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, downStation, 100);
+            Section section2 = DomainFixture.Section.buildWithStations(downStation, station3, 10);
 
             // when
-            section2.connectSection(section1);
-            section1 = section1.findUpSection();
+            Optional<Section> updateSection = section2.findUpdateSectionWhenConnect(section1);
 
             // then
-            assertSectionConnectedStatus(section1, List.of(station1, station2, station3, station4));
+            assertThat(updateSection).isEmpty();
         }
 
         @Test
-        @DisplayName("하행 끝 지점에 Section을 삽입한다")
-        void Connect_Section_By_UpStation_On_Down() {
+        @DisplayName("하행 종점에 Section을 추가할 경우, 갱신되는 Section은 없다")
+        void Return_Null_By_UpStation_On_Up() {
             // given
-            Section section1 = DomainFixture.Section.buildWithStations(station1, station2, 10);
-            Section section2 = DomainFixture.Section.buildWithStations(station2, station3, 10);
-
-            section1.connectDownSection(section2);
-
-            Section section3 = DomainFixture.Section.buildWithStations(station3, station4, 100);
+            Station upStation = station2;
+            Section section1 = DomainFixture.Section.buildWithStations(station1, upStation, 10);
+            Section section2 = DomainFixture.Section.buildWithStations(upStation, station3, 100);
 
             // when
-            section2.connectSection(section3);
-            section1 = section1.findUpSection();
+            Optional<Section> updateSection = section1.findUpdateSectionWhenConnect(section2);
+
             // then
-            assertSectionConnectedStatus(section1, List.of(station1, station2, station3, station4));
+            assertThat(updateSection).isEmpty();
         }
 
         @Test
@@ -342,18 +343,10 @@ class SectionTest {
             Section nullSection = null;
 
             // when
-            Exception exception = catchException(() -> section.connectSection(nullSection));
+            Exception exception = catchException(() -> section.findUpdateSectionWhenConnect(nullSection));
 
             // then
             assertThat(exception).isInstanceOf(SectionException.class);
-        }
-
-        private void assertSectionConnectedStatus(Section section, List<Station> stations) {
-            for (int stationIdx = 0; stationIdx < stations.size() - 1; stationIdx++) {
-                assertThat(section.getUpStation()).isEqualTo(stations.get(stationIdx));
-                assertThat(section.getDownStation()).isEqualTo(stations.get(stationIdx + 1));
-                section = section.getDownSection();
-            }
         }
     }
 }

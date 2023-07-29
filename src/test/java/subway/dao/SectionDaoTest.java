@@ -90,8 +90,8 @@ class SectionDaoTest {
     }
 
     @Nested
-    @DisplayName("deleteByLineIdAndDownStationId 메소드는")
-    class DeleteByLineIdAndDownStationId_Method {
+    @DisplayName("deleteByLineIdAndStationId 메소드는")
+    class DeleteByLineIdAndStationId_Method {
 
         @Test
         @DisplayName("lineId와 stationId에 일치하는 Section을 삭제한다")
@@ -108,7 +108,7 @@ class SectionDaoTest {
             section1.connectDownSection(section2);
 
             // when
-            sectionDao.deleteByLineIdAndDownStationId(line.getId(), station3.getId());
+            sectionDao.deleteByLineIdAndStationId(line.getId(), station3.getId());
             List<Section> sections = sectionDao.findAllByLineId(line.getId());
 
             // then
