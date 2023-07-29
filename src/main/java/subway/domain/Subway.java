@@ -1,6 +1,7 @@
 package subway.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,10 @@ public class Subway {
     public ShortestSubwayPath calculateShortestPath(Station sourceStation, Station destinationStation) {
         SubwayPath subwayPath = new SubwayPath(this.lineSections);
         return subwayPath.calculateShortestPath(sourceStation, destinationStation);
+    }
+
+    public List<LineSections> getLineSections() {
+        return Collections.unmodifiableList(lineSections);
     }
 
     @Override
