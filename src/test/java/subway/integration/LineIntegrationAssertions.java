@@ -48,34 +48,29 @@ class LineIntegrationAssertions {
         assertThat(errorTemplate.getStatus()).isEqualTo(CANNOT_DISCONNECT_SECTION.getStatus());
     }
 
-    static void assertIsLineCreated(ExtractableResponse<Response> response) {
+    static void assertIsLineCreated(ExtractableResponse<Response> response, LineResponse expected) {
         HttpStatusAssertions.assertIsCreated(response);
 
-        LineResponse lineResponse = response.as(LineResponse.class);
-        assertLineResponse(lineResponse);
+        assertLineResponse(response, expected);
     }
 
-    static void assertIsLineFound(ExtractableResponse<Response> response, int expectedSize) {
+    static void assertIsLineFound(ExtractableResponse<Response> response, LineResponse expected) {
+        HttpStatusAssertions.assertIsOk(response);
+
+        assertLineResponse(response, expected);
+    }
+
+    private static void assertLineResponse(ExtractableResponse<Response> response, LineResponse expected) {
+        LineResponse lineResponse = response.as(LineResponse.class);
+        assertThat(lineResponse).isEqualTo(expected);
+    }
+
+    static void assertIsLineFound(ExtractableResponse<Response> response, LineResponse... exactlyExpected) {
         HttpStatusAssertions.assertIsOk(response);
 
         List<LineResponse> lineResponses = response.as(new TypeRef<>() {
         });
-        assertThat(lineResponses).hasSize(expectedSize);
-        lineResponses.forEach(LineIntegrationAssertions::assertLineResponse);
-    }
-
-    static void assertIsLineFound(ExtractableResponse<Response> response) {
-        HttpStatusAssertions.assertIsOk(response);
-
-        LineResponse lineResponse = response.as(LineResponse.class);
-        LineIntegrationAssertions.assertLineResponse(lineResponse);
-    }
-
-    private static void assertLineResponse(LineResponse lineResponse) {
-        assertThat(lineResponse.getId()).isInstanceOf(Number.class);
-        assertThat(lineResponse.getName()).isNotEmpty().isInstanceOf(String.class);
-        assertThat(lineResponse.getColor()).isNotEmpty().isInstanceOf(String.class);
-        assertThat(lineResponse.getStations()).isNotEmpty().hasSizeGreaterThanOrEqualTo(2);
+        assertThat(lineResponses).containsExactly(exactlyExpected);
     }
 
 }

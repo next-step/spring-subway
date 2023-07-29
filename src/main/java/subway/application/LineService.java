@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
@@ -35,6 +36,7 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public LineResponse saveLine(LineCreateRequest request) {
         validLineRequest(request);
         Station upStation = getStation(request.getUpStationId());
@@ -62,6 +64,7 @@ public class LineService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
 
@@ -75,6 +78,7 @@ public class LineService {
         return lineDao.findAll();
     }
 
+    @Transactional(readOnly = true)
     public LineResponse findLineResponseById(long id) {
         Line line = getLineById(id);
 
@@ -87,6 +91,7 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void connectSectionByStationId(long lineId, SectionCreateRequest sectionCreateRequest) {
         Line line = getLineById(lineId);
 
@@ -105,6 +110,7 @@ public class LineService {
         sectionDao.update(section);
     }
 
+    @Transactional
     public void disconnectSectionByStationId(long lineId, long stationId) {
         Station station = getStation(stationId);
 
@@ -122,10 +128,12 @@ public class LineService {
                         MessageFormat.format("lineId \"{0}\"에 해당하는 line이 존재하지 않습니다", id), CANNOT_FIND_LINE));
     }
 
+    @Transactional
     public void updateLine(long id, LineUpdateRequest lineUpdateRequest) {
         lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
     }
 
+    @Transactional
     public void deleteLineById(long id) {
         lineDao.deleteById(id);
     }

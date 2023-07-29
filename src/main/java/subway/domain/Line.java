@@ -129,7 +129,9 @@ public class Line {
     }
 
     public List<Section> getSections() {
-        return List.copyOf(sections);
+        List<Section> deepCopiedSections = new ArrayList<>();
+        sections.forEach(section -> deepCopiedSections.add(section.deepCopy()));
+        return deepCopiedSections;
     }
 
     @Override

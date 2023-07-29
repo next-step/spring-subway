@@ -24,32 +24,29 @@ class StationIntegrationAssertions {
         assertThat(errorTemplate.getStatus()).isEqualTo(DUPLICATED_STATION);
     }
 
-    static void assertIsStationCreated(ExtractableResponse<Response> response) {
+    static void assertIsStationCreated(ExtractableResponse<Response> response, StationResponse expected) {
         HttpStatusAssertions.assertIsCreated(response);
 
-        StationResponse stationResponse = response.as(StationResponse.class);
-        assertStationResponse(stationResponse);
+        assertStationResponse(response, expected);
     }
 
-    static void assertIsStationFound(ExtractableResponse<Response> response, int expectedSize) {
+    static void assertIsStationFound(ExtractableResponse<Response> response, StationResponse... expected) {
         HttpStatusAssertions.assertIsOk(response);
 
         List<StationResponse> stationResponses = response.as(new TypeRef<>() {
         });
-        assertThat(stationResponses).hasSize(expectedSize);
-        stationResponses.forEach(StationIntegrationAssertions::assertStationResponse);
+        assertThat(stationResponses).containsExactly(expected);
     }
 
-    static void assertIsStationFound(ExtractableResponse<Response> response) {
+    static void assertIsStationFound(ExtractableResponse<Response> response, StationResponse expected) {
         HttpStatusAssertions.assertIsOk(response);
 
-        StationResponse stationResponse = response.as(StationResponse.class);
-        StationIntegrationAssertions.assertStationResponse(stationResponse);
+        assertStationResponse(response, expected);
     }
 
-    private static void assertStationResponse(StationResponse stationResponse) {
-        assertThat(stationResponse.getId()).isInstanceOf(Number.class);
-        assertThat(stationResponse.getName()).isNotEmpty().isInstanceOf(String.class);
+    private static void assertStationResponse(ExtractableResponse<Response> response, StationResponse expected) {
+        StationResponse stationResponse = response.as(StationResponse.class);
+        assertThat(stationResponse).isEqualTo(expected);
     }
 
 }

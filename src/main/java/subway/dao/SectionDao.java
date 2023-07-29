@@ -18,6 +18,11 @@ public class SectionDao {
                     + "JOIN STATION AS US ON S.line_id = ? AND S.up_station_id = US.id "
                     + "JOIN STATION AS DS ON S.line_id = ? AND S.down_station_id = DS.id";
 
+    private static final String FIND_ALL_SQL =
+            "SELECT S.*, US.id AS US_ID, US.name AS US_NAME, DS.id AS DS_ID, DS.name AS DS_NAME FROM SECTIONS AS S "
+                    + "JOIN STATION AS US ON S.up_station_id = US.id "
+                    + "JOIN STATION AS DS ON S.down_station_id = DS.id";
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
     private final RowMapper<Section> sectionRowMapper;
@@ -74,7 +79,7 @@ public class SectionDao {
     }
 
     public void update(Section section) {
-        String sql = "UPDATE SECTIONS SET (up_station_id, down_station_id, distance) = (?, ?, ?) WHERE id = ?";
+        String sql = "UPDATE SECTIONS SET up_station_id = ?, down_station_id = ?, distance = ? WHERE id = ?";
         jdbcTemplate.update(sql, section.getUpStation().getId(), section.getDownStation().getId(),
                 section.getDistance(), section.getId());
     }
@@ -82,5 +87,9 @@ public class SectionDao {
     public void deleteBySectionId(long sectionId) {
         String deleteSql = "DELETE FROM SECTIONS AS S WHERE S.id = ?";
         jdbcTemplate.update(deleteSql, sectionId);
+    }
+
+    public List<Section> findAll() {
+        return jdbcTemplate.query(FIND_ALL_SQL, sectionRowMapper);
     }
 }
