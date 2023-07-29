@@ -2,12 +2,13 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.catchException;
 
 class PathTest {
 
@@ -54,9 +55,13 @@ class PathTest {
 
         List<Sections> allSections = List.of(line2Sections);
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Path(allSections, gyodae, gyodae));
+        // when
+        Exception exception = catchException(() -> new Path(allSections, gyodae, gyodae));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.SAME_SOURCE_TARGET);
     }
 
     @DisplayName("출발역이 노선에 연결되어 있지 않을 때 경로 탐색을 하면 예외를 던진다.")
@@ -77,9 +82,13 @@ class PathTest {
 
         List<Sections> allSections = List.of(line2Sections, line3Sections);
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Path(allSections, yangjae, gyodae));
+        // when
+        Exception exception = catchException(() -> new Path(allSections, yangjae, gyodae));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.NO_CONNECTED_PATH);
     }
 
     @DisplayName("도착역이 노선에 연결되어 있지 않을 때 경로 탐색을 하면 예외를 던진다.")
@@ -100,9 +109,13 @@ class PathTest {
 
         List<Sections> allSections = List.of(line2Sections, line3Sections);
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Path(allSections, gyodae, yangjae));
+        // when
+        Exception exception = catchException(() -> new Path(allSections, gyodae, yangjae));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.NO_CONNECTED_PATH);
     }
 
     @DisplayName("출발역 노선과 도착역 노선이 연결되어 있지 않을 때 경로 탐색을 하면 예외를 던진다.")
@@ -123,8 +136,12 @@ class PathTest {
 
         List<Sections> allSections = List.of(line2Sections, line3Sections);
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Path(allSections, gyodae, yangjae));
+        // when
+        Exception exception = catchException(() -> new Path(allSections, gyodae, yangjae));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.NO_CONNECTED_PATH);
     }
 }

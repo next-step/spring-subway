@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.domain.Station;
+import subway.dto.ErrorResponse;
 import subway.dto.PathResponse;
 import subway.helper.CreateHelper;
 
@@ -82,6 +83,8 @@ class PathIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("PATH_001");
     }
 
     @DisplayName("연결되어 있지 않은 출발역과 도착역으로 탐색을 요청한다.")
@@ -106,6 +109,8 @@ class PathIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("PATH_002");
     }
 
     @DisplayName("존재하지 않는 역으로 탐색을 요청한다.")
@@ -133,5 +138,7 @@ class PathIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("DB_001");
     }
 }

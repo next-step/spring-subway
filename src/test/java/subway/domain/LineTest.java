@@ -2,10 +2,12 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchException;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LineTest {
 
@@ -24,12 +26,16 @@ class LineTest {
     @Test
     void validateNameNotNull() {
         // given
-        String name = null;
+        String nullName = null;
         String color = "bg-red-600";
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Line(name, color));
+        // when
+        Exception exception = catchException(() -> new Line(nullName, color));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.NULL_LINE_NAME);
     }
 
     @DisplayName("색깔이 null인지 확인한다.")
@@ -37,11 +43,15 @@ class LineTest {
     void validateColorNotNull() {
         // given
         String name = "신분당선";
-        String color = null;
+        String nullColor = null;
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Line(name, color));
+        // when
+        Exception exception = catchException(() -> new Line(name, nullColor));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.NULL_LINE_COLOR);
     }
 
     @DisplayName("이름이 255자 이하인지 확인한다.")
@@ -51,9 +61,13 @@ class LineTest {
         String nameOverThan255 = "이 문장은 총 스물다섯글자로 이루어져 있습니다".repeat(11);
         String color = "bg-red-600";
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Line(nameOverThan255, color));
+        // when
+        Exception exception = catchException(() -> new Line(nameOverThan255, color));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.LONG_LINE_NAME);
     }
 
     @DisplayName("색이 20자 이하인지 확인한다.")
@@ -63,8 +77,12 @@ class LineTest {
         String name = "신분당선";
         String colorOverThan20 = "color too long! long!!!";
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Line(name, colorOverThan20));
+        // when
+        Exception exception = catchException(() -> new Line(name, colorOverThan20));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.LONG_LINE_COLOR);
     }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ErrorResponse;
 import subway.dto.SectionRequest;
 import subway.helper.CreateHelper;
 import subway.helper.GetHelper;
@@ -138,6 +139,8 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("SECTION_001");
     }
 
     @DisplayName("기존에 존재하지 않는 지하철 역으로 지하철 구간을 생성한다.")
@@ -162,6 +165,8 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("SECTION_001");
     }
 
     @DisplayName("같은 역으로 지하철 구간을 생성한다.")
@@ -184,6 +189,8 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("SECTION_009");
     }
 
     @DisplayName("중간에 기존 구간보다 길이가 긴 지하철 구간을 생성한다.")
@@ -207,6 +214,8 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("SECTION_012");
     }
 
     @DisplayName("종점역 지하철 구간을 제거한다.")
@@ -272,6 +281,8 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("SECTION_003");
     }
 
     @DisplayName("기존에 존재하지 않는 역으로 구간을 제거한다.")
@@ -281,7 +292,9 @@ class SectionIntegrationTest extends IntegrationTest {
         Long gangnamId = CreateHelper.createStation("강남역");
         Long yeoksamId = CreateHelper.createStation("역삼역");
         Long gyodaeId = CreateHelper.createStation("교대역");
+        Long seonreungId = CreateHelper.createStation("선릉역");
         Long lineId = CreateHelper.createLine("2호선", "bg-123", gangnamId, yeoksamId, 10);
+        CreateHelper.createSection(yeoksamId, seonreungId, 5, lineId);
 
         // when
         ExtractableResponse<Response> response = RestAssured
@@ -292,6 +305,8 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("SECTION_004");
     }
 
     @DisplayName("역 id가 올바르지 않은 경우 예외 처리한다.")
@@ -311,5 +326,7 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("STATION_002");
     }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import subway.dto.ErrorResponse;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
 
@@ -64,6 +65,8 @@ class StationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.as(ErrorResponse.class).getCode())
+                .isEqualTo("STATION_001");
     }
 
     @DisplayName("지하철역 목록을 조회한다.")
