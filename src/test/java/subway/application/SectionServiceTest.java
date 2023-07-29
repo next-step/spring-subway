@@ -86,8 +86,8 @@ class SectionServiceTest {
     void delete() {
         when(sectionDao.findAllByLineId(1L)).thenReturn(칠호선_구간들);
         when(stationDao.findById(2L)).thenReturn(Optional.of(신중동역));
-        when(sectionDao.insert(부천시청_신중동_구간.combineSection(신중동_춘의_구간))).thenReturn(
-            부천시청_신중동_구간.combineSection(신중동_춘의_구간));
+        when(sectionDao.insert(부천시청_신중동_구간.combineSection(Optional.of(신중동_춘의_구간)).get()))
+            .thenReturn(부천시청_신중동_구간.combineSection(Optional.of(신중동_춘의_구간)).get());
 
         Assertions.assertThatNoException()
             .isThrownBy(() -> sectionService.deleteSection(2L, 1L));

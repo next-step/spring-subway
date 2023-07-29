@@ -1,6 +1,7 @@
 package subway.domain;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class Section {
 
@@ -67,14 +68,20 @@ public class Section {
         }
     }
 
-    public Section combineSection(Section otherSection) {
+    public Optional<Section> combineSection(Optional<Section> otherSectionOptional) {
+        if (otherSectionOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Section otherSection = otherSectionOptional.get();
         validateCombineSection(otherSection);
-        return new Section(
+
+        return Optional.of(new Section(
             this.upStation,
             otherSection.downStation,
             this.line,
             this.distance.add(otherSection.distance).getDistance()
-        );
+        ));
     }
 
     private void validateCombineSection(Section otherSection) {

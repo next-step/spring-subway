@@ -88,12 +88,9 @@ public class SectionService {
         Optional<Section> sectionByUpStation,
         Optional<Section> sectionByDownStation
     ) {
-        sectionByDownStation.ifPresent(
-            newSectionUpStation -> sectionByUpStation.ifPresent(
-                newSectionDownStation ->
-                    sectionDao.insert(newSectionUpStation.combineSection(newSectionDownStation))
-            )
-        );
+        sectionByDownStation
+            .flatMap(newSectionUpStation -> newSectionUpStation.combineSection(sectionByUpStation))
+            .ifPresent(sectionDao::insert);
     }
 
     @Transactional
