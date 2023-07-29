@@ -24,11 +24,11 @@ import static subway.domain.fixture.StationFixture.createStation;
 
 @SpringBootTest
 @Transactional
-class PathFinderTest {
+class PathServiceTest {
 
 
     @Autowired
-    private PathFinder pathFinder;
+    private PathService pathService;
 
     @Autowired
     private SectionDao sectionDao;
@@ -97,7 +97,7 @@ class PathFinderTest {
         final PathFindRequest request = new PathFindRequest(stationF.getId(), stationD.getId());
 
         // when
-        final PathFindResponse response = pathFinder.findShortPath(request);
+        final PathFindResponse response = pathService.findShortPath(request);
 
         // then
         assertThat(response.getDistance()).isEqualTo(26);
@@ -115,7 +115,7 @@ class PathFinderTest {
         final PathFindRequest request = new PathFindRequest(stationA.getId(), stationA.getId());
 
         // when , then
-        assertThatCode(() -> pathFinder.findShortPath(request))
+        assertThatCode(() -> pathService.findShortPath(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 같은 경우 최단 거리를 구할 수 없습니다.");
     }
@@ -128,7 +128,7 @@ class PathFinderTest {
         final PathFindRequest request = new PathFindRequest(stationA.getId(), station.getId());
 
         // when , then
-        assertThatCode(() -> pathFinder.findShortPath(request))
+        assertThatCode(() -> pathService.findShortPath(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("출발역과 도착역이 연결되어 있지 않습니다.");
     }
@@ -141,7 +141,7 @@ class PathFinderTest {
         final PathFindRequest request = new PathFindRequest(-1L, 99L);
 
         // when , then
-        assertThatCode(() -> pathFinder.findShortPath(request))
+        assertThatCode(() -> pathService.findShortPath(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("역을 찾을 수 없습니다.");
     }

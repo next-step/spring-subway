@@ -12,11 +12,11 @@ import subway.dto.request.PathFindRequest;
 import subway.dto.response.PathFindResponse;
 
 @Service
-public class PathFinder {
+public class PathService {
     private final SectionDao sectionDao;
     private final StationDao stationDao;
 
-    public PathFinder(final SectionDao sectionDao, final StationDao stationDao) {
+    public PathService(final SectionDao sectionDao, final StationDao stationDao) {
         this.sectionDao = sectionDao;
         this.stationDao = stationDao;
     }

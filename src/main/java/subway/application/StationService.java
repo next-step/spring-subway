@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.SortedSections;
+import subway.domain.SortedLineSections;
 import subway.domain.Station;
 import subway.dto.request.StationRequest;
 import subway.dto.response.StationResponse;
@@ -56,7 +56,7 @@ public class StationService {
 
     @Transactional(readOnly = true)
     public List<Station> findInOrderStationsByLineId(final Long lineId) {
-        SortedSections sections = new SortedSections(sectionDao.findAllByLineId(lineId));
+        SortedLineSections sections = new SortedLineSections(sectionDao.findAllByLineId(lineId));
         return sections.toStations();
     }
 

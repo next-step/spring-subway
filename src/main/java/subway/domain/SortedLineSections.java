@@ -7,8 +7,8 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
-public class SortedSections extends Sections {
-    public SortedSections(final List<Section> sections) {
+public class SortedLineSections extends LineSections {
+    public SortedLineSections(final List<Section> sections) {
         super(sections);
         this.sections = sort(sections);
     }

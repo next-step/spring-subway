@@ -57,7 +57,7 @@
 - 구간 등록 request
 
 ```
-POST /lines/1/sections HTTP/1.1
+POST /lines/1/lineSections HTTP/1.1
 accept: */*
 content-type: application/json; charset=UTF-8
 host: localhost:52165
@@ -80,7 +80,7 @@ host: localhost:52165
 - 지하철 구간 삭제 request
 
 ```
-- DELETE /lines/1/sections?stationId=2 HTTP/1.1
+- DELETE /lines/1/lineSections?stationId=2 HTTP/1.1
 accept: */*
 host: localhost:52165
 ```

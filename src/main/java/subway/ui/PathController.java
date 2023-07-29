@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import subway.application.PathFinder;
+import subway.application.PathService;
 import subway.dto.request.PathFindRequest;
 import subway.dto.response.PathFindResponse;
 
@@ -13,15 +13,15 @@ import subway.dto.response.PathFindResponse;
 @RequestMapping("/paths")
 public class PathController {
 
-    private final PathFinder pathFinder;
+    private final PathService pathService;
 
-    public PathController(final PathFinder pathFinder) {
-        this.pathFinder = pathFinder;
+    public PathController(final PathService pathService) {
+        this.pathService = pathService;
     }
 
     @GetMapping
     public ResponseEntity<PathFindResponse> find(@RequestParam("source") Long source, @RequestParam("target") Long target) {
-        PathFindResponse response = pathFinder.findShortPath(new PathFindRequest(source, target));
+        PathFindResponse response = pathService.findShortPath(new PathFindRequest(source, target));
         return ResponseEntity.ok(response);
     }
 }

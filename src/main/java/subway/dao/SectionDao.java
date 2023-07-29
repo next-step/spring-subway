@@ -100,8 +100,8 @@ public class SectionDao {
         jdbcTemplate.update(sql);
     }
 
-    public void updateSections(final Long lineId, final Sections sections) {
-        dirtyChecking(findAllByLineId(lineId), sections.getSections());
+    public void updateSections(final Long lineId, final LineSections lineSections) {
+        dirtyChecking(findAllByLineId(lineId), lineSections.getSections());
     }
 
     private void dirtyChecking(final List<Section> beforeSection, final List<Section> afterSection) {

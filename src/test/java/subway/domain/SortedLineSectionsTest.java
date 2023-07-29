@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SortedSectionsTest {
+class SortedLineSectionsTest {
 
     private Line line;
     private Station stationA;
@@ -36,7 +36,7 @@ class SortedSectionsTest {
                 new Section(line, stationB, stationC, new Distance(10L)),
                 new Section(line, stationD, stationA, new Distance(10L))
         );
-        final SortedSections sortedSections = new SortedSections(sectionList);
+        final SortedLineSections sortedSections = new SortedLineSections(sectionList);
 
         // when
         final List<Station> stations = sortedSections.toStations();

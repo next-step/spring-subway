@@ -45,9 +45,9 @@ public class SectionService {
                 request.getUpStationId(),
                 request.getDownStationId(),
                 request.getDistance());
-        Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        sections.addSection(newSection);
-        sectionDao.updateSections(lineId, sections);
+        LineSections lineSections = new LineSections(sectionDao.findAllByLineId(lineId));
+        lineSections.addSection(newSection);
+        sectionDao.updateSections(lineId, lineSections);
     }
 
     private Section createSection(final Long lineId,
@@ -63,9 +63,9 @@ public class SectionService {
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
         final Station station = findStationById(stationId);
-        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
-        sections.deleteSection(station);
-        sectionDao.updateSections(lineId, sections);
+        final LineSections lineSections = new LineSections(sectionDao.findAllByLineId(lineId));
+        lineSections.deleteSection(station);
+        sectionDao.updateSections(lineId, lineSections);
     }
 
     private Station findStationById(final Long stationId) {
