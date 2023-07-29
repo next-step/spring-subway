@@ -57,30 +57,6 @@ class SectionsTest {
     }
 
     @Test
-    @DisplayName("Sections에 가장 처음의 구간을 찾을 수 있다.")
-    void getFirstSection() {
-        /* given */
-
-        /* when */
-        final Section firstSection = SECTIONS.getFirstSection();
-
-        /* then */
-        assertThat(firstSection).isEqualTo(FIRST_SECTION);
-    }
-
-    @Test
-    @DisplayName("Sections에 가장 마지막 구간을 찾을 수 있다.")
-    void getLastSection() {
-        /* given */
-
-        /* when */
-        final Section lastSection = SECTIONS.getLastSection();
-
-        /* then */
-        assertThat(lastSection).isEqualTo(LAST_SECTION);
-    }
-
-    @Test
     @DisplayName("Section의 크기가 1인지 확인할 수 있다.")
     void isEqualSizeToOne() {
         /* given */

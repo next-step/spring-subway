@@ -51,11 +51,8 @@ public class SectionService {
         validateSectionsSizeIsNotOne(sections);
         validateSectionsHasNotStation(sections, stationId);
 
-        if (sections.isFirstStation(stationId)) {
-            sectionDao.delete(sections.getFirstSection().getId());
-            return;
-        } else if (sections.isLastStation(stationId)) {
-            sectionDao.delete(sections.getLastSection().getId());
+        if (sections.isFirstStation(stationId) || sections.isLastStation(stationId)) {
+            sectionDao.deleteFirstOrLastStation(stationId, lineId);
             return;
         }
 

@@ -35,14 +35,6 @@ public class Sections {
         return this.stationIds.contains(stationId);
     }
 
-    public Section getFirstSection() {
-        return this.firstSection;
-    }
-
-    public Section getLastSection() {
-        return this.lastSection;
-    }
-
     public Section getBetweenSectionToNext(final Long stationId) {
         return find(this.values, section -> section.isSameDownStationId(stationId))
                 .orElseThrow(() -> new SubwayException("해당 역을 하행역으로 가지는 구간이 존재하지 않습니다. 역 ID : " + stationId));

@@ -28,7 +28,7 @@ public class SectionDao {
     public SectionDao(final JdbcTemplate jdbcTemplate, final DataSource dataSource) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
-                .withTableName("section")
+                .withTableName("SECTION")
                 .usingGeneratedKeyColumns("id");
     }
 
@@ -56,9 +56,21 @@ public class SectionDao {
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
+    public List<Section> findAll() {
+        final String sql = "select * from SECTION";
+
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
     public int delete(final Long targetSectionId) {
         final String sql = "delete from SECTION where id = ?";
 
         return jdbcTemplate.update(sql, targetSectionId);
+    }
+
+    public int deleteFirstOrLastStation(final Long stationId, final Long lineId) {
+        final String sql = "delete from SECTION where (up_station_id = ? or down_station_id = ?) and line_id = ?";
+
+        return jdbcTemplate.update(sql, stationId, stationId, lineId);
     }
 }
