@@ -1,6 +1,7 @@
 package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,6 @@ class SubwayPathTest {
         lineD = LineFixture.createLineD();
     }
 
-
     /*
                        10
           stationA    --- *lineA* ---  stationB
@@ -45,36 +45,44 @@ class SubwayPathTest {
                        10
      */
     @Test
-    @DisplayName("지하철 최단경로 길이를 가져온다")
+    @DisplayName("지하철 최단경로를 계산한다")
     void getShortestDistance() {
-        LineSections lineSectionsA = new LineSections(lineA, new Section(1L, lineA, stationA, stationB, 10));
-        LineSections lineSectionsB = new LineSections(lineB, new Section(2L, lineB, stationB, stationC, 10));
-        LineSections lineSectionsC = new LineSections(lineC, new Section(3L, lineC, stationC, stationD, 10));
-        LineSections lineSectionsD = new LineSections(lineD, new Section(4L, lineD, stationD, stationA, 3));
+        LineSections lineSectionsA = new LineSections(lineA,
+            new Section(1L, lineA, stationA, stationB, 10));
+        LineSections lineSectionsB = new LineSections(lineB,
+            new Section(2L, lineB, stationB, stationC, 10));
+        LineSections lineSectionsC = new LineSections(lineC,
+            new Section(3L, lineC, stationC, stationD, 10));
+        LineSections lineSectionsD = new LineSections(lineD,
+            new Section(4L, lineD, stationD, stationA, 3));
 
-        SubwayPath subwayPath = new SubwayPath(List.of(lineSectionsA, lineSectionsB, lineSectionsC, lineSectionsD));
+        SubwayPath subwayPath = new SubwayPath(
+            List.of(lineSectionsA, lineSectionsB, lineSectionsC, lineSectionsD));
 
-        assertThat(subwayPath.getShortestDistance(stationC, stationA)).isEqualTo(13);
+        assertThat(subwayPath.calculateShortestPath(stationC, stationA).getStations()).containsExactly(stationC,
+            stationD, stationA);
+
+        assertThat(subwayPath.calculateShortestPath(stationC, stationA).getDistance()).isEqualTo(13);
     }
 
     @Test
-    @DisplayName("지하철 최단경로의 역 목록을 순서대로 가져온다")
-    void getShortestPath() {
-        LineSections lineSectionsA = new LineSections(lineA, new Section(1L, lineA, stationA, stationB, 10));
-        LineSections lineSectionsB = new LineSections(lineB, new Section(2L, lineB, stationB, stationC, 10));
-        LineSections lineSectionsC = new LineSections(lineC, new Section(3L, lineC, stationC, stationD, 10));
-        LineSections lineSectionsD = new LineSections(lineD, new Section(4L, lineD, stationD, stationA, 3));
+    @DisplayName("path 없음")
+    void noPath() {
+        LineSections lineSectionsA = new LineSections(lineA,
+            new Section(1L, lineA, stationA, stationB, 10));
+        LineSections lineSectionsC = new LineSections(lineC,
+            new Section(3L, lineC, stationC, stationD, 10));
 
-        SubwayPath subwayPath = new SubwayPath(List.of(lineSectionsA, lineSectionsB, lineSectionsC, lineSectionsD));
+        SubwayPath subwayPath = new SubwayPath(List.of(lineSectionsA, lineSectionsC));
 
-        assertThat(subwayPath.getShortestPath(stationC, stationA)).containsExactly(stationC, stationD, stationA);
+        assertThatThrownBy(() -> subwayPath.calculateShortestPath(stationC, stationA)).isInstanceOf(
+            IllegalArgumentException.class);
     }
 
     /*
     source station 없음
     dest station 없음
-    path가 없음
     source-dest가 같음 -> 1 station , distance 0
-
+    해당 부분을 검증해볼것
      */
 }
