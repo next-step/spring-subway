@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.SectionService;
-import subway.domain.ShortestPath;
 import subway.dto.PathRequest;
 import subway.dto.PathResponse;
 

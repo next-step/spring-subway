@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class PathFinderTest {
+class ShortestPathFinderTest {
 
     @Test
     @DisplayName("출발역과 도착역이 같은 경우 경로를 구할 수 없다.")
@@ -21,10 +21,8 @@ class PathFinderTest {
         Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
         Section sectionB = new Section(2L, lineA, stationB, stationC, 4);
 
-        final PathFinder pathFinder = new PathFinder(List.of(sectionA, sectionB));
-
         //when & then
-        assertThatThrownBy(() -> pathFinder.findShortestPath(stationA, stationA))
+        assertThatThrownBy(() -> new ShortestPathFinder(List.of(sectionA, sectionB), stationA, stationA))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -43,10 +41,8 @@ class PathFinderTest {
         Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
         Section sectionB = new Section(2L, lineB, stationC, stationD, 4);
 
-        final PathFinder pathFinder = new PathFinder(List.of(sectionA, sectionB));
-
         //when & then
-        assertThatThrownBy(() -> pathFinder.findShortestPath(stationA, stationD))
+        assertThatThrownBy(() -> new ShortestPathFinder(List.of(sectionA, sectionB), stationA, stationD))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -71,15 +67,14 @@ class PathFinderTest {
         Section sectionE = new Section(5L, lineB, stationA, stationC, 5);
         Section sectionF = new Section(6L, lineB, stationC, stationE, 3);
 
-        final PathFinder pathFinder = new PathFinder(
-            List.of(sectionA, sectionB, sectionC, sectionD, sectionE, sectionF));
-
         //when
-        final ShortestPath shortestPath = pathFinder.findShortestPath(stationA, stationE);
+        final ShortestPathFinder pathFinder = new ShortestPathFinder(
+            List.of(sectionA, sectionB, sectionC, sectionD, sectionE, sectionF), stationA,
+            stationE);
 
         //then
-        assertThat(shortestPath.getStations()).isEqualTo(
+        assertThat(pathFinder.getStations()).isEqualTo(
             List.of(stationA, stationB, stationC, stationE));
-        assertThat(shortestPath.getDistance()).isEqualTo(7);
+        assertThat(pathFinder.getDistance()).isEqualTo(7);
     }
 }
