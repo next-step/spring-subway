@@ -3,8 +3,8 @@ package subway.ui;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import subway.application.SectionService;
-import subway.dto.SectionRequest;
-import subway.dto.SectionResponse;
+import subway.dto.request.SectionCreateRequest;
+import subway.dto.response.SectionCreateResponse;
 
 import java.net.URI;
 
@@ -18,13 +18,13 @@ public class SectionController {
     }
 
     @PostMapping("/lines/{lineId}/sections")
-    public ResponseEntity<SectionResponse> createSection(
+    public ResponseEntity<SectionCreateResponse> createSection(
             @PathVariable Long lineId,
-            @RequestBody SectionRequest sectionRequest
+            @RequestBody SectionCreateRequest request
     ) {
-        SectionResponse sectionResponse = sectionService.createSection(lineId, sectionRequest);
+        SectionCreateResponse response = sectionService.createSection(lineId, request);
 
-        return ResponseEntity.created(URI.create("/lines/" + lineId)).body(sectionResponse);
+        return ResponseEntity.created(URI.create("/lines/" + lineId)).body(response);
     }
 
     @DeleteMapping("/lines/{lineId}/sections")

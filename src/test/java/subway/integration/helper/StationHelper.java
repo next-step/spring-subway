@@ -1,16 +1,20 @@
 package subway.integration.helper;
 
-import subway.dto.StationRequest;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
+import subway.dto.request.StationCreateRequest;
 
-public class StationHelper extends RestHelper {
+import static subway.integration.helper.RestHelper.post;
+
+public class StationHelper {
 
     private StationHelper() {
         throw new UnsupportedOperationException();
     }
 
-    public static void createStation(final String name) {
-        final StationRequest request = new StationRequest(name);
+    public static ExtractableResponse<Response> createStation(final String name) {
+        final StationCreateRequest request = new StationCreateRequest(name);
 
-        post(request, "/stations");
+        return post(request, "/stations");
     }
 }

@@ -4,8 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.StationDao;
 import subway.domain.Station;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.dto.request.StationCreateRequest;
+import subway.dto.request.StationUpdateRequest;
+import subway.dto.response.StationCreateResponse;
+import subway.dto.response.StationFindResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,32 +21,32 @@ public class StationService {
     }
 
     @Transactional
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
-        return StationResponse.of(station);
+    public StationCreateResponse saveStation(StationCreateRequest request) {
+        final Station station = stationDao.insert(new Station(request.getName()));
+        return StationCreateResponse.of(station);
     }
 
     @Transactional
-    public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+    public StationFindResponse findStation(Long id) {
+        return StationFindResponse.of(stationDao.findById(id));
     }
 
     @Transactional
-    public List<StationResponse> findAllStationResponses() {
+    public List<StationFindResponse> findAllStation() {
         List<Station> stations = stationDao.findAll();
 
         return stations.stream()
-                .map(StationResponse::of)
+                .map(StationFindResponse::of)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateStation(Long id, StationRequest stationRequest) {
-        stationDao.update(new Station(id, stationRequest.getName()));
+    public void updateStation(final Long id, final StationUpdateRequest request) {
+        stationDao.update(new Station(id, request.getName()));
     }
 
     @Transactional
-    public void deleteStationById(Long id) {
+    public void deleteStation(Long id) {
         stationDao.deleteById(id);
     }
 }

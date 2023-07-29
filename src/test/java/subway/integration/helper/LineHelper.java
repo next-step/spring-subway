@@ -1,8 +1,10 @@
 package subway.integration.helper;
 
-import subway.dto.LineRequest;
+import subway.dto.request.LineCreateRequest;
 
-public class LineHelper extends RestHelper {
+import static subway.integration.helper.RestHelper.post;
+
+public class LineHelper {
 
     private LineHelper() {
         throw new UnsupportedOperationException();
@@ -17,8 +19,8 @@ public class LineHelper extends RestHelper {
             final int distance,
             final String color
     ) {
-        final LineRequest request = new LineRequest(name, upStationId, downStationId, distance, color);
-        
+        final LineCreateRequest request = new LineCreateRequest(name, upStationId, downStationId, distance, color);
+
         post(request, "/lines");
     }
 }

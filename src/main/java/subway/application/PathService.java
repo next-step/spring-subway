@@ -6,8 +6,7 @@ import subway.dao.StationDao;
 import subway.domain.DistinctSections;
 import subway.domain.Station;
 import subway.domain.StationGraph;
-import subway.dto.PathRequest;
-import subway.dto.PathResponse;
+import subway.dto.response.PathFindResponse;
 
 import java.util.List;
 
@@ -22,15 +21,13 @@ public class PathService {
         this.stationDao = stationDao;
     }
 
-    public PathResponse findPath(final PathRequest pathRequest) {
-        final Long sourceId = pathRequest.getSource();
-        final Long targetId = pathRequest.getTarget();
+    public PathFindResponse findPath(final Long sourceId, final Long targetId) {
         final DistinctSections sections = new DistinctSections(sectionDao.findAll());
 
         final StationGraph stationGraph = new StationGraph(sections);
         final List<Long> stationIds = stationGraph.getShortestPathStationIds(sourceId, targetId);
         final List<Station> stations = stationDao.findAllByIds(stationIds);
 
-        return PathResponse.of(stations, stationGraph.getShortestPathDistance(sourceId, targetId));
+        return PathFindResponse.of(stations, stationGraph.getShortestPathDistance(sourceId, targetId));
     }
 }

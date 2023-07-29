@@ -1,33 +1,29 @@
-package subway.dto;
+package subway.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import subway.domain.Distance;
+import subway.domain.Section;
 
-public class LineRequest {
-    
-    private final String name;
+public class SectionCreateRequest {
+
     private final Long upStationId;
     private final Long downStationId;
     private final int distance;
-    private final String color;
 
     @JsonCreator
-    public LineRequest(
-            @JsonProperty("name") final String name,
+    public SectionCreateRequest(
             @JsonProperty("upStationId") final Long upStationId,
             @JsonProperty("downStationId") final Long downStationId,
-            @JsonProperty("distance") final int distance,
-            @JsonProperty("color") final String color
+            @JsonProperty("distance") final int distance
     ) {
-        this.name = name;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
-        this.color = color;
     }
 
-    public String getName() {
-        return this.name;
+    public Section toSection(final Long lineId) {
+        return new Section(lineId, this.upStationId, this.downStationId, new Distance(this.distance));
     }
 
     public Long getUpStationId() {
@@ -40,9 +36,5 @@ public class LineRequest {
 
     public int getDistance() {
         return this.distance;
-    }
-
-    public String getColor() {
-        return this.color;
     }
 }

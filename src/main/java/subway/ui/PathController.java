@@ -5,8 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import subway.application.PathService;
-import subway.dto.PathRequest;
-import subway.dto.PathResponse;
+import subway.dto.response.PathFindResponse;
 
 @RestController
 @RequestMapping("/paths")
@@ -19,10 +18,10 @@ public class PathController {
     }
 
     @GetMapping
-    public PathResponse findPath(
+    public PathFindResponse findPath(
             @RequestParam Long source,
             @RequestParam Long target
     ) {
-        return pathService.findPath(new PathRequest(source, target));
+        return pathService.findPath(source, target);
     }
 }

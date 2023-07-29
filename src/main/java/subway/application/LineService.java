@@ -6,8 +6,10 @@ import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.*;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.dto.request.LineCreateRequest;
+import subway.dto.request.LineUpdateRequest;
+import subway.dto.response.LineCreateResponse;
+import subway.dto.response.LineFindResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +29,7 @@ public class LineService {
     }
 
     @Transactional
-    public Line saveLine(final LineRequest request) {
+    public LineCreateResponse saveLine(final LineCreateRequest request) {
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         sectionDao.insert(
                 new Section(
@@ -38,19 +40,19 @@ public class LineService {
                 )
         );
 
-        return persistLine;
+        return LineCreateResponse.of(persistLine);
     }
 
     @Transactional
-    public List<LineResponse> findLineResponses() {
-        final List<Line> persistLines = findLines();
+    public List<LineFindResponse> findAllLines() {
+        final List<Line> persistLines = lineDao.findAll();
         return persistLines.stream()
-                .map(line -> findLineResponse(line.getId()))
+                .map(line -> findLine(line.getId()))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public LineResponse findLineResponse(final Long lineId) {
+    public LineFindResponse findLine(final Long lineId) {
         final Map<Long, Station> stationById = stationDao.findAllByLineId(lineId).stream()
                 .collect(Collectors.toMap(Station::getId, Function.identity()));
 
@@ -59,20 +61,16 @@ public class LineService {
                 .map(stationById::get)
                 .collect(Collectors.toList());
 
-        return LineResponse.of(lineDao.findById(lineId), stations);
+        return LineFindResponse.of(lineDao.findById(lineId), stations);
     }
 
     @Transactional
-    public void updateLine(Long id, LineRequest lineUpdateRequest) {
-        lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
+    public void updateLine(final Long id, final LineUpdateRequest request) {
+        lineDao.update(new Line(id, request.getName(), request.getColor()));
     }
 
     @Transactional
-    public void deleteLineById(Long id) {
+    public void deleteLine(final Long id) {
         lineDao.deleteById(id);
-    }
-
-    private List<Line> findLines() {
-        return lineDao.findAll();
     }
 }
