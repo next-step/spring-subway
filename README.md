@@ -23,6 +23,12 @@ Line 색(color)
 
 - [x] Line
   - [x] Line 이름은 중복될 수 없다.
+- [x] 구간 삭제
+  - [x] Line에 하나의 Section만 있을때, 삭제할 수 없다.
+  - [x] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
+  - [x] 하행 종점 Section을 삭제할 수 있다.
+  - [x] 중간 Section을 삭제할 수 있다.
+  - [x] 상행 종점 Section을 삭제할 수 있다.
 - [x] Section
   - [x] Station과 Station을 연결할 수 있다.
   - [x] 연결된 Section을 알고있다.
@@ -31,15 +37,14 @@ Line 색(color)
   - [x] Section과 Station이 Line에 포함되어있는지 알 수 있다.
     - [x] Section이 추가될 때, 추가되는 Section의 상행Station이 자신의 하행Station과 동일한지 확인한다.
     - [x] 새로운 Section의 하행Station은 해당 Line에 등록되어있는 Station일 수 없다. (상행은 됨)
-  - [x] 구간 삭제 
-    - [x] Line에 하나의 Section만 있을때, 삭제할 수 없다.
-    - [x] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.  
-    - [x] 하행 종점 Section을 삭제할 수 있다.
-    - [x] 중간 Section을 삭제할 수 있다.
-    - [x] 상행 종점 Section을 삭제할 수 있다.
 - [x] Station
   - [x] 이름을 표현한다.
   - [x] 이름이 중복되면 예외를 던진다.
+- [ ] PathFinder
+  - [ ] 출발 Station과 도착 Station의 최단 거리 경로와 거리를 조회한다.
+  - [ ] 출발 Station과 도착 Station이 같은 경우 조회할 수 없다.
+  - [ ] 출발 Station과 도착Station이 연결되지 않은 경우 조회할 수 없다.
+  - [ ] 존재하지 않는 출발 Station이나 도착 Station일 경우 조회할 수 없다.
 
 lineId, upStationId, downStationId;
 
@@ -74,3 +79,18 @@ lineId, upStationId, downStationId;
 
 - [x] Line에 하나의 Section만 있을때, 삭제할 수 없다.
 - [x] Line에서 Station을 삭제할때, Station이 Line에 존재하지 않는다면, 예외를 던진다.
+
+### 경로 조회 기능
+
+- [ ] 출발역으로부터 도착역까지의 경로에 있는 역의 목록과 거리를 조회한다.
+  - [ ] 출발역과 도착역이 같은 경우 조회할 수 없음
+  - [ ] 출발역과 도착역이 연결되지 않은 경우 조회할 수 없음
+  - [ ] 존재하지 않는 출발역이나 도착열일 경우 조회할 수 없음
+  
+### 학습 테스트
+
+- [X] 다익스트라 알고리즘 라이브러리 학습 테스트를 진행한다.
+
+### 프로그래밍 요구사항
+
+- [ ] 데이터베이스 설정을 프로덕션(로컬)과 테스트(인메모리)를 다르게 한다.
