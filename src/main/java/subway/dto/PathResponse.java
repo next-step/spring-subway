@@ -1,8 +1,6 @@
 package subway.dto;
 
 import java.util.List;
-import org.jgrapht.GraphPath;
-import org.jgrapht.graph.DefaultWeightedEdge;
 import subway.domain.Station;
 
 public class PathResponse {
@@ -15,10 +13,8 @@ public class PathResponse {
         this.distance = distance;
     }
 
-
-    public static PathResponse of(GraphPath<Station, DefaultWeightedEdge> route) {
-        return new PathResponse(StationResponse.of(route.getVertexList()),
-            (long) route.getWeight());
+    public static PathResponse of(final List<Station> stations, final Long distance) {
+        return new PathResponse(StationResponse.of(stations), distance);
     }
 
     public List<StationResponse> getStations() {

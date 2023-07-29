@@ -52,7 +52,7 @@ public class PathGraph {
         if (path == null) {
             throw new SubwayException(NOT_CONNECTED_BETWEEN_START_AND_END_PATH);
         }
-        return PathResponse.of(path);
+        return PathResponse.of(path.getVertexList(), (long) path.getWeight());
     }
 
     private void validatePathConnect(final Station start, final Station end) {
