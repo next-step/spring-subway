@@ -1,26 +1,95 @@
 package subway.application;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.dao.LineDao;
+import subway.dao.SectionDao;
+import subway.dao.StationDao;
+import subway.domain.Distance;
 import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Sections;
+import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
+import subway.exception.LineAlreadyExistException;
+import subway.exception.LineNotFoundException;
+import subway.exception.StationNotFoundException;
 
-public interface LineService {
+@Service
+public class LineService {
+
+    private final LineDao lineDao;
+
+    private final SectionDao sectionDao;
+
+    private final StationDao stationDao;
+
+    public LineService(LineDao lineDao, SectionDao sectionDao, StationDao stationDao) {
+        this.lineDao = lineDao;
+        this.sectionDao = sectionDao;
+        this.stationDao = stationDao;
+    }
 
     @Transactional
-    LineResponse saveLine(LineRequest request);
+    public LineResponse saveLine(LineRequest request) {
+        validateDuplicatedName(request);
+        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        insertFirstSection(request, persistLine);
+        return LineResponse.of(persistLine);
+    }
 
-    List<LineResponse> findLineResponses();
+    private void validateDuplicatedName(LineRequest request) {
+        if (lineDao.existByName(request.getName())) {
+            throw new LineAlreadyExistException(request.getName());
+        }
+    }
 
-    List<Line> findLines();
+    private void insertFirstSection(LineRequest request, Line persistLine) {
+        Station upStation = stationDao.findById(request.getUpStationId())
+                .orElseThrow(() -> new StationNotFoundException(request.getUpStationId()));
+        Station downStation = stationDao.findById(request.getDownStationId())
+                .orElseThrow(() -> new StationNotFoundException(request.getDownStationId()));
+        Distance distance = new Distance(request.getDistance());
+        Section section = new Section(persistLine, upStation, downStation, distance);
+        sectionDao.insert(section);
+    }
 
-    LineWithStationsResponse findLineResponseById(Long id);
-    
+    public List<LineResponse> findLineResponses() {
+        List<Line> persistLines = findLines();
+        return persistLines.stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public List<Line> findLines() {
+        return lineDao.findAll();
+    }
+
+    public LineWithStationsResponse findLineResponseById(Long id) {
+        Line persistLine = findLineOrThrow(id);
+        List<Section> sectionList = sectionDao.findAllByLineId(id);
+        Sections sections = new Sections(sectionList);
+        return LineWithStationsResponse.of(persistLine, sections.toStations());
+    }
+
     @Transactional
-    void updateLine(Long id, LineRequest lineUpdateRequest);
+    public void updateLine(Long id, LineRequest lineUpdateRequest) {
+        findLineOrThrow(id);
+        lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
+    }
 
     @Transactional
-    void deleteLineById(Long id);
+    public void deleteLineById(Long id) {
+        findLineOrThrow(id);
+        lineDao.deleteById(id);
+    }
+
+    private Line findLineOrThrow(Long id) {
+        return lineDao.findById(id)
+                .orElseThrow(() -> new LineNotFoundException(id));
+    }
 }

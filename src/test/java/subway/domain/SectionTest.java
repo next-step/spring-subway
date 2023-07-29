@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.SectionCreateException;
 
+@DisplayName("구간 도메인 객체 테스트")
 class SectionTest {
 
     Line line;
@@ -153,5 +154,33 @@ class SectionTest {
         assertThatCode(() -> section1.cuttedSection(section2))
                 .isInstanceOf(SectionCreateException.class)
                 .hasMessage("상행역과 하행역 중 하나는 같아야 합니다.");
+    }
+
+    @DisplayName("두 구간을 합친다.")
+    @Test
+    void whenCombineThenReturn() {
+        // given
+
+        Station station1 = new Station(3L, "잠실");
+        Station station2 = new Station(4L, "잠실새내");
+        Station station3 = new Station(5L, "종합운동장");
+        Section section1 = new Section(line, station1, station2, new Distance(10L));
+        Section section2 = new Section(line, station2, station3, new Distance(11L));
+
+        // when,
+        Section combined = section1.combine(section2);
+
+        // then
+        assertThat(combined).extracting(
+                Section::getLine,
+                Section::getUpStation,
+                Section::getDownStation,
+                Section::getDistance
+        ).contains(
+                line,
+                station1,
+                station3,
+                21L
+        );
     }
 }

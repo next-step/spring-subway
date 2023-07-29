@@ -17,19 +17,24 @@ import subway.dto.ErrorResponse;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineWithStationsResponse;
+import subway.dto.StationRequest;
+import subway.dto.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능 인수 테스트")
 class LineIntegrationTest extends IntegrationTest {
 
     private LineRequest lineRequest1;
     private LineRequest lineRequest2;
+    private Long stationId1;
+    private Long stationId2;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
+        setUpStations();
 
-        lineRequest1 = new LineRequest("신분당선", "bg-red-600", 1L, 2L, 10L);
-        lineRequest2 = new LineRequest("구신분당선", "bg-red-600", 1L, 2L, 10L);
+        lineRequest1 = new LineRequest("신분당선", "bg-red-600", stationId1, stationId2, 10L);
+        lineRequest2 = new LineRequest("구신분당선", "bg-red-600", stationId1, stationId2, 10L);
     }
 
     @DisplayName("지하철 노선을 생성하면서 첫 구간도 함께 생성한다.")
@@ -80,7 +85,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new LineRequest("신분당선", "bg-red-600", 1L, 99999L, 10L))
+                .body(new LineRequest("신분당선", "bg-red-600", stationId1, 99999L, 10L))
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -95,7 +100,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(new LineRequest("", "bg-red-600", 1L, 2L, 10L))
+                .body(new LineRequest("", "bg-red-600", stationId1, stationId2, 10L))
                 .when().post("/lines")
                 .then().log().all().
                 extract();
@@ -274,5 +279,26 @@ class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    private void setUpStations() {
+        stationId1 = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new StationRequest("강남1"))
+                .when().post("/stations")
+                .then().log().all()
+                .extract()
+                .as(StationResponse.class)
+                .getId();
+        stationId2 = RestAssured
+                .given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new StationRequest("역삼1"))
+                .when().post("/stations")
+                .then().log().all()
+                .extract()
+                .as(StationResponse.class)
+                .getId();
     }
 }

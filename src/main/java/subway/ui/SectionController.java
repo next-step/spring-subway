@@ -9,24 +9,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import subway.application.SectionServiceImpl;
+import subway.application.SectionService;
 import subway.dto.SectionRequest;
 import subway.dto.SectionResponse;
 
 @RestController
 public class SectionController {
 
-    private final SectionServiceImpl sectionServiceImpl;
+    private final SectionService sectionService;
 
-    public SectionController(SectionServiceImpl sectionServiceImpl) {
-        this.sectionServiceImpl = sectionServiceImpl;
+    public SectionController(SectionService sectionService) {
+        this.sectionService = sectionService;
     }
 
     @PostMapping("/lines/{lineId}/sections")
     public ResponseEntity<SectionResponse> createSection(
             @PathVariable Long lineId,
             @RequestBody @Valid SectionRequest sectionRequest) {
-        SectionResponse sectionResponse = sectionServiceImpl.saveSection(lineId, sectionRequest);
+        SectionResponse sectionResponse = sectionService.saveSection(lineId, sectionRequest);
         return ResponseEntity.created(
                         URI.create("/lines/" + lineId + "/sections/" + sectionResponse.getId()))
                 .body(sectionResponse);
@@ -37,7 +37,7 @@ public class SectionController {
             @PathVariable Long lineId,
             @RequestParam Long stationId
     ) {
-        sectionServiceImpl.deleteSection(lineId, stationId);
+        sectionService.deleteSection(lineId, stationId);
         return ResponseEntity.noContent().build();
     }
 }

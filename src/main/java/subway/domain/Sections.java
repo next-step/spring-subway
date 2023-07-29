@@ -7,12 +7,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import subway.exception.SectionCreateException;
-import subway.exception.SectionDeleteException;
 
 public class Sections {
 
-    private static final int MINIMUM_SIZE = 1;
     private final List<Section> sections;
 
     public Sections(List<Section> sections) {
@@ -72,65 +69,50 @@ public class Sections {
         return result;
     }
 
-    public Section findLastSection() {
-        validateSize(sections);
-        return sections.get(sections.size() - 1);
+    public boolean isFirstStation(Station downStation) {
+        return !sections.isEmpty() &&
+                sections.get(0).getUpStation().equals(downStation);
     }
 
-    private static void validateSize(List<Section> sections) {
-        if (sections.size() <= MINIMUM_SIZE) {
-            throw new SectionDeleteException("노선에 등록된 구간이 한 개 이하이면 제거할 수 없습니다.");
-        }
+    public boolean isLastStation(Station upStation) {
+        return !sections.isEmpty() &&
+                sections.get(sections.size() - 1).getDownStation().equals(upStation);
     }
 
-    public Optional<Section> validateAndCutSectionIfExist(Station upStation, Station downStation,
-            Distance distance) {
-        if (sections.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Optional<Section> upStationSection = sections.stream()
-                .filter(section -> section.getUpStation().equals(upStation)).findAny();
-        Optional<Section> downStationSection = sections.stream()
-                .filter(section -> section.getDownStation().equals(downStation)).findAny();
-        boolean isLast = sections.get(sections.size() - 1).getDownStation().equals(upStation);
-        boolean isFirst = sections.get(0).getUpStation().equals(downStation);
-
-        validateStationNotExist(
-                upStationSection.isEmpty(), downStationSection.isEmpty(), isLast, isFirst);
-        validateStationBothExist(
-                upStationSection.isPresent(), downStationSection.isPresent(), isLast, isFirst);
-
-        if (upStationSection.isPresent()) {
-            return cutSection(upStation, downStation, distance, upStationSection.get());
-        }
-
-        if (downStationSection.isPresent()) {
-            return cutSection(upStation, downStation, distance, downStationSection.get());
-        }
-
-        return Optional.empty();
+    public Optional<Section> findByUpStationId(Long stationId) {
+        return sections.stream()
+                .filter(section -> section.getUpStationId().equals(stationId)).findAny();
     }
 
-    private static Optional<Section> cutSection(Station upStation, Station downStation,
-            Distance distance, Section originalSection) {
-        return Optional.of(originalSection
-                .cuttedSection(upStation, downStation, distance));
+    public Optional<Section> findByDownStationId(Long stationId) {
+        return sections.stream()
+                .filter(section -> section.getDownStationId().equals(stationId)).findAny();
     }
 
-    private static void validateStationBothExist(boolean upStationSection,
-            boolean downStationSection, boolean isLast, boolean isFirst) {
-        if ((upStationSection || isLast)
-                && (downStationSection || isFirst)) {
-            throw new SectionCreateException("추가할 구간의 하행역과 상행역이 기존 노선에 모두 존재해서는 안됩니다.");
-        }
+    public boolean isEmpty() {
+        return sections.isEmpty();
     }
 
-    private static void validateStationNotExist(boolean upStationSection,
-            boolean downStationSection, boolean isLast, boolean isFirst) {
-        if (upStationSection && downStationSection && !isLast && !isFirst) {
-            throw new SectionCreateException("추가할 구간의 하행역과 상행역이 기존 노선에 하나는 존재해야합니다.");
-        }
+    public List<Section> findDeleteSections(Long stationId) {
+        Optional<Section> upSection = findByDownStationId(stationId);
+        Optional<Section> downSection = findByUpStationId(stationId);
+        SectionDeleteType deleteType = SectionDeleteType.of(
+                sections.size(),
+                upSection.isPresent(),
+                downSection.isPresent());
+
+        return deleteType.findDeleteSections(upSection.orElse(null), downSection.orElse(null));
+    }
+
+    public Optional<Section> findCombinedSection(Long stationId) {
+        Optional<Section> upSection = findByDownStationId(stationId);
+        Optional<Section> downSection = findByUpStationId(stationId);
+        SectionDeleteType deleteType = SectionDeleteType.of(
+                sections.size(),
+                upSection.isPresent(),
+                downSection.isPresent());
+
+        return deleteType.findCombinedSection(upSection.orElse(null), downSection.orElse(null));
     }
 
     public List<Section> getSections() {
