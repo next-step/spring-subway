@@ -7,6 +7,7 @@ import static subway.exception.ErrorCode.NOT_FOUND_START_PATH_POINT;
 import static subway.exception.ErrorCode.SAME_START_END_PATH_POINT;
 
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.SubwayException;
@@ -36,7 +37,9 @@ public class PathGraphTest {
 
         // when
         PathGraph graph = new PathGraph(
-            List.of(new Section(서울대입구역, 상도역, new Distance(10))
+            new Sections(
+                List.of(new Section(서울대입구역, 상도역, new Distance(10))
+                )
             )
         );
         assertThatCode(() -> graph.createPath(서울대입구역, 상도역))
@@ -51,7 +54,7 @@ public class PathGraphTest {
         Station 신대방역 = new Station("신대방역");
 
         Section section = new Section(서울대입구역, 신대방역, new Distance(10));
-        PathGraph graph = new PathGraph(List.of(section));
+        PathGraph graph = new PathGraph(new Sections(List.of(section)));
 
         Station 서울대입구역2 = new Station("서울대입구역");
 
@@ -73,7 +76,7 @@ public class PathGraphTest {
         Section section = new Section(서울대입구역, 신대방역, new Distance(10));
         Section section2 = new Section(오이도역, 신당역, new Distance(10));
         // when & then
-        PathGraph graph = new PathGraph(List.of(section, section2));
+        PathGraph graph = new PathGraph(new Sections(List.of(section, section2)));
         assertThatCode(() -> graph.createPath(서울대입구역, 오이도역))
             .isInstanceOf(SubwayException.class)
             .hasMessage(NOT_CONNECTED_BETWEEN_START_AND_END_PATH.getMessage());
@@ -89,7 +92,7 @@ public class PathGraphTest {
         Station 대림역 = new Station("대림역");
 
         Section section = new Section(서울대입구역, 신대방역, new Distance(10));
-        PathGraph graph = new PathGraph(List.of(section));
+        PathGraph graph = new PathGraph(new Sections(List.of(section)));
         // when & then
         assertThatCode(() -> graph.createPath(대림역, 신대방역))
             .isInstanceOf(SubwayException.class)
@@ -106,7 +109,7 @@ public class PathGraphTest {
         Station 대림역 = new Station("대림역");
 
         Section section = new Section(서울대입구역, 신대방역, new Distance(10));
-        PathGraph graph = new PathGraph(List.of(section));
+        PathGraph graph = new PathGraph(new Sections(List.of(section)));
         // when & then
         assertThatCode(() -> graph.createPath(서울대입구역, 대림역))
             .isInstanceOf(SubwayException.class)

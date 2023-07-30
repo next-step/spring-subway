@@ -1,30 +1,28 @@
 package subway.domain;
 
-import static subway.exception.ErrorCode.NOT_CONNECTED_BETWEEN_START_AND_END_PATH;
-import static subway.exception.ErrorCode.NOT_FOUND_START_PATH_POINT;
-import static subway.exception.ErrorCode.SAME_START_END_PATH_POINT;
-
-import java.util.List;
-import java.util.Set;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
-import subway.dto.PathResponse;
 import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
+
+import java.util.List;
+import java.util.Set;
+
+import static subway.exception.ErrorCode.*;
 
 public class PathGraph {
 
     private final WeightedMultigraph<Station, DefaultWeightedEdge> graph;
 
-    public PathGraph(final Set<Station> vertex, List<Section> edges) {
+    private PathGraph(final Set<Station> vertex, List<Section> edges) {
         graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
         initializeVertex(vertex);
         initializeEdges(edges);
     }
 
-    private void initializeEdges(List<Section> edges) {
+    private void initializeEdges(final List<Section> edges) {
         edges.forEach(section -> graph.setEdgeWeight(
                 graph.addEdge(section.getUpStation(), section.getDownStation()),
                 section.getDistance()
@@ -32,7 +30,7 @@ public class PathGraph {
         );
     }
 
-    private void initializeVertex(Set<Station> vertex) {
+    private void initializeVertex(final Set<Station> vertex) {
         vertex.forEach(graph::addVertex);
     }
 
@@ -40,11 +38,7 @@ public class PathGraph {
         this(sections.getStationsCache(), sections.getSections());
     }
 
-    public PathGraph(final List<Section> sections) {
-        this(new Sections(sections));
-    }
-
-    public PathResponse createPath(final Station start, final Station end) {
+    public GraphPath<Station, DefaultWeightedEdge> createPath(final Station start, final Station end) {
         validatePathConnect(start, end);
 
         GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
@@ -52,7 +46,7 @@ public class PathGraph {
         if (path == null) {
             throw new SubwayException(NOT_CONNECTED_BETWEEN_START_AND_END_PATH);
         }
-        return PathResponse.of(path.getVertexList(), (long) path.getWeight());
+        return path;
     }
 
     private void validatePathConnect(final Station start, final Station end) {
@@ -67,7 +61,7 @@ public class PathGraph {
         }
     }
 
-    private boolean notContainsVertex(final Station station) {
+    public boolean notContainsVertex(final Station station) {
         return !graph.containsVertex(station);
     }
 }
