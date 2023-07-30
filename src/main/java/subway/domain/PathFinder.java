@@ -51,9 +51,12 @@ public class PathFinder {
         sections.getAll()
             .stream()
             .filter(section -> !section.hasStation(stationId))
-            .forEach(section -> graph.setEdgeWeight(
-                graph.addEdge(section.getUpStation(), section.getDownStation()),
-                section.getDistance()));
+            .forEach(section -> {
+                graph.setEdgeWeight(graph.addEdge(section.getUpStation(), section.getDownStation()),
+                section.getDistance());
+                graph.setEdgeWeight(graph.addEdge(section.getDownStation(), section.getUpStation()),
+                    section.getDistance());
+            });
     }
 
     private void addStationConnectedSections(long stationId,

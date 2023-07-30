@@ -43,14 +43,9 @@ public class Sections {
     }
 
     public List<Section> getAll() {
-        Stream<Section> downDirectionSections = upStationMap.keySet()
+        return upStationMap.keySet()
             .stream()
-            .map(upStationMap::get);
-        Stream<Section> upDirectionSections = downStationMap.keySet()
-            .stream()
-            .map(downStationMap::get);
-
-        return Stream.concat(downDirectionSections, upDirectionSections)
+            .map(upStationMap::get)
             .collect(Collectors.toList());
     }
 
