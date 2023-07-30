@@ -55,6 +55,18 @@ class PathManagerTest {
                 .isInstanceOf(SubwayException.class);
     }
 
+    @DisplayName("출발역과 도착역이 같아 최단 경로를 찾는 데 실패한다.")
+    @Test
+    void findShortestPathWithSameStations() {
+        // given
+        final PathManager pathManager = pathManager();
+
+        // when & then
+        assertThatThrownBy(() -> pathManager.findStationsOfShortestPath(범계역(), 범계역()))
+                .hasMessage("출발역과 도착역은 같을 수 없습니다.")
+                .isInstanceOf(SubwayException.class);
+    }
+
     private PathManager pathManager() {
         /*
           <지하철 노선도>
