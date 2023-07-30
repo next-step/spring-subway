@@ -106,8 +106,8 @@ class LineIntegrationTest {
         final ExtractableResponse<Response> 신분당선_생성_응답 = LineIntegrationSupporter.createLine(신분당선_요청);
         final Long 신분당선_ID = Long.parseLong(신분당선_생성_응답.header("Location").split("/")[2]);
 
-        SectionIntegrationSupporter.createSectionInLine(신분당선_ID, SectionRequestFixture.create(2, 3));
-        SectionIntegrationSupporter.createSectionInLine(신분당선_ID, SectionRequestFixture.create(3, 4));
+        SectionIntegrationSupporter.createSectionInLine(신분당선_ID, SectionRequestFixture.createSection(2, 3));
+        SectionIntegrationSupporter.createSectionInLine(신분당선_ID, SectionRequestFixture.createSection(3, 4));
 
         // when
         final ExtractableResponse<Response> response = LineIntegrationSupporter.findLine(신분당선_ID);
