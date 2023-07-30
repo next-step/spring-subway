@@ -8,16 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 
 @DisplayName("역 Dao 테스트")
-@Transactional
-@SpringBootTest
-@ActiveProfiles("test")
-class StationDaoTest {
+class StationDaoTest extends DaoTest {
 
     private final StationDao stationDao;
 
@@ -74,7 +68,7 @@ class StationDaoTest {
         Optional<Station> result = stationDao.findById(station.getId());
 
         // then
-        assertThat(emptyResult).isPresent();
+        assertThat(emptyResult).isNotPresent();
         assertThat(result)
             .isPresent()
             .hasValue(station);

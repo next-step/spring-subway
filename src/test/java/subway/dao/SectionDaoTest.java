@@ -11,18 +11,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 
 @DisplayName("구간 Dao 테스트")
-@Transactional
-@SpringBootTest
-@ActiveProfiles("test")
-class SectionDaoTest {
+class SectionDaoTest extends DaoTest {
 
     private final SectionDao sectionDao;
     private final StationDao stationDao;

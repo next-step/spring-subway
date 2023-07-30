@@ -8,18 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
-import subway.exception.IllegalStationsException;
-import subway.vo.StationPair;
 
 @DisplayName("라인 Dao 테스트")
-@Transactional
-@SpringBootTest
-@ActiveProfiles("test")
-class LineDaoTest {
+class LineDaoTest extends DaoTest {
 
     LineDao lineDao;
     SectionDao sectionDao;
@@ -130,15 +122,5 @@ class LineDaoTest {
         assertThat(result)
             .isPresent()
             .hasValue(response);
-    }
-
-    private void validateDuplicateUpStation(List<StationPair> stationPairs) {
-        long distinctUpStationCount = stationPairs.stream()
-            .map(StationPair::getUpStation)
-            .distinct()
-            .count();
-        if (distinctUpStationCount != stationPairs.size()) {
-            throw new IllegalStationsException("중복된 역은 노선에 포함될 수 없습니다.");
-        }
     }
 }
