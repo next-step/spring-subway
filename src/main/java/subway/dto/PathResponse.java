@@ -16,7 +16,14 @@ public final class PathResponse {
     }
 
     public static PathResponse of(final List<Station> stations, final double distance) {
-        throw new UnsupportedOperationException();
+        final List<StationResponse> stationResponses = stationsToResponses(stations);
+        return new PathResponse(stationResponses, (long) distance);
+    }
+
+    private static List<StationResponse> stationsToResponses(final List<Station> stations) {
+        return stations.stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public List<StationResponse> getStations() {

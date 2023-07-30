@@ -22,7 +22,7 @@ import static subway.fixture.StationFixture.*;
 
 @DisplayName("경로 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
-class PathManagerServiceTest {
+class PathServiceTest {
 
     @InjectMocks
     private PathService pathService;

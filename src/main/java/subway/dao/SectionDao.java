@@ -51,10 +51,10 @@ public class SectionDao {
     }
 
     public List<Section> findAll() {
-        throw new UnsupportedOperationException();
+        return jdbcTemplate.query(SELECT_ALL_FROM_SECTION_QUERY, rowMapper);
     }
 
-    public List<Section> findAll(final long lineId) {
+    public List<Section> findAllByLineId(final long lineId) {
         String sql = SELECT_ALL_FROM_SECTION_QUERY + "WHERE line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
