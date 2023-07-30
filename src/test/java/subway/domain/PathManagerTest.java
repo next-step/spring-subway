@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static subway.fixture.SectionFixture.*;
 import static subway.fixture.StationFixture.*;
@@ -21,6 +22,21 @@ class PathManagerTest {
 
         // when & then
         assertThatNoException().isThrownBy(() -> PathManager.create(stations, sections));
+    }
+
+    @DisplayName("출발역과 도착역으로 최단 경로를 찾는 데 성공한다.")
+    @Test
+    void findShortestPath() {
+        // given
+        final PathManager pathManager = pathManager();
+
+        // when
+        final List<Station> 범계역_잠실역_최단경로 = pathManager.findStationsOfShortestPath(범계역(), 잠실역());
+
+        // then
+        assertThat(범계역_잠실역_최단경로).containsExactly(
+                범계역(), 경마공원역(), 사당역(), 강남역(), 잠실역()
+        );
     }
 
     private PathManager pathManager() {
