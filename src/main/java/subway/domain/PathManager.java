@@ -37,6 +37,10 @@ public final class PathManager {
         return shortestPath.getVertexList();
     }
 
+    public double findDistanceOfShortestPath(final Station source, final Station target) {
+        throw new UnsupportedOperationException();
+    }
+
     private DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath() {
         return new DijkstraShortestPath<>(subwayMap);
     }

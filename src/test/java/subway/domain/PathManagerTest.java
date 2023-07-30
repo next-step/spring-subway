@@ -79,6 +79,19 @@ class PathManagerTest {
                 .isInstanceOf(SubwayException.class);
     }
 
+    @DisplayName("출발역과 도착역으로 최단 거리를 찾는 데 성공한다.")
+    @Test
+    void findShortestDistance() {
+        // given
+        final PathManager pathManager = pathManager();
+
+        // when
+        final double 범계역_잠실역_최단거리 = pathManager.findDistanceOfShortestPath(범계역(), 잠실역());
+
+        // then
+        assertThat(범계역_잠실역_최단거리).isEqualTo(DEFAULT_DISTANCE * 4);
+    }
+
     private PathManager pathManager() {
         /*
           <지하철 노선도>
