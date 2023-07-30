@@ -8,6 +8,6 @@ public final class PathManager {
     }
 
     public static PathManager create(final List<Station> stations, final List<Section> sections) {
-        throw new UnsupportedOperationException();
+        return new PathManager();
     }
 }
