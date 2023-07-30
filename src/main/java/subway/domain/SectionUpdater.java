@@ -55,10 +55,6 @@ public class SectionUpdater {
         return sections.getUpDirectionSection(stationId);
     }
 
-    public Section findDownDirectionSection(long stationId) {
-        return sections.getDownDirectionSection(stationId);
-    }
-
     public Section getLastSection(long stationId) {
         if (sections.isLastStation(stationId)) {
             return sections.getConnectedSection(stationId)
@@ -76,6 +72,15 @@ public class SectionUpdater {
             .map(Section::getLine)
             .findFirst()
             .orElseThrow(() -> new IllegalSectionException("구간이 소속된 노선이 존재하지 않습니다."));
+    }
+
+    public Section extendSection(long stationId, Section upDirection) {
+        final Section downDirection = findDownDirectionSection(stationId);
+        return downDirection.extendToUpDirection(upDirection);
+    }
+
+    private Section findDownDirectionSection(long stationId) {
+        return sections.getDownDirectionSection(stationId);
     }
 
     private Section updateOverlappedDownDirectionSection(Section overlapped, SectionParam params) {

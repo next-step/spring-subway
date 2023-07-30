@@ -194,21 +194,27 @@ class SectionUpdaterTest {
         assertThat(result).isEqualTo(upDirection);
     }
 
-    @DisplayName("역과 하행 방향으로 연결된 구간을 반환한다.")
+    @DisplayName("역의 하행 방향 구간을 확장한다.")
     @Test
-    void findDownDirectionSectionTest() {
+    void extendDownDirectionSection() {
         // given
         List<Section> sectionList = createInitialSectionList();
         SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
 
-        Section downDirection = sectionList.get(2);
-        long stationId = downDirection.getUpStation().getId();
+        Section upDirection = sectionList.get(2);
+        Section downDirection = sectionList.get(3);
 
         // when
-        Section result = sectionUpdater.findDownDirectionSection(stationId);
+        Section result = sectionUpdater.extendSection(downDirection.getUpStation().getId(),
+            upDirection);
 
         // then
-        assertThat(result).isEqualTo(downDirection);
+        assertThat(result.getId()).isEqualTo(downDirection.getId());
+        assertThat(result.getLine()).isEqualTo(downDirection.getLine());
+        assertThat(result.getUpStation()).isEqualTo(upDirection.getUpStation());
+        assertThat(result.getDownStation()).isEqualTo(downDirection.getDownStation());
+        assertThat(result.getDistance()).isEqualTo(
+            upDirection.getDistance() + downDirection.getDistance());
     }
 
     private List<Station> createInitialStationList() {

@@ -30,7 +30,8 @@ public class SectionService {
         final Station upStation = getStationById(sectionRequest.getUpStationId());
         final Station downStation = getStationById(sectionRequest.getDownStationId());
 
-        final SectionUpdater sectionUpdater = new SectionUpdater(sectionDao.findAllByLineId(lineId));
+        final SectionUpdater sectionUpdater = new SectionUpdater(
+            sectionDao.findAllByLineId(lineId));
         final SectionParam params = new SectionParam(lineId, upStation, downStation,
             sectionRequest.getDistance());
 
@@ -46,7 +47,8 @@ public class SectionService {
         validateLineInStation(lineId, stationId);
         validateSectionInLine(lineId);
 
-        final SectionUpdater sectionUpdater = new SectionUpdater(sectionDao.findAllByLineId(lineId));
+        final SectionUpdater sectionUpdater = new SectionUpdater(
+            sectionDao.findAllByLineId(lineId));
 
         if (sectionUpdater.isLastStation(stationId)) {
             deleteLastSection(stationId, sectionUpdater);
@@ -56,15 +58,16 @@ public class SectionService {
         deleteInnerSection(stationId, sectionUpdater);
     }
 
-    private void updateOverlappedSection(final SectionParam params, final SectionUpdater sectionUpdater) {
+    private void updateOverlappedSection(final SectionParam params,
+        final SectionUpdater sectionUpdater) {
         Section updateResult = sectionUpdater.updateOverlappedSection(params);
         sectionDao.update(updateResult);
     }
 
     private void deleteInnerSection(long stationId, SectionUpdater sectionUpdater) {
         final Section upDirection = sectionUpdater.findUpDirectionSection(stationId);
-        final Section downDirection = sectionUpdater.findDownDirectionSection(stationId);
-        final Section extendedSection = downDirection.extendToUpDirection(upDirection);
+        final Section extendedSection = sectionUpdater.extendSection(stationId,
+            upDirection);
 
         sectionDao.delete(upDirection.getId());
         sectionDao.update(extendedSection);
