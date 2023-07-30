@@ -80,11 +80,7 @@ class StationIntegrationTest extends IntegrationTest {
 
         // when
         Long stationId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .when()
-            .get("/stations/{stationId}", stationId)
-            .then().log().all()
-            .extract();
+        ExtractableResponse<Response> response = RestApiUtils.get("/stations/{stationId}", stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());

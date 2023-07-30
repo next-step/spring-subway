@@ -1,16 +1,18 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.DomainFixtures.createInitialLine;
+import static subway.DomainFixtures.createStation;
+import static subway.DomainFixtures.extendSectionToLine;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.DomainFixtures.LineWithStationId;
 import subway.RestApiUtils;
-import subway.ui.dto.LineRequest;
 import subway.ui.dto.SectionRequest;
-import subway.ui.dto.StationRequest;
 
 @DisplayName("지하철 구간 관련 기능")
 class SectionIntegrationTest extends IntegrationTest {
@@ -19,21 +21,22 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSection() {
         // given
-        createInitialLine();
-
-        final String seoulStationId = "3";
-        final StationRequest seoul = new StationRequest("서울");
-        final SectionRequest extendToSeoul = new SectionRequest("2", seoulStationId, 10);
-        RestApiUtils.post(seoul, "stations");
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
+        long seoulId = createStation("서울");
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.post(extendToSeoul, "/lines/1/sections");
+        final SectionRequest extendToSeoul = new SectionRequest(
+            String.valueOf(lineNo1.getDownStationId()),
+            String.valueOf(seoulId), 10);
+        ExtractableResponse<Response> response = RestApiUtils.post(extendToSeoul,
+            "/lines/" + lineNo1.getLineId() + "/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
 
-        ExtractableResponse<Response> responseForCheck = RestApiUtils.get("/lines/1");
+        ExtractableResponse<Response> responseForCheck = RestApiUtils.get(
+            "/lines/" + lineNo1.getLineId());
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -41,11 +44,15 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionWithUnmatchedLineId() {
         // given
-        final String notExistStationId = "3";
-        SectionRequest extend = new SectionRequest("2", notExistStationId, 10);
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
+        long notExistStationId = createStation("서울");
+        long newStationId = createStation("남영");
+        SectionRequest extend = new SectionRequest(String.valueOf(notExistStationId),
+            String.valueOf(newStationId), 10);
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.post(extend, "/lines/1/sections");
+        ExtractableResponse<Response> response = RestApiUtils.post(extend,
+            "/lines/" + lineNo1.getLineId() + "/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -55,16 +62,16 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionWithBothExistingStation() {
         // given
-        createInitialLine();
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
 
-        final String duplicateUpStationId = "1";
-        final String duplicateDownStationId = "2";
+        final String duplicateUpStationId = String.valueOf(lineNo1.getUpStationId());
+        final String duplicateDownStationId = String.valueOf(lineNo1.getDownStationId());
         final SectionRequest badSectionRequest = new SectionRequest(duplicateUpStationId,
             duplicateDownStationId, 5);
 
         // when
         ExtractableResponse<Response> response = RestApiUtils.post(badSectionRequest,
-            "/lines/1/sections");
+            "/lines/" + lineNo1.getLineId() + "/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -74,16 +81,16 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void createSectionWithBothNotExistingStation() {
         // given
-        createInitialLine();
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
 
-        final String notExistUpStationId = "5";
-        final String notExistDownStationId = "6";
+        final String notExistUpStationId = String.valueOf(lineNo1.getDownStationId() + 1);
+        final String notExistDownStationId = String.valueOf(lineNo1.getDownStationId() + 2);
         final SectionRequest badSectionRequest = new SectionRequest(notExistUpStationId,
             notExistDownStationId, 5);
 
         // when
         ExtractableResponse<Response> response = RestApiUtils.post(badSectionRequest,
-            "/lines/1/sections");
+            "/lines/"+ lineNo1.getLineId() +"/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -93,13 +100,15 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteNotExistSectionInLine() {
         // given
-        final long notExistSectionId = 999;
-        createInitialLine();
-        extendSectionsInLine();
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
+        long seoul = createStation("남영");
+        long lastSectionId = extendSectionToLine(lineNo1.getLineId(), lineNo1.getDownStationId(),
+            seoul);
+        final long notExistSectionId = lastSectionId + 1;
 
         // when
         ExtractableResponse<Response> response = RestApiUtils.delete(
-            "/lines/1/sections?stationId=" + notExistSectionId);
+            "/lines/"+ lineNo1.getLineId() +"/sections?stationId=" + notExistSectionId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -109,18 +118,19 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteMiddleSection() {
         // given
-        final long middleStationId = 3;
-        createInitialLine();
-        extendSectionsInLine();
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
+        long seoul = createStation("남영");
+        extendSectionToLine(lineNo1.getLineId(), lineNo1.getDownStationId(), seoul);
 
         // when
+        long middleStationId = lineNo1.getDownStationId();
         ExtractableResponse<Response> response = RestApiUtils.delete(
-            "/lines/1/sections?stationId=" + middleStationId);
+            "/lines/" + lineNo1.getLineId() + "/sections?stationId=" + middleStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> responseForCheck = RestApiUtils.get("/lines/1");
+        ExtractableResponse<Response> responseForCheck = RestApiUtils.get("/lines/"+ lineNo1.getLineId());
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -128,18 +138,19 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteLastSection() {
         // given
-        final long lastStationId = 4;
-        createInitialLine();
-        extendSectionsInLine();
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
+        long lastStationId = createStation("남영");
+        extendSectionToLine(lineNo1.getLineId(), lineNo1.getDownStationId(), lastStationId);
 
         // when
         ExtractableResponse<Response> response = RestApiUtils.delete(
-            "/lines/1/sections?stationId=" + lastStationId);
+            "/lines/" + lineNo1.getLineId() + "/sections?stationId=" + lastStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> responseForCheck = RestApiUtils.get("/lines/1");
+        ExtractableResponse<Response> responseForCheck = RestApiUtils.get(
+            "/lines/" + lineNo1.getLineId());
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -147,34 +158,13 @@ class SectionIntegrationTest extends IntegrationTest {
     @Test
     void deleteSectionAtLineHasOneSection() {
         // given
-        createInitialLine();
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.delete("/lines/1/sections?stationId=2");
+        ExtractableResponse<Response> response = RestApiUtils.delete(
+            "/lines/"+ lineNo1.getLineId() + "/sections?stationId=" + lineNo1.getDownStationId());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    private void createInitialLine() {
-        final LineRequest line1 = new LineRequest("1호선", 1L, 2L, 10, "blue");
-        final StationRequest incheon = new StationRequest("인천");
-        final StationRequest bupyeon = new StationRequest("부평");
-
-        RestApiUtils.post(incheon, "/stations");
-        RestApiUtils.post(bupyeon, "/stations");
-        RestApiUtils.post(line1, "/lines");
-    }
-
-    private void extendSectionsInLine() {
-        final StationRequest seoul = new StationRequest("서울");
-        final StationRequest dongmyo = new StationRequest("동묘앞");
-        final SectionRequest extendToSeoul = new SectionRequest("2", "3", 10);
-        final SectionRequest extendToDongmyo = new SectionRequest("3", "4", 10);
-
-        RestApiUtils.post(seoul, "/stations");
-        RestApiUtils.post(dongmyo, "/stations");
-        RestApiUtils.post(extendToSeoul, "/lines/1/sections");
-        RestApiUtils.post(extendToDongmyo, "/lines/1/sections");
     }
 }

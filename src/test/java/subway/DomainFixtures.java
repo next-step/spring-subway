@@ -33,7 +33,8 @@ public class DomainFixtures {
             10
         );
 
-        return extractIdFromApiResult(RestApiUtils.post(extendToDownStation, "/lines/" + lineId + "/sections"));
+        return extractIdFromApiResult(
+            RestApiUtils.post(extendToDownStation, "/lines/" + lineId + "/sections"));
     }
 
     public static class LineWithStationId {

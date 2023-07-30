@@ -1,6 +1,9 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.DomainFixtures.createInitialLine;
+import static subway.DomainFixtures.createStation;
+import static subway.DomainFixtures.extendSectionToLine;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -12,7 +15,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.DomainFixtures;
+import subway.DomainFixtures.LineWithStationId;
 import subway.RestApiUtils;
+import subway.domain.Station;
 import subway.ui.dto.LineRequest;
 import subway.ui.dto.LineResponse;
 import subway.ui.dto.SectionRequest;
@@ -22,24 +28,11 @@ import subway.ui.dto.StationResponse;
 @DisplayName("지하철 노선 관련 기능")
 class LineIntegrationTest extends IntegrationTest {
 
-    private LineRequest lineRequest1;
-    private LineRequest lineRequest2;
-
-    @BeforeEach
-    public void setUp() {
-        super.setUp();
-
-        lineRequest1 = new LineRequest("신분당선", 1L, 2L, 10, "bg-red-600");
-        lineRequest2 = new LineRequest("구신분당선", 3L, 4L, 5, "bg-red-600");
-
-        createInitialStations();
-    }
-
     @DisplayName("지하철 노선을 생성한다.")
     @Test
     void createLineTest() {
         // when
-        ExtractableResponse<Response> response = createLine(lineRequest1);
+        ExtractableResponse<Response> response = createLine("신분당선", "판교", "정자");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -50,10 +43,11 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void createLineWithDuplicateNameTest() {
         // given
-        createLine(lineRequest1);
+        String duplicateLineName = "신분당선";
+        createLine(duplicateLineName, "판교", "정자");
 
         // when
-        ExtractableResponse<Response> response = createLine(lineRequest1);
+        ExtractableResponse<Response> response = createLine(duplicateLineName, "광교", "신사");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -63,15 +57,15 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLinesTest() {
         // given
-        ExtractableResponse<Response> createResponse1 = createLine(lineRequest1);
-        ExtractableResponse<Response> createResponse2 = createLine(lineRequest2);
+        ExtractableResponse<Response> lineNo1 = createLine("1호선", "판교", "정");
+        ExtractableResponse<Response> lineNo2 = createLine("2호선", "오리", "미금");
 
         // when
         ExtractableResponse<Response> response = RestApiUtils.get("/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        List<Long> expectedLineIds = Stream.of(createResponse1, createResponse2)
+        List<Long> expectedLineIds = Stream.of(lineNo1, lineNo2)
             .map(it -> Long.parseLong(it.header("Location").split("/")[2]))
             .collect(Collectors.toList());
         List<Long> resultLineIds = response.jsonPath().getList(".", LineResponse.class).stream()
@@ -84,13 +78,14 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void getLineTest() {
         // given
-        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
-        createInitialSections();
-
-        List<StationResponse> stationResponses = createStationResponses();
+        LineWithStationId lineNo1 = createInitialLine("1호선", "판교", "정자");
+        long newStationId = createStation("광교");
+        extendSectionToLine(lineNo1.getLineId(), lineNo1.getDownStationId(), newStationId);
+        List<Long> expectedStationIds = List.of(lineNo1.getUpStationId(),
+            lineNo1.getDownStationId(), newStationId);
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        Long lineId = lineNo1.getLineId();
         ExtractableResponse<Response> response = RestApiUtils.get("/lines/{lindId}", lineId);
 
         // then
@@ -98,7 +93,6 @@ class LineIntegrationTest extends IntegrationTest {
         LineResponse resultResponse = response.as(LineResponse.class);
         assertThat(resultResponse.getId()).isEqualTo(lineId);
 
-        List<Long> expectedStationIds = extractIds(stationResponses);
         List<Long> resultLineIds = extractIds(resultResponse.getStations());
         assertThat(resultLineIds).containsAll(expectedStationIds);
     }
@@ -107,12 +101,13 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void updateLineTest() {
         // given
-        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
+        LineWithStationId lineNo1 = createInitialLine("1호선", "인천", "부평");
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestApiUtils.put(lineRequest2,
-            "/lines/{lineId}", lineId);
+        LineRequest updateRequest = new LineRequest("신분당선", lineNo1.getUpStationId(),
+            lineNo1.getDownStationId(), 10, "red");
+        ExtractableResponse<Response> response = RestApiUtils.put(updateRequest,
+            "/lines/{lineId}", lineNo1.getLineId());
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -122,47 +117,23 @@ class LineIntegrationTest extends IntegrationTest {
     @Test
     void deleteLineTest() {
         // given
-        ExtractableResponse<Response> createResponse = createLine(lineRequest1);
+        LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
 
         // when
-        Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
+        long lineId = lineNo1.getLineId();
         ExtractableResponse<Response> response = RestApiUtils.delete("/lines/{lineId}", lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private void createInitialStations() {
-        final StationRequest stationRequest1 = new StationRequest("오이도");
-        final StationRequest stationRequest2 = new StationRequest("장지");
-        final StationRequest stationRequest3 = new StationRequest("용산");
-        final StationRequest stationRequest4 = new StationRequest("삼각지");
-
-        RestApiUtils.post(stationRequest1, "/stations");
-        RestApiUtils.post(stationRequest2, "/stations");
-        RestApiUtils.post(stationRequest3, "/stations");
-        RestApiUtils.post(stationRequest4, "/stations");
-    }
-
-    private void createInitialSections() {
-        SectionRequest sectionRequest1 = new SectionRequest("2", "3", 10);
-        SectionRequest sectionRequest2 = new SectionRequest("3", "4", 10);
-
-        RestApiUtils.post(sectionRequest1, "/lines/1/sections");
-        RestApiUtils.post(sectionRequest2, "/lines/1/sections");
-    }
-
-    private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
+    private ExtractableResponse<Response> createLine(String name, String upStationName,
+        String downStationName) {
+        long upStationId = createStation(upStationName);
+        long downStationId = createStation(downStationName);
+        LineRequest lineRequest = new LineRequest(name, upStationId, downStationId, 10,
+            "bg-red-600");
         return RestApiUtils.post(lineRequest, "/lines");
-    }
-
-    private List<StationResponse> createStationResponses() {
-        List<StationResponse> stationResponses = new ArrayList<>();
-        stationResponses.add(StationResponse.of(1L, "오이도"));
-        stationResponses.add(StationResponse.of(2L, "장지"));
-        stationResponses.add(StationResponse.of(3L, "용산"));
-        stationResponses.add(StationResponse.of(4L, "삼각지"));
-        return stationResponses;
     }
 
     private List<Long> extractIds(List<StationResponse> stationResponses) {
