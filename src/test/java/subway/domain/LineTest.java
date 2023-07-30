@@ -18,7 +18,7 @@ public class LineTest {
                 new Station("신대방역"),
                 10
         );
-        Line line = new Line("2호선", "green", new Sections(List.of(section)));
+        Line line = new Line("2호선", "green", new LineSections(List.of(section)));
 
         Station upStation = new Station("신대방역");
         Station downStation = new Station("잠실역");

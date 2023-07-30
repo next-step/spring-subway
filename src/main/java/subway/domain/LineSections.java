@@ -11,20 +11,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Sections {
+public class LineSections {
     private final List<Section> sections;
     private final Stations stationsCache;
 
-    public Sections(final List<Section> sections) {
+    public LineSections(final List<Section> sections) {
         this.sections = Collections.unmodifiableList(sections);
         this.stationsCache = Stations.of(sections);
     }
 
-    public Sections() {
+    public LineSections() {
         this(new ArrayList<>());
     }
 
-    public Sections addSection(final Section section) {
+    public LineSections addSection(final Section section) {
         validateBothMatches(section);
         validateNoMatches(section);
 
@@ -36,7 +36,7 @@ public class Sections {
         });
 
         newSections.add(section);
-        return new Sections(newSections);
+        return new LineSections(newSections);
     }
 
     private void validateBothMatches(final Section section) {
@@ -65,7 +65,7 @@ public class Sections {
                 .findAny();
     }
 
-    public Sections removeStation(final Station station) {
+    public LineSections removeStation(final Station station) {
         validateSize();
         validateContainStation(station);
         List<Section> newSections = new ArrayList<>(this.sections);
@@ -86,7 +86,7 @@ public class Sections {
             newSections.add(downSection.union(upSection));
         }
 
-        return new Sections(newSections);
+        return new LineSections(newSections);
     }
 
     private void validateContainStation(final Station station) {

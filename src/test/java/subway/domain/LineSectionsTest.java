@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 @DisplayName("Sections 일급 컬렉션 단위 테스트")
-class SectionsTest {
+class LineSectionsTest {
     @Test
     @DisplayName("하행 종점역을 삭제할 수 있다.")
     void removeDownTerminalStationTest() {
@@ -22,7 +22,7 @@ class SectionsTest {
                 deleteStation,
                 4
         );
-        Sections sections = new Sections(List.of(
+        LineSections lineSections = new LineSections(List.of(
                 new Section(
                         new Station("서울대입구역"),
                         new Station("신대방역"),
@@ -32,10 +32,10 @@ class SectionsTest {
         ));
 
         // when
-        Sections newSections = sections.removeStation(deleteStation);
+        LineSections newLineSections = lineSections.removeStation(deleteStation);
 
         // then
-        assertThat(newSections.getSections()).doesNotContain(deleteSection);
+        assertThat(newLineSections.getSections()).doesNotContain(deleteSection);
     }
 
     @Test
@@ -48,7 +48,7 @@ class SectionsTest {
                 new Station("신대방역"),
                 4
         );
-        Sections sections = new Sections(List.of(
+        LineSections lineSections = new LineSections(List.of(
                 deleteSection,
                 new Section(
                         new Station("신대방역"),
@@ -58,10 +58,10 @@ class SectionsTest {
         ));
 
         // when
-        Sections newSections = sections.removeStation(deleteStation);
+        LineSections newLineSections = lineSections.removeStation(deleteStation);
 
         // then
-        assertThat(newSections.getSections()).doesNotContain(deleteSection);
+        assertThat(newLineSections.getSections()).doesNotContain(deleteSection);
     }
 
     @Test
@@ -69,7 +69,7 @@ class SectionsTest {
     void removeMiddleStationTest() {
         // given
         Station deleteStation = new Station("신대방역");
-        Sections sections = new Sections(List.of(
+        LineSections lineSections = new LineSections(List.of(
                 new Section(
                         new Station("서울대입구역"),
                         deleteStation,
@@ -83,11 +83,11 @@ class SectionsTest {
         ));
 
         // when
-        Sections newSections = sections.removeStation(deleteStation);
+        LineSections newLineSections = lineSections.removeStation(deleteStation);
 
         // then
-        assertThat(newSections.getSections()).hasSize(1);
-        assertThat(newSections.getSections()).contains(
+        assertThat(newLineSections.getSections()).hasSize(1);
+        assertThat(newLineSections.getSections()).contains(
                 new Section(new Station("서울대입구역"), new Station("상도역"), 14)
         );
     }
@@ -97,7 +97,7 @@ class SectionsTest {
     void stationNotInSectionsTest() {
         // given
         Station deleteStation = new Station("신대방역");
-        Sections sections = new Sections(List.of(
+        LineSections lineSections = new LineSections(List.of(
                 new Section(
                         new Station("서울대입구역"),
                         new Station("잠실역"),
@@ -111,7 +111,7 @@ class SectionsTest {
         ));
 
         // when, then
-        assertThatCode(() -> sections.removeStation(deleteStation))
+        assertThatCode(() -> lineSections.removeStation(deleteStation))
                 .isInstanceOf(SubwayException.class)
                 .hasMessage(ErrorCode.REMOVE_SECTION_NOT_CONTAIN.getMessage());
     }
@@ -121,7 +121,7 @@ class SectionsTest {
     void validateOnlyOneSectionRemoveSectionTest() {
         // given
         Station deleteStation = new Station("신대방역");
-        Sections sections = new Sections(List.of(
+        LineSections lineSections = new LineSections(List.of(
                 new Section(
                         new Station("서울대입구역"),
                         deleteStation,
@@ -130,7 +130,7 @@ class SectionsTest {
         ));
 
         // when, then
-        assertThatCode(() -> sections.removeStation(deleteStation))
+        assertThatCode(() -> lineSections.removeStation(deleteStation))
                 .isInstanceOf(SubwayException.class)
                 .hasMessage(ErrorCode.SECTION_VALIDATE_SIZE.getMessage());
     }
@@ -143,9 +143,9 @@ class SectionsTest {
                 new Station("신대방역"),
                 10
         );
-        Sections sections = new Sections(List.of(section));
+        LineSections lineSections = new LineSections(List.of(section));
 
-        assertThatCode(() -> sections.addSection(section))
+        assertThatCode(() -> lineSections.addSection(section))
                 .isInstanceOf(SubwayException.class)
                 .hasMessage(ErrorCode.NEW_SECTION_BOTH_MATCH.getMessage());
     }
@@ -164,10 +164,10 @@ class SectionsTest {
                 new Station("잠실역"),
                 10
         );
-        Sections sections = new Sections(List.of(section));
+        LineSections lineSections = new LineSections(List.of(section));
 
         // when, then
-        assertThatCode(() -> sections.addSection(section2))
+        assertThatCode(() -> lineSections.addSection(section2))
                 .isInstanceOf(SubwayException.class)
                 .hasMessage(ErrorCode.NEW_SECTION_NO_MATCH.getMessage());
     }
@@ -181,7 +181,7 @@ class SectionsTest {
                 new Station("신대방역"),
                 10
         );
-        Sections sections = new Sections(List.of(section));
+        LineSections lineSections = new LineSections(List.of(section));
         Section newSection = new Section
                 (
                         new Station("신대방역"),
@@ -190,10 +190,10 @@ class SectionsTest {
                 );
 
         // when
-        Sections newSections = sections.addSection(newSection);
+        LineSections newLineSections = lineSections.addSection(newSection);
 
         // then
-        assertThat(newSections.getSections()).containsAll(List.of(section, newSection));
+        assertThat(newLineSections.getSections()).containsAll(List.of(section, newSection));
     }
 
     @Test
@@ -205,7 +205,7 @@ class SectionsTest {
                 new Station("신대방역"),
                 10
         );
-        Sections sections = new Sections(List.of(section));
+        LineSections lineSections = new LineSections(List.of(section));
         Section newSection = new Section(
                 new Station("잠실역"),
                 new Station("서울대입구역"),
@@ -213,10 +213,10 @@ class SectionsTest {
         );
 
         // when
-        Sections newSections = sections.addSection(newSection);
+        LineSections newLineSections = lineSections.addSection(newSection);
 
         // then
-        assertThat(newSections.getSections()).containsAll(List.of(section, newSection));
+        assertThat(newLineSections.getSections()).containsAll(List.of(section, newSection));
     }
 
     @Test
@@ -228,7 +228,7 @@ class SectionsTest {
                 new Station("신대방역"),
                 10
         );
-        Sections sections = new Sections(List.of(section));
+        LineSections lineSections = new LineSections(List.of(section));
         Section newSection = new Section(
                 new Station("잠실역"),
                 new Station("신대방역"),
@@ -236,10 +236,10 @@ class SectionsTest {
         );
 
         // when
-        Sections newSections = sections.addSection(newSection);
+        LineSections newLineSections = lineSections.addSection(newSection);
 
         // then
-        assertThat(newSections.getSections()).containsAll(List.of(
+        assertThat(newLineSections.getSections()).containsAll(List.of(
                 new Section(new Station("서울대입구역"), new Station("잠실역"), 6),
                 new Section(new Station("잠실역"), new Station("신대방역"), 4)
         ));
@@ -254,7 +254,7 @@ class SectionsTest {
                 new Station("신대방역"),
                 10
         );
-        Sections sections = new Sections(List.of(section));
+        LineSections lineSections = new LineSections(List.of(section));
         Section newSection = new Section(
                 new Station("서울대입구역"),
                 new Station("잠실역"),
@@ -262,10 +262,10 @@ class SectionsTest {
         );
 
         // when
-        Sections newSections = sections.addSection(newSection);
+        LineSections newLineSections = lineSections.addSection(newSection);
 
         // then
-        assertThat(newSections.getSections()).containsAll(List.of(
+        assertThat(newLineSections.getSections()).containsAll(List.of(
                 new Section(new Station("서울대입구역"), new Station("잠실역"), 4),
                 new Section(new Station("잠실역"), new Station("신대방역"), 6)
         ));
@@ -280,7 +280,7 @@ class SectionsTest {
                 new Station("신대방역"),
                 10
         );
-        Sections sections = new Sections(List.of(section));
+        LineSections lineSections = new LineSections(List.of(section));
         Section newSection = new Section(
                 new Station("잠실역"),
                 new Station("신대방역"),
@@ -288,7 +288,7 @@ class SectionsTest {
         );
 
         // when, then
-        assertThatCode(() -> sections.addSection(newSection))
+        assertThatCode(() -> lineSections.addSection(newSection))
                 .isInstanceOf(SubwayException.class)
                 .hasMessage(ErrorCode.DISTANCE_VALIDATE_SUBTRACT.getMessage() + "10");
     }
@@ -301,10 +301,10 @@ class SectionsTest {
         Section section2 = new Section(new Station("신대방역"), new Station("상도역"), 1);
         Section section3 = new Section(new Station("상도역"), new Station("서울역"), 1);
 
-        Sections sections = new Sections(List.of(section1, section2, section3));
+        LineSections lineSections = new LineSections(List.of(section1, section2, section3));
 
         // when
-        List<Station> sortedStations = sections.getSortedStations();
+        List<Station> sortedStations = lineSections.getSortedStations();
 
         // then
         assertThat(sortedStations).containsExactly(

@@ -8,7 +8,7 @@
 	- 상행역과 하행역 사이의 연결 정보.
 	- 길이(distance) 속성을 가짐.
 - [x] 구간 등록 기능
-	- `POST` /lines/{id}/sections
+	- `POST` /lines/{id}/lineSections
 	  ```json
 	  {
 		"downStationId" : "4",
@@ -22,7 +22,7 @@
 	- 새로운 구간의 하행역은 해당 노선에 등록되어있는 역일 수 없다.
 	- 위 조건에 부합하지 않는 경우 에러 처리한다.
 - [x] 구간 제거 기능
-	- `DELETE` /lines/{id}/sections?stationId={station_id}
+	- `DELETE` /lines/{id}/lineSections?stationId={station_id}
 	- 하행 종점역만 제거할 수 있다.
 	- 지하철 노선에 상행 종점역과 하행 종점역만 있는 경우 역을 삭제할 수 없다.
 		- 구간이 1개인 경우 삭제할 수 없다.

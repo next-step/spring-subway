@@ -9,8 +9,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Distance;
 import subway.domain.Line;
+import subway.domain.LineSections;
 import subway.domain.Section;
-import subway.domain.Sections;
 import subway.domain.Station;
 import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
@@ -54,7 +54,7 @@ public class LineDao {
             isNext = rs.next();
         }
 
-        return new Line(id, name, color, new Sections(sections)
+        return new Line(id, name, color, new LineSections(sections)
         );
     };
 
