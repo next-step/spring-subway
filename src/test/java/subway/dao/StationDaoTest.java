@@ -9,12 +9,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Station;
 
 @DisplayName("역 Dao 테스트")
 @Transactional
 @SpringBootTest
+@ActiveProfiles("test")
 class StationDaoTest {
 
     private final StationDao stationDao;
@@ -40,7 +42,7 @@ class StationDaoTest {
         Station result = stationDao.insert(station1);
 
         // then
-        assertThat(result.getId()).isNotNull();
+        assertThat(result.getId()).isPositive();
         assertThat(result.getName()).isEqualTo(station1.getName());
     }
 
@@ -55,8 +57,9 @@ class StationDaoTest {
         List<Station> result = stationDao.findAll();
 
         // then
-        assertThat(result).hasSize(2);
-        assertThat(result).contains(result1, result2);
+        assertThat(result)
+            .hasSize(2)
+            .contains(result1, result2);
     }
 
     @Test
@@ -71,9 +74,10 @@ class StationDaoTest {
         Optional<Station> result = stationDao.findById(station.getId());
 
         // then
-        assertThat(emptyResult.isEmpty()).isTrue();
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(station);
+        assertThat(emptyResult).isPresent();
+        assertThat(result)
+            .isPresent()
+            .hasValue(station);
     }
 
     @Test
@@ -88,8 +92,9 @@ class StationDaoTest {
 
         // then
         Optional<Station> result = stationDao.findById(station.getId());
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result).hasValue(update);
+        assertThat(result)
+            .isPresent()
+            .hasValue(update);
     }
 
     @Test
@@ -103,6 +108,6 @@ class StationDaoTest {
 
         // then
         Optional<Station> result = stationDao.findById(station.getId());
-        assertThat(result.isEmpty()).isTrue();
+        assertThat(result).isNotPresent();
     }
 }

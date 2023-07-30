@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import subway.domain.Line;
 import subway.exception.IllegalStationsException;
@@ -17,6 +18,7 @@ import subway.vo.StationPair;
 @DisplayName("라인 Dao 테스트")
 @Transactional
 @SpringBootTest
+@ActiveProfiles("test")
 class LineDaoTest {
 
     LineDao lineDao;
