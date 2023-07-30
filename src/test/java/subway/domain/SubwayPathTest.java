@@ -67,8 +67,8 @@ class SubwayPathTest {
     }
 
     @Test
-    @DisplayName("경로가 존재하지 않으면 최단경로를 계산할 수 없다")
-    void cannotCalculateShortestPathIfPathDoesNotExist() {
+        @DisplayName("경로가 존재하지 않으면 IllegalArgumentException을 던진다")
+    void throwIllegalArgumentExceptionIfPathDoesNotExist() {
         LineSections lineSectionsA = new LineSections(lineA,
             new Section(1L, lineA, stationA, stationB, 10));
         LineSections lineSectionsC = new LineSections(lineC,
@@ -81,7 +81,7 @@ class SubwayPathTest {
     }
 
     @Test
-    @DisplayName("출발역과 도착역이 같으면 제자리 경로를 계산한다")
+    @DisplayName("출발역과 도착역이 같으면 거리가 0, 출발역 하나를 반환한다")
     void calculateShortestPathBothSameSourceAndDestination() {
         LineSections lineSectionsA = new LineSections(lineA,
             new Section(1L, lineA, stationA, stationB, 10));
