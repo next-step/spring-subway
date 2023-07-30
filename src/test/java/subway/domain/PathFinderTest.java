@@ -1,5 +1,6 @@
 package subway.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -55,5 +56,6 @@ class PathFinderTest {
         // when & then
         assertEquals(2, result.getDistance());
         assertEquals(3, result.getPaths().size());
+        assertThat(result.getPaths()).containsExactlyInAnyOrder(1L, 2L, 3L);
     }
 }
