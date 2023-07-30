@@ -11,7 +11,7 @@ import java.util.List;
 
 public class PathFinder {
 
-    private final Long distance;
+    private final Integer distance;
     private final List<Station> path;
 
     public PathFinder(List<Section> sections, Station startStation, Station endStation) {
@@ -24,7 +24,7 @@ public class PathFinder {
         validateUnlinked(graphPath);
 
         this.path = graphPath.getVertexList();
-        this.distance = (long) shortestPath.getPathWeight(startStation, endStation);
+        this.distance = (int) shortestPath.getPathWeight(startStation, endStation);
     }
 
     private DijkstraShortestPath<Station, DefaultWeightedEdge> getShortestPath(List<Section> sections, Station startStation, Station endStation) {
@@ -66,7 +66,7 @@ public class PathFinder {
         }
     }
 
-    public Long getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 

@@ -3,7 +3,7 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.Path;
+import subway.domain.PathFinder;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.response.FindPathResponse;
@@ -23,7 +23,13 @@ public class PathService {
     }
 
     public FindPathResponse findPath(Long source, Long target) {
-        return null;
+        Station startStation = getStation(source);
+        Station endStation = getStation(target);
+        List<Section> sections = sectionDao.findAll();
+
+        PathFinder pathFinder = new PathFinder(sections, startStation, endStation);
+
+        return FindPathResponse.from(pathFinder.getPath(), pathFinder.getDistance());
     }
 
     private Station getStation(final Long stationId) {

@@ -112,7 +112,7 @@ public class PathFinderTest {
             PathFinder pathFinder = new PathFinder(List.of(section1, section2, section3), startStation, endStation);
 
             List<Station> stations = pathFinder.getPath();
-            Long distance = pathFinder.getDistance();
+            Integer distance = pathFinder.getDistance();
 
             // then
             assertThat(stations).containsExactly(startStation, station2, station3, endStation);
@@ -141,7 +141,7 @@ public class PathFinderTest {
             PathFinder pathFinder = new PathFinder(List.of(section1, section2, section3, section4), startStation, endStation);
 
             List<Station> stations = pathFinder.getPath();
-            Long distance = pathFinder.getDistance();
+            Integer distance = pathFinder.getDistance();
 
             // then
             assertThat(stations).containsExactly(startStation, station3, endStation);

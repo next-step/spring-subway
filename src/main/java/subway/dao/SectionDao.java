@@ -23,6 +23,14 @@ public class SectionDao {
                     "FROM SECTIONS AS S " +
                     "where line_id = ?";
 
+    private static final String FIND_ALL_SQL =
+            "SELECT S.*," +
+                    "(SELECT US.id FROM STATION AS US WHERE S.up_station_id = US.id) AS US_ID," +
+                    "(SELECT US.name FROM STATION AS US WHERE S.up_station_id = US.id) AS US_NAME," +
+                    "(SELECT DS.id FROM STATION AS DS WHERE S.down_station_id = DS.id) AS DS_ID," +
+                    "(SELECT DS.name FROM STATION AS DS WHERE S.down_station_id = DS.id) AS DS_NAME " +
+                    "FROM SECTIONS AS S ";
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
     private final RowMapper<Section> sectionRowMapper;
@@ -71,5 +79,9 @@ public class SectionDao {
         String sql = "update SECTIONS set up_station_id = ?, down_station_id = ?, distance = ? where id = ?";
         jdbcTemplate.update(sql, section.getUpStation().getId(), section.getDownStation().getId(),
                 section.getDistance(), section.getId());
+    }
+
+    public List<Section> findAll() {
+        return jdbcTemplate.query(FIND_ALL_SQL, sectionRowMapper);
     }
 }
