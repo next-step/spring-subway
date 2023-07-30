@@ -40,11 +40,11 @@ Line 색(color)
 - [x] Station
   - [x] 이름을 표현한다.
   - [x] 이름이 중복되면 예외를 던진다.
-- [ ] PathFinder
-  - [ ] 출발 Station과 도착 Station의 최단 거리 경로와 거리를 조회한다.
-  - [ ] 출발 Station과 도착 Station이 같은 경우 조회할 수 없다.
-  - [ ] 출발 Station과 도착Station이 연결되지 않은 경우 조회할 수 없다.
-  - [ ] 존재하지 않는 출발 Station이나 도착 Station일 경우 조회할 수 없다.
+- [x] PathFinder
+  - [x] 출발 Station과 도착 Station의 최단 거리 경로와 거리를 조회한다.
+  - [x] 출발 Station과 도착 Station이 같은 경우 조회할 수 없다.
+  - [x] 출발 Station과 도착Station이 연결되지 않은 경우 조회할 수 없다.
+  - [x] 존재하지 않는 출발 Station이나 도착 Station일 경우 조회할 수 없다.
 
 lineId, upStationId, downStationId;
 
@@ -82,10 +82,10 @@ lineId, upStationId, downStationId;
 
 ### 경로 조회 기능
 
-- [ ] 출발역으로부터 도착역까지의 경로에 있는 역의 목록과 거리를 조회한다.
-  - [ ] 출발역과 도착역이 같은 경우 조회할 수 없음
-  - [ ] 출발역과 도착역이 연결되지 않은 경우 조회할 수 없음
-  - [ ] 존재하지 않는 출발역이나 도착열일 경우 조회할 수 없음
+- [x] 출발역으로부터 도착역까지의 경로에 있는 역의 목록과 거리를 조회한다.
+  - [x] 출발역과 도착역이 같은 경우 조회할 수 없음
+  - [x] 출발역과 도착역이 연결되지 않은 경우 조회할 수 없음
+  - [x] 존재하지 않는 출발역이나 도착열일 경우 조회할 수 없음
   
 ### 학습 테스트
 
