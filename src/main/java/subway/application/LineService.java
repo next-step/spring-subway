@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
+import subway.dao.PathDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.DeleteSections;
@@ -36,11 +37,14 @@ public class LineService {
     private final LineDao lineDao;
     private final StationDao stationDao;
     private final SectionDao sectionDao;
+    private final PathDao pathDao;
 
-    public LineService(final LineDao lineDao, final StationDao stationDao, final SectionDao sectionDao) {
+    public LineService(final LineDao lineDao, final StationDao stationDao, final SectionDao sectionDao,
+            final PathDao pathDao) {
         this.lineDao = lineDao;
         this.stationDao = stationDao;
         this.sectionDao = sectionDao;
+        this.pathDao = pathDao;
     }
 
     @Transactional
@@ -55,6 +59,7 @@ public class LineService {
         Section section = newSection(SectionRequest.of(request));
 
         sectionDao.insert(section, persistLine.getId());
+        pathDao.flushCache();
 
         return LineResponse.of(persistLine);
     }
@@ -101,6 +106,7 @@ public class LineService {
     @Transactional
     public void deleteLineById(final Long id) {
         lineDao.deleteById(id);
+        pathDao.flushCache();
     }
 
     @Transactional
@@ -119,6 +125,7 @@ public class LineService {
         }
 
         sectionDao.insert(newSection, lineId);
+        pathDao.flushCache();
 
         final Long newUpStationId = newSection.getUpStation().getId();
         final Long newDownStationId = newSection.getDownStation().getId();
@@ -144,6 +151,8 @@ public class LineService {
         if (deleteSections.isKindOfMidDeletion()) {
             sectionDao.insert(deleteSections.newSection(), lineId);
         }
+
+        pathDao.flushCache();
     }
 
     private Section newSection(final SectionRequest request) {
