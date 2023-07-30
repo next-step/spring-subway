@@ -47,6 +47,10 @@ public class Section {
         return this.distance <= other;
     }
 
+    public boolean isContainStation(final long stationId) {
+        return upStation.matchId(stationId) || downStation.matchId(stationId);
+    }
+
     private void validateStations(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
             throw new IllegalSectionException("상행역과 하행역은 달라야 합니다.");

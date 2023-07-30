@@ -22,6 +22,10 @@ public class Station {
         return id;
     }
 
+    public boolean matchId(final long other) {
+        return id == other;
+    }
+
     public String getName() {
         return name;
     }
