@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.exception.SubwayException;
 import subway.exception.dto.ExceptionResponse;
 
-import java.sql.SQLException;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -20,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleSQLException(final SQLException exception) {
+    public ExceptionResponse handleRuntimeException(final RuntimeException exception) {
         exception.printStackTrace();
         return new ExceptionResponse("서버 내부에 예외가 발생했습니다.");
     }
