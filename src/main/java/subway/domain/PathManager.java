@@ -38,7 +38,7 @@ public final class PathManager {
     }
 
     public double findDistanceOfShortestPath(final Station source, final Station target) {
-        throw new UnsupportedOperationException();
+        return dijkstraShortestPath().getPathWeight(source, target);
     }
 
     private DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath() {
