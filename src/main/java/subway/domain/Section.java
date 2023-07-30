@@ -1,10 +1,11 @@
 package subway.domain;
 
-import static subway.exception.ErrorCode.SAME_UP_AND_DOWN_STATION;
-import static subway.exception.ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION;
+import subway.exception.SubwayException;
 
 import java.util.Objects;
-import subway.exception.SubwayException;
+
+import static subway.exception.ErrorCode.SAME_UP_AND_DOWN_STATION;
+import static subway.exception.ErrorCode.SECTION_DOES_NOT_CONTAIN_SECTION;
 
 public class Section {
 
@@ -97,4 +98,7 @@ public class Section {
         return Objects.hash(id, upStation, downStation, distance);
     }
 
+    public boolean matchOneStation(Station station) {
+        return upStation.match(station) || downStation.match(station);
+    }
 }
