@@ -8,6 +8,7 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
 import subway.exception.ErrorCode;
+import subway.exception.FindPathException;
 import subway.exception.SectionException;
 
 public class PathFinder {
@@ -58,6 +59,10 @@ public class PathFinder {
     }
 
     public PathFinderResult findShortestPath(final Station source, final Station target) {
+        if (source.equals(target)) {
+            throw new FindPathException(ErrorCode.SAME_SOURCE_AS_TARGET, "출발역과 도착역이 같습니다.");
+        }
+
         GraphPath<Long, DefaultWeightedEdge> path = shortestPath.getPath(source.getId(), target.getId());
 
         return new PathFinderResult(path);
