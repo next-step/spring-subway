@@ -10,6 +10,62 @@
 
 ## 요구사항
 
+### Step4
+
+#### 프로그래밍 요구사항
+
+- [x] 데이터베이스 설정을 프로덕션과 테스트를 다르게 합니다.
+    - [x] 프로덕션의 데이터베이스는 로컬에 저장될 수 있도록 설정 - MySQL
+    - [x] 테스트용 데이터베이스는 인메모리로 동작할 수 있도록 설정 - H2
+
+#### 경로 조회 기능 요구사항
+
+- 정점(vertex)과 간선(edge), 그리고 가중치 개념을 이용
+    - 정점: 지하철역(Station)
+    - 간선: 지하철역 연결정보(Section)
+    - 가중치: 거리(Distance)
+- 최단 거리 기준 조회 시 가중치를 거리로 설정
+
+- Request
+    - [x] source: 출발역 id
+    - [x] target: 도착역 id
+  ```
+  HTTP/1.1 200
+  Request method:	GET
+  Request URI:	http://localhost:55494/paths?source=1&target=3
+  Headers: 	Accept=application/json
+  Content-Type=application/json; charset=UTF-8
+  ```
+- Response
+    - [x] stations: 출발역으로부터 도착역까지의 경로에 있는 역 목록
+    - [x] distance: 조회한 경로 구간의 거리
+  ```
+  HTTP/1.1 200 
+  Content-Type: application/json
+  Transfer-Encoding: chunked
+  Date: Sat, 09 May 2020 14:54:11 GMT
+  Keep-Alive: timeout=60
+  Connection: keep-alive
+  
+  {
+    "stations": [
+      {
+        "id": 1,
+        "name": "교대역"
+      },
+      {
+        "id": 4,
+        "name": "남부터미널역"
+      },
+      {
+        "id": 3,
+        "name": "양재역"
+      }
+    ],
+    "distance": 5
+  }
+  ```
+
 ### Step3
 
 #### 변경된 스펙 - 구간 삭제에 대한 제약 사항 변경 구현
@@ -71,6 +127,7 @@
 - 구간 등록 request
 
 ```
+
 POST /lines/1/sections HTTP/1.1
 accept: */*
 content-type: application/json; charset=UTF-8
@@ -81,6 +138,7 @@ host: localhost:52165
 "upStationId": "2",
 "distance": 10
 }
+
 ```
 
 #### 구간 제거 기능
@@ -92,9 +150,11 @@ host: localhost:52165
 - 지하철 구간 삭제 request
 
 ```
+
 - DELETE /lines/1/sections?stationId=2 HTTP/1.1
-accept: */*
-host: localhost:52165
+  accept: */*
+  host: localhost:52165
+
 ```
 
 #### 구간 관리 기능의 예외 케이스를 고려하기
