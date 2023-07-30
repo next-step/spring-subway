@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ class SectionTest {
     @DisplayName("Section 생성 테스트")
     void fieldTest() {
         Assertions.assertThatNoException()
-                .isThrownBy(() -> new Section(new Station(), new Station(), new Line(), 10));
+            .isThrownBy(() -> new Section(new Station(), new Station(), new Line(), 10));
     }
 
     @Test
@@ -25,13 +26,13 @@ class SectionTest {
         Section section1 = new Section(station1, station2, line, 10);
         Section section2 = new Section(station2, station3, line, 10);
 
-        Section result = section1.combineSection(section2);
+        Section result = section1.combineSection(Optional.of(section2)).get();
 
         assertAll(
-                () -> Assertions.assertThat(result.getDistance()).isEqualTo(new Distance(20)),
-                () -> Assertions.assertThat(result.getUpStation()).isEqualTo(station1),
-                () -> Assertions.assertThat(result.getDownStation()).isEqualTo(station3),
-                () -> Assertions.assertThat(result.getLine()).isEqualTo(line)
+            () -> Assertions.assertThat(result).extracting("distance").isEqualTo(new Distance(20)),
+            () -> Assertions.assertThat(result).extracting("upStation").isEqualTo(station1),
+            () -> Assertions.assertThat(result).extracting("downStation").isEqualTo(station3),
+            () -> Assertions.assertThat(result).extracting("line").isEqualTo(line)
         );
 
     }
@@ -47,8 +48,8 @@ class SectionTest {
         Section section1 = new Section(station1, station4, line, 10);
         Section section2 = new Section(station2, station3, line, 10);
 
-        Assertions.assertThatThrownBy(() -> section1.combineSection(section2))
-                .isInstanceOf(IllegalArgumentException.class);
+        Assertions.assertThatThrownBy(() -> section1.combineSection(Optional.of(section2)))
+            .isInstanceOf(IllegalArgumentException.class);
 
     }
 }

@@ -53,7 +53,7 @@ public class Distance {
     @Override
     public String toString() {
         return "Distance{" +
-                "distance=" + distance +
-                '}';
+            "distance=" + distance +
+            '}';
     }
 }

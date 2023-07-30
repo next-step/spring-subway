@@ -5,6 +5,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.WeightedMultigraph;
 
 public class Sections {
 
@@ -12,15 +15,14 @@ public class Sections {
     private final List<Section> sections;
 
     public Sections(List<Section> sections) {
-        validSections(sections);
         this.sections = sections;
     }
 
-    private void validSections(List<Section> sections) {
+    public void validSectionsLine() {
         long sectionsLinesCount = sections.stream()
-                .map(Section::getLine)
-                .distinct()
-                .count();
+            .map(Section::getLine)
+            .distinct()
+            .count();
 
         if (sectionsLinesCount > 1L) {
             throw new IllegalArgumentException("서로 다른 호선의 구간이 들어가 있습니다.");
@@ -35,7 +37,7 @@ public class Sections {
     private void validSectionsCount() {
         if (sections.size() <= MINIMUM_SIZE) {
             throw new IllegalArgumentException(
-                    MessageFormat.format("구간이 {0}개 이하이므로 해당역을 삭제할 수 없습니다.", MINIMUM_SIZE)
+                MessageFormat.format("구간이 {0}개 이하이므로 해당역을 삭제할 수 없습니다.", MINIMUM_SIZE)
             );
         }
     }
@@ -48,13 +50,13 @@ public class Sections {
 
     public List<Station> sortStations() {
         List<Station> sortedStations = new ArrayList<>();
-        Map<Station, Section> sectionMapByUpStation = initSectionMapByUpStation();
+        Map<Station, Section> sectionByUpStation = initSectionByUpStation();
 
         Station nowStation = findTopStation();
         sortedStations.add(nowStation);
 
-        while (sectionMapByUpStation.containsKey(nowStation)) {
-            Section section = sectionMapByUpStation.get(nowStation);
+        while (sectionByUpStation.containsKey(nowStation)) {
+            Section section = sectionByUpStation.get(nowStation);
             sortedStations.add(section.getDownStation());
             nowStation = section.getDownStation();
         }
@@ -62,19 +64,19 @@ public class Sections {
         return Collections.unmodifiableList(sortedStations);
     }
 
-    private Map<Station, Section> initSectionMapByUpStation() {
+    private Map<Station, Section> initSectionByUpStation() {
         return sections.stream()
-                .collect(Collectors.toMap(
-                        Section::getUpStation,
-                        Function.identity()
-                ));
+            .collect(Collectors.toMap(
+                Section::getUpStation,
+                Function.identity()
+            ));
     }
 
     private Station findTopStation() {
         return findStations().stream()
-                .filter(station -> !findDownStations().contains(station))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
+            .filter(station -> !findDownStations().contains(station))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("현재 노선의 역 정보가 올바르지 않습니다."));
     }
 
     public void validRegisterSection(Section section) {
@@ -87,13 +89,14 @@ public class Sections {
     }
 
     private boolean isSectionDuplicated(Section section) {
-        return findStations().contains(section.getUpStation()) && findStations().contains(section.getDownStation());
+        return findStations().contains(section.getUpStation()) && findStations().contains(
+            section.getDownStation());
     }
 
     private boolean isStationNotInSections(Section section) {
         return !findStations().contains(section.getUpStation())
-                && !findStations().contains(section.getDownStation())
-                && !sections.isEmpty();
+            && !findStations().contains(section.getDownStation())
+            && !sections.isEmpty();
     }
 
     public Optional<Section> makeUpdateSection(Section registerSection) {
@@ -108,44 +111,111 @@ public class Sections {
 
     private Set<Station> findUpStations() {
         return sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
+            .map(Section::getUpStation)
+            .collect(Collectors.toSet());
     }
 
     private Set<Station> findDownStations() {
         return sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet());
+            .map(Section::getDownStation)
+            .collect(Collectors.toSet());
     }
 
     private Section makeNewSectionByUpStation(Section registerSection) {
         Section duplicatedUpSection = findSectionByUpStation(registerSection.getUpStation())
-                .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
+            .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
         return registerSection.makeNewUpSection(duplicatedUpSection);
     }
 
     private Section makeNewSectionByDownStation(Section registerSection) {
         Section duplicatedDownSection = findSectionByDownStation(registerSection.getDownStation())
-                .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
+            .orElseThrow(() -> new IllegalStateException("현재 구간에 등록된 정보가 올바르지 않습니다."));
         return registerSection.makeNewDownSection(duplicatedDownSection);
     }
 
     public Optional<Section> findSectionByDownStation(Station station) {
         return sections.stream()
-                .filter(section -> section.downStationEquals(station))
-                .findFirst();
+            .filter(section -> section.downStationEquals(station))
+            .findFirst();
     }
 
     public Optional<Section> findSectionByUpStation(Station station) {
         return sections.stream()
-                .filter(section -> section.upStationEquals(station))
-                .findFirst();
+            .filter(section -> section.upStationEquals(station))
+            .findFirst();
     }
 
     private Set<Station> findStations() {
         return sections.stream()
-                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-                .collect(Collectors.toUnmodifiableSet());
+            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+            .collect(Collectors.toUnmodifiableSet());
+    }
+
+    public Distance findSourceToTargetDistance(Station sourceStation, Station targetStation) {
+        validSameSourceAndTarget(sourceStation, targetStation);
+
+        DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
+        double pathWeight = dijkstraShortestPath.getPathWeight(sourceStation, targetStation);
+
+        validPathWeight(pathWeight);
+
+        return new Distance((int) pathWeight);
+    }
+
+    private void validPathWeight(double pathWeight) {
+        if (Double.isInfinite(pathWeight)) {
+            throw new IllegalArgumentException("출발역과 도착역이 연결되어있지 않습니다.");
+        }
+    }
+
+    public List<Station> findSourceToTargetRoute(Station sourceStation, Station targetStation) {
+        validSameSourceAndTarget(sourceStation, targetStation);
+
+        DijkstraShortestPath dijkstraShortestPath = makeDijkstraShortestPath();
+
+        List<Station> shortestPath = makeShortestPath(
+            sourceStation,
+            targetStation,
+            dijkstraShortestPath
+        );
+
+        return shortestPath;
+    }
+
+    private void validSameSourceAndTarget(Station sourceStation, Station targetStation) {
+        if (sourceStation.equals(targetStation)) {
+            throw new IllegalArgumentException("출발역과 도착역이 동일합니다.");
+        }
+    }
+
+    private DijkstraShortestPath makeDijkstraShortestPath() {
+        WeightedMultigraph<Station, DefaultWeightedEdge> graph
+            = new WeightedMultigraph(DefaultWeightedEdge.class);
+
+        for (Section section : sections) {
+            graph.addVertex(section.getUpStation());
+            graph.addVertex(section.getDownStation());
+            graph.setEdgeWeight(
+                graph.addEdge(section.getUpStation(), section.getDownStation()),
+                section.getDistance().getDistance()
+            );
+        }
+
+        return new DijkstraShortestPath(graph);
+    }
+
+    private List<Station> makeShortestPath(
+        Station sourceStation,
+        Station targetStation,
+        DijkstraShortestPath dijkstraShortestPath
+    ) {
+        try {
+            return Collections.unmodifiableList(
+                dijkstraShortestPath.getPath(sourceStation, targetStation).getVertexList()
+            );
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("출발역과 도착역이 연결되어있지 않습니다.");
+        }
     }
 
     @Override
@@ -168,7 +238,7 @@ public class Sections {
     @Override
     public String toString() {
         return "Sections{" +
-                "sections=" + sections +
-                '}';
+            "sections=" + sections +
+            '}';
     }
 }

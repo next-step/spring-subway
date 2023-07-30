@@ -31,8 +31,10 @@ public class LineService {
     @Transactional
     public LineResponse saveLine(LineRequest request) {
         Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+        Station upStation = stationDao.findById(request.getUpStationId())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Station downStation = stationDao.findById(request.getDownStationId())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
         Section section = new Section(
             upStation,
             downStation,
@@ -51,7 +53,8 @@ public class LineService {
     }
 
     public LineResponse findLineWithSections(Long id) {
-        Line persistLine = lineDao.findById(id);
+        Line persistLine = lineDao.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 호선을 입력했습니다."));
         Sections sections = sectionDao.findAllByLineId(id);
         List<Station> sortedStations = sections.sortStations();
         return LineResponse.of(persistLine, sortedStations);

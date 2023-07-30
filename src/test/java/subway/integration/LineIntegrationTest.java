@@ -155,7 +155,7 @@ public class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> response = RestAssured
             .given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(lineRequest2)
+            .body(new LineRequest("신신분당선", "bg-red-600", 1L, 2L, 20))
             .when().put("/lines/{lineId}", lineId)
             .then().log().all()
             .extract();

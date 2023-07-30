@@ -1,17 +1,21 @@
 package subway.application;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
+import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
 import subway.domain.Station;
+import subway.dto.request.PathRequest;
 import subway.dto.request.SectionRegisterRequest;
 
 import java.util.Optional;
+import subway.dto.response.PathResponse;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,6 +36,7 @@ public class SectionService {
         Section section = makeSection(sectionRegisterRequest, lineId);
         Sections sections = sectionDao.findAllByLineId(lineId);
 
+        sections.validSectionsLine();
         sections.validRegisterSection(section);
 
         sectionDao.insert(section);
@@ -39,21 +44,28 @@ public class SectionService {
     }
 
     private Section makeSection(SectionRegisterRequest sectionRegisterRequest, Long lineId) {
-        Station upStation = stationDao.findById(sectionRegisterRequest.getUpStationId());
-        Station downStation = stationDao.findById(sectionRegisterRequest.getDownStationId());
-        Line line = lineDao.findById(lineId);
+        Station upStation = stationDao.findById(sectionRegisterRequest.getUpStationId())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Station downStation = stationDao.findById(sectionRegisterRequest.getDownStationId())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Line line = lineDao.findById(lineId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 호선을 입력했습니다."));
+
         return new Section(
-                upStation,
-                downStation,
-                line,
-                sectionRegisterRequest.getDistance()
+            upStation,
+            downStation,
+            line,
+            sectionRegisterRequest.getDistance()
         );
     }
 
     @Transactional
     public void deleteSection(Long stationId, Long lineId) {
         Sections sections = sectionDao.findAllByLineId(lineId);
-        Station deleteStation = stationDao.findById(stationId);
+        Station deleteStation = stationDao.findById(stationId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+
+        sections.validSectionsLine();
         sections.validDeleteStation(deleteStation);
 
         Optional<Section> sectionByUpStation = sections.findSectionByUpStation(deleteStation);
@@ -65,19 +77,35 @@ public class SectionService {
     }
 
     private void deleteSectionsContainingDeleteStation(
-            Optional<Section> sectionByUpStation,
-            Optional<Section> sectionByDownStation
+        Optional<Section> sectionByUpStation,
+        Optional<Section> sectionByDownStation
     ) {
         sectionByUpStation.ifPresent(section -> sectionDao.deleteById(section.getId()));
         sectionByDownStation.ifPresent(section -> sectionDao.deleteById(section.getId()));
     }
 
-    private void makeCombineSection(Optional<Section> sectionByUpStation, Optional<Section> sectionByDownStation) {
-        if (sectionByDownStation.isPresent() && sectionByUpStation.isPresent()) {
-            Section newSectionUpStation = sectionByDownStation.get();
-            Section newSectionDownStation = sectionByUpStation.get();
-            Section newSection = newSectionUpStation.combineSection(newSectionDownStation);
-            sectionDao.insert(newSection);
-        }
+    private void makeCombineSection(
+        Optional<Section> sectionByUpStation,
+        Optional<Section> sectionByDownStation
+    ) {
+        sectionByDownStation
+            .flatMap(newSectionUpStation -> newSectionUpStation.combineSection(sectionByUpStation))
+            .ifPresent(sectionDao::insert);
+    }
+
+    @Transactional
+    public PathResponse findStationToStationDistance(PathRequest pathRequest) {
+        Station sourceStation = stationDao.findById(pathRequest.getSource())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Station targetStation = stationDao.findById(pathRequest.getTarget())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 역을 입력했습니다."));
+        Sections allSections = sectionDao.findAll();
+
+        List<Station> sourceToTargetRoute
+            = allSections.findSourceToTargetRoute(sourceStation, targetStation);
+        Distance sourceToTargetDistance
+            = allSections.findSourceToTargetDistance(sourceStation, targetStation);
+
+        return new PathResponse(sourceToTargetRoute, sourceToTargetDistance.getDistance());
     }
 }
