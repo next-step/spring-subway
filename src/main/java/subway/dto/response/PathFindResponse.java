@@ -1,7 +1,5 @@
 package subway.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import subway.domain.Distance;
 import subway.domain.Station;
 
@@ -13,10 +11,9 @@ public class PathFindResponse {
     private final List<StationFindResponse> stations;
     private final Integer distance;
 
-    @JsonCreator
     public PathFindResponse(
-            @JsonProperty("stations") final List<StationFindResponse> stations,
-            @JsonProperty("distance") final Integer distance
+            final List<StationFindResponse> stations,
+            final Integer distance
     ) {
         this.stations = stations;
         this.distance = distance;

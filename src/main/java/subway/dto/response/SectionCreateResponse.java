@@ -1,7 +1,5 @@
 package subway.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import subway.domain.Distance;
 import subway.domain.Section;
 
@@ -12,12 +10,11 @@ public class SectionCreateResponse {
     private final Long downStationId;
     private final int distance;
 
-    @JsonCreator
     public SectionCreateResponse(
-            @JsonProperty("id") final Long id,
-            @JsonProperty("upStationId") final Long upStationId,
-            @JsonProperty("downStationId") final Long downStationId,
-            @JsonProperty("distance") final Distance distance
+            final Long id,
+            final Long upStationId,
+            final Long downStationId,
+            final Distance distance
     ) {
         this.id = id;
         this.upStationId = upStationId;

@@ -1,7 +1,5 @@
 package subway.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import subway.domain.Line;
 import subway.domain.Station;
 
@@ -15,12 +13,11 @@ public class LineFindResponse {
     private final String color;
     private final List<StationFindResponse> stations;
 
-    @JsonCreator
     public LineFindResponse(
-            @JsonProperty("id") final Long id,
-            @JsonProperty("name") final String name,
-            @JsonProperty("color") final String color,
-            @JsonProperty("stations") final List<StationFindResponse> stations
+            final Long id,
+            final String name,
+            final String color,
+            final List<StationFindResponse> stations
     ) {
         this.id = id;
         this.name = name;

@@ -1,17 +1,15 @@
 package subway.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import subway.domain.Station;
 
 public class StationFindResponse {
+    
     private final Long id;
     private final String name;
 
-    @JsonCreator
     public StationFindResponse(
-            @JsonProperty("id") final Long id,
-            @JsonProperty("name") final String name
+            final Long id,
+            final String name
     ) {
         this.id = id;
         this.name = name;

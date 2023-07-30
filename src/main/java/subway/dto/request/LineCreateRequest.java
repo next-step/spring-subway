@@ -1,7 +1,6 @@
 package subway.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LineCreateRequest {
 
@@ -13,11 +12,11 @@ public class LineCreateRequest {
 
     @JsonCreator
     public LineCreateRequest(
-            @JsonProperty("name") final String name,
-            @JsonProperty("color") final String color,
-            @JsonProperty("upStationId") final Long upStationId,
-            @JsonProperty("downStationId") final Long downStationId,
-            @JsonProperty("distance") final int distance
+            final String name,
+            final String color,
+            final Long upStationId,
+            final Long downStationId,
+            final int distance
     ) {
         this.name = name;
         this.color = color;

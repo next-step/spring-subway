@@ -1,7 +1,6 @@
 package subway.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import subway.domain.Distance;
 import subway.domain.Section;
 
@@ -13,9 +12,9 @@ public class SectionCreateRequest {
 
     @JsonCreator
     public SectionCreateRequest(
-            @JsonProperty("upStationId") final Long upStationId,
-            @JsonProperty("downStationId") final Long downStationId,
-            @JsonProperty("distance") final int distance
+            final Long upStationId,
+            final Long downStationId,
+            final int distance
     ) {
         this.upStationId = upStationId;
         this.downStationId = downStationId;
