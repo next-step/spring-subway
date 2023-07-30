@@ -101,7 +101,9 @@ public class Sections {
                 upSection.isPresent(),
                 downSection.isPresent());
 
-        return deleteType.findDeleteSections(upSection.orElse(null), downSection.orElse(null));
+        return deleteType.findDeleteSections(
+                upSection.orElse(new Section()),
+                downSection.orElse(new Section()));
     }
 
     public Optional<Section> findCombinedSection(Long stationId) {
@@ -112,7 +114,9 @@ public class Sections {
                 upSection.isPresent(),
                 downSection.isPresent());
 
-        return deleteType.findCombinedSection(upSection.orElse(null), downSection.orElse(null));
+        return deleteType.findCombinedSection(
+                upSection.orElse(new Section()),
+                downSection.orElse(new Section()));
     }
 
     public List<Section> getSections() {
