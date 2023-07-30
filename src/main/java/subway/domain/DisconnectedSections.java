@@ -4,6 +4,7 @@ package subway.domain;
 import subway.exception.SubwayException;
 
 import java.util.List;
+import java.util.Optional;
 
 public final class DisconnectedSections {
 
@@ -46,7 +47,10 @@ public final class DisconnectedSections {
         return deleteSection;
     }
 
-    public Section getUpdateSection() {
-        return updateSection;
+    public Optional<Section> getUpdateSection() {
+        if (updateSection.isNotNull()) {
+            return Optional.of(updateSection);
+        }
+        return Optional.empty();
     }
 }

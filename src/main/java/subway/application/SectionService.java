@@ -55,9 +55,10 @@ public class SectionService {
 
     private void disconnectSection(final long stationId, final Sections sections) {
         final DisconnectedSections disconnectedSections = DisconnectedSections.of(sections.disconnect(stationId));
-        if(disconnectedSections.getUpdateSection().isNotNull()) {
-            sectionDao.update(disconnectedSections.getUpdateSection());
-        }
+
+        disconnectedSections.getUpdateSection()
+                .ifPresent(sectionDao::update);
+
         sectionDao.delete(disconnectedSections.getDeleteSection());
     }
 
