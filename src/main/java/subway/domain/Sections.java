@@ -110,28 +110,27 @@ public class Sections {
 
     public List<Station> getSortedStations() {
         Map<Station, Station> stationMap = new HashMap<>();
+        List<Station> sortedStations = new ArrayList<>();
+        Station start = findTerminalUpStation()
+                .orElseThrow(() -> new SubwayException(ErrorCode.SECTION_NO_START_STATION));
 
         sections.forEach(section -> stationMap.put(section.getUpStation(), section.getDownStation()));
 
-        Station start = findTerminalUpStation();
+        sortedStations.add(start);
 
-        List<Station> sortedStations = new ArrayList<>();
-
-        while (start != null) {
-            sortedStations.add(start);
+        while (stationMap.containsKey(start)) {
             start = stationMap.get(start);
+            sortedStations.add(start);
         }
 
         return sortedStations;
     }
 
-    private Station findTerminalUpStation() {
-        Station start = sections.stream()
+    private Optional<Station> findTerminalUpStation() {
+        return sections.stream()
                 .map(Section::getUpStation)
                 .filter(downStation -> !downStationsCache.contains(downStation))
-                .findAny()
-                .orElse(null);
-        return start;
+                .findAny();
     }
 
     public List<Section> getSections() {

@@ -19,7 +19,8 @@ public enum ErrorCode {
     SECTION_VALIDATE_SIZE(400, "노선에 구간이 하나일 때는 삭제할 수 없습니다"),
     PATH_SAME_STATIONS(400, "출발역과 도착역이 같은 경우 경로 탐색이 불가능합니다"), PATH_NO_SECTIONS(400, "등록된 구간이 없습니다"),
     STATION_NOT_CONTAINED(400, "해당 역이 포함된 역이 없습니다 : "),
-    NO_PATH(400, "출발역부터 도착역까지 경로가 존재하지 않습니다");
+    NO_PATH(400, "출발역부터 도착역까지 경로가 존재하지 않습니다"),
+    SECTION_NO_START_STATION(400, "구간에서 상행 종점역을 찾을 수 없습니다.");
     private final HttpStatus code;
     private final String message;
 
