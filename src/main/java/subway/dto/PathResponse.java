@@ -1,7 +1,7 @@
 package subway.dto;
 
 import java.util.List;
-import subway.domain.ShortestPathFinder;
+import subway.domain.ShortestPath;
 import subway.domain.Station;
 
 public class PathResponse {
@@ -17,8 +17,8 @@ public class PathResponse {
         this.distance = distance;
     }
 
-    public static PathResponse of(final ShortestPathFinder pathFinder) {
-        return new PathResponse(pathFinder.getStations(), pathFinder.getDistance());
+    public static PathResponse of(final ShortestPath shortestPath) {
+        return new PathResponse(shortestPath.getStations(), shortestPath.getDistance());
     }
 
     public List<Station> getStations() {

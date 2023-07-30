@@ -9,7 +9,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
-import subway.domain.ShortestPathFinder;
+import subway.domain.ShortestPath;
 import subway.domain.Station;
 import subway.dto.PathRequest;
 import subway.dto.PathResponse;
@@ -63,8 +63,8 @@ public class SectionService {
         final Station source = getStationBy(pathRequest.getSource());
         final Station target = getStationBy(pathRequest.getTarget());
 
-        final ShortestPathFinder pathFinder = new ShortestPathFinder(sections, source, target);
-        return PathResponse.of(pathFinder);
+        final ShortestPath shortestPath = ShortestPath.createDefault(sections, source, target);
+        return PathResponse.of(shortestPath);
     }
 
     private Line getLineBy(Long id) {
