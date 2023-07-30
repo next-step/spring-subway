@@ -1,14 +1,14 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.RestApi.extractIdFromApiResult;
+import static subway.RestApiUtils.extractIdFromApiResult;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.RestApi;
+import subway.RestApiUtils;
 import subway.ui.dto.LineRequest;
 import subway.ui.dto.SectionRequest;
 import subway.ui.dto.StationRequest;
@@ -31,7 +31,7 @@ class PathIntegrationTest extends IntegrationTest {
         long sourceId = lineNo1.getUpStationId(); // 인천
         long targetId = lineNo2.getUpStationId(); // 잠실
 
-        ExtractableResponse<Response> response = RestApi.get(
+        ExtractableResponse<Response> response = RestApiUtils.get(
             "paths?source=" + sourceId + "&target=" + targetId);
 
         // then
@@ -47,7 +47,7 @@ class PathIntegrationTest extends IntegrationTest {
         // when
         long stationId = lineNo1.getUpStationId();
 
-        ExtractableResponse<Response> response = RestApi.get(
+        ExtractableResponse<Response> response = RestApiUtils.get(
             "paths?source=" + stationId + "&target=" + stationId);
 
         // then
@@ -64,7 +64,7 @@ class PathIntegrationTest extends IntegrationTest {
         long notExistTargetId = lastStationId + 2;
 
         // when
-        ExtractableResponse<Response> response = RestApi.get(
+        ExtractableResponse<Response> response = RestApiUtils.get(
             "paths?source=" + notExistSourceId + "&target=" + notExistTargetId);
 
         // then
@@ -82,7 +82,7 @@ class PathIntegrationTest extends IntegrationTest {
         long notConnectedSource = lineNo1.getUpStationId();
         long notConnectedTarget = lineNo2.getDownStationId();
 
-        ExtractableResponse<Response> response = RestApi.get(
+        ExtractableResponse<Response> response = RestApiUtils.get(
             "paths?source=" + notConnectedSource + "&target=" + notConnectedTarget);
 
         // then
@@ -91,12 +91,12 @@ class PathIntegrationTest extends IntegrationTest {
 
     private long createLine(String name, long upStationId, long downStationId) {
         final LineRequest line = new LineRequest(name, upStationId, downStationId, 10, "blue");
-        return extractIdFromApiResult(RestApi.post(line, "/lines"));
+        return extractIdFromApiResult(RestApiUtils.post(line, "/lines"));
     }
 
     private long createStation(String name) {
         final StationRequest stationRequest = new StationRequest(name);
-        return extractIdFromApiResult(RestApi.post(stationRequest, "/stations"));
+        return extractIdFromApiResult(RestApiUtils.post(stationRequest, "/stations"));
     }
 
     private LineWithStationId createInitialLine(String name, String upStationName,
@@ -114,7 +114,7 @@ class PathIntegrationTest extends IntegrationTest {
             10
         );
 
-        return extractIdFromApiResult(RestApi.post(extendToDownStation, "/lines/" + lineId + "/sections"));
+        return extractIdFromApiResult(RestApiUtils.post(extendToDownStation, "/lines/" + lineId + "/sections"));
     }
 
     private static class LineWithStationId {

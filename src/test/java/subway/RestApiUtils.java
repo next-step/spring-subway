@@ -6,7 +6,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
-public class RestApi {
+public class RestApiUtils {
 
     public static ExtractableResponse<Response> get(String path, Object... pathParams) {
         return RestAssured

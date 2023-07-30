@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.RestApi;
+import subway.RestApiUtils;
 import subway.ui.dto.LineRequest;
 import subway.ui.dto.LineResponse;
 import subway.ui.dto.SectionRequest;
@@ -67,7 +67,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> createResponse2 = createLine(lineRequest2);
 
         // when
-        ExtractableResponse<Response> response = RestApi.get("/lines");
+        ExtractableResponse<Response> response = RestApiUtils.get("/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -91,7 +91,7 @@ class LineIntegrationTest extends IntegrationTest {
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestApi.get("/lines/{lindId}", lineId);
+        ExtractableResponse<Response> response = RestApiUtils.get("/lines/{lindId}", lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -111,7 +111,7 @@ class LineIntegrationTest extends IntegrationTest {
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestApi.put(lineRequest2,
+        ExtractableResponse<Response> response = RestApiUtils.put(lineRequest2,
             "/lines/{lineId}", lineId);
 
         // then
@@ -126,7 +126,7 @@ class LineIntegrationTest extends IntegrationTest {
 
         // when
         Long lineId = Long.parseLong(createResponse.header("Location").split("/")[2]);
-        ExtractableResponse<Response> response = RestApi.delete("/lines/{lineId}", lineId);
+        ExtractableResponse<Response> response = RestApiUtils.delete("/lines/{lineId}", lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -138,22 +138,22 @@ class LineIntegrationTest extends IntegrationTest {
         final StationRequest stationRequest3 = new StationRequest("용산");
         final StationRequest stationRequest4 = new StationRequest("삼각지");
 
-        RestApi.post(stationRequest1, "/stations");
-        RestApi.post(stationRequest2, "/stations");
-        RestApi.post(stationRequest3, "/stations");
-        RestApi.post(stationRequest4, "/stations");
+        RestApiUtils.post(stationRequest1, "/stations");
+        RestApiUtils.post(stationRequest2, "/stations");
+        RestApiUtils.post(stationRequest3, "/stations");
+        RestApiUtils.post(stationRequest4, "/stations");
     }
 
     private void createInitialSections() {
         SectionRequest sectionRequest1 = new SectionRequest("2", "3", 10);
         SectionRequest sectionRequest2 = new SectionRequest("3", "4", 10);
 
-        RestApi.post(sectionRequest1, "/lines/1/sections");
-        RestApi.post(sectionRequest2, "/lines/1/sections");
+        RestApiUtils.post(sectionRequest1, "/lines/1/sections");
+        RestApiUtils.post(sectionRequest2, "/lines/1/sections");
     }
 
     private ExtractableResponse<Response> createLine(LineRequest lineRequest) {
-        return RestApi.post(lineRequest, "/lines");
+        return RestApiUtils.post(lineRequest, "/lines");
     }
 
     private List<StationResponse> createStationResponses() {
