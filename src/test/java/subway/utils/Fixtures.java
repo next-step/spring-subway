@@ -1,21 +1,21 @@
-package subway;
+package subway.utils;
 
-import static subway.RestApiUtils.extractIdFromApiResult;
+import static subway.utils.RestApi.extractIdFromApiResult;
 
 import subway.ui.dto.LineRequest;
 import subway.ui.dto.SectionRequest;
 import subway.ui.dto.StationRequest;
 
-public class DomainFixtures {
+public class Fixtures {
 
     public static long createLine(String name, long upStationId, long downStationId) {
         final LineRequest line = new LineRequest(name, upStationId, downStationId, 10, "blue");
-        return extractIdFromApiResult(RestApiUtils.post(line, "/lines"));
+        return extractIdFromApiResult(RestApi.post(line, "/lines"));
     }
 
     public static long createStation(String name) {
         final StationRequest stationRequest = new StationRequest(name);
-        return extractIdFromApiResult(RestApiUtils.post(stationRequest, "/stations"));
+        return extractIdFromApiResult(RestApi.post(stationRequest, "/stations"));
     }
 
     public static LineWithStationId createInitialLine(String name, String upStationName,
@@ -34,7 +34,7 @@ public class DomainFixtures {
         );
 
         return extractIdFromApiResult(
-            RestApiUtils.post(extendToDownStation, "/lines/" + lineId + "/sections"));
+            RestApi.post(extendToDownStation, "/lines/" + lineId + "/sections"));
     }
 
     public static class LineWithStationId {

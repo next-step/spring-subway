@@ -1,17 +1,17 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.DomainFixtures.createInitialLine;
-import static subway.DomainFixtures.createStation;
-import static subway.DomainFixtures.extendSectionToLine;
+import static subway.utils.Fixtures.createInitialLine;
+import static subway.utils.Fixtures.createStation;
+import static subway.utils.Fixtures.extendSectionToLine;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.DomainFixtures.LineWithStationId;
-import subway.RestApiUtils;
+import subway.utils.Fixtures.LineWithStationId;
+import subway.utils.RestApi;
 import subway.ui.dto.SectionRequest;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -28,14 +28,14 @@ class SectionIntegrationTest extends IntegrationTest {
         final SectionRequest extendToSeoul = new SectionRequest(
             String.valueOf(lineNo1.getDownStationId()),
             String.valueOf(seoulId), 10);
-        ExtractableResponse<Response> response = RestApiUtils.post(extendToSeoul,
+        ExtractableResponse<Response> response = RestApi.post(extendToSeoul,
             "/lines/" + lineNo1.getLineId() + "/sections");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.header("Location")).isNotBlank();
 
-        ExtractableResponse<Response> responseForCheck = RestApiUtils.get(
+        ExtractableResponse<Response> responseForCheck = RestApi.get(
             "/lines/" + lineNo1.getLineId());
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
@@ -51,7 +51,7 @@ class SectionIntegrationTest extends IntegrationTest {
             String.valueOf(newStationId), 10);
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.post(extend,
+        ExtractableResponse<Response> response = RestApi.post(extend,
             "/lines/" + lineNo1.getLineId() + "/sections");
 
         // then
@@ -70,7 +70,7 @@ class SectionIntegrationTest extends IntegrationTest {
             duplicateDownStationId, 5);
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.post(badSectionRequest,
+        ExtractableResponse<Response> response = RestApi.post(badSectionRequest,
             "/lines/" + lineNo1.getLineId() + "/sections");
 
         // then
@@ -89,7 +89,7 @@ class SectionIntegrationTest extends IntegrationTest {
             notExistDownStationId, 5);
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.post(badSectionRequest,
+        ExtractableResponse<Response> response = RestApi.post(badSectionRequest,
             "/lines/"+ lineNo1.getLineId() +"/sections");
 
         // then
@@ -107,7 +107,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final long notExistSectionId = lastSectionId + 1;
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.delete(
+        ExtractableResponse<Response> response = RestApi.delete(
             "/lines/"+ lineNo1.getLineId() +"/sections?stationId=" + notExistSectionId);
 
         // then
@@ -124,13 +124,13 @@ class SectionIntegrationTest extends IntegrationTest {
 
         // when
         long middleStationId = lineNo1.getDownStationId();
-        ExtractableResponse<Response> response = RestApiUtils.delete(
+        ExtractableResponse<Response> response = RestApi.delete(
             "/lines/" + lineNo1.getLineId() + "/sections?stationId=" + middleStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> responseForCheck = RestApiUtils.get("/lines/"+ lineNo1.getLineId());
+        ExtractableResponse<Response> responseForCheck = RestApi.get("/lines/"+ lineNo1.getLineId());
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 
@@ -143,13 +143,13 @@ class SectionIntegrationTest extends IntegrationTest {
         extendSectionToLine(lineNo1.getLineId(), lineNo1.getDownStationId(), lastStationId);
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.delete(
+        ExtractableResponse<Response> response = RestApi.delete(
             "/lines/" + lineNo1.getLineId() + "/sections?stationId=" + lastStationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
 
-        ExtractableResponse<Response> responseForCheck = RestApiUtils.get(
+        ExtractableResponse<Response> responseForCheck = RestApi.get(
             "/lines/" + lineNo1.getLineId());
         assertThat(responseForCheck.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
@@ -161,7 +161,7 @@ class SectionIntegrationTest extends IntegrationTest {
         LineWithStationId lineNo1 = createInitialLine("1호선", "부평", "인천");
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.delete(
+        ExtractableResponse<Response> response = RestApi.delete(
             "/lines/"+ lineNo1.getLineId() + "/sections?stationId=" + lineNo1.getDownStationId());
 
         // then

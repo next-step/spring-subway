@@ -1,28 +1,22 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.DomainFixtures.createInitialLine;
-import static subway.DomainFixtures.createStation;
-import static subway.DomainFixtures.extendSectionToLine;
+import static subway.utils.Fixtures.createInitialLine;
+import static subway.utils.Fixtures.createStation;
+import static subway.utils.Fixtures.extendSectionToLine;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import subway.DomainFixtures;
-import subway.DomainFixtures.LineWithStationId;
-import subway.RestApiUtils;
-import subway.domain.Station;
+import subway.utils.Fixtures.LineWithStationId;
+import subway.utils.RestApi;
 import subway.ui.dto.LineRequest;
 import subway.ui.dto.LineResponse;
-import subway.ui.dto.SectionRequest;
-import subway.ui.dto.StationRequest;
 import subway.ui.dto.StationResponse;
 
 @DisplayName("지하철 노선 관련 기능")
@@ -61,7 +55,7 @@ class LineIntegrationTest extends IntegrationTest {
         ExtractableResponse<Response> lineNo2 = createLine("2호선", "오리", "미금");
 
         // when
-        ExtractableResponse<Response> response = RestApiUtils.get("/lines");
+        ExtractableResponse<Response> response = RestApi.get("/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -86,7 +80,7 @@ class LineIntegrationTest extends IntegrationTest {
 
         // when
         Long lineId = lineNo1.getLineId();
-        ExtractableResponse<Response> response = RestApiUtils.get("/lines/{lindId}", lineId);
+        ExtractableResponse<Response> response = RestApi.get("/lines/{lindId}", lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -106,7 +100,7 @@ class LineIntegrationTest extends IntegrationTest {
         // when
         LineRequest updateRequest = new LineRequest("신분당선", lineNo1.getUpStationId(),
             lineNo1.getDownStationId(), 10, "red");
-        ExtractableResponse<Response> response = RestApiUtils.put(updateRequest,
+        ExtractableResponse<Response> response = RestApi.put(updateRequest,
             "/lines/{lineId}", lineNo1.getLineId());
 
         // then
@@ -121,7 +115,7 @@ class LineIntegrationTest extends IntegrationTest {
 
         // when
         long lineId = lineNo1.getLineId();
-        ExtractableResponse<Response> response = RestApiUtils.delete("/lines/{lineId}", lineId);
+        ExtractableResponse<Response> response = RestApi.delete("/lines/{lineId}", lineId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
@@ -133,7 +127,7 @@ class LineIntegrationTest extends IntegrationTest {
         long downStationId = createStation(downStationName);
         LineRequest lineRequest = new LineRequest(name, upStationId, downStationId, 10,
             "bg-red-600");
-        return RestApiUtils.post(lineRequest, "/lines");
+        return RestApi.post(lineRequest, "/lines");
     }
 
     private List<Long> extractIds(List<StationResponse> stationResponses) {

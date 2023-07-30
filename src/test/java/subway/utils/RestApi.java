@@ -1,4 +1,4 @@
-package subway;
+package subway.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -6,7 +6,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
 
-public class RestApiUtils {
+public class RestApi {
 
     public static ExtractableResponse<Response> get(String path, Object... pathParams) {
         return RestAssured
