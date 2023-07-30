@@ -21,7 +21,7 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long firstStationId = CreateHelper.createStation("강남역");
         final Long secondStationId = CreateHelper.createStation("역삼역");
         final Long thirdStationId = CreateHelper.createStation("교대역");
-        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId, 10);
 
         final SectionRequest params = new SectionRequest(secondStationId, thirdStationId, 10);
 
@@ -40,8 +40,8 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long firstStationId = CreateHelper.createStation("강남역");
         final Long secondStationId = CreateHelper.createStation("역삼역");
         final Long thirdStationId = CreateHelper.createStation("교대역");
-        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
-        CreateHelper.createSection(secondStationId, thirdStationId, lineId);
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId, 10);
+        CreateHelper.createSection(secondStationId, thirdStationId, lineId, 10);
 
         final SectionRequest params = new SectionRequest(thirdStationId, secondStationId, 10);
 
@@ -58,7 +58,7 @@ class SectionIntegrationTest extends IntegrationTest {
         // given
         final Long firstStationId = CreateHelper.createStation("강남역");
         final Long secondStationId = CreateHelper.createStation("역삼역");
-        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId, 10);
 
         final SectionRequest params = new SectionRequest(secondStationId, secondStationId, 10);
 
@@ -76,8 +76,8 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long firstStationId = CreateHelper.createStation("강남역");
         final Long secondStationId = CreateHelper.createStation("역삼역");
         final Long thirdStationId = CreateHelper.createStation("교대역");
-        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
-        CreateHelper.createSection(secondStationId, thirdStationId, lineId);
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId, 10);
+        CreateHelper.createSection(secondStationId, thirdStationId, lineId, 10);
 
         // when
         ExtractableResponse<Response> response = RestAssuredHelper.delete(
@@ -95,8 +95,8 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long firstStationId = CreateHelper.createStation("강남역");
         final Long secondStationId = CreateHelper.createStation("역삼역");
         final Long thirdStationId = CreateHelper.createStation("교대역");
-        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
-        CreateHelper.createSection(secondStationId, thirdStationId, lineId);
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId, 10);
+        CreateHelper.createSection(secondStationId, thirdStationId, lineId, 10);
 
         // when
         ExtractableResponse<Response> response = RestAssuredHelper.delete(
@@ -114,8 +114,8 @@ class SectionIntegrationTest extends IntegrationTest {
         final Long firstStationId = CreateHelper.createStation("강남역");
         final Long secondStationId = CreateHelper.createStation("역삼역");
         final Long thirdStationId = CreateHelper.createStation("교대역");
-        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId);
-        CreateHelper.createSection(secondStationId, thirdStationId, lineId);
+        final Long lineId = CreateHelper.createLine("2호선", "bg-123", firstStationId, secondStationId, 10);
+        CreateHelper.createSection(secondStationId, thirdStationId, lineId, 10);
 
         // when
         ExtractableResponse<Response> response = RestAssuredHelper.delete(

@@ -19,14 +19,16 @@ public class CreateHelper {
                 .getStations().size();
     }
 
-    public static void createSection(final Long upStationId, final Long downStationId, Long lineId) {
-        SectionRequest params = new SectionRequest(upStationId, downStationId, 10);
+    public static void createSection(final Long upStationId, final Long downStationId, final Long lineId,
+            final Integer distance) {
+        SectionRequest params = new SectionRequest(upStationId, downStationId, distance);
 
         RestAssuredHelper.post("/lines/" + lineId + "/sections", params);
     }
 
-    public static Long createLine(String name, String color, long upStationId, long downStationId) {
-        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, 10);
+    public static Long createLine(String name, String color, long upStationId, long downStationId,
+            final Integer distance) {
+        LineRequest lineRequest = new LineRequest(name, color, upStationId, downStationId, distance);
 
         ExtractableResponse<Response> lineResponse = RestAssuredHelper.post("/lines", lineRequest);
 
