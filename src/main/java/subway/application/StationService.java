@@ -1,33 +1,52 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.SubwayException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class StationService {
+
     private final StationDao stationDao;
 
     public StationService(StationDao stationDao) {
         this.stationDao = stationDao;
     }
 
+    @Transactional
     public StationResponse saveStation(StationRequest stationRequest) {
+        validateByName(stationRequest.getName());
         Station station = stationDao.insert(new Station(stationRequest.getName()));
         return StationResponse.of(station);
     }
 
-    public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+    private void validateByName(final String name) {
+        stationDao.findByName(name)
+                .ifPresent(station -> {
+                    throw new SubwayException(String.format("중복된 이름(%s)의 역이 존재합니다.", name));
+                });
     }
 
-    public List<StationResponse> findAllStationResponses() {
-        List<Station> stations = stationDao.findAll();
+    public StationResponse findStationById(Long id) {
+        return StationResponse.of(findStation(id));
+    }
+
+    private Station findStation(final long id) {
+        return stationDao.findById(id)
+                .orElseThrow(() ->
+                        new SubwayException(String.format("해당 id(%d)를 가지는 역이 존재하지 않습니다.", id))
+                );
+    }
+
+    public List<StationResponse> findAllStations() {
+        final List<Station> stations = stationDao.findAll();
 
         return stations.stream()
                 .map(StationResponse::of)

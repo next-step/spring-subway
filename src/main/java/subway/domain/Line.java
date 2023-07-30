@@ -2,12 +2,13 @@ package subway.domain;
 
 import java.util.Objects;
 
-public class Line {
+public final class Line {
+
     private Long id;
     private String name;
     private String color;
 
-    public Line() {
+    private Line() {
     }
 
     public Line(String name, String color) {
@@ -44,5 +45,14 @@ public class Line {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, color);
+    }
+
+    @Override
+    public String toString() {
+        return "Line{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                '}';
     }
 }

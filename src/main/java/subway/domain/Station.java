@@ -2,11 +2,12 @@ package subway.domain;
 
 import java.util.Objects;
 
-public class Station {
+public final class Station {
+
     private Long id;
     private String name;
 
-    public Station() {
+    private Station() {
     }
 
     public Station(Long id, String name) {
@@ -16,6 +17,10 @@ public class Station {
 
     public Station(String name) {
         this.name = name;
+    }
+
+    public boolean equalsId(final long id) {
+        return this.id.equals(id);
     }
 
     public Long getId() {
@@ -37,5 +42,13 @@ public class Station {
     @Override
     public int hashCode() {
         return Objects.hash(id, name);
+    }
+
+    @Override
+    public String toString() {
+        return "Station{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

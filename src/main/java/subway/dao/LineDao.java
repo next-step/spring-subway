@@ -17,23 +17,18 @@ public class LineDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
+    private final RowMapper<Line> rowMapper;
 
-    private final RowMapper<Line> lineRowMapper = (rs, rowNum) ->
-            new Line(
-                    rs.getLong("id"),
-                    rs.getString("name"),
-                    rs.getString("color")
-            );
-
-    public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource) {
+    public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource, final RowMapper<Line> rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.insertAction = new SimpleJdbcInsert(dataSource)
                 .withTableName("line")
                 .usingGeneratedKeyColumns("id");
+        this.rowMapper = rowMapper;
     }
 
     public Line insert(Line line) {
-        Map<String, Object> params = new HashMap<>();
+        final Map<String, Object> params = new HashMap<>();
         params.put("id", line.getId());
         params.put("name", line.getName());
         params.put("color", line.getColor());
@@ -44,17 +39,19 @@ public class LineDao {
 
     public List<Line> findAll() {
         String sql = "select id, name, color from LINE";
-        return jdbcTemplate.query(sql, lineRowMapper);
+        return jdbcTemplate.query(sql, rowMapper);
     }
 
-    public Line findById(Long id) {
-        String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, lineRowMapper, id);
+    public Optional<Line> findById(Long id) {
+        String sql = "SELECT id, name, color FROM line WHERE id = ?";
+        return jdbcTemplate.query(sql, rowMapper, id)
+                .stream()
+                .findAny();
     }
 
     public void update(Line newLine) {
         String sql = "update LINE set name = ?, color = ? where id = ?";
-        jdbcTemplate.update(sql, new Object[]{newLine.getName(), newLine.getColor(), newLine.getId()});
+        jdbcTemplate.update(sql, newLine.getName(), newLine.getColor(), newLine.getId());
     }
 
     public void deleteById(Long id) {
@@ -63,9 +60,8 @@ public class LineDao {
 
     public Optional<Line> findByName(final String name) {
         String sql = "select * from LINE WHERE name = ?";
-        return jdbcTemplate.query(sql, lineRowMapper, name)
+        return jdbcTemplate.query(sql, rowMapper, name)
                 .stream()
                 .findAny();
     }
-
 }

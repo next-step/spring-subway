@@ -6,32 +6,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.sql.SQLException;
-
 @RestControllerAdvice
 public class SubwayControllerAdvice {
 
-    @ExceptionHandler(SQLException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse sqlExceptionHandler(SQLException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler(IllegalSectionException.class)
+    @ExceptionHandler(SubwayException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse illegalSectionExceptionHandler(IllegalSectionException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler(IllegalLineException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse illegalLineExceptionHandler(IllegalLineException exception) {
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler(IllegalStationsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse illegalStationsExceptionHandler(IllegalStationsException exception) {
+    public ErrorResponse illegalSubwayExceptionHandler(SubwayException exception) {
         return new ErrorResponse(exception.getMessage());
     }
 
@@ -42,10 +22,11 @@ public class SubwayControllerAdvice {
         return new ErrorResponse(message);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse illegalArgumentExceptionHandler(IllegalArgumentException exception) {
-        return new ErrorResponse(exception.getMessage());
+    public ErrorResponse runtimeExceptionHandler(Exception exception) {
+        exception.printStackTrace();
+        return new ErrorResponse(exception.getLocalizedMessage());
     }
 
     private static String extractMessage(final HttpMessageNotReadableException exception) {

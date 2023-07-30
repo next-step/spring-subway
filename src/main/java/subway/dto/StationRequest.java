@@ -1,14 +1,13 @@
 package subway.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import subway.exception.IllegalRequestException;
+import subway.exception.SubwayException;
 
 public final class StationRequest {
 
-    private String name;
+    private static final int MAX_NAME_LENGTH = 255;
 
-    private StationRequest() {
-    }
+    private final String name;
 
     @JsonCreator
     public StationRequest(final String name) {
@@ -19,7 +18,10 @@ public final class StationRequest {
 
     private void validateName(final String name) {
         if (name == null || name.isBlank()) {
-            throw new IllegalRequestException("역의 이름은 최소 한 글자 이상이어야 합니다.");
+            throw new SubwayException("역의 이름은 최소 한 글자 이상이어야 합니다.");
+        }
+        if (name.length() > MAX_NAME_LENGTH) {
+            throw new SubwayException("역의 이름은 " + MAX_NAME_LENGTH + "자를 넘을 수 없습니다.");
         }
     }
 
