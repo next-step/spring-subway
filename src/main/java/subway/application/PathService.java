@@ -1,6 +1,5 @@
 package subway.application;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,8 +59,8 @@ public class PathService {
 
     private List<StationResponse> sortedStationResponse(final PathFinderResult result,
             final List<Station> unsortedStations) {
-        Map<Long, Station> idToStation = new HashMap<>();
-        unsortedStations.forEach(station -> idToStation.put(station.getId(), station));
+        Map<Long, Station> idToStation = unsortedStations.stream()
+                .collect(Collectors.toMap(Station::getId, station -> station));
 
         return result.getPaths().stream()
                 .map(stationId -> StationResponse.of(idToStation.get(stationId)))
