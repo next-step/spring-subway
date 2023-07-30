@@ -39,7 +39,9 @@ public class StationDao {
 
     public Optional<Station> findById(Long id) {
         String sql = "select * from STATION where id = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, rowMapper, id));
+        return jdbcTemplate.query(sql, rowMapper, id)
+                .stream()
+                .findAny();
     }
 
     public Optional<Station> findByName(String name) {

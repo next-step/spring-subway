@@ -10,7 +10,7 @@ public class PathIntegrationSupporter {
     static ExtractableResponse<Response> findPath(Long source, Long target) {
         return given().log().all()
                 .when()
-                .post("/paths?source={source}&target={target}", source, target)
+                .get("/paths?source={source}&target={target}", source, target)
                 .then().log().all()
                 .extract();
     }

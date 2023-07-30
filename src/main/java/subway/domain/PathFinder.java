@@ -29,16 +29,17 @@ public class PathFinder {
 
     private DijkstraShortestPath<Station, DefaultWeightedEdge> getShortestPath(List<Section> sections, Station startStation, Station endStation) {
         WeightedMultigraph<Station, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
+        graph.addVertex(startStation);
+        graph.addVertex(endStation);
+
         for (Section section : sections) {
             Station upStation = section.getUpStation();
             Station downStation = section.getDownStation();
-
             graph.addVertex(upStation);
             graph.addVertex(downStation);
 
             graph.setEdgeWeight(graph.addEdge(upStation, downStation), section.getDistance());
         }
-
         return new DijkstraShortestPath<>(graph);
     }
 
