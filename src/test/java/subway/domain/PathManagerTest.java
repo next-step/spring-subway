@@ -3,11 +3,12 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.SubwayException;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static subway.fixture.SectionFixture.*;
 import static subway.fixture.StationFixture.*;
 
@@ -37,6 +38,21 @@ class PathManagerTest {
         assertThat(범계역_잠실역_최단경로).containsExactly(
                 범계역(), 경마공원역(), 사당역(), 강남역(), 잠실역()
         );
+    }
+
+    @DisplayName("출발역 또는 도착역이 존재하지 않아 최단 경로를 찾는 데 실패한다.")
+    @Test
+    void findShortestPathWithStationNoExist() {
+        // given
+        final PathManager pathManager = pathManager();
+
+        // when & then
+        assertThatThrownBy(() -> pathManager.findStationsOfShortestPath(첫번째역(), 범계역()))
+                .hasMessage(첫번째역().getName()+ "은(는) 존재하지 않는 역입니다.")
+                .isInstanceOf(SubwayException.class);
+        assertThatThrownBy(() -> pathManager.findStationsOfShortestPath(범계역(), 두번째역()))
+                .hasMessage(두번째역().getName()+ "은(는) 존재하지 않는 역입니다.")
+                .isInstanceOf(SubwayException.class);
     }
 
     private PathManager pathManager() {
