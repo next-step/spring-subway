@@ -1,17 +1,17 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.RestApiUtils.extractIdFromApiResult;
+import static subway.DomainFixtures.createInitialLine;
+import static subway.DomainFixtures.createStation;
+import static subway.DomainFixtures.extendSectionToLine;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import subway.DomainFixtures.LineWithStationId;
 import subway.RestApiUtils;
-import subway.ui.dto.LineRequest;
-import subway.ui.dto.SectionRequest;
-import subway.ui.dto.StationRequest;
 
 @DisplayName("지하철 구간 조회 관련 기능")
 class PathIntegrationTest extends IntegrationTest {
@@ -87,57 +87,5 @@ class PathIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
-
-    private long createLine(String name, long upStationId, long downStationId) {
-        final LineRequest line = new LineRequest(name, upStationId, downStationId, 10, "blue");
-        return extractIdFromApiResult(RestApiUtils.post(line, "/lines"));
-    }
-
-    private long createStation(String name) {
-        final StationRequest stationRequest = new StationRequest(name);
-        return extractIdFromApiResult(RestApiUtils.post(stationRequest, "/stations"));
-    }
-
-    private LineWithStationId createInitialLine(String name, String upStationName,
-        String downStationName) {
-        long upStationId = createStation(upStationName);
-        long downStationId = createStation(downStationName);
-        long lineId = createLine(name, upStationId, downStationId);
-        return new LineWithStationId(lineId, upStationId, downStationId);
-    }
-
-    private long extendSectionToLine(long lineId, long upStationId, long downStationId) {
-        final SectionRequest extendToDownStation = new SectionRequest(
-            String.valueOf(upStationId),
-            String.valueOf(downStationId),
-            10
-        );
-
-        return extractIdFromApiResult(RestApiUtils.post(extendToDownStation, "/lines/" + lineId + "/sections"));
-    }
-
-    private static class LineWithStationId {
-        private final long lineId;
-        private final long upStationId;
-        private final long downStationId;
-
-        public LineWithStationId(long lineId, long upStationId, long downStationId) {
-            this.lineId = lineId;
-            this.upStationId = upStationId;
-            this.downStationId = downStationId;
-        }
-
-        public long getLineId() {
-            return lineId;
-        }
-
-        public long getUpStationId() {
-            return upStationId;
-        }
-
-        public long getDownStationId() {
-            return downStationId;
-        }
     }
 }
