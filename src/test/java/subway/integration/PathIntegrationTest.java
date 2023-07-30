@@ -25,7 +25,7 @@ import static subway.integration.supporter.StationIntegrationSupporter.createSta
 
 @DisplayName("지하철 경로 관련 기능")
 @IntegrationTest
-class PathManagerIntegrationTest {
+class PathIntegrationTest {
 
     private long 범계역_ID;
     private long 경마공원역_ID;
@@ -93,5 +93,47 @@ class PathManagerIntegrationTest {
                 .map(StationResponse::getId)
                 .collect(Collectors.toUnmodifiableList());
         assertThat(stationsId).containsExactly(범계역_ID, 경마공원역_ID, 사당역_ID, 강남역_ID, 잠실역_ID);
+    }
+
+    @DisplayName("출발역과 도착역이 같아 지하철 경로를 조회하는 데 실패한다.")
+    @Test
+    void getPathWithSameStations() {
+        // when
+        final ExtractableResponse<Response> response = PathIntegrationSupporter.findPath(범계역_ID, 범계역_ID);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().jsonPath().getString("message"))
+                .isEqualTo("출발역과 도착역은 같을 수 없습니다.");
+    }
+
+    @DisplayName("출발역 또는 도착역이 존재하지 않아 지하철 경로를 조회하는 데 실패한다.")
+    @Test
+    void getPathWithStationNotExist() {
+        // when
+        final int notExistId = -1;
+        final ExtractableResponse<Response> response1 = PathIntegrationSupporter.findPath(notExistId, 범계역_ID);
+        final ExtractableResponse<Response> response2 = PathIntegrationSupporter.findPath(범계역_ID, notExistId);
+
+        // then
+        assertThat(response1.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response1.body().jsonPath().getString("message"))
+                .isEqualTo("해당 id(" + notExistId + ")를 가지는 역이 존재하지 않습니다.");
+
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response2.body().jsonPath().getString("message"))
+                .isEqualTo("해당 id(" + notExistId + ")를 가지는 역이 존재하지 않습니다.");
+    }
+
+    @DisplayName("출발역과 도착역을 연결하는 경로가 없어 지하철 경로를 조회하는 데 실패한다.")
+    @Test
+    void getPathWithNotConnectedStations() {
+        // when
+        final ExtractableResponse<Response> response = PathIntegrationSupporter.findPath(범계역_ID, 노량진역_ID);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().jsonPath().getString("message"))
+                .isEqualTo("출발역과 도착역을 연결하는 경로가 존재하지 않습니다.");
     }
 }
