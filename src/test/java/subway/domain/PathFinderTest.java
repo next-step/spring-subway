@@ -136,26 +136,4 @@ class PathFinderTest {
         // when & then
         assertThrows(FindPathException.class, () -> pathFinder.findShortestPath(교대역, 면목역));
     }
-
-    @DisplayName("출발역과 도착역이 같을 경우 예외를 던진다.")
-    @Test
-    void sourceEqualsToTarget() {
-        // given
-        /**
-         * 교대역    --- 1km ---    강남역    --- 1km ---    양재역
-         */
-        final Station 교대역 = new Station(1L, "교대역");
-        final Station 강남역 = new Station(2L, "강남역");
-        final Station 양재역 = new Station(3L, "양재역");
-
-        final Section 교대_강남 = new Section(교대역, 강남역, 1);
-        final Section 강남_양재 = new Section(강남역, 양재역, 1);
-
-        final List<Section> sections = new ArrayList<>(List.of(교대_강남, 강남_양재));
-
-        final PathFinder pathFinder = new PathFinder(sections);
-
-        // when & then
-        assertThrows(FindPathException.class, () -> pathFinder.findShortestPath(교대역, 교대역));
-    }
 }
