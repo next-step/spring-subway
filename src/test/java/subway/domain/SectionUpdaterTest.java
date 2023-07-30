@@ -15,7 +15,7 @@ import subway.exception.IllegalStationsException;
 
 class SectionUpdaterTest {
 
-    @DisplayName("Sections 생성에 성공한다.")
+    @DisplayName("SectionUpdater 생성에 성공한다.")
     @Test
     void createSectionsTest() {
         // given
@@ -35,11 +35,9 @@ class SectionUpdaterTest {
 
         Station startStation = sectionList.get(0).getUpStation();
         Station newStation = new Station(6, "munjeong");
-        SectionParam overlapped = new SectionParam(line.getId(), startStation, newStation, 2);
         SectionParam notOverlapped = new SectionParam(line.getId(), newStation, startStation, 2);
 
         // when & then
-        //assertThat(sections.isOverlapped(overlapped)).isTrue();
         assertThat(sectionUpdater.shouldUpdate(notOverlapped)).isFalse();
     }
 
