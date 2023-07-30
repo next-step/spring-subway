@@ -13,11 +13,11 @@ import subway.domain.Section;
 @Repository
 public class SectionDao {
 
-    private static final String SECTION_FIELD_SQL = "s.id AS id, s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, s.distance AS distance";
-    private static final String LINE_FIELD_SQL = "l.id AS line_id, l.name AS line_name, l.color AS line_color";
-    private static final String UP_STATION_FIELD_SQL = "up.id AS up_station_id, up.name as up_station_name";
-    private static final String DOWN_STATION_FIELD_SQL = "down.id AS down_station_id, down.name AS down_station_name";
-    private static final String SECTION_FIELD_SELECT_SQL = "SELECT " + SECTION_FIELD_SQL +", " + LINE_FIELD_SQL + ", " + UP_STATION_FIELD_SQL + ", " + DOWN_STATION_FIELD_SQL + " ";
+    private static final String SECTION_FIELD_SELECT_SQL = "SELECT s.id AS id, s.distance AS distance, "
+        + "s.up_station_id AS up_station_id, s.down_station_id AS down_station_id, "
+        + "l.id AS line_id, l.name AS line_name, l.color AS line_color, "
+        + "up.id AS up_station_id, up.name as up_station_name, "
+        + "down.id AS down_station_id, down.name AS down_station_name ";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert insertAction;
@@ -33,7 +33,6 @@ public class SectionDao {
     }
 
     public Section insert(final Section section) {
-        // TODO: 지저분하다. rowMapper 를 활용하는 방법은 없나 ? 직접 타이핑하면 틀릴 수도 있고 귀찮음.
         SqlParameterSource params = new MapSqlParameterSource()
             .addValue("id", section.getId())
             .addValue("line_id", section.getLine().getId())
