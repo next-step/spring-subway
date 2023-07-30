@@ -81,7 +81,7 @@ class PathIntegrationTest extends IntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.statusCode());
     }
 
-    @DisplayName("출발역과 도착역이 연결되어 있지 않은 경우 예외를 던진다.")
+    @DisplayName("경로가 존재하지 않을 경우 예외를 던진다.")
     @Test
     void searchPath_notConnected() {
         // given
@@ -97,7 +97,7 @@ class PathIntegrationTest extends IntegrationTest {
         final ExtractableResponse<Response> response = RestAssuredHelper.get("/paths", params);
 
         // then
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.statusCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.statusCode());
     }
 
     @DisplayName("출발역이 존재하지 않을 경우 예외를 던진다.")

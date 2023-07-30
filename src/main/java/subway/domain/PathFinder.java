@@ -1,6 +1,8 @@
 package subway.domain;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -35,8 +37,14 @@ public class PathFinder {
     }
 
     private void setVertices(final WeightedMultigraph<Long, DefaultWeightedEdge> graph, final List<Section> sections) {
-        graph.addVertex(sections.get(0).getUpStation().getId());
-        sections.forEach(section -> graph.addVertex(section.getDownStation().getId()));
+        final Set<Long> stationsIds = new HashSet<>();
+
+        sections.forEach(section -> {
+            stationsIds.add(section.getUpStation().getId());
+            stationsIds.add(section.getDownStation().getId());
+        });
+
+        stationsIds.forEach(graph::addVertex);
     }
 
     private void setEdges(final WeightedMultigraph<Long, DefaultWeightedEdge> graph, final List<Section> sections) {
@@ -52,6 +60,6 @@ public class PathFinder {
     public PathFinderResult findShortestPath(final Station source, final Station target) {
         GraphPath<Long, DefaultWeightedEdge> path = shortestPath.getPath(source.getId(), target.getId());
 
-        return new PathFinderResult(path.getVertexList(), (int) path.getWeight());
+        return new PathFinderResult(path);
     }
 }

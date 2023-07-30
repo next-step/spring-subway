@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.dto.ErrorResponse;
 import subway.exception.CustomException;
 import subway.exception.ErrorCode;
+import subway.exception.FindPathException;
 import subway.exception.LineException;
 import subway.exception.SectionException;
 import subway.exception.StationException;
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({LineException.class, SectionException.class, StationException.class})
+    @ExceptionHandler({LineException.class, SectionException.class, StationException.class, FindPathException.class})
     protected ResponseEntity<ErrorResponse> handleSectionException(final CustomException e) {
         log.error(e.getMessage());
 
