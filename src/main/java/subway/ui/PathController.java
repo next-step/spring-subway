@@ -11,8 +11,14 @@ import subway.dto.PathResponse;
 @RequestMapping("/paths")
 public class PathController {
 
+    private static final String NUMBER_PATTERN = "-?\\d+";
+
     @GetMapping
     public ResponseEntity<PathResponse> searchPath(@RequestParam String source, @RequestParam String target) {
+        if (!source.matches(NUMBER_PATTERN) || !target.matches(NUMBER_PATTERN)) {
+            throw new IllegalArgumentException("출발역과 도착역은 정수만 입력할 수 있습니다.");
+        }
+
         return ResponseEntity.ok().build();
     }
 }
