@@ -26,18 +26,6 @@ class DistanceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {-1.2, 3.4})
-    @DisplayName("값이 정수가 아닐 경우 SubwayIllegalException을 던진다.")
-    void createFailWithNotInteger(final double value) {
-        /* given */
-
-
-        /* when & then */
-        assertThatThrownBy(() -> new Distance(value)).isInstanceOf(SubwayIllegalArgumentException.class)
-                .hasMessage("거리는 정수여야합니다. 입력값: " + value);
-    }
-
-    @ParameterizedTest
     @ValueSource(ints = {-777, -1, 0})
     @DisplayName("값이 0 이하일 경우 SubwayIllegalException을 던진다.")
     void createFailWithLessThanOrEqualZero(final int value) {

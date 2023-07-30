@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class StationGraph {
 
-    private final Graph<Long, DefaultWeightedEdge> stationGraph
+    private final Graph<Long, DefaultWeightedEdge> graph
             = new WeightedMultigraph<>(DefaultWeightedEdge.class);
 
     public StationGraph(final List<Section> sections) {
@@ -29,7 +29,7 @@ public class StationGraph {
     }
 
     public Distance getShortestPathDistance(final Long from, final Long to) {
-        return new Distance(getShortestPath(from, to).getWeight());
+        return new Distance((int) getShortestPath(from, to).getWeight());
     }
 
     private void initVertices(final List<Section> sections) {
@@ -38,13 +38,13 @@ public class StationGraph {
             sectionIds.add(section.getUpStationId());
             sectionIds.add(section.getDownStationId());
         }
-        sectionIds.forEach(stationGraph::addVertex);
+        sectionIds.forEach(graph::addVertex);
     }
 
     private void initEdges(final List<Section> sections) {
         for (Section section : sections) {
-            stationGraph.setEdgeWeight(
-                    stationGraph.addEdge(section.getUpStationId(), section.getDownStationId()),
+            graph.setEdgeWeight(
+                    graph.addEdge(section.getUpStationId(), section.getDownStationId()),
                     section.getDistance().getValue()
             );
         }
@@ -56,7 +56,7 @@ public class StationGraph {
         validateContainsStation(to);
 
         final GraphPath<Long, DefaultWeightedEdge> shortestPath
-                = new DijkstraShortestPath<>(stationGraph).getPath(from, to);
+                = new DijkstraShortestPath<>(graph).getPath(from, to);
         if (shortestPath == null) {
             throw new SubwayIllegalArgumentException(from + "번역과 " + to + "번역 사이에 경로가 존재하지 않습니다.");
         }
@@ -83,6 +83,6 @@ public class StationGraph {
     }
 
     private boolean notContains(final Long stationId) {
-        return !stationGraph.containsVertex(stationId);
+        return !graph.containsVertex(stationId);
     }
 }

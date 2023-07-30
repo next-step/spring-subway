@@ -8,14 +8,6 @@ public class Distance {
 
     private final int value;
 
-    public Distance(final double value) {
-        if (value != Math.floor(value)) {
-            throw new SubwayIllegalArgumentException("거리는 정수여야합니다. 입력값: " + value);
-        }
-
-        this.value = (int) value;
-    }
-
     public Distance(final int value) {
         validateNotLessThanEqualZero(value);
 
