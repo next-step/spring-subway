@@ -29,13 +29,13 @@ create table if not exists SECTION
 create table if not exists PATH
 (
     id bigint auto_increment not null,
-    departure_id bigint not null,
-    arrival_id bigint not null,
+    source_id bigint not null,
+    target_id bigint not null,
     distance int not null,
     primary key(id),
-    foreign key(departure_id) references STATION(id),
-    foreign key(arrival_id) references STATION(id)
-    );
+    foreign key(source_id) references STATION(id),
+    foreign key(target_id) references STATION(id)
+);
 
 create table if not exists DETAIL_PATH
 (
@@ -46,4 +46,4 @@ create table if not exists DETAIL_PATH
     primary key(id),
     foreign key(path_id) references PATH(id) on delete cascade,
     foreign key(waypoint_id) references STATION(id)
-    );
+);

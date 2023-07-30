@@ -68,7 +68,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("출발역과 도착역이 같은 경우 예외를 던진다.")
     @Test
-    void searchPath_departureEqualsToArrival() {
+    void searchPath_sourceEqualsToTarget() {
         // given
         final Map<String, Object> params = new HashMap<>();
         params.put("source", 교대역_ID);
@@ -102,7 +102,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("출발역이 존재하지 않을 경우 예외를 던진다.")
     @Test
-    void searchPath_notExistsDeparture() {
+    void searchPath_notExistsSource() {
         // given
         final Map<String, Object> params = new HashMap<>();
         params.put("source", 9999L);
@@ -117,7 +117,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("도착역이 존재하지 않을 경우 예외를 던진다.")
     @Test
-    void searchPath_notExistsArrival() {
+    void searchPath_notExistsTarget() {
         // given
         final Map<String, Object> params = new HashMap<>();
         params.put("source", 교대역_ID);
@@ -132,7 +132,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("출발역이 비어있을 경우 예외를 던진다.")
     @Test
-    void searchPath_nullDeparture() {
+    void searchPath_nullSource() {
         // given
         final Map<String, Object> params = new HashMap<>();
 //        params.put("source", 교대역_ID);
@@ -147,7 +147,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("도착역이 비어있을 경우 예외를 던진다.")
     @Test
-    void searchPath_nullArrival() {
+    void searchPath_nullTarget() {
         // given
         final Map<String, Object> params = new HashMap<>();
         params.put("source", 교대역_ID);
@@ -162,7 +162,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("출발역에 숫자가 아닌 문자가 포함되어 있을 경우 예외를 던진다.")
     @Test
-    void searchPath_departureIncludeCharacter() {
+    void searchPath_sourceIncludeCharacter() {
         // given
         final Map<String, Object> params = new HashMap<>();
         params.put("source", "1,");
@@ -177,7 +177,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("도착역에 숫자가 아닌 문자가 포함되어 있을 경우 예외를 던진다.")
     @Test
-    void searchPath_arrivalIncludeCharacter() {
+    void searchPath_targetIncludeCharacter() {
         // given
         final Map<String, Object> params = new HashMap<>();
         params.put("source", 교대역_ID);
