@@ -185,7 +185,7 @@ class SectionUpdaterTest {
         SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
 
         Section upDirection = sectionList.get(2);
-        long stationId = upDirection.getDownStation().getId();
+        long stationId = upDirection.getDownStationId();
 
         // when
         Section result = sectionUpdater.findUpDirectionSection(stationId);

@@ -155,8 +155,8 @@ class LineServiceTest {
     }
 
     private LineRequest convertToLineRequest(Line line, Section section) {
-        return new LineRequest(line.getName(), section.getUpStation().getId(),
-            section.getDownStation().getId(), section.getDistance(), line.getColor());
+        return new LineRequest(line.getName(), section.getUpStationId(),
+            section.getDownStationId(), section.getDistance(), line.getColor());
     }
 
     private List<Long> getSortedStationIds() {

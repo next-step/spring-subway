@@ -19,15 +19,15 @@ public class SectionUpdater {
     public Section updateOverlappedSection(final SectionParam params) {
         validateOnlyOneStationExistInLine(params);
 
-        if (sections.isDownDirectionSectionExist(params.getUpStation().getId())) {
+        if (sections.isDownDirectionSectionExist(params.getUpStationId())) {
             Section overlappedSection = sections.getDownDirectionSection(
-                params.getUpStation().getId());
+                params.getUpStationId());
             return updateOverlappedDownDirectionSection(overlappedSection, params);
         }
 
-        if (sections.isUpDirectionSectionExist(params.getDownStation().getId())) {
+        if (sections.isUpDirectionSectionExist(params.getDownStationId())) {
             Section overlappedSection = sections.getUpDirectionSection(
-                params.getDownStation().getId());
+                params.getDownStationId());
             return updateOverlappedUpDirectionSection(overlappedSection, params);
         }
 
@@ -42,11 +42,11 @@ public class SectionUpdater {
         validateOnlyOneStationExistInLine(params);
 
         boolean isUpStationOverlapped =
-            sections.isStationExist(params.getUpStation().getId()) &&
-                !sections.isEndStation(params.getUpStation().getId());
+            sections.isStationExist(params.getUpStationId()) &&
+                !sections.isEndStation(params.getUpStationId());
         boolean isDownStationOverlapped =
-            sections.isStationExist(params.getDownStation().getId()) &&
-                !sections.isStartStation(params.getDownStation().getId());
+            sections.isStationExist(params.getDownStationId()) &&
+                !sections.isStartStation(params.getDownStationId());
 
         return isUpStationOverlapped || isDownStationOverlapped;
     }
@@ -95,8 +95,8 @@ public class SectionUpdater {
     }
 
     private void validateOnlyOneStationExistInLine(final SectionParam params) {
-        boolean upStationExist = sections.isStationExist(params.getUpStation().getId());
-        boolean downStationExist = sections.isStationExist(params.getDownStation().getId());
+        boolean upStationExist = sections.isStationExist(params.getUpStationId());
+        boolean downStationExist = sections.isStationExist(params.getDownStationId());
         if (upStationExist == downStationExist) {
             throw new IllegalSectionException("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
         }

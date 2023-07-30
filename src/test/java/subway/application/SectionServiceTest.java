@@ -64,9 +64,9 @@ class SectionServiceTest {
         final SectionResponse sectionResponse = sectionService.saveSection(1L, sectionRequest);
 
         // then
-        assertThat(sectionResponse.getUpStationId()).isEqualTo(newSection.getUpStation().getId());
+        assertThat(sectionResponse.getUpStationId()).isEqualTo(newSection.getUpStationId());
         assertThat(sectionResponse.getDownStationId()).isEqualTo(
-            newSection.getDownStation().getId());
+            newSection.getDownStationId());
         assertThat(sectionResponse.getDistance()).isEqualTo(10);
     }
 
@@ -173,8 +173,8 @@ class SectionServiceTest {
         // given
         final List<Section> sections = createSections();
         final Section deleteTarget = sections.get(0);
-        final long lineId = deleteTarget.getLine().getId();
-        final long startStationId = deleteTarget.getUpStation().getId();
+        final long lineId = deleteTarget.getLineId();
+        final long startStationId = deleteTarget.getUpStationId();
 
         given(sectionDao.existByLineIdAndStationId(lineId, startStationId)).willReturn(true);
         given(sectionDao.count(lineId)).willReturn(3L);
@@ -197,8 +197,8 @@ class SectionServiceTest {
         final Section deleteTarget = sections.get(0);
         final Section updateTarget = sections.get(1);
 
-        final long lineId = deleteTarget.getLine().getId();
-        final long deleteStationId = deleteTarget.getDownStation().getId();
+        final long lineId = deleteTarget.getLineId();
+        final long deleteStationId = deleteTarget.getDownStationId();
         final Section updatedResult = createUpdateResult(deleteTarget, updateTarget);
 
         given(sectionDao.existByLineIdAndStationId(lineId, deleteStationId)).willReturn(true);

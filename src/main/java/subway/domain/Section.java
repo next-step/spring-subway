@@ -71,8 +71,20 @@ public class Section {
         return line;
     }
 
+    public long getLineId() {
+        return line.getId();
+    }
+
     public Station getUpStation() {
         return upStation;
+    }
+
+    public long getUpStationId() {
+        return upStation.getId();
+    }
+
+    public long getDownStationId() {
+        return downStation.getId();
     }
 
     public Station getDownStation() {

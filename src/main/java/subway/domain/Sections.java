@@ -15,8 +15,8 @@ public class Sections {
 
     public Sections(final List<Section> sections) {
         sections.forEach(section -> {
-            upStationMap.put(section.getUpStation().getId(), section);
-            downStationMap.put(section.getDownStation().getId(), section);
+            upStationMap.put(section.getUpStationId(), section);
+            downStationMap.put(section.getDownStationId(), section);
         });
     }
 

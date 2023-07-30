@@ -52,7 +52,7 @@ class SectionsTest {
         Sections sections = new Sections(sectionList);
 
         Section upDirection = sectionList.get(2);
-        long stationId = upDirection.getDownStation().getId();
+        long stationId = upDirection.getDownStationId();
 
         // when
         Section result = sections.getUpDirectionSection(stationId);
@@ -69,7 +69,7 @@ class SectionsTest {
         Sections sections = new Sections(sectionList);
 
         Section downDirection = sectionList.get(2);
-        long stationId = downDirection.getUpStation().getId();
+        long stationId = downDirection.getUpStationId();
 
         // when
         Section result = sections.getDownDirectionSection(stationId);
@@ -145,7 +145,7 @@ class SectionsTest {
         // given
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
-        long stationId = sectionList.get(1).getUpStation().getId();
+        long stationId = sectionList.get(1).getUpStationId();
 
         // when & then
         assertThat(sections.isDownDirectionSectionExist(stationId)).isTrue();
@@ -157,7 +157,7 @@ class SectionsTest {
         // given
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
-        long stationId = sectionList.get(1).getUpStation().getId();
+        long stationId = sectionList.get(1).getUpStationId();
 
         // when & then
         assertThat(sections.isUpDirectionSectionExist(stationId)).isTrue();
@@ -169,7 +169,7 @@ class SectionsTest {
         // given
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
-        long stationId = sectionList.get(0).getUpStation().getId();
+        long stationId = sectionList.get(0).getUpStationId();
 
         // when & then
         assertThat(sections.isLastStation(stationId)).isTrue();
@@ -181,7 +181,7 @@ class SectionsTest {
         // given
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
-        long stationId = sectionList.get(0).getUpStation().getId();
+        long stationId = sectionList.get(0).getUpStationId();
 
         // when & then
         assertThat(sections.isLastStation(stationId)).isTrue();
@@ -194,7 +194,7 @@ class SectionsTest {
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
         long stationId = sectionList.get(sectionList.size()-1)
-            .getDownStation().getId();
+            .getDownStationId();
 
         // when & then
         assertThat(sections.isEndStation(stationId)).isTrue();
@@ -207,7 +207,7 @@ class SectionsTest {
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
         long existStationId = sectionList.get(sectionList.size()-1)
-            .getDownStation().getId();
+            .getDownStationId();
         long notExistStationId = 99;
 
         // when & then

@@ -58,7 +58,7 @@ class SectionDaoTest extends DaoTest {
         // given
         Section upSection = initializeSingleSection();
         Section downSection = extendSection(upSection.getLine(), upSection.getDownStation());
-        long lineId = upSection.getLine().getId();
+        long lineId = upSection.getLineId();
 
         // when
         List<Section> result = sectionDao.findAllByLineId(lineId);
@@ -76,7 +76,7 @@ class SectionDaoTest extends DaoTest {
         Section section = initializeSingleSection();
         Section update = new Section(section.getId(), section.getLine(), section.getUpStation(),
             section.getDownStation(), 20);
-        long lineId = section.getLine().getId();
+        long lineId = section.getLineId();
 
         // when
         sectionDao.update(update);
@@ -93,7 +93,7 @@ class SectionDaoTest extends DaoTest {
     void deleteSectionTest() {
         // given
         Section section = initializeSingleSection();
-        long lineId = section.getLine().getId();
+        long lineId = section.getLineId();
 
         // when
         sectionDao.delete(section.getId());
@@ -108,7 +108,7 @@ class SectionDaoTest extends DaoTest {
     void countTest() {
         // given
         Section section = initializeSingleSection();
-        long lineId = section.getLine().getId();
+        long lineId = section.getLineId();
         extendSection(section.getLine(), section.getDownStation());
 
         // when
@@ -128,10 +128,10 @@ class SectionDaoTest extends DaoTest {
         // when & then
         assertAll(
             "노선에 역 존재하는지 여부 테스트",
-            () -> assertTrue(sectionDao.existByLineIdAndStationId(section.getLine().getId(),
-                section.getDownStation().getId())),
+            () -> assertTrue(sectionDao.existByLineIdAndStationId(section.getLineId(),
+                section.getDownStationId())),
             () -> assertFalse(
-                sectionDao.existByLineIdAndStationId(section.getLine().getId(), notExistStationId))
+                sectionDao.existByLineIdAndStationId(section.getLineId(), notExistStationId))
         );
     }
 

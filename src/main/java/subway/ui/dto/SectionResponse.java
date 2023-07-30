@@ -25,9 +25,9 @@ public class SectionResponse {
     public static SectionResponse of(final Section section) {
         return new SectionResponse(
                 section.getId(),
-                section.getLine().getId(),
-                section.getUpStation().getId(),
-                section.getDownStation().getId(),
+                section.getLineId(),
+                section.getUpStationId(),
+                section.getDownStationId(),
                 section.getDistance()
         );
     }

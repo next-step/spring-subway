@@ -35,9 +35,9 @@ public class SectionDao {
     public Section insert(final Section section) {
         SqlParameterSource params = new MapSqlParameterSource()
             .addValue("id", section.getId())
-            .addValue("line_id", section.getLine().getId())
-            .addValue("up_station_id", section.getUpStation().getId())
-            .addValue("down_station_id", section.getDownStation().getId())
+            .addValue("line_id", section.getLineId())
+            .addValue("up_station_id", section.getUpStationId())
+            .addValue("down_station_id", section.getDownStationId())
             .addValue("distance", section.getDistance());
         Long id = insertAction.executeAndReturnKey(params).longValue();
         return new Section(id, section.getLine(), section.getUpStation(),
@@ -101,8 +101,8 @@ public class SectionDao {
         final String sql = "UPDATE section SET up_station_id = ?, down_station_id = ?, distance = ? WHERE id = ?";
         jdbcTemplate.update(
             sql,
-            newSection.getUpStation().getId(),
-            newSection.getDownStation().getId(),
+            newSection.getUpStationId(),
+            newSection.getDownStationId(),
             newSection.getDistance(),
             newSection.getId()
         );
