@@ -19,8 +19,6 @@ import subway.dto.StationResponse;
 @RequestMapping("/stations")
 public class StationController {
 
-    private static final String EMPTY_REQUEST_EXCEPTION_MESSAGE = "비어 있는 요청 정보가 존재합니다.";
-
     private final StationService stationService;
 
     public StationController(StationService stationService) {
@@ -30,7 +28,7 @@ public class StationController {
     @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
         if (stationRequest == null || stationRequest.hasNullField()) {
-            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException("비어 있는 요청 정보가 존재합니다.");
         }
 
         StationResponse station = stationService.saveStation(stationRequest);
@@ -51,7 +49,7 @@ public class StationController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateStation(@PathVariable Long id, @RequestBody StationRequest stationRequest) {
         if (stationRequest == null || stationRequest.hasNullField()) {
-            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException("비어 있는 요청 정보가 존재합니다.");
         }
 
         stationService.updateStation(id, stationRequest);

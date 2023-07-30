@@ -18,9 +18,6 @@ import subway.exception.StationException;
 @Repository
 public class SectionDao {
 
-    private static final String NO_UP_STATION_EXCEPTION_MESSAGE = "상행역이 존재하지 않습니다.";
-    private static final String NO_DOWN_STATION_EXCEPTION_MESSAGE = "하행역이 존재하지 않습니다.";
-
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final SimpleJdbcInsert insertAction;
     private final RowMapper<Section> rowMapper;
@@ -37,10 +34,10 @@ public class SectionDao {
                         rs.getLong("id"),
                         stationDao.findById(rs.getLong("up_station_id"))
                                 .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION,
-                                        NO_UP_STATION_EXCEPTION_MESSAGE)),
+                                        "상행역이 존재하지 않습니다.")),
                         stationDao.findById(rs.getLong("down_station_id"))
                                 .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION,
-                                        NO_DOWN_STATION_EXCEPTION_MESSAGE)),
+                                        "하행역이 존재하지 않습니다.")),
                         rs.getInt("distance")
                 );
         this.idRowMapper = (rs, rowNum) -> rs.getLong("id");

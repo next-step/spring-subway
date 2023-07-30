@@ -26,14 +26,6 @@ import subway.exception.StationException;
 @Service
 public class LineService {
 
-    private static final String NO_STATION_EXCEPTION_MESSAGE = "삭제할 역이 존재하지 않습니다.";
-    private static final String NO_UP_STATION_EXCEPTION_MESSAGE = "새로운 구간의 상행역이 존재하지 않습니다.";
-    private static final String NO_DOWN_STATION_EXCEPTION_MESSAGE = "새로운 구간의 하행역이 존재하지 않습니다.";
-    private static final String NO_SAVED_SECTION_EXCEPTION_MESSAGE = "등록된 구간이 없습니다.";
-    private static final String NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE = "해당 노선의 구간이 존재하지 않습니다.";
-    private static final String NO_LINE_EXCEPTION_MESSAGE = "존재하지 않는 노선입니다.";
-    private static final String EXISTS_LINE_EXCEPTION_MESSAGE = "이미 존재하는 노선입니다.";
-
     private final LineDao lineDao;
     private final StationDao stationDao;
     private final SectionDao sectionDao;
@@ -52,7 +44,7 @@ public class LineService {
         Line newLine = new Line(request.getName(), request.getColor());
 
         if (lineDao.exists(newLine.getLineName())) {
-            throw new LineException(ErrorCode.EXISTS_LINE, EXISTS_LINE_EXCEPTION_MESSAGE);
+            throw new LineException(ErrorCode.EXISTS_LINE, "이미 존재하는 노선입니다.");
         }
 
         Line persistLine = lineDao.insert(newLine);
@@ -83,7 +75,7 @@ public class LineService {
         Line persistLine = findLineById(id);
         Sections sections = sectionDao.findAllByLineId(id)
                 .orElseThrow(
-                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, "해당 노선의 구간이 존재하지 않습니다."));
 
         List<StationResponse> stationResponses = sections.toStations().stream()
                 .map(StationResponse::of)
@@ -95,7 +87,7 @@ public class LineService {
     @Transactional(readOnly = true)
     public Line findLineById(final Long id) {
         return lineDao.findById(id)
-                .orElseThrow(() -> new LineException(ErrorCode.NO_SUCH_LINE, NO_LINE_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new LineException(ErrorCode.NO_SUCH_LINE, "존재하지 않는 노선입니다."));
     }
 
     @Transactional
@@ -114,7 +106,7 @@ public class LineService {
         Section newSection = newSection(request);
         Sections sections = sectionDao.findAllByLineId(lineId)
                 .orElseThrow(
-                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, "해당 노선의 구간이 존재하지 않습니다."));
 
         sections.validateInsert(newSection);
 
@@ -131,16 +123,16 @@ public class LineService {
         final Long newDownStationId = newSection.getDownStation().getId();
 
         return sectionDao.findIdByStationIdsAndLineId(newUpStationId, newDownStationId, lineId)
-                .orElseThrow(() -> new SectionException(ErrorCode.NO_SUCH_SECTION, NO_SAVED_SECTION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new SectionException(ErrorCode.NO_SUCH_SECTION, "등록된 구간이 없습니다."));
     }
 
     @Transactional
     public void deleteSection(final Long lineId, final Long stationId) {
         final Station delete = stationDao.findById(stationId)
-                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, "삭제할 역이 존재하지 않습니다."));
         final Sections sections = sectionDao.findAllByLineId(lineId)
                 .orElseThrow(
-                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, "해당 노선의 구간이 존재하지 않습니다."));
 
         sections.validateDelete();
 
@@ -157,9 +149,9 @@ public class LineService {
 
     private Section newSection(final SectionRequest request) {
         final Station upStation = stationDao.findById(request.getUpStationId())
-                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_UP_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, "새로운 구간의 상행역이 존재하지 않습니다."));
         final Station downStation = stationDao.findById(request.getDownStationId())
-                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_DOWN_STATION_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, "새로운 구간의 하행역이 존재하지 않습니다."));
 
         return new Section(upStation, downStation, request.getDistance());
     }

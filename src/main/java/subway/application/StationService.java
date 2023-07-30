@@ -14,10 +14,6 @@ import subway.exception.StationException;
 @Service
 public class StationService {
 
-    private static final String NO_STATION_EXCEPTION_MESSAGE = "존재하지 않는 지하철 역입니다.";
-    private static final String CAN_DELETE_ONLY_EXIST_STATION_EXCEPTION_MESSAGE = "존재하는 지하철 역만 삭제할 수 있습니다.";
-    private static final String EXISTS_STATION_EXCEPTION_MESSAGE = "이미 존재하는 지하철 역입니다.";
-
     private final StationDao stationDao;
 
     public StationService(final StationDao stationDao) {
@@ -29,7 +25,7 @@ public class StationService {
         Station newStation = new Station(stationRequest.getName());
 
         if (stationDao.exists(newStation.getStationName())) {
-            throw new StationException(ErrorCode.EXISTS_STATION, EXISTS_STATION_EXCEPTION_MESSAGE);
+            throw new StationException(ErrorCode.EXISTS_STATION, "이미 존재하는 지하철 역입니다.");
         }
 
         Station station = stationDao.insert(newStation);
@@ -40,7 +36,7 @@ public class StationService {
     @Transactional(readOnly = true)
     public StationResponse findStationResponseById(final Long id) {
         final Station station = stationDao.findById(id).orElseThrow(
-                () -> new StationException(ErrorCode.NO_SUCH_STATION, NO_STATION_EXCEPTION_MESSAGE));
+                () -> new StationException(ErrorCode.NO_SUCH_STATION, "존재하지 않는 지하철 역입니다."));
 
         return StationResponse.of(station);
     }
@@ -62,7 +58,7 @@ public class StationService {
     @Transactional
     public void deleteStationById(final Long id) {
         stationDao.findById(id).orElseThrow(
-                () -> new StationException(ErrorCode.NO_SUCH_STATION, CAN_DELETE_ONLY_EXIST_STATION_EXCEPTION_MESSAGE));
+                () -> new StationException(ErrorCode.NO_SUCH_STATION, "존재하는 지하철 역만 삭제할 수 있습니다."));
 
         stationDao.deleteById(id);
     }

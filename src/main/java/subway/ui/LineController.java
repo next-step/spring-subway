@@ -22,9 +22,6 @@ import subway.dto.SectionRequest;
 @RequestMapping("/lines")
 public class LineController {
 
-    private static final String NOT_POSITIVE_STATION_ID_EXCEPTION_MESSAGE = "stationId는 정수만 입력받을 수 있습니다.";
-    private static final String EMPTY_REQUEST_EXCEPTION_MESSAGE = "비어 있는 요청 정보가 존재합니다.";
-
     private final LineService lineService;
 
     public LineController(LineService lineService) {
@@ -34,7 +31,7 @@ public class LineController {
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         if (lineRequest == null || lineRequest.hasCreateNullField()) {
-            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException("비어 있는 요청 정보가 존재합니다.");
         }
 
         LineResponse line = lineService.saveLine(lineRequest);
@@ -55,7 +52,7 @@ public class LineController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
         if (lineRequest == null || lineRequest.hasUpdateNullField()) {
-            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException("비어 있는 요청 정보가 존재합니다.");
         }
 
         lineService.updateLine(id, lineRequest);
@@ -73,7 +70,7 @@ public class LineController {
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         if (sectionRequest == null || sectionRequest.hasNullField()) {
-            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException("비어 있는 요청 정보가 존재합니다.");
         }
 
         Long newSectionId = lineService.saveSection(sectionRequest, id);
@@ -84,7 +81,7 @@ public class LineController {
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam String stationId) {
         if (!stationId.strip().matches("\\d+")) {
-            throw new IllegalArgumentException(NOT_POSITIVE_STATION_ID_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException("stationId는 정수만 입력받을 수 있습니다.");
         }
 
         lineService.deleteSection(id, Long.parseLong(stationId));
