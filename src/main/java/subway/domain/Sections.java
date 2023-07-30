@@ -9,22 +9,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Sections {
     private final List<Section> sections;
-    private final Set<Station> downStationsCache;
-    private final Set<Station> upStationsCache;
+    private final Stations stationsCache;
 
     public Sections(final List<Section> sections) {
         this.sections = Collections.unmodifiableList(sections);
-        this.downStationsCache = sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet());
-        this.upStationsCache = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
+        this.stationsCache = Stations.of(sections);
     }
 
     public Sections() {
@@ -59,7 +52,7 @@ public class Sections {
     }
 
     private boolean contains(final Station station) {
-        return downStationsCache.contains(station) || upStationsCache.contains(station);
+        return stationsCache.contains(station);
     }
 
     private boolean notContains(final Station station) {
@@ -117,7 +110,6 @@ public class Sections {
         sections.forEach(section -> stationMap.put(section.getUpStation(), section.getDownStation()));
 
         sortedStations.add(start);
-
         while (stationMap.containsKey(start)) {
             start = stationMap.get(start);
             sortedStations.add(start);
@@ -127,9 +119,11 @@ public class Sections {
     }
 
     private Optional<Station> findTerminalUpStation() {
-        return sections.stream()
-                .map(Section::getUpStation)
-                .filter(downStation -> !downStationsCache.contains(downStation))
+        Stations downStations = new Stations(sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet()));
+
+        return stationsCache.subtract(downStations)
                 .findAny();
     }
 

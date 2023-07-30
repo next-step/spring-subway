@@ -27,6 +27,10 @@ public class PathGraph {
                 .distinct()
                 .forEach(graph::addVertex);
 
+        Stations.of(sections)
+                .getStations()
+                .forEach(graph::addVertex);
+
         sections.forEach(section -> graph.setEdgeWeight(
                 graph.addEdge(section.getUpStation(), section.getDownStation()),
                 section.getDistance()
