@@ -81,6 +81,10 @@ public class SectionDao {
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }
 
+    public List<Section> findAll() {
+        return jdbcTemplate.query(ROW_MAPPER_BASE_SQL, rowMapper);
+    }
+
     public boolean existSectionByLineId(final Long lineId) {
         final String sql = "select count(*) > 0 from section where line_id = ? ";
         return TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, lineId));
@@ -91,8 +95,13 @@ public class SectionDao {
         jdbcTemplate.update(sql, sectionId);
     }
 
-    public void updateSections(final Long lineId, final Sections sections) {
-        dirtyChecking(findAllByLineId(lineId), sections.getSections());
+    public void deleteAll() {
+        final String sql = "delete from section";
+        jdbcTemplate.update(sql);
+    }
+
+    public void updateSections(final Long lineId, final LineSections lineSections) {
+        dirtyChecking(findAllByLineId(lineId), lineSections.getSections());
     }
 
     private void dirtyChecking(final List<Section> beforeSection, final List<Section> afterSection) {
@@ -120,5 +129,4 @@ public class SectionDao {
             deleteById(section.getId());
         }
     }
-
 }

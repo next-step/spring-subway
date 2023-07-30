@@ -7,11 +7,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.springframework.util.Assert.isTrue;
 
-public class Sections {
+public class LineSections {
     protected static final int MINIMUM_SIZE = 1;
     protected List<Section> sections;
 
-    public Sections(final List<Section> sections) {
+    public LineSections(final List<Section> sections) {
         isTrue(sections.size() >= MINIMUM_SIZE, "노선에 등록된 구간은 반드시 한 개 이상이어야합니다.");
         this.sections = new ArrayList<>(sections);
     }
@@ -151,7 +151,7 @@ public class Sections {
 
     @Override
     public String toString() {
-        return "Sections{" +
+        return "LineSections{" +
                 "sections=" + sections +
                 '}';
     }

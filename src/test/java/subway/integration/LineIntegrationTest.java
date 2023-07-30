@@ -15,13 +15,12 @@ import subway.dto.response.LineResponse;
 import subway.dto.response.LineWithStationsResponse;
 import subway.error.ErrorResponse;
 import subway.integration.helper.LineIntegrationHelper;
-import subway.integration.helper.StationIntegrationHelper;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.integration.helper.StationIntegrationHelper.createStation;
 
 @DisplayName("지하철 노선 관련 기능")
 public class LineIntegrationTest extends IntegrationTest {
@@ -33,9 +32,9 @@ public class LineIntegrationTest extends IntegrationTest {
     public void setUp() {
         super.setUp();
 
-        Station upStation = StationIntegrationHelper.createStation(Map.of("name", "낙성대"));
-        Station downStation = StationIntegrationHelper.createStation(Map.of("name", "사당"));
-        Station station = StationIntegrationHelper.createStation(Map.of("name", "방배"));
+        Station upStation = createStation("낙성대");
+        Station downStation = createStation("사당");
+        Station station = createStation("방배");
 
         lineCreateRequestA = new LineCreateRequest("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10L);
         lineCreateRequestB = new LineCreateRequest("2호선", "bg-red-600", upStation.getId(), station.getId(), 10L);
@@ -128,7 +127,6 @@ public class LineIntegrationTest extends IntegrationTest {
         final Line line = LineIntegrationHelper.createLine(lineCreateRequestA);
 
         // when
-        Long lineId = line.getId();
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)

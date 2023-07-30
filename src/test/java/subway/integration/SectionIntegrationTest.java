@@ -17,8 +17,6 @@ import subway.integration.helper.LineIntegrationHelper;
 import subway.integration.helper.SectionIntegrationHelper;
 import subway.integration.helper.StationIntegrationHelper;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 구간 관련 기능")
@@ -35,11 +33,11 @@ class SectionIntegrationTest extends IntegrationTest {
     public void setUp() {
         super.setUp();
 
-        Station upStation = StationIntegrationHelper.createStation(Map.of("name", "낙성대"));
-        Station downStation = StationIntegrationHelper.createStation(Map.of("name", "사당"));
-        Station newStationA = StationIntegrationHelper.createStation(Map.of("name", "방배"));
-        Station newStationB = StationIntegrationHelper.createStation(Map.of("name", "서초"));
-        Station newStationC = StationIntegrationHelper.createStation(Map.of("name", "교대"));
+        Station upStation = StationIntegrationHelper.createStation("낙성대");
+        Station downStation = StationIntegrationHelper.createStation("사당");
+        Station newStationA = StationIntegrationHelper.createStation("방배");
+        Station newStationB = StationIntegrationHelper.createStation("서초");
+        Station newStationC = StationIntegrationHelper.createStation("교대");
 
         final Line line = LineIntegrationHelper.createLine(new LineCreateRequest("신분당선", "bg-red-600", upStation.getId(), downStation.getId(), 10L));
 

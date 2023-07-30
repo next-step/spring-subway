@@ -16,6 +16,10 @@ public class StationFixture {
         return new Station(stationName);
     }
 
+    public static Station createStation(Long id, String stationName) {
+        return new Station(id, stationName);
+    }
+
     public static List<Station> createStations(String... stationName) {
         return Arrays.stream(stationName)
                 .map(Station::new)

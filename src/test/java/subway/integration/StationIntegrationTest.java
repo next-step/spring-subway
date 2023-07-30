@@ -45,12 +45,10 @@ public class StationIntegrationTest extends IntegrationTest {
     @Test
     void createStationWithDuplicateName() {
         // given
-        Map<String, String> params = Map.of("name", "강남역");
-        StationIntegrationHelper.createStation(params);
-
+        StationIntegrationHelper.createStation("강남역");
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(params)
+                .body(Map.of("name", "강남역"))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/stations")
@@ -65,10 +63,8 @@ public class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStations() {
         /// given
-        Map<String, String> params1 = Map.of("name", "강남역");
-        final Station stationA = StationIntegrationHelper.createStation(params1);
-        Map<String, String> params2 = Map.of("name", "역삼역");
-        final Station stationB = StationIntegrationHelper.createStation(params2);
+        final Station stationA = StationIntegrationHelper.createStation("강남역");
+        final Station stationB = StationIntegrationHelper.createStation("역삼역");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -90,8 +86,7 @@ public class StationIntegrationTest extends IntegrationTest {
     @Test
     void getStation() {
         /// given
-        Map<String, String> params = Map.of("name", "강남역");
-        final Station station = StationIntegrationHelper.createStation(params);
+        final Station station = StationIntegrationHelper.createStation("강남역");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
@@ -127,15 +122,12 @@ public class StationIntegrationTest extends IntegrationTest {
     @Test
     void updateStation() {
         // given
-        Map<String, String> params = Map.of("name", "강남역");
-        Station station = StationIntegrationHelper.createStation(params);
+        Station station = StationIntegrationHelper.createStation("강남역");
 
         // when
-        Map<String, String> otherParams = Map.of("name", "삼성역");
-
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(otherParams)
+                .body(Map.of("name", "삼성역"))
                 .when()
                 .put("/stations/{stationId}", station.getId())
                 .then().log().all()
@@ -149,8 +141,7 @@ public class StationIntegrationTest extends IntegrationTest {
     @Test
     void deleteStation() {
         // given
-        Map<String, String> params = Map.of("name", "강남역");
-        Station station = StationIntegrationHelper.createStation(params);
+        Station station = StationIntegrationHelper.createStation("강남역");
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
