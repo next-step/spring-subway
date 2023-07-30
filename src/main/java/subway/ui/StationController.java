@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import subway.application.StationService;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
-import subway.exception.ErrorCode;
-import subway.exception.InvalidRequestException;
 
 @RestController
 @RequestMapping("/stations")
@@ -32,7 +30,7 @@ public class StationController {
     @PostMapping
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
         if (stationRequest == null || stationRequest.hasNullField()) {
-            throw new InvalidRequestException(ErrorCode.INVALID_REQUEST, EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
         }
 
         StationResponse station = stationService.saveStation(stationRequest);
@@ -53,7 +51,7 @@ public class StationController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateStation(@PathVariable Long id, @RequestBody StationRequest stationRequest) {
         if (stationRequest == null || stationRequest.hasNullField()) {
-            throw new InvalidRequestException(ErrorCode.INVALID_REQUEST, EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
         }
 
         stationService.updateStation(id, stationRequest);

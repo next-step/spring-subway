@@ -17,8 +17,6 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
-import subway.exception.ErrorCode;
-import subway.exception.InvalidRequestException;
 
 @RestController
 @RequestMapping("/lines")
@@ -36,7 +34,7 @@ public class LineController {
     @PostMapping
     public ResponseEntity<LineResponse> createLine(@RequestBody LineRequest lineRequest) {
         if (lineRequest == null || lineRequest.hasCreateNullField()) {
-            throw new InvalidRequestException(ErrorCode.INVALID_REQUEST, EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
         }
 
         LineResponse line = lineService.saveLine(lineRequest);
@@ -57,7 +55,7 @@ public class LineController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateLine(@PathVariable Long id, @RequestBody LineRequest lineRequest) {
         if (lineRequest == null || lineRequest.hasUpdateNullField()) {
-            throw new InvalidRequestException(ErrorCode.INVALID_REQUEST, EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
         }
 
         lineService.updateLine(id, lineRequest);
@@ -75,7 +73,7 @@ public class LineController {
     @PostMapping("/{id}/sections")
     public ResponseEntity<Void> createSection(@PathVariable Long id, @RequestBody SectionRequest sectionRequest) {
         if (sectionRequest == null || sectionRequest.hasNullField()) {
-            throw new InvalidRequestException(ErrorCode.INVALID_REQUEST, EMPTY_REQUEST_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(EMPTY_REQUEST_EXCEPTION_MESSAGE);
         }
 
         Long newSectionId = lineService.saveSection(sectionRequest, id);
@@ -86,7 +84,7 @@ public class LineController {
     @DeleteMapping("/{id}/sections")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id, @RequestParam String stationId) {
         if (!stationId.strip().matches("\\d+")) {
-            throw new InvalidRequestException(ErrorCode.INVALID_REQUEST, NOT_POSITIVE_STATION_ID_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(NOT_POSITIVE_STATION_ID_EXCEPTION_MESSAGE);
         }
 
         lineService.deleteSection(id, Long.parseLong(stationId));
