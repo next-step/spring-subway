@@ -28,9 +28,7 @@ public final class PathManager {
     }
 
     public List<Station> findStationsOfShortestPath(final Station source, final Station target) {
-        validateStation(source);
-        validateStation(target);
-        validateStationsDuplicate(source, target);
+        validateStations(source, target);
 
         final GraphPath<Station, DefaultWeightedEdge> shortestPath = dijkstraShortestPath().getPath(source, target);
         validateShortestPath(shortestPath);
@@ -38,6 +36,8 @@ public final class PathManager {
     }
 
     public double findDistanceOfShortestPath(final Station source, final Station target) {
+        validateStations(source, target);
+
         final double distance = dijkstraShortestPath().getPathWeight(source, target);
         validateDistance(distance);
         return distance;
@@ -45,6 +45,12 @@ public final class PathManager {
 
     private DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath() {
         return new DijkstraShortestPath<>(subwayMap);
+    }
+
+    private void validateStations(final Station source, final Station target) {
+        validateStation(source);
+        validateStation(target);
+        validateStationsDuplicate(source, target);
     }
 
     private void validateStation(final Station station) {
