@@ -29,6 +29,7 @@ public final class PathManager {
     public List<Station> findStationsOfShortestPath(final Station source, final Station target) {
         validateStation(source);
         validateStation(target);
+        validateStationsDuplicate(source, target);
 
         final GraphPath<Station, DefaultWeightedEdge> shortestPath = dijkstraShortestPath().getPath(source, target);
         return shortestPath.getVertexList();
@@ -41,6 +42,12 @@ public final class PathManager {
     private void validateStation(final Station station) {
         if (!subwayMap.containsVertex(station)) {
             throw new SubwayException(String.format("%s은(는) 존재하지 않는 역입니다.", station.getName()));
+        }
+    }
+
+    private void validateStationsDuplicate(final Station source, final Station target) {
+        if (source.equals(target)) {
+            throw new SubwayException("출발역과 도착역은 같을 수 없습니다.");
         }
     }
 }
