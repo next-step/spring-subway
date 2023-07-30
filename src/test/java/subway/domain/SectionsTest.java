@@ -1,13 +1,17 @@
 package subway.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import subway.exception.SectionException;
+import subway.exception.StationException;
 
 class SectionsTest {
 
@@ -19,7 +23,7 @@ class SectionsTest {
         Station downStation = new Station(2L, "잠실나루역");
         Station newDownStation = new Station(1L, "강변역");
 
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
 
         Section newSection = new Section(downStation, newDownStation, 10);
@@ -35,7 +39,7 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
 
         Section newSection = new Section(newUpStation, upStation, 10);
@@ -51,7 +55,7 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
 
         Section newSection = new Section(midStation, downStation, 3);
@@ -67,7 +71,7 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
 
         Section newSection = new Section(upStation, midStation, 3);
@@ -82,11 +86,11 @@ class SectionsTest {
         Station downStation = new Station(2L, "잠실역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(upStation, downStation,  3);
+        Section newSection = new Section(upStation, downStation, 3);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
+        assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 두 역이 모두 존재하지 않으면 예외를 던진다.")
@@ -98,11 +102,11 @@ class SectionsTest {
         Station newDownStation = new Station(3L, "구의역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(newUpStation, newDownStation,  3);
+        Section newSection = new Section(newUpStation, newDownStation, 3);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
+        assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
 
     @DisplayName("새로운 구간이 가운데에 삽입될 때 업데이트할 기존 구간을 반환한다.")
@@ -116,8 +120,8 @@ class SectionsTest {
         Section oldSection = new Section(upStation, downStation, 10);
         originSections.add(oldSection);
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(upStation, midStation,  3);
-        Section newSection2 = new Section(midStation, downStation,  3);
+        Section newSection = new Section(upStation, midStation, 3);
+        Section newSection2 = new Section(midStation, downStation, 3);
 
         assertEquals(sections.oldSection(newSection), oldSection);
         assertEquals(sections.oldSection(newSection2), oldSection);
@@ -135,11 +139,11 @@ class SectionsTest {
         originSections.add(oldSection);
         Sections sections = new Sections(originSections);
 
-        Section upMidSection = new Section(upStation, midStation,  3);
+        Section upMidSection = new Section(upStation, midStation, 3);
         Section midDownSection = new Section(midStation, downStation, 7);
 
-        assertEquals(sections.cut(oldSection, upMidSection), midDownSection);
-        assertEquals(sections.cut(oldSection, midDownSection), upMidSection);
+        assertEquals(oldSection.cutBy(upMidSection), midDownSection);
+        assertEquals(oldSection.cutBy(midDownSection), upMidSection);
     }
 
     @DisplayName("새로운 구간을 삽입할 때 가운데에 삽입되는지 구분한다.")
@@ -150,9 +154,9 @@ class SectionsTest {
         Station downStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(upStation, midStation,  3);
+        Section newSection = new Section(upStation, midStation, 3);
 
         assertTrue(sections.isInsertedMiddle(newSection));
     }
@@ -165,9 +169,9 @@ class SectionsTest {
         Station newDownStation = new Station(1L, "강변역");
 
         List<Section> originSections = new ArrayList<>();
-        originSections.add(new Section(upStation, downStation,  10));
+        originSections.add(new Section(upStation, downStation, 10));
         Sections sections = new Sections(originSections);
-        Section newSection = new Section(downStation, newDownStation,  3);
+        Section newSection = new Section(downStation, newDownStation, 3);
 
         assertFalse(sections.isInsertedMiddle(newSection));
     }
@@ -182,9 +186,9 @@ class SectionsTest {
         int distance = 10;
 
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
-        Section  newSection = new Section(newUpStation, newDownStation, distance);
+        Section newSection = new Section(newUpStation, newDownStation, distance);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
+        assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
 
     @DisplayName("새로운 구간의 하행역이 노선에 등록되어 있을 경우")
@@ -197,9 +201,9 @@ class SectionsTest {
         int distance = 10;
 
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
-        Section  newSection = new Section(newUpStation, newDownStation, distance);
+        Section newSection = new Section(newUpStation, newDownStation, distance);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.validateInsert(newSection));
+        assertThrows(SectionException.class, () -> sections.validateInsert(newSection));
     }
 
     @DisplayName("새로운 구간을 중간에 삽입할 때의 거리가 기존 구간의 거리와 같거나 긴 경우 예외를 던진다.")
@@ -209,52 +213,49 @@ class SectionsTest {
         Station midStation = new Station(2L, "잠실역");
         Station downStation = new Station(1L, "강변역");
 
-        List<Section> originSections = new ArrayList<>();
         Section oldSection = new Section(upStation, downStation, 10);
-        originSections.add(oldSection);
-        Sections sections = new Sections(originSections);
-        Section newSection = new Section(upStation, midStation,  10);
+        Section newSection = new Section(upStation, midStation, 10);
 
-        assertThrows(IllegalArgumentException.class, () -> sections.cut(oldSection, newSection));
+        assertThrows(SectionException.class, () -> oldSection.cutBy(newSection));
     }
 
-    @DisplayName("마지막 구간을 제거하는 경우")
+    @DisplayName("존재하는 역을 제거하려는 경우 검증을 통과한다.")
     @Test
-    void deleteLastSection() {
+    void deleteExistStation() {
         // given
         Station upStation = new Station(4L, "강변역");
         Station downStation = new Station(3L, "구의역");
-        Station newUpStation = new Station(3L, "구의역");
         Station newDownStation = new Station(2L, "건대입구역");
         int distance = 10;
 
         Sections sections = new Sections(List.of(
                 new Section(upStation, downStation, distance),
-                new Section(newUpStation, newDownStation, distance)));
-
-        // when
-        sections.delete(newDownStation);
-
-        // then
-        assertThat(sections).isEqualTo(new Sections(List.of(new Section(upStation, downStation, distance))));
-    }
-
-    @DisplayName("마지막이 아닌 구간을 제거하는 경우 예외를 던진다.")
-    @Test
-    void deleteNotLastSection() {
-        // given
-        Station upStation = new Station(4L, "강변역");
-        Station downStation = new Station(3L, "구의역");
-        Station newUpStation = new Station(3L, "구의역");
-        Station newDownStation = new Station(2L, "건대입구역");
-        int distance = 10;
-
-        Sections sections = new Sections(List.of(
-                new Section(upStation, downStation, distance),
-                new Section(newUpStation, newDownStation, distance)));
+                new Section(downStation, newDownStation, distance)));
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> sections.delete(downStation));
+        assertDoesNotThrow(() -> new DeleteSections(sections.findSectionsIncluding(upStation)));
+        assertDoesNotThrow(() -> new DeleteSections(sections.findSectionsIncluding(downStation)));
+        assertDoesNotThrow(() -> new DeleteSections(sections.findSectionsIncluding(newDownStation)));
+    }
+
+    @DisplayName("존재하지 않는 역을 제거하려는 경우 예외를 던진다.")
+    @Test
+    void deleteNotExistStation() {
+        // given
+        Station upStation = new Station(4L, "강변역");
+        Station downStation = new Station(3L, "구의역");
+        Station newDownStation = new Station(2L, "건대입구역");
+        Station notExistsStation = new Station(100L, "존재하지 않는 역");
+        int distance = 10;
+
+        Sections sections = new Sections(List.of(
+                new Section(upStation, downStation, distance),
+                new Section(downStation, newDownStation, distance)));
+
+        List<Section> deleteSections = sections.findSectionsIncluding(notExistsStation);
+
+        // when & then
+        assertThrows(StationException.class, () -> new DeleteSections(deleteSections));
     }
 
     @DisplayName("구간이 1개만 있을 때 구간을 제거하는 경우 예외를 던진다.")
@@ -268,6 +269,6 @@ class SectionsTest {
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
 
         // when & then
-        assertThrows(IllegalStateException.class, () -> sections.delete(downStation));
+        assertThrows(SectionException.class, sections::validateDelete);
     }
 }

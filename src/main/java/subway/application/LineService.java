@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
+import subway.domain.DeleteSections;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Sections;
@@ -15,9 +16,22 @@ import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineStationsResponse;
 import subway.dto.SectionRequest;
+import subway.dto.StationResponse;
+import subway.exception.ErrorCode;
+import subway.exception.LineException;
+import subway.exception.SectionException;
+import subway.exception.StationException;
 
 @Service
 public class LineService {
+
+    private static final String NO_STATION_EXCEPTION_MESSAGE = "삭제할 역이 존재하지 않습니다.";
+    private static final String NO_UP_STATION_EXCEPTION_MESSAGE = "새로운 구간의 상행역이 존재하지 않습니다.";
+    private static final String NO_DOWN_STATION_EXCEPTION_MESSAGE = "새로운 구간의 하행역이 존재하지 않습니다.";
+    private static final String NO_SAVED_SECTION_EXCEPTION_MESSAGE = "등록된 구간이 없습니다.";
+    private static final String NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE = "해당 노선의 구간이 존재하지 않습니다.";
+    private static final String NO_LINE_EXCEPTION_MESSAGE = "존재하지 않는 노선입니다.";
+    private static final String EXISTS_LINE_EXCEPTION_MESSAGE = "이미 존재하는 노선입니다.";
 
     private final LineDao lineDao;
     private final StationDao stationDao;
@@ -31,7 +45,13 @@ public class LineService {
 
     @Transactional
     public LineResponse saveLine(final LineRequest request) {
-        Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
+        Line newLine = new Line(request.getName(), request.getColor());
+
+        if (lineDao.exists(newLine.getLineName())) {
+            throw new LineException(ErrorCode.EXISTS_LINE, EXISTS_LINE_EXCEPTION_MESSAGE);
+        }
+
+        Line persistLine = lineDao.insert(newLine);
         Section section = newSection(SectionRequest.of(request));
 
         sectionDao.insert(section, persistLine.getId());
@@ -56,14 +76,21 @@ public class LineService {
     @Transactional(readOnly = true)
     public LineStationsResponse findLineResponseById(final Long id) {
         Line persistLine = findLineById(id);
-        Sections sections = sectionDao.findAllByLineId(id);
+        Sections sections = sectionDao.findAllByLineId(id)
+                .orElseThrow(
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
-        return LineStationsResponse.from(persistLine, sections.toStations());
+        List<StationResponse> stationResponses = sections.toStations().stream()
+                .map(StationResponse::of)
+                .collect(Collectors.toList());
+
+        return LineStationsResponse.from(persistLine, stationResponses);
     }
 
     @Transactional(readOnly = true)
     public Line findLineById(final Long id) {
-        return lineDao.findById(id);
+        return lineDao.findById(id)
+                .orElseThrow(() -> new LineException(ErrorCode.NO_SUCH_LINE, NO_LINE_EXCEPTION_MESSAGE));
     }
 
     @Transactional
@@ -77,34 +104,53 @@ public class LineService {
     }
 
     @Transactional
-    public void saveSection(final SectionRequest request, final Long lineId) {
+    public Long saveSection(final SectionRequest request, final Long lineId) {
         Section newSection = newSection(request);
-        Sections sections = sectionDao.findAllByLineId(lineId);
+        Sections sections = sectionDao.findAllByLineId(lineId)
+                .orElseThrow(
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
         sections.validateInsert(newSection);
 
         if (sections.isInsertedMiddle(newSection)) {
             Section oldSection = sections.oldSection(newSection);
             sectionDao.deleteById(oldSection.getId());
-            sectionDao.insert(sections.cut(oldSection, newSection), lineId);
+            sectionDao.insert(oldSection.cutBy(newSection), lineId);
         }
+
         sectionDao.insert(newSection, lineId);
+
+        final Long newUpStationId = newSection.getUpStation().getId();
+        final Long newDownStationId = newSection.getDownStation().getId();
+
+        return sectionDao.findIdByStationIdsAndLineId(newUpStationId, newDownStationId, lineId)
+                .orElseThrow(() -> new SectionException(ErrorCode.NO_SUCH_SECTION, NO_SAVED_SECTION_EXCEPTION_MESSAGE));
     }
 
     @Transactional
-    public void deleteSectionByStationId(final Long lineId, final String stationId) {
-        Long deleteId = Long.parseLong(stationId);
-        Station delete = stationDao.findById(deleteId);
-        Sections sections = sectionDao.findAllByLineId(lineId);
+    public void deleteSection(final Long lineId, final Long stationId) {
+        final Station delete = stationDao.findById(stationId)
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_STATION_EXCEPTION_MESSAGE));
+        final Sections sections = sectionDao.findAllByLineId(lineId)
+                .orElseThrow(
+                        () -> new SectionException(ErrorCode.EMPTY_SECTION, NO_SECTIONS_IN_LINE_EXCEPTION_MESSAGE));
 
-        sections.delete(delete);
-        sectionDao.deleteByStation(delete, lineId);
+        sections.validateDelete();
+
+        DeleteSections deleteSections = new DeleteSections(sections.findSectionsIncluding(delete));
+
+        sectionDao.deleteAllIn(deleteSections.getIds());
+
+        if (deleteSections.isKindOfMidDeletion()) {
+            sectionDao.insert(deleteSections.newSection(), lineId);
+        }
     }
 
-    @Transactional(readOnly = true)
-    private Section newSection(SectionRequest request) {
-        Station upStation = stationDao.findById(request.getUpStationId());
-        Station downStation = stationDao.findById(request.getDownStationId());
+    private Section newSection(final SectionRequest request) {
+        final Station upStation = stationDao.findById(request.getUpStationId())
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_UP_STATION_EXCEPTION_MESSAGE));
+        final Station downStation = stationDao.findById(request.getDownStationId())
+                .orElseThrow(() -> new StationException(ErrorCode.NO_SUCH_STATION, NO_DOWN_STATION_EXCEPTION_MESSAGE));
 
         return new Section(upStation, downStation, request.getDistance());
     }

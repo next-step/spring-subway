@@ -1,10 +1,11 @@
 package subway.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import subway.exception.SectionException;
 
 class SectionTest {
 
@@ -20,7 +21,7 @@ class SectionTest {
         Station station = new Station(4L, "잠실역");
         Station station2 = new Station(4L, "잠실역");
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(SectionException.class,
                 () -> new Section(station, station2, 10));
     }
 }

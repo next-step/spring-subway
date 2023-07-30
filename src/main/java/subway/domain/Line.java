@@ -5,32 +5,36 @@ import java.util.Objects;
 public class Line {
 
     private Long id;
-    private String name;
-    private String color;
+    private final LineName lineName;
+    private final Color color;
 
-    public Line() {
+    public Line(final String lineName, final String color) {
+        this(new LineName(lineName), new Color(color));
     }
 
-    public Line(final String name, final String color) {
-        this.name = name;
+    public Line(final LineName lineName, final Color color) {
+        this.lineName = lineName;
         this.color = color;
     }
 
-    public Line(final Long id, final String name, final String color) {
+    public Line(final Long id, final String lineName, final String color) {
+        this(id, new LineName(lineName), new Color(color));
+    }
+
+    public Line(final Long id, final LineName lineName, final Color color) {
+        this(lineName, color);
         this.id = id;
-        this.name = name;
-        this.color = color;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public LineName getLineName() {
+        return lineName;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
@@ -39,11 +43,12 @@ public class Line {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Line line = (Line) o;
-        return Objects.equals(id, line.id) && Objects.equals(name, line.name) && Objects.equals(color, line.color);
+        if (id != null && line.id != null) return Objects.equals(id, line.id);
+        return Objects.equals(lineName, line.lineName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, color);
+        return Objects.hash(lineName);
     }
 }

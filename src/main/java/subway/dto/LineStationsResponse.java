@@ -2,22 +2,23 @@ package subway.dto;
 
 import java.util.List;
 import subway.domain.Line;
-import subway.domain.Station;
 
-public class LineStationsResponse extends LineResponse{
+public class LineStationsResponse extends LineResponse {
 
-    private final List<Station> stations;
+    private final List<StationResponse> stations;
 
-    public LineStationsResponse(final Long id, final String name, final String color, final List<Station> stations) {
+    public LineStationsResponse(
+            final Long id, final String name, final String color, final List<StationResponse> stations) {
         super(id, name, color);
         this.stations = stations;
     }
 
-    public static LineStationsResponse from(final Line line, final List<Station> stations) {
-        return new LineStationsResponse(line.getId(), line.getName(), line.getColor(), stations);
+    public static LineStationsResponse from(final Line line, final List<StationResponse> stations) {
+        return new LineStationsResponse(line.getId(), line.getLineName().getValue(), line.getColor().getValue(),
+                stations);
     }
 
-    public List<Station> getStations() {
+    public List<StationResponse> getStations() {
         return stations;
     }
 }

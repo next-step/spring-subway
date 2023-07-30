@@ -19,6 +19,18 @@ public class LineRequest {
         this.distance = distance;
     }
 
+    public boolean hasCreateNullField() {
+        return hasCommonNullField() || upStationId == null || downStationId == null || distance == null;
+    }
+
+    public boolean hasUpdateNullField() {
+        return hasCommonNullField();
+    }
+
+    private boolean hasCommonNullField() {
+        return name == null || color == null;
+    }
+
     public String getName() {
         return name;
     }

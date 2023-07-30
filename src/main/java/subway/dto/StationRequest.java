@@ -11,6 +11,10 @@ public class StationRequest {
         this.name = name;
     }
 
+    public boolean hasNullField() {
+        return name == null;
+    }
+
     public String getName() {
         return name;
     }

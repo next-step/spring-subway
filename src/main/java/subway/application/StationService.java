@@ -8,9 +8,15 @@ import subway.dao.StationDao;
 import subway.domain.Station;
 import subway.dto.StationRequest;
 import subway.dto.StationResponse;
+import subway.exception.ErrorCode;
+import subway.exception.StationException;
 
 @Service
 public class StationService {
+
+    private static final String NO_STATION_EXCEPTION_MESSAGE = "존재하지 않는 지하철 역입니다.";
+    private static final String CAN_DELETE_ONLY_EXIST_STATION_EXCEPTION_MESSAGE = "존재하는 지하철 역만 삭제할 수 있습니다.";
+    private static final String EXISTS_STATION_EXCEPTION_MESSAGE = "이미 존재하는 지하철 역입니다.";
 
     private final StationDao stationDao;
 
@@ -20,14 +26,23 @@ public class StationService {
 
     @Transactional
     public StationResponse saveStation(final StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
+        Station newStation = new Station(stationRequest.getName());
+
+        if (stationDao.exists(newStation.getStationName())) {
+            throw new StationException(ErrorCode.EXISTS_STATION, EXISTS_STATION_EXCEPTION_MESSAGE);
+        }
+
+        Station station = stationDao.insert(newStation);
 
         return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
     public StationResponse findStationResponseById(final Long id) {
-        return StationResponse.of(stationDao.findById(id));
+        final Station station = stationDao.findById(id).orElseThrow(
+                () -> new StationException(ErrorCode.NO_SUCH_STATION, NO_STATION_EXCEPTION_MESSAGE));
+
+        return StationResponse.of(station);
     }
 
     @Transactional(readOnly = true)
@@ -46,6 +61,9 @@ public class StationService {
 
     @Transactional
     public void deleteStationById(final Long id) {
+        stationDao.findById(id).orElseThrow(
+                () -> new StationException(ErrorCode.NO_SUCH_STATION, CAN_DELETE_ONLY_EXIST_STATION_EXCEPTION_MESSAGE));
+
         stationDao.deleteById(id);
     }
 }

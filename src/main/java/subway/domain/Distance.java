@@ -1,6 +1,8 @@
 package subway.domain;
 
 import java.util.Objects;
+import subway.exception.ErrorCode;
+import subway.exception.SectionException;
 
 public class Distance {
 
@@ -10,12 +12,13 @@ public class Distance {
 
     public Distance(final int value) {
         validatePositive(value);
+
         this.value = value;
     }
 
     private void validatePositive(final int distance) {
         if (distance <= 0) {
-            throw new IllegalArgumentException(DISTANCE_POSITIVE_EXCEPTION_MESSAGE);
+            throw new SectionException(ErrorCode.NOT_POSITIVE_DISTANCE, DISTANCE_POSITIVE_EXCEPTION_MESSAGE);
         }
     }
 
@@ -23,7 +26,7 @@ public class Distance {
         return this.value <= other.value;
     }
 
-    public Distance difference(final Distance other) {
+    public Distance subtract(final Distance other) {
         return new Distance(this.value - other.value);
     }
 
