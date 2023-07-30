@@ -39,7 +39,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("하나의 노선에서 찾기")
     @Test
-    void test1() {
+    void findOneLinePath() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -63,7 +63,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("환승 한번")
     @Test
-    void test3() {
+    void findOneTransferPath() {
         // given
         RestAssured.given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -96,7 +96,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("환승 여러번")
     @Test
-    void test2() {
+    void findMultiTransferPath() {
         // given
         RestAssured.given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -151,7 +151,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("데이터 베이스에 출발역 없음")
     @Test
-    void test4() {
+    void noSourceIdInDB() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -167,7 +167,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("데이터베이스에 도착역 없음")
     @Test
-    void test5() {
+    void noTargetIdInDB() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -183,7 +183,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("출발역이 소속된 노선 없음")
     @Test
-    void test6() {
+    void noSourceInLine() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -199,7 +199,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("도착역이 소속된 노선 없음")
     @Test
-    void test7() {
+    void noTargetInLine() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -215,7 +215,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("출발역과 도착역이 같음")
     @Test
-    void test8() {
+    void sameSourceAndTarget() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -231,7 +231,7 @@ class PathIntegrationTest extends IntegrationTest {
 
     @DisplayName("출발역과 도착역 사이 연결된 구간 없음")
     @Test
-    void test9() {
+    void noPathExist() {
         // when
         ExtractableResponse<Response> response = RestAssured
                 .given().log().all()
@@ -284,6 +284,4 @@ class PathIntegrationTest extends IntegrationTest {
                 .as(StationResponse.class)
                 .getId();
     }
-
 }
-
