@@ -4,6 +4,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import subway.exception.SubwayException;
 
 import java.util.List;
 
@@ -26,11 +27,20 @@ public final class PathManager {
     }
 
     public List<Station> findStationsOfShortestPath(final Station source, final Station target) {
+        validateStation(source);
+        validateStation(target);
+
         final GraphPath<Station, DefaultWeightedEdge> shortestPath = dijkstraShortestPath().getPath(source, target);
         return shortestPath.getVertexList();
     }
 
     private DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath() {
         return new DijkstraShortestPath<>(subwayMap);
+    }
+
+    private void validateStation(final Station station) {
+        if (!subwayMap.containsVertex(station)) {
+            throw new SubwayException(String.format("%s은(는) 존재하지 않는 역입니다.", station.getName()));
+        }
     }
 }
