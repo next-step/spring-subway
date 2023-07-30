@@ -51,7 +51,7 @@ public class SubWayHelper {
         Map<String, Long> params = new HashMap<>();
         params.put("source", sourceStationId);
         params.put("target", targetStationId);
-        return CommonRestAssuredUtils.get("/path", params);
+        return CommonRestAssuredUtils.get("/paths", params);
     }
 
     public static ExtractableResponse<Response> removeStationOfLine(Line line, Station station) {

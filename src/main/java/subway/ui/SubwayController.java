@@ -16,7 +16,7 @@ public class SubwayController {
         this.sectionsService = sectionsService;
     }
 
-    @GetMapping("/path")
+    @GetMapping("/paths")
     public ResponseEntity<ShortestSubwayPath> calculateShortestSubwayPath(@RequestParam Long source, @RequestParam Long target) {
         ShortestSubwayPath shortestSubwayPath = sectionsService.calculateShortestSubwayPath(source, target);
         return ResponseEntity.ok(shortestSubwayPath);
