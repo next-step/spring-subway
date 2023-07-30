@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.exception.IllegalStationsException;
-import subway.vo.StationPair;
+import subway.domain.vo.StationPair;
 
 @DisplayName("StationPair 테스트")
 class StationPairTest {
