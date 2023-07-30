@@ -10,4 +10,3 @@ public class PathNotFoundException extends SubwayBaseException {
         super(String.format(MESSAGE, source, target), CODE);
     }
 }
-

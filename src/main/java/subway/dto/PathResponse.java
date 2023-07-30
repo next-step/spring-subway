@@ -7,9 +7,9 @@ import subway.domain.Station;
 
 public class PathResponse {
 
-    private List<StationResponse> stations;
+    private final List<StationResponse> stations;
 
-    private Long distance;
+    private final Long distance;
 
     private PathResponse(List<StationResponse> stations, Long distance) {
         this.stations = stations;
@@ -58,4 +58,3 @@ public class PathResponse {
                 '}';
     }
 }
-

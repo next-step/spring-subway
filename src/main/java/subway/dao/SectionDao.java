@@ -127,4 +127,3 @@ public class SectionDao {
         jdbcTemplate.update(sql, id);
     }
 }
-

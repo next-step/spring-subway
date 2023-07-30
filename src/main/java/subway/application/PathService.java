@@ -28,12 +28,9 @@ public class PathService {
                 .orElseThrow(() -> new StationNotFoundException(source));
         Station targetStation = stationDao.findById(target)
                 .orElseThrow(() -> new StationNotFoundException(target));
-
         PathGraph graph = new PathGraph(allSections, sourceStation, targetStation);
         List<Station> stations = graph.findRoute();
         Long distance = graph.findDistance();
-
         return PathResponse.of(stations, distance);
     }
 }
-

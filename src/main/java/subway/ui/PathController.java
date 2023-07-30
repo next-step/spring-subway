@@ -27,4 +27,3 @@ public class PathController {
         return ResponseEntity.ok().body(response);
     }
 }
-

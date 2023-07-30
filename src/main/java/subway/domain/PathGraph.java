@@ -22,6 +22,12 @@ public class PathGraph {
                 .orElseThrow(() -> new PathNotFoundException(source.getId(), target.getId()));
     }
 
+    private void validateStations(Station source, Station target) {
+        if (source.getId().equals(target.getId())) {
+            throw new SameSourceAndTargetException();
+        }
+    }
+
     private static WeightedMultigraph<Station, DefaultWeightedEdge> toGraph(
             List<Section> allSections) {
         WeightedMultigraph<Station, DefaultWeightedEdge> graph
@@ -36,12 +42,6 @@ public class PathGraph {
         return graph;
     }
 
-    private void validateStations(Station source, Station target) {
-        if (source.getId().equals(target.getId())) {
-            throw new SameSourceAndTargetException();
-        }
-    }
-
     public List<Station> findRoute() {
         return graphPath.getVertexList();
     }
@@ -50,4 +50,3 @@ public class PathGraph {
         return Math.round(graphPath.getWeight());
     }
 }
-

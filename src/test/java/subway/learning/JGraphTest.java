@@ -145,4 +145,3 @@ class JGraphTest {
         assertThat(distance).isEqualTo(15L);
     }
 }
-

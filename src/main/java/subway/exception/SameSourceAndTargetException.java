@@ -10,4 +10,3 @@ public class SameSourceAndTargetException extends SubwayBaseException {
         super(MESSAGE, CODE);
     }
 }
-
