@@ -35,7 +35,7 @@ public class PathGraph {
     }
 
     private static void validateSize(List<Section> sections) {
-        if (sections.size() == 0) {
+        if (sections.isEmpty()) {
             throw new SubwayException(ErrorCode.PATH_NO_SECTIONS);
         }
     }
@@ -45,12 +45,17 @@ public class PathGraph {
         validateContains(sourceStation);
         validateContains(targetStation);
 
-        try {
-            GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
-                    .getPath(sourceStation, targetStation);
-            return new Path(path.getVertexList(), (int) path.getWeight());
-        } catch (NullPointerException e) {
-            throw new SubwayException(ErrorCode.NO_PATH, e);
+        GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
+                .getPath(sourceStation, targetStation);
+
+        validatePath(path);
+
+        return new Path(path.getVertexList(), (int) path.getWeight());
+    }
+
+    private void validatePath(GraphPath<Station, DefaultWeightedEdge> path) {
+        if (path == null) {
+            throw new SubwayException(ErrorCode.NO_PATH);
         }
     }
 
