@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import subway.application.PathService;
 import subway.dto.PathResponse;
 
 @RestController
@@ -13,12 +14,18 @@ public class PathController {
 
     private static final String NUMBER_PATTERN = "-?\\d+";
 
+    private final PathService pathService;
+
+    public PathController(PathService pathService) {
+        this.pathService = pathService;
+    }
+
     @GetMapping
-    public ResponseEntity<PathResponse> searchPath(@RequestParam String source, @RequestParam String target) {
+    public ResponseEntity<PathResponse> findShortestPath(@RequestParam String source, @RequestParam String target) {
         if (!source.matches(NUMBER_PATTERN) || !target.matches(NUMBER_PATTERN)) {
             throw new IllegalArgumentException("출발역과 도착역은 정수만 입력할 수 있습니다.");
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(pathService.findShortestPath(Long.parseLong(source), Long.parseLong(target)));
     }
 }
