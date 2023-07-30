@@ -13,7 +13,7 @@ import subway.application.dto.SectionParam;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 
-class SectionsTest {
+class SectionUpdaterTest {
 
     @DisplayName("Sections 생성에 성공한다.")
     @Test
@@ -22,7 +22,7 @@ class SectionsTest {
         List<Section> sections = createInitialSectionList();
 
         // when & then
-        assertThatNoException().isThrownBy(() -> new Sections(sections));
+        assertThatNoException().isThrownBy(() -> new SectionUpdater(sections));
     }
 
     @DisplayName("해당 구간과 겹치는 구간이 존재하는지 검증한다.")
@@ -30,8 +30,8 @@ class SectionsTest {
     void isOverlappedTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
+        Line line = sectionUpdater.getLine();
 
         Station startStation = sectionList.get(0).getUpStation();
         Station newStation = new Station(6, "munjeong");
@@ -40,7 +40,7 @@ class SectionsTest {
 
         // when & then
         //assertThat(sections.isOverlapped(overlapped)).isTrue();
-        assertThat(sections.isOverlapped(notOverlapped)).isFalse();
+        assertThat(sectionUpdater.shouldUpdate(notOverlapped)).isFalse();
     }
 
     @DisplayName("해당 구간이 추가 가능한 구간인지 검증에 성공한다.")
@@ -48,8 +48,8 @@ class SectionsTest {
     void validateSectionTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
+        Line line = sectionUpdater.getLine();
 
         Station upStation = new Station(6, "munjeong");
         Station downStation = sectionList.get(2).getUpStation();
@@ -57,7 +57,7 @@ class SectionsTest {
 
         // when & then
         assertThatNoException()
-            .isThrownBy(() -> sections.updateOverlappedSection(sectionParam));
+            .isThrownBy(() -> sectionUpdater.updateOverlappedSection(sectionParam));
     }
 
     @DisplayName("두 역이 모두 노선에 존재하는 경우 검증에 실패한다.")
@@ -65,8 +65,8 @@ class SectionsTest {
     void validateSectionFailBothContainTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
+        Line line = sectionUpdater.getLine();
 
         Station duplicateUpStation = sectionList.get(0).getDownStation();
         Station duplicateDownStation = sectionList.get(1).getUpStation();
@@ -74,7 +74,7 @@ class SectionsTest {
             duplicateDownStation, 3);
 
         // when & then
-        assertThatThrownBy(() -> sections.updateOverlappedSection(sectionParam))
+        assertThatThrownBy(() -> sectionUpdater.updateOverlappedSection(sectionParam))
             .isInstanceOf(IllegalSectionException.class)
             .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
@@ -83,8 +83,8 @@ class SectionsTest {
     @Test
     void validateSectionFailNeitherContainTest() {
         // given
-        Sections sections = createInitialSections();
-        Line line = sections.getLine();
+        SectionUpdater sectionUpdater = createInitialSections();
+        Line line = sectionUpdater.getLine();
 
         Station notExistUpStation = new Station(8L, "munjeong");
         Station notExistDownStation = new Station("jangji");
@@ -92,7 +92,7 @@ class SectionsTest {
             notExistDownStation, 3);
 
         // when & then
-        assertThatThrownBy(() -> sections.updateOverlappedSection(sectionParam))
+        assertThatThrownBy(() -> sectionUpdater.updateOverlappedSection(sectionParam))
             .isInstanceOf(IllegalSectionException.class)
             .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
     }
@@ -102,8 +102,8 @@ class SectionsTest {
     void validateSectionDistanceFailTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
+        Line line = sectionUpdater.getLine();
 
         int invalidDistance = 10;
         Station upStation = new Station(6, "munjeong");
@@ -112,7 +112,7 @@ class SectionsTest {
             downStation, invalidDistance);
 
         // when & then
-        assertThatThrownBy(() -> sections.updateOverlappedSection(sectionParam))
+        assertThatThrownBy(() -> sectionUpdater.updateOverlappedSection(sectionParam))
             .isInstanceOf(IllegalSectionException.class)
             .hasMessage("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
     }
@@ -122,8 +122,8 @@ class SectionsTest {
     void validateSectionDistanceTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
+        Line line = sectionUpdater.getLine();
 
         int validDistance = 3;
         Station upStation = sectionList.get(1).getDownStation();
@@ -133,7 +133,7 @@ class SectionsTest {
 
         // when & then
         assertThatNoException()
-            .isThrownBy(() -> sections.updateOverlappedSection(sectionParam));
+            .isThrownBy(() -> sectionUpdater.updateOverlappedSection(sectionParam));
     }
 
     @DisplayName("역 식별자로 해당 역이 종점역인지 반환한다.")
@@ -141,13 +141,13 @@ class SectionsTest {
     void isLastSectionTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
         Station startStation = sectionList.get(0).getUpStation();
         Station innerStation = sectionList.get(1).getDownStation();
 
         // when & then
-        assertThat(sections.isLastStation(startStation.getId())).isTrue();
-        assertThat(sections.isLastStation(innerStation.getId())).isFalse();
+        assertThat(sectionUpdater.isLastStation(startStation.getId())).isTrue();
+        assertThat(sectionUpdater.isLastStation(innerStation.getId())).isFalse();
     }
 
     @DisplayName("역 식별자와 일치하는 종점역을 반환한다.")
@@ -155,11 +155,11 @@ class SectionsTest {
     void getLastSectionTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
         Station startStation = sectionList.get(0).getUpStation();
 
         // when
-        Section startSection = sections.getLastSection(startStation.getId());
+        Section startSection = sectionUpdater.getLastSection(startStation.getId());
 
         // then
         assertThat(startSection.getUpStation()).isEqualTo(startStation);
@@ -170,11 +170,11 @@ class SectionsTest {
     void getLastSectionNotExistExceptionTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
         Station innerStation = sectionList.get(2).getUpStation();
 
         // when & then
-        assertThatThrownBy(() -> sections.getLastSection(innerStation.getId()))
+        assertThatThrownBy(() -> sectionUpdater.getLastSection(innerStation.getId()))
             .hasMessage("종점 구간이 포함된 역이 아닙니다.")
             .isInstanceOf(IllegalStationsException.class);
     }
@@ -184,13 +184,13 @@ class SectionsTest {
     void findUpDirectionSectionTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
 
         Section upDirection = sectionList.get(2);
         long stationId = upDirection.getDownStation().getId();
 
         // when
-        Section result = sections.findUpDirectionSection(stationId);
+        Section result = sectionUpdater.findUpDirectionSection(stationId);
 
         // then
         assertThat(result).isEqualTo(upDirection);
@@ -201,13 +201,13 @@ class SectionsTest {
     void findDownDirectionSectionTest() {
         // given
         List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
+        SectionUpdater sectionUpdater = new SectionUpdater(sectionList);
 
         Section downDirection = sectionList.get(2);
         long stationId = downDirection.getUpStation().getId();
 
         // when
-        Section result = sections.findDownDirectionSection(stationId);
+        Section result = sectionUpdater.findDownDirectionSection(stationId);
 
         // then
         assertThat(result).isEqualTo(downDirection);
@@ -235,9 +235,9 @@ class SectionsTest {
         return sections;
     }
 
-    private Sections createInitialSections() {
+    private SectionUpdater createInitialSections() {
         List<Section> sectionList = createInitialSectionList();
-        return new Sections(sectionList);
+        return new SectionUpdater(sectionList);
     }
 
     private Line createInitialLine() {

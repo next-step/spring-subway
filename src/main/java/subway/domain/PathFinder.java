@@ -11,15 +11,15 @@ import subway.exception.IllegalStationsException;
 
 public class PathFinder {
 
-    private final ConnectedSection connectedSection;
+    private final Sections sections;
 
     public PathFinder(List<Section> sections) {
-        connectedSection = new ConnectedSection(sections);
+        this.sections = new Sections(sections);
     }
 
     public ShortestPath searchShortestPath(long sourceId, long targetId) {
-        Station source = connectedSection.getStation(sourceId);
-        Station target = connectedSection.getStation(targetId);
+        Station source = sections.getStationById(sourceId);
+        Station target = sections.getStationById(targetId);
 
         validateSourceAndTarget(source, target);
 
@@ -48,9 +48,9 @@ public class PathFinder {
 
     private void addRemainSections(long stationId,
         WeightedMultigraph<Station, DefaultWeightedEdge> graph) {
-        connectedSection.getAllSections()
+        sections.getAll()
             .stream()
-            .filter(section -> !section.isContainStation(stationId))
+            .filter(section -> !section.hasStation(stationId))
             .forEach(section -> graph.setEdgeWeight(
                 graph.addEdge(section.getUpStation(), section.getDownStation()),
                 section.getDistance()));
@@ -58,14 +58,14 @@ public class PathFinder {
 
     private void addStationConnectedSections(long stationId,
         WeightedMultigraph<Station, DefaultWeightedEdge> graph) {
-        connectedSection.getConnectedSection(stationId)
+        sections.getConnectedSection(stationId)
             .forEach(section -> graph.setEdgeWeight(
                 graph.addEdge(section.getUpStation(), section.getDownStation()),
                 section.getDistance()));
     }
 
     private void addVertexes(WeightedMultigraph<Station, DefaultWeightedEdge> graph) {
-        connectedSection.getAllStations()
+        sections.getAllStations()
             .forEach(graph::addVertex);
     }
 }

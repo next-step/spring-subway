@@ -47,7 +47,7 @@ public class Section {
         return this.distance <= other;
     }
 
-    public boolean isContainStation(final long stationId) {
+    public boolean hasStation(final long stationId) {
         return upStation.matchId(stationId) || downStation.matchId(stationId);
     }
 
