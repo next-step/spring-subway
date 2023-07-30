@@ -1,6 +1,6 @@
 package subway.ui.dto;
 
-import org.springframework.util.Assert;
+import subway.exception.IllegalRequestException;
 
 public class SectionRequest {
 
@@ -12,13 +12,28 @@ public class SectionRequest {
     }
 
     public SectionRequest(final String upStationId, final String downStationId, final int distance) {
-        Assert.hasText(upStationId, "상행역을 입력해야 합니다.");
-        Assert.hasText(downStationId, "하행역을 입력해야 합니다.");
-        Assert.isTrue(distance > 0, "구간 길이는 0보다 커야합니다.");
+        validateStation(upStationId, downStationId);
+        validateDistance(distance);
 
         this.upStationId = Long.parseLong(upStationId);
         this.downStationId = Long.parseLong(downStationId);
         this.distance = distance;
+    }
+
+    private void validateStation(final String upStationId, final String downStationId) {
+        if (upStationId.isBlank()) {
+            throw new IllegalRequestException("상행역을 입력해야 합니다.");
+        }
+
+        if (downStationId.isBlank()) {
+            throw new IllegalRequestException("하행역을 입력해야 합니다.");
+        }
+    }
+
+    private void validateDistance(final int distance) {
+        if (distance <= 0) {
+            throw new IllegalRequestException("구간 거리는 0보다 커야합니다.");
+        }
     }
 
     public long getUpStationId() {

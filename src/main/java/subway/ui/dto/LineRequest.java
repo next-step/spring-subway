@@ -1,6 +1,6 @@
 package subway.ui.dto;
 
-import org.springframework.util.Assert;
+import subway.exception.IllegalRequestException;
 
 public class LineRequest {
 
@@ -18,17 +18,41 @@ public class LineRequest {
                        final long downStationId,
                        final int distance,
                        final String color) {
-        Assert.hasText(name, "이름을 입력해야 합니다.");
-        Assert.hasText(color, "색깔을 입력해야 합니다.");
-        Assert.isTrue(name.length() <= 255, "이름 길이는 255자를 초과할 수 없습니다.");
-        Assert.isTrue(color.length() <= 20, "색상은 20자를 초과할 수 없습니다.");
-        Assert.isTrue(distance > 0, "구간 길이는 0보다 커야합니다.");
+        validateName(name);
+        validateColor(color);
+        validateDistance(distance);
 
         this.name = name;
         this.upStationId = upStationId;
         this.downStationId = downStationId;
         this.distance = distance;
         this.color = color;
+    }
+
+    private void validateName(final String name) {
+        if (name.isBlank()) {
+            throw new IllegalRequestException("이름을 입력해야 합니다.");
+        }
+
+        if (name.length() > 255) {
+            throw new IllegalRequestException("이름 길이는 255자를 초과할 수 없습니다.");
+        }
+    }
+
+    private void validateColor(final String color) {
+        if (color.isBlank()) {
+            throw new IllegalRequestException("색상을 입력해야 합니다.");
+        }
+
+        if (color.length() > 20) {
+            throw new IllegalRequestException("색상 길이는 20자를 초과할 수 없습니다.");
+        }
+    }
+
+    private void validateDistance(final int distance) {
+        if (distance <= 0) {
+            throw new IllegalRequestException("구간 거리는 0보다 커야합니다.");
+        }
     }
 
     public String getName() {
