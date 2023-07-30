@@ -38,7 +38,9 @@ public final class PathManager {
     }
 
     public double findDistanceOfShortestPath(final Station source, final Station target) {
-        return dijkstraShortestPath().getPathWeight(source, target);
+        final double distance = dijkstraShortestPath().getPathWeight(source, target);
+        validateDistance(distance);
+        return distance;
     }
 
     private DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath() {
@@ -59,6 +61,12 @@ public final class PathManager {
 
     private void validateShortestPath(final GraphPath<Station, DefaultWeightedEdge> shortestPath) {
         if (Objects.isNull(shortestPath)) {
+            throw new SubwayException("출발역과 도착역을 연결하는 경로가 존재하지 않습니다.");
+        }
+    }
+
+    private void validateDistance(final double distance) {
+        if (Double.isInfinite(distance)) {
             throw new SubwayException("출발역과 도착역을 연결하는 경로가 존재하지 않습니다.");
         }
     }
