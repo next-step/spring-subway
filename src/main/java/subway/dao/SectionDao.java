@@ -58,6 +58,12 @@ public class SectionDao {
 
     }
 
+    public List<Section> findAll() {
+        final String sql = "select * from SECTION";
+
+        return namedJdbcTemplate.query(sql, rowMapper);
+    }
+
     public Optional<Long> findIdByStationIdsAndLineId(final Long upStationId, final Long downStationId,
             final Long lineId) {
         final String sql = "select id from SECTION where up_station_id = :u_id and down_station_id = :d_id and line_id = :l_id";

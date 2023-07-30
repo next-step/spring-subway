@@ -46,6 +46,14 @@ public class StationDao {
         return namedJdbcTemplate.query(sql, rowMapper);
     }
 
+    public List<Station> findAllIn(final List<Long> ids) {
+        String sql = "select * from STATION where id in (:ids)";
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("ids", ids);
+
+        return namedJdbcTemplate.query(sql, params, rowMapper);
+    }
+
     public Optional<Station> findById(final Long id) {
         String sql = "select * from STATION where id = :id";
         SqlParameterSource params = new MapSqlParameterSource()

@@ -17,12 +17,12 @@ import subway.helper.RestAssuredHelper;
 @DisplayName("경로 조회 기능")
 class PathIntegrationTest extends IntegrationTest {
 
-    Long 교대역_ID;
-    Long 강남역_ID;
-    Long 남부터미널역_ID;
-    Long 양재역_ID;
-    Long 일호선_ID;
-    Long 이호선_ID;
+    private Long 교대역_ID;
+    private Long 강남역_ID;
+    private Long 남부터미널역_ID;
+    private Long 양재역_ID;
+    private Long 일호선_ID;
+    private Long 이호선_ID;
 
     @BeforeEach
     public void setUp() {
@@ -112,7 +112,7 @@ class PathIntegrationTest extends IntegrationTest {
         final ExtractableResponse<Response> response = RestAssuredHelper.get("/paths", params);
 
         // then
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.statusCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.statusCode());
     }
 
     @DisplayName("도착역이 존재하지 않을 경우 예외를 던진다.")
@@ -127,7 +127,7 @@ class PathIntegrationTest extends IntegrationTest {
         final ExtractableResponse<Response> response = RestAssuredHelper.get("/paths", params);
 
         // then
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.statusCode());
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.statusCode());
     }
 
     @DisplayName("출발역이 비어있을 경우 예외를 던진다.")
