@@ -4,6 +4,7 @@ import static java.util.Collections.unmodifiableList;
 import static subway.util.CollectionUtil.toGroupByMap;
 import static subway.util.CollectionUtil.toMappedList;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -226,6 +227,16 @@ public class Sections {
 
     private Section getLast() {
         return this.values.get(this.values.size() - 1);
+    }
+
+    public int getTotalDistance() {
+        return this.values.stream()
+            .mapToInt(Section::getDistance)
+            .sum();
+    }
+
+    public List<Section> getValues() {
+        return Collections.unmodifiableList(values);
     }
 
     @Override

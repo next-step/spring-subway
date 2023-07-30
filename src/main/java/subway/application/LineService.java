@@ -32,8 +32,8 @@ public class LineService {
     public LineResponse saveLine(LineCreationRequest lineCreationRequest) {
 
         Line persistLine = lineDao.insert(new Line(lineCreationRequest.getName(), lineCreationRequest.getColor()));
-        Station upStation = getStationOrElseThrow(lineCreationRequest.getUpStationId());
-        Station downStation = getStationOrElseThrow(lineCreationRequest.getDownStationId());
+        Station upStation = getStationById(lineCreationRequest.getUpStationId());
+        Station downStation = getStationById(lineCreationRequest.getDownStationId());
         Section persistSection = sectionDao.save(
             new Section(persistLine, upStation, downStation, lineCreationRequest.getDistance()));
 
@@ -57,19 +57,8 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findLineResponseById(Long id) {
-        LineSections lineSections = sectionDao.findAllByLine(getLineOrElseThrow(id));
+        LineSections lineSections = sectionDao.findAllByLine(getLineById(id));
         return LineResponse.of(lineSections);
-    }
-
-    private Station getStationOrElseThrow(Long id) {
-        return stationDao.findById(id)
-            .orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\""));
-    }
-
-    private Line getLineOrElseThrow(Long id) {
-        return lineDao.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
     }
 
     @Transactional
@@ -87,5 +76,11 @@ public class LineService {
     private Line getLineById(Long id) {
         return lineDao.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 line id입니다. id: \"" + id + "\""));
+    }
+
+    private Station getStationById(Long id) {
+        return stationDao.findById(id)
+            .orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 station id입니다. id: \"" + id + "\""));
     }
 }

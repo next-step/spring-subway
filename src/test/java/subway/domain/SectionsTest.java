@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.domain.fixture.SectionFixture;
 import subway.dto.SectionRemovalResult;
 
 class SectionsTest {
@@ -31,10 +32,9 @@ class SectionsTest {
     @Test
     @DisplayName("정렬된 구간들을 생성한다.")
     void createSortedSections() {
-
-        Section firstSection = new Section(lineA, stationA, stationB, 1);
-        Section secondSection = new Section(lineA, stationB, stationC, 1);
-        Section thirdSection = new Section(lineA, stationC, stationD, 1);
+        Section firstSection = SectionFixture.createSectionA();
+        Section secondSection = SectionFixture.createSectionB();
+        Section thirdSection = SectionFixture.createSectionC();
 
         Sections sections = new Sections(List.of(thirdSection, secondSection, firstSection));
 
@@ -47,7 +47,7 @@ class SectionsTest {
     void cannotCreateWithCircularSection() {
         Station stationA = new Station(1L, "A");
         Station stationB = new Station(2L, "B");
-        Section section = new Section(lineA, stationA, stationB, 1);
+        Section section = SectionFixture.createSectionA();;
         Section circularSection = new Section(lineA, stationB, stationA, 1);
 
         assertThatThrownBy(() -> new Sections(List.of(section, circularSection)))
@@ -67,10 +67,10 @@ class SectionsTest {
     @Test
     @DisplayName("끊어진 구간들로 생성할 수 없습니다.")
     void cannotCreateWithSeperatedSections() {
-        Section sectionA = new Section(lineA, stationA, stationB, 3);
-        Section sectionB = new Section(lineA, stationC, stationD, 3);
+        Section sectionA = SectionFixture.createSectionA();
+        Section sectionC = SectionFixture.createSectionC();
 
-        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionB)))
+        assertThatThrownBy(() -> new Sections(List.of(sectionA, sectionC)))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -79,8 +79,8 @@ class SectionsTest {
     void cannotRemoveStationNotInSections() {
         Station stationA = new Station(1L, "A");
         Station stationB = new Station(2L, "B");
-        Section section = new Section(lineA, stationA, stationB, 1);
-        Sections sections = new Sections(List.of(section));
+        Section sectionA = SectionFixture.createSectionA();
+        Sections sections = new Sections(List.of(sectionA));
 
         assertThatThrownBy(() -> sections.remove(stationC))
             .isInstanceOf(IllegalArgumentException.class);
@@ -89,10 +89,9 @@ class SectionsTest {
     @Test
     @DisplayName("구간이 1개인 경우 구간을 삭제할 수 없다")
     void cannotRemoveOneSizeSections() {
-        Station stationA = new Station(1L, "A");
         Station stationB = new Station(2L, "B");
-        Section section = new Section(lineA, stationA, stationB, 1);
-        Sections sections = new Sections(List.of(section));
+        Section sectionA = SectionFixture.createSectionA();
+        Sections sections = new Sections(List.of(sectionA));
 
         assertThatThrownBy(() -> sections.remove(stationB))
             .isInstanceOf(IllegalStateException.class);
@@ -101,8 +100,8 @@ class SectionsTest {
     @Test
     @DisplayName("첫 구간을 삭제한다")
     void removeFirst() {
-        Section sectionA = new Section(lineA, stationA, stationB, 1);
-        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Section sectionA = SectionFixture.createSectionA();
+        Section sectionB = SectionFixture.createSectionB();
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
          SectionRemovalResult sectionRemovalResult = sections.remove(stationA);
@@ -116,8 +115,8 @@ class SectionsTest {
     @Test
     @DisplayName("중간 구간을 삭제한다")
     void removeMiddle() {
-        Section sectionA = new Section(lineA, stationA, stationB, 1);
-        Section sectionB = new Section(lineA, stationB, stationC, 2);
+        Section sectionA = SectionFixture.createSectionA();
+        Section sectionB = SectionFixture.createSectionB();
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
         SectionRemovalResult sectionRemovalResult = sections.remove(stationB);
@@ -133,8 +132,8 @@ class SectionsTest {
     @Test
     @DisplayName("마지막 구간을 삭제한다")
     void removeLast() {
-        Section sectionA = new Section(lineA, stationA, stationB, 1);
-        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Section sectionA = SectionFixture.createSectionA();
+        Section sectionB = SectionFixture.createSectionB();
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
         SectionRemovalResult sectionRemovalResult = sections.remove(stationC);
@@ -148,12 +147,24 @@ class SectionsTest {
     @Test
     @DisplayName("구간들의 역 목록을 순서대로 가져온다")
     void getStationOfSections() {
-        Section sectionA = new Section(lineA, stationA, stationB, 1);
-        Section sectionB = new Section(lineA, stationB, stationC, 1);
+        Section sectionA = SectionFixture.createSectionA();
+        Section sectionB = SectionFixture.createSectionB();
         Sections sections = new Sections(List.of(sectionA, sectionB));
 
         List<Station> stations = sections.getStations();
 
         assertThat(stations).containsExactly(stationA, stationB, stationC);
+    }
+
+    @Test
+    @DisplayName("구간들의 총 거리를 가져온다")
+    void getTotalDistance() {
+        Section sectionA = SectionFixture.createSectionA();
+        Section sectionB = SectionFixture.createSectionB();
+        Sections sections = new Sections(List.of(sectionA, sectionB));
+
+        int totalDistance = sections.getTotalDistance();
+
+        assertThat(totalDistance).isEqualTo(10);
     }
 }

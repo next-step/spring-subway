@@ -4,6 +4,8 @@ import static subway.integration.helper.CommonRestAssuredUtils.post;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.HashMap;
+import java.util.Map;
 import subway.domain.Line;
 import subway.domain.Station;
 import subway.dto.request.LineCreationRequest;
@@ -39,12 +41,29 @@ public class SubWayHelper {
             sectionAdditionRequest);
     }
 
+    public static ExtractableResponse<Response> addSectionToLine(Long lineId,
+        SectionAdditionRequest sectionAdditionRequest) {
+        return CommonRestAssuredUtils.post("/lines/{id}/sections", lineId,
+            sectionAdditionRequest);
+    }
+
+    public static ExtractableResponse<Response> calculateShortestSubwayPath(Long sourceStationId, Long targetStationId) {
+        Map<String, Long> params = new HashMap<>();
+        params.put("source", sourceStationId);
+        params.put("target", targetStationId);
+        return CommonRestAssuredUtils.get("/paths", params);
+    }
+
     public static ExtractableResponse<Response> removeStationOfLine(Line line, Station station) {
         return CommonRestAssuredUtils.delete("/lines/{id}/sections", line.getId(), "stationId", station.getId());
     }
 
     public static ExtractableResponse<Response> createStation(StationRequest stationRequest) {
         return post("/stations", stationRequest);
+    }
+
+    public static ExtractableResponse<Response> createStation(String stationName) {
+        return post("/stations", new StationRequest(stationName));
     }
 
     public static ExtractableResponse<Response> findAllStations() {
