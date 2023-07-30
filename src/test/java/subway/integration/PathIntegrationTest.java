@@ -1,9 +1,8 @@
 package subway.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.RestApi.extractIdFromApiResult;
 
-import io.restassured.RestAssured;
-import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
@@ -21,11 +20,17 @@ class PathIntegrationTest extends IntegrationTest {
     @Test
     void showPaths_returnStatusOK() {
         // given
-        long sourceId = 3;
-        long targetId = 5;
-        createInitialSections();
+        final LineWithStationId lineNo1 = createInitialLine("1호선", "인천", "부평");
+        final LineWithStationId lineNo2 = createInitialLine("2호선", "잠실", "잠실나루");
+
+        final long sindorimId = createStation("신도림");
+        extendSectionToLine(lineNo1.getLineId(), lineNo1.getDownStationId(), sindorimId);
+        extendSectionToLine(lineNo2.getLineId(), lineNo2.getDownStationId(), sindorimId);
 
         // when
+        long sourceId = lineNo1.getUpStationId(); // 인천
+        long targetId = lineNo2.getUpStationId(); // 잠실
+
         ExtractableResponse<Response> response = RestApi.get(
             "paths?source=" + sourceId + "&target=" + targetId);
 
@@ -37,13 +42,13 @@ class PathIntegrationTest extends IntegrationTest {
     @Test
     void showPaths_sameSourceAndTarget_statusBadRequest() {
         // given
-        long sourceId = 3;
-        long targetId = 3;
-        createInitialSections();
+        final LineWithStationId lineNo1 = createInitialLine("1호선", "인천", "부평");
 
         // when
+        long stationId = lineNo1.getUpStationId();
+
         ExtractableResponse<Response> response = RestApi.get(
-            "paths?source=" + sourceId + "&target=" + targetId);
+            "paths?source=" + stationId + "&target=" + stationId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -53,9 +58,10 @@ class PathIntegrationTest extends IntegrationTest {
     @Test
     void showPaths_notExistSourceOrTarget_statusBadRequest() {
         // given
-        long notExistSourceId = 10;
-        long notExistTargetId = 11;
-        createInitialSections();
+        final long lastStationId = createStation("오류동");
+
+        long notExistSourceId = lastStationId + 1;
+        long notExistTargetId = lastStationId + 2;
 
         // when
         ExtractableResponse<Response> response = RestApi.get(
@@ -69,11 +75,13 @@ class PathIntegrationTest extends IntegrationTest {
     @Test
     void showPaths_notConnectedSourceAndTarget_statusBadRequest() {
         // given
-        long notConnectedSource = 1;
-        long notConnectedTarget = 3;
-        createInitialSections();
+        final LineWithStationId lineNo1 = createInitialLine("1호선", "인천", "부평");
+        final LineWithStationId lineNo2 = createInitialLine("2호선", "잠실", "잠실나루");
 
         // when
+        long notConnectedSource = lineNo1.getUpStationId();
+        long notConnectedTarget = lineNo2.getDownStationId();
+
         ExtractableResponse<Response> response = RestApi.get(
             "paths?source=" + notConnectedSource + "&target=" + notConnectedTarget);
 
@@ -91,44 +99,45 @@ class PathIntegrationTest extends IntegrationTest {
         return extractIdFromApiResult(RestApi.post(stationRequest, "/stations"));
     }
 
-    private long createInitialLine(String name, String upStationName,
+    private LineWithStationId createInitialLine(String name, String upStationName,
         String downStationName) {
         long upStationId = createStation(upStationName);
         long downStationId = createStation(downStationName);
-        return createLine(name, upStationId, downStationId);
+        long lineId = createLine(name, upStationId, downStationId);
+        return new LineWithStationId(lineId, upStationId, downStationId);
     }
 
-    private void extendSectionToLine(long lineId, long upStationId, long downStationId) {
+    private long extendSectionToLine(long lineId, long upStationId, long downStationId) {
         final SectionRequest extendToDownStation = new SectionRequest(
             String.valueOf(upStationId),
             String.valueOf(downStationId),
             10
         );
 
-        RestApi.post(extendToDownStation, "/lines/" + lineId + "/sections");
+        return extractIdFromApiResult(RestApi.post(extendToDownStation, "/lines/" + lineId + "/sections"));
     }
 
-    private void createInitialSections() {
-        createInitialLine("3호선", "대화", "구파발");
-        final long lineNo1Id = createInitialLine("1호선", "인천", "부평");
-        final long lineNo2Id = createInitialLine("2호선", "잠실", "잠실나루");
-        final long stationId = createStation("신도림");
+    private static class LineWithStationId {
+        private final long lineId;
+        private final long upStationId;
+        private final long downStationId;
 
-        /**
-         *  대화                           잠실
-         *   |                            |
-         * *3호선*                       *2호선*
-         *  |                            |
-         * 구파발                       잠실나루
-         *                              |
-         * 인천--- *1호선* ---부평--- ---신도림
-         */
-        extendSectionToLine(lineNo1Id, 4, stationId);
-        extendSectionToLine(lineNo2Id, 6, stationId);
-    }
+        public LineWithStationId(long lineId, long upStationId, long downStationId) {
+            this.lineId = lineId;
+            this.upStationId = upStationId;
+            this.downStationId = downStationId;
+        }
 
-    private long extractIdFromApiResult(ExtractableResponse<Response> apiResponse) {
-        RestAssured.defaultParser = Parser.JSON;
-        return apiResponse.jsonPath().getLong("id");
+        public long getLineId() {
+            return lineId;
+        }
+
+        public long getUpStationId() {
+            return upStationId;
+        }
+
+        public long getDownStationId() {
+            return downStationId;
+        }
     }
 }
