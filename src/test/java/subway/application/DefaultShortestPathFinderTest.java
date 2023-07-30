@@ -1,4 +1,4 @@
-package subway.domain;
+package subway.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,25 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.domain.Line;
+import subway.domain.Section;
+import subway.domain.Station;
 
-class ShortestPathFinderTest {
-
-    @Test
-    @DisplayName("출발역과 도착역이 같은 경우 경로를 구할 수 없다.")
-    void cannotFindPathWithSameSourceAndTarget() {
-        //given
-        Line lineA = new Line(1L, "A", "red");
-        Station stationA = new Station(1L, "A");
-        Station stationB = new Station(2L, "B");
-        Station stationC = new Station(3L, "C");
-
-        Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
-        Section sectionB = new Section(2L, lineA, stationB, stationC, 4);
-
-        //when & then
-        assertThatThrownBy(() -> new ShortestPathFinder(List.of(sectionA, sectionB), stationA, stationA))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
+class DefaultShortestPathFinderTest {
 
     @Test
     @DisplayName("출발역과 도착역이 연결되어 있지 않은 경우 경로를 구할 수 없다.")
@@ -41,8 +27,11 @@ class ShortestPathFinderTest {
         Section sectionA = new Section(1L, lineA, stationA, stationB, 3);
         Section sectionB = new Section(2L, lineB, stationC, stationD, 4);
 
+        final DefaultShortestPathFinder pathFinder = new DefaultShortestPathFinder();
+
         //when & then
-        assertThatThrownBy(() -> new ShortestPathFinder(List.of(sectionA, sectionB), stationA, stationD))
+        assertThatThrownBy(
+            () -> pathFinder.calculatePath(List.of(sectionA, sectionB), stationA, stationD))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -67,8 +56,10 @@ class ShortestPathFinderTest {
         Section sectionE = new Section(5L, lineB, stationA, stationC, 5);
         Section sectionF = new Section(6L, lineB, stationC, stationE, 3);
 
+        final DefaultShortestPathFinder pathFinder = new DefaultShortestPathFinder();
+
         //when
-        final ShortestPathFinder pathFinder = new ShortestPathFinder(
+        pathFinder.calculatePath(
             List.of(sectionA, sectionB, sectionC, sectionD, sectionE, sectionF), stationA,
             stationE);
 
