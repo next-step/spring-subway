@@ -67,6 +67,18 @@ class PathManagerTest {
                 .isInstanceOf(SubwayException.class);
     }
 
+    @DisplayName("출발역과 도착역을 연결하는 경로가 없어 최단 경로를 찾는 데 실패한다.")
+    @Test
+    void findShortestPathWithNotConnectedStations() {
+        // given
+        final PathManager pathManager = pathManager();
+
+        // when & then
+        assertThatThrownBy(() -> pathManager.findStationsOfShortestPath(범계역(), 여의도역()))
+                .hasMessage("출발역과 도착역을 연결하는 경로가 존재하지 않습니다.")
+                .isInstanceOf(SubwayException.class);
+    }
+
     private PathManager pathManager() {
         /*
           <지하철 노선도>
