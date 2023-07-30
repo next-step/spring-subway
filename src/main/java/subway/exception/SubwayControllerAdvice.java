@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class SubwayControllerAdvice {
+public final class SubwayControllerAdvice {
 
     @ExceptionHandler(SubwayException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -26,7 +26,7 @@ public class SubwayControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse runtimeExceptionHandler(Exception exception) {
         exception.printStackTrace();
-        return new ErrorResponse(exception.getLocalizedMessage());
+        return new ErrorResponse("서버 오류가 발생했습니다.");
     }
 
     private static String extractMessage(final HttpMessageNotReadableException exception) {
