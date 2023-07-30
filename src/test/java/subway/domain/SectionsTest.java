@@ -2,12 +2,15 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class SectionsTest {
 
@@ -95,8 +98,13 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(upStation, downStation,  3);
 
-        // when & then
-        assertThrows(IncorrectRequestException.class, () -> sections.validateConstruction(newSection));
+        // when
+        Exception exception = catchException(() -> sections.validateConstruction(newSection));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.ONLY_ONE_OVERLAPPED_STATION);
     }
 
     @DisplayName("새로운 구간을 삽입할 때 두 역이 모두 존재하지 않으면 예외를 던진다.")
@@ -113,8 +121,13 @@ class SectionsTest {
         Sections sections = new Sections(originSections);
         Section newSection = new Section(newUpStation, newDownStation,  3);
 
-        // when & then
-        assertThrows(IncorrectRequestException.class, () -> sections.validateConstruction(newSection));
+        // when
+        Exception exception = catchException(() -> sections.validateConstruction(newSection));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.ONLY_ONE_OVERLAPPED_STATION);
     }
 
     @DisplayName("새로운 구간이 가운데에 삽입될 때 업데이트할 기존 구간을 반환한다.")
@@ -137,8 +150,8 @@ class SectionsTest {
         Section actualMidDown = sections.findOverlappedSection(midDownSection);
 
         // then
-        assertEquals(actualUpMid, new Section(upStation, downStation, 10));
-        assertEquals(actualMidDown, new Section(upStation, downStation, 10));
+        assertThat(actualUpMid).isEqualTo(new Section(upStation, downStation, 10));
+        assertThat(actualMidDown).isEqualTo(new Section(upStation, downStation, 10));
     }
 
     @DisplayName("새로운 구간을 삽입할 때 가운데에 삽입되는지 확인한다.")
@@ -155,7 +168,7 @@ class SectionsTest {
         Section newSection = new Section(upStation, midStation,  3);
 
         // when & then
-        assertTrue(sections.isConstructedInMiddle(newSection));
+        assertThat(sections.isConstructedInMiddle(newSection)).isTrue();
     }
 
     @DisplayName("새로운 구간을 삽입할 때 끝 구간에 삽입되는지 확인한다.")
@@ -172,7 +185,7 @@ class SectionsTest {
         Section newSection = new Section(downStation, newDownStation,  3);
 
         // when & then
-        assertFalse(sections.isConstructedInMiddle(newSection));
+        assertThat(sections.isConstructedInMiddle(newSection)).isFalse();
     }
 
     @DisplayName("구간 내에서 역을 제거할 수 있는지 확인한다.")
@@ -208,8 +221,13 @@ class SectionsTest {
                 new Section(upStation, midStation, distance),
                 new Section(midStation, downStation, distance)));
 
-        // when & then
-        assertThrows(IncorrectRequestException.class, () -> sections.validateClose(notExist));
+        // when
+        Exception exception = catchException(() -> sections.validateClose(notExist));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.NOT_EXIST_STATION_IN_LINE);
     }
 
     @DisplayName("구간이 1개만 있을 때 구간을 제거하면 예외를 던진다.")
@@ -222,7 +240,12 @@ class SectionsTest {
 
         Sections sections = new Sections(List.of(new Section(upStation, downStation, distance)));
 
-        // when & then
-        assertThrows(IncorrectRequestException.class, () -> sections.validateClose(downStation));
+        // when
+        Exception exception = catchException(() -> sections.validateClose(downStation));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.CANNOT_CLOSE_LAST_SECTION);
     }
 }

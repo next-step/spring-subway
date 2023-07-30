@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
+import subway.exception.ErrorCode;
+import subway.exception.IncorrectRequestException;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -50,7 +52,11 @@ public class LineDao {
 
     public Line findById(final Long id) {
         String sql = "select id, name, color from LINE WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, rowMapper, id);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new IncorrectRequestException(ErrorCode.NOT_EXIST_IN_DB, " 노선 입력값: " + id);
+        }
     }
 
     public void update(final Line newLine) {

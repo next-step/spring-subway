@@ -160,4 +160,8 @@ public class Sections {
             );
         }
     }
+
+    public List<Section> getSections() {
+        return sections;
+    }
 }

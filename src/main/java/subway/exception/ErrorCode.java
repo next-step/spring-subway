@@ -16,8 +16,19 @@ public enum ErrorCode {
     LONGER_THAN_ORIGIN_SECTION(400, "SECTION_012","삽입하는 새로운 구간의 거리는 기존 구간보다 짧아야 합니다."),
     NEGATIVE_DISTANCE(400, "DISTANCE_001","거리는 양수여야 합니다."),
     DUPLICATED_LINE_NAME(400, "LINE_001","노선 이름은 중복될 수 없습니다."),
+    NULL_LINE_NAME(400, "LINE_002","노선 이름은 null일 수 없습니다."),
+    NULL_LINE_COLOR(400, "LINE_003","노선 색은 null일 수 없습니다."),
+    LONG_LINE_NAME(400, "LINE_004","노선 이름은 255자 이하여야 합니다."),
+    LONG_LINE_COLOR(400, "LINE_005","노선 색은 20자 이하여야 합니다."),
     DUPLICATED_STATION_NAME(400, "STATION_001","역 이름은 중복될 수 없습니다."),
-    INVALID_STATION_ID(400, "STATION_002","역 id가 올바르지 않습니다.");
+    INVALID_STATION_ID(400, "STATION_002","역 id가 올바르지 않습니다."),
+    NULL_STATION_NAME(400, "STATION_003","역 이름은 null일 수 없습니다."),
+    LONG_STATION_NAME(400, "STATION_004","역 이름은 255자 이하여야 합니다."),
+    SAME_SOURCE_TARGET(400, "PATH_001", "경로 탐색 시 출발역과 도착역은 달라야 합니다."),
+    NO_CONNECTED_PATH(400, "PATH_002", "출발역과 도착역이 서로 연결되어 있지 않습니다."),
+    NOT_EXIST_IN_DB(400, "DB_001", "해당 데이터를 찾을 수 없습니다."),
+    UNKNOWN_DB_ERROR(500, "DB_002", "DB에서 알 수 없는 오류가 발생했습니다."),
+    UNKNOWN_SERVER_ERROR(500, "SERVER_001", "서버에서 알 수 없는 오류가 발생했습니다.");
 
     private final int status;
     private final String code;

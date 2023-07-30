@@ -4,9 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchException;
 
 class DistanceTest {
 
@@ -14,7 +16,13 @@ class DistanceTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, 0})
     void notPositiveDistance(int distance) {
-        assertThrows(IncorrectRequestException.class, () -> new Distance(distance));
+        // when
+        Exception exception = catchException(() -> new Distance(distance));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.NEGATIVE_DISTANCE);
     }
 
     @DisplayName("거리와 거리를 뺀다.")
@@ -28,7 +36,7 @@ class DistanceTest {
         Distance actual = distance.subtract(subtract);
 
         // then
-        assertEquals(actual, new Distance(3));
+        assertThat(actual).isEqualTo(new Distance(3));
     }
 
     @DisplayName("거리와 거리를 뺐을 때 0 이하이면 예외를 던진다.")
@@ -38,8 +46,13 @@ class DistanceTest {
         Distance distance = new Distance(10);
         Distance subtract = new Distance(17);
 
-        // when & then
-        assertThrows(IncorrectRequestException.class, () -> distance.subtract(subtract));
+        // when
+        Exception exception = catchException(() -> distance.subtract(subtract));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.NEGATIVE_DISTANCE);
     }
 
     @DisplayName("거리와 거리를 더한다.")
@@ -53,7 +66,7 @@ class DistanceTest {
         Distance actual = distance.add(add);
 
         // then
-        assertEquals(actual, new Distance(10));
+        assertThat(actual).isEqualTo(new Distance(10));
     }
 
     @DisplayName("한 거리가 다른 거리보다 같거나 작은지 판단한다.")
@@ -65,8 +78,8 @@ class DistanceTest {
         Distance shorter = new Distance(3);
 
         // when & then
-        assertTrue(distance.shorterOrEqualTo(longer));
-        assertTrue(distance.shorterOrEqualTo(distance));
-        assertFalse(distance.shorterOrEqualTo(shorter));
+        assertThat(distance.shorterOrEqualTo(longer)).isTrue();
+        assertThat(distance.shorterOrEqualTo(distance)).isTrue();
+        assertThat(distance.shorterOrEqualTo(shorter)).isFalse();
     }
 }

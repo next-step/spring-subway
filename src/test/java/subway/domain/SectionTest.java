@@ -2,10 +2,11 @@ package subway.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.exception.ErrorCode;
 import subway.exception.IncorrectRequestException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchException;
 
 class SectionTest {
 
@@ -15,9 +16,13 @@ class SectionTest {
         // given
         Station station = new Station(4L, "잠실역");
 
-        // when & then
-        assertThrows(IncorrectRequestException.class,
-                () -> new Section(station, station, 10));
+        // when
+        Exception exception = catchException(() -> new Section(station, station, 10));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.SAME_STATION_SECTION);
     }
 
     @DisplayName("새로운 구간이 삽입될 수 있도록 기존 구간을 잘라서 반환한다.")
@@ -37,8 +42,8 @@ class SectionTest {
         Section actualUpMid = oldSection.divideWith(midDownSection);
 
         // then
-        assertEquals(actualMidDown, new Section(midStation, downStation, 7));
-        assertEquals(actualUpMid, new Section(upStation, midStation,  3));
+        assertThat(actualMidDown).isEqualTo(new Section(midStation, downStation, 7));
+        assertThat(actualUpMid).isEqualTo(new Section(upStation, midStation,  3));
     }
 
     @DisplayName("새로운 구간을 중간에 삽입할 때의 거리가 기존 구간의 거리와 같거나 길면 예외를 던진다.")
@@ -52,8 +57,13 @@ class SectionTest {
         Section oldSection = new Section(upStation, downStation, 10);
         Section newSection = new Section(upStation, midStation,  10);
 
-        // when & then
-        assertThrows(IncorrectRequestException.class, () -> oldSection.divideWith(newSection));
+        // when
+        Exception exception = catchException(() -> oldSection.divideWith(newSection));
+
+        // then
+        assertThat(exception).isInstanceOf(IncorrectRequestException.class);
+        assertThat(((IncorrectRequestException) exception).getErrorCode())
+                .isEqualTo(ErrorCode.LONGER_THAN_ORIGIN_SECTION);
     }
 
     @DisplayName("역을 삭제할 수 있도록 기존 구간들을 합쳐서 반환한다.")
@@ -71,6 +81,6 @@ class SectionTest {
         Section actual = upMidSection.connectWith(midDownSection);
 
         // then
-        assertEquals(actual, new Section(upStation, downStation, 10));
+        assertThat(actual).isEqualTo(new Section(upStation, downStation, 10));
     }
 }
