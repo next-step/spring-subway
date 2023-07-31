@@ -6,7 +6,7 @@ import subway.application.dto.SectionParam;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Section;
-import subway.domain.Sections;
+import subway.domain.SectionUpdater;
 import subway.domain.Station;
 import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
@@ -30,15 +30,16 @@ public class SectionService {
         final Station upStation = getStationById(sectionRequest.getUpStationId());
         final Station downStation = getStationById(sectionRequest.getDownStationId());
 
-        final Sections sections = new Sections(sectionDao.findAll(lineId));
+        final SectionUpdater sectionUpdater = new SectionUpdater(
+            sectionDao.findAllByLineId(lineId));
         final SectionParam params = new SectionParam(lineId, upStation, downStation,
             sectionRequest.getDistance());
 
-        if (sections.isOverlapped(params)) {
-            updateOverlappedSection(params, sections);
+        if (sectionUpdater.shouldUpdate(params)) {
+            updateOverlappedSection(params, sectionUpdater);
         }
 
-        final Section newSection = params.to(sections.getLine());
+        final Section newSection = params.to(sectionUpdater.getLine());
         return SectionResponse.of(sectionDao.insert(newSection));
     }
 
@@ -46,32 +47,34 @@ public class SectionService {
         validateLineInStation(lineId, stationId);
         validateSectionInLine(lineId);
 
-        final Sections sections = new Sections(sectionDao.findAll(lineId));
+        final SectionUpdater sectionUpdater = new SectionUpdater(
+            sectionDao.findAllByLineId(lineId));
 
-        if (sections.isLastStation(stationId)) {
-            deleteLastSection(stationId, sections);
+        if (sectionUpdater.isLastStation(stationId)) {
+            deleteLastSection(stationId, sectionUpdater);
             return;
         }
 
-        deleteInnerSection(stationId, sections);
+        deleteInnerSection(stationId, sectionUpdater);
     }
 
-    private void updateOverlappedSection(final SectionParam params, final Sections sections) {
-        Section updateResult = sections.updateOverlappedSection(params);
+    private void updateOverlappedSection(final SectionParam params,
+        final SectionUpdater sectionUpdater) {
+        Section updateResult = sectionUpdater.updateOverlappedSection(params);
         sectionDao.update(updateResult);
     }
 
-    private void deleteInnerSection(long stationId, Sections sections) {
-        final Section upDirection = sections.findUpDirectionSection(stationId);
-        final Section downDirection = sections.findDownDirectionSection(stationId);
-        final Section extendedSection = downDirection.extendToUpDirection(upDirection);
+    private void deleteInnerSection(long stationId, SectionUpdater sectionUpdater) {
+        final Section upDirection = sectionUpdater.findUpDirectionSection(stationId);
+        final Section extendedSection = sectionUpdater.extendSection(stationId,
+            upDirection);
 
         sectionDao.delete(upDirection.getId());
         sectionDao.update(extendedSection);
     }
 
-    private void deleteLastSection(long stationId, Sections sections) {
-        final Section connectedSection = sections.getLastSection(stationId);
+    private void deleteLastSection(long stationId, SectionUpdater sectionUpdater) {
+        final Section connectedSection = sectionUpdater.getLastSection(stationId);
         sectionDao.delete(connectedSection.getId());
     }
 

@@ -47,6 +47,10 @@ public class Section {
         return this.distance <= other;
     }
 
+    public boolean hasStation(final long stationId) {
+        return upStation.matchId(stationId) || downStation.matchId(stationId);
+    }
+
     private void validateStations(final Station upStation, final Station downStation) {
         if (upStation.equals(downStation)) {
             throw new IllegalSectionException("상행역과 하행역은 달라야 합니다.");
@@ -67,8 +71,20 @@ public class Section {
         return line;
     }
 
+    public long getLineId() {
+        return line.getId();
+    }
+
     public Station getUpStation() {
         return upStation;
+    }
+
+    public long getUpStationId() {
+        return upStation.getId();
+    }
+
+    public long getDownStationId() {
+        return downStation.getId();
     }
 
     public Station getDownStation() {
@@ -88,10 +104,9 @@ public class Section {
             return false;
         }
         Section section = (Section) o;
-        return Objects.equals(id, section.id) && Objects.equals(line,
-            section.line) && Objects.equals(upStation, section.upStation)
-            && Objects.equals(downStation, section.downStation)
-            && Objects.equals(distance, section.distance);
+        return Objects.equals(id, section.id) && Objects.equals(line, section.line)
+            && Objects.equals(upStation, section.upStation) && Objects.equals(
+            downStation, section.downStation) && Objects.equals(distance, section.distance);
     }
 
     @Override
@@ -103,9 +118,9 @@ public class Section {
     public String toString() {
         return "Section{" +
             "id=" + id +
-            ", lineId=" + line +
-            ", upStationId=" + upStation +
-            ", downStationId=" + downStation +
+            ", line=" + line +
+            ", upStation=" + upStation +
+            ", downStation=" + downStation +
             ", distance=" + distance +
             '}';
     }

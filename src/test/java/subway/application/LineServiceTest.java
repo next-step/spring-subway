@@ -116,7 +116,7 @@ class LineServiceTest {
         Line line = createInitialLine();
 
         given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
-        given(sectionDao.findAll(line.getId())).willReturn(createInitialSections(line));
+        given(sectionDao.findAllByLineId(line.getId())).willReturn(createInitialSections(line));
 
         // when
         LineResponse lineResponse = lineService.findLineResponseById(line.getId());
@@ -155,8 +155,8 @@ class LineServiceTest {
     }
 
     private LineRequest convertToLineRequest(Line line, Section section) {
-        return new LineRequest(line.getName(), section.getUpStation().getId(),
-            section.getDownStation().getId(), section.getDistance(), line.getColor());
+        return new LineRequest(line.getName(), section.getUpStationId(),
+            section.getDownStationId(), section.getDistance(), line.getColor());
     }
 
     private List<Long> getSortedStationIds() {

@@ -1,12 +1,11 @@
 package subway.domain;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import subway.application.dto.SectionParam;
-import subway.exception.IllegalLineException;
-import subway.exception.IllegalSectionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import subway.exception.IllegalStationsException;
 
 public class Sections {
@@ -15,139 +14,81 @@ public class Sections {
     private final Map<Long, Section> downStationMap = new HashMap<>();
 
     public Sections(final List<Section> sections) {
-        validateLine(sections);
         sections.forEach(section -> {
-            upStationMap.put(section.getUpStation().getId(), section);
-            downStationMap.put(section.getDownStation().getId(), section);
+            upStationMap.put(section.getUpStationId(), section);
+            downStationMap.put(section.getDownStationId(), section);
         });
     }
 
-    public Section updateOverlappedSection(final SectionParam params) {
-        validateOnlyOneStationExistInLine(params);
+    public List<Section> getConnectedSection(long stationId) {
+        List<Section> sections = new ArrayList<>();
 
-        if (upStationMap.containsKey(params.getUpStation().getId())) {
-            Section overlappedSection = upStationMap.get(params.getUpStation().getId());
-            return updateOverlappedDownDirectionSection(overlappedSection, params);
-
+        if (isDownDirectionSectionExist(stationId)) {
+            sections.add(upStationMap.get(stationId));
         }
 
-        if (downStationMap.containsKey(params.getDownStation().getId())) {
-            Section overlappedSection = downStationMap.get(params.getDownStation().getId());
-            return updateOverlappedUpDirectionSection(overlappedSection, params);
+        if (isUpDirectionSectionExist(stationId)) {
+            sections.add(downStationMap.get(stationId));
         }
 
-        throw new IllegalSectionException("연결된 구간이 존재하지 않습니다.");
+        return sections;
+    }
+
+    public Section getUpDirectionSection(long stationId) {
+        return downStationMap.get(stationId);
+    }
+
+    public Section getDownDirectionSection(long stationId) {
+        return upStationMap.get(stationId);
+    }
+
+    public List<Section> getAll() {
+        return upStationMap.keySet()
+            .stream()
+            .map(upStationMap::get)
+            .collect(Collectors.toList());
+    }
+
+    public Station getStationById(long stationId) {
+        if (isDownDirectionSectionExist(stationId)) {
+            return upStationMap.get(stationId).getUpStation();
+        }
+
+        if (isUpDirectionSectionExist(stationId)) {
+            return downStationMap.get(stationId).getDownStation();
+        }
+
+        throw new IllegalStationsException("존재하지 않는 역 정보입니다.");
+    }
+
+    public List<Station> getAllStations() {
+        return upStationMap.keySet().stream()
+            .flatMap(key -> Stream.of(upStationMap.get(key).getUpStation(), upStationMap.get(key).getDownStation()))
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
+    public boolean isDownDirectionSectionExist(final long stationId) {
+        return upStationMap.containsKey(stationId);
+    }
+
+    public boolean isUpDirectionSectionExist(final long stationId) {
+        return downStationMap.containsKey(stationId);
     }
 
     public boolean isLastStation(final long stationId) {
         return isStartStation(stationId) || isEndStation(stationId);
     }
 
-    public boolean isOverlapped(final SectionParam params) {
-        validateOnlyOneStationExistInLine(params);
-
-        boolean isUpStationOverlapped = isStationExist(params.getUpStation().getId()) &&
-            !isEndStation(params.getUpStation().getId());
-        boolean isDownStationOverlapped = isStationExist(params.getDownStation().getId()) &&
-            !isStartStation(params.getDownStation().getId());
-
-        return isUpStationOverlapped || isDownStationOverlapped;
+    public boolean isStationExist(long stationId) {
+        return isDownDirectionSectionExist(stationId)|| isUpDirectionSectionExist(stationId);
     }
 
-    public Section findUpDirectionSection(long stationId) {
-        return downStationMap.get(stationId);
-    }
-
-    public Section findDownDirectionSection(long stationId) {
-        return upStationMap.get(stationId);
-    }
-
-    public Section getLastSection(long stationId) {
-        if (isStartStation(stationId)) {
-            return findDownDirectionSection(stationId);
-        }
-
-        if (isEndStation(stationId)) {
-            return findUpDirectionSection(stationId);
-        }
-
-        throw new IllegalStationsException("종점 구간이 포함된 역이 아닙니다.");
-    }
-
-    public Line getLine() {
-        return upStationMap.values()
-            .stream()
-            .map(Section::getLine)
-            .findFirst()
-            .orElseThrow(() -> new IllegalSectionException("구간이 소속된 노선이 존재하지 않습니다."));
-    }
-
-    private boolean isStartStation(final long stationId) {
+    public boolean isStartStation(final long stationId) {
         return upStationMap.containsKey(stationId) && !downStationMap.containsKey(stationId);
     }
 
-    private boolean isEndStation(final long stationId) {
+    public boolean isEndStation(final long stationId) {
         return !upStationMap.containsKey(stationId) && downStationMap.containsKey(stationId);
-    }
-
-    private Section updateOverlappedDownDirectionSection(Section overlapped, SectionParam params) {
-        validateDistance(overlapped, params.getDistance());
-        return overlapped.narrowToDownDirection(overlapped.getUpStation(), params.getDistance());
-    }
-
-
-    private Section updateOverlappedUpDirectionSection(Section overlapped, SectionParam params) {
-        validateDistance(overlapped, params.getDistance());
-        return overlapped.narrowToUpDirection(overlapped.getDownStation(), params.getDistance());
-    }
-
-    private void validateOnlyOneStationExistInLine(final SectionParam params) {
-        boolean upStationExist = isStationExist(params.getUpStation().getId());
-        boolean downStationExist = isStationExist(params.getDownStation().getId());
-        if (upStationExist == downStationExist) {
-            throw new IllegalSectionException("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
-        }
-    }
-
-    private boolean isStationExist(long stationId) {
-        return upStationMap.containsKey(stationId) || downStationMap.containsKey(stationId);
-    }
-
-    private void validateLine(final List<Section> sections) {
-        if (sections.isEmpty()) {
-            throw new IllegalLineException("해당 노선은 생성되지 않았습니다.");
-        }
-    }
-
-    private void validateDistance(final Section existSection, final int distance) {
-        if (existSection.isDistanceLessThanOrEqualTo(distance)) {
-            throw new IllegalSectionException("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Sections sections = (Sections) o;
-        return Objects.equals(upStationMap, sections.upStationMap)
-            && Objects.equals(downStationMap, sections.downStationMap);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(upStationMap, downStationMap);
-    }
-
-    @Override
-    public String toString() {
-        return "Sections{" +
-            "upStationMap=" + upStationMap +
-            ", downStationMap=" + downStationMap +
-            '}';
     }
 }

@@ -1,6 +1,7 @@
-package subway;
+package subway.utils;
 
 import io.restassured.RestAssured;
+import io.restassured.parsing.Parser;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.http.MediaType;
@@ -42,5 +43,10 @@ public class RestApi {
             .when().delete(path, pathParams)
             .then().log().all().
             extract();
+    }
+
+    public static long extractIdFromApiResult(ExtractableResponse<Response> apiResponse) {
+        RestAssured.defaultParser = Parser.JSON;
+        return apiResponse.jsonPath().getLong("id");
     }
 }

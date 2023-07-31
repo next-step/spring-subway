@@ -1,4 +1,4 @@
-package subway.vo;
+package subway.domain.vo;
 
 import java.util.Objects;
 import subway.domain.Section;

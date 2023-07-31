@@ -26,12 +26,12 @@ public class SectionParam {
         return lineId;
     }
 
-    public Station getUpStation() {
-        return upStation;
+    public long getUpStationId() {
+        return upStation.getId();
     }
 
-    public Station getDownStation() {
-        return downStation;
+    public long getDownStationId() {
+        return downStation.getId();
     }
 
     public int getDistance() {

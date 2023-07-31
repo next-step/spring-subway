@@ -1,23 +1,22 @@
 package subway.domain;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import subway.application.dto.SectionParam;
-import subway.exception.IllegalSectionException;
 import subway.exception.IllegalStationsException;
 
 class SectionsTest {
 
     @DisplayName("Sections 생성에 성공한다.")
     @Test
-    void createSectionsTest() {
+    void createSections_notThrowException() {
         // given
         List<Section> sections = createInitialSectionList();
 
@@ -25,172 +24,38 @@ class SectionsTest {
         assertThatNoException().isThrownBy(() -> new Sections(sections));
     }
 
-    @DisplayName("해당 구간과 겹치는 구간이 존재하는지 검증한다.")
+    @DisplayName("역과 연결된 구간들을 반환한다.")
     @Test
-    void isOverlappedTest() {
+    void getConnectedSection_returnSections() {
         // given
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
-
-        Station startStation = sectionList.get(0).getUpStation();
-        Station newStation = new Station(6, "munjeong");
-        SectionParam overlapped = new SectionParam(line.getId(), startStation, newStation, 2);
-        SectionParam notOverlapped = new SectionParam(line.getId(), newStation, startStation, 2);
-
-        // when & then
-        //assertThat(sections.isOverlapped(overlapped)).isTrue();
-        assertThat(sections.isOverlapped(notOverlapped)).isFalse();
-    }
-
-    @DisplayName("해당 구간이 추가 가능한 구간인지 검증에 성공한다.")
-    @Test
-    void validateSectionTest() {
-        // given
-        List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
-
-        Station upStation = new Station(6, "munjeong");
-        Station downStation = sectionList.get(2).getUpStation();
-        SectionParam sectionParam = new SectionParam(line.getId(), upStation, downStation, 3);
-
-        // when & then
-        assertThatNoException()
-            .isThrownBy(() -> sections.updateOverlappedSection(sectionParam));
-    }
-
-    @DisplayName("두 역이 모두 노선에 존재하는 경우 검증에 실패한다.")
-    @Test
-    void validateSectionFailBothContainTest() {
-        // given
-        List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
-
-        Station duplicateUpStation = sectionList.get(0).getDownStation();
-        Station duplicateDownStation = sectionList.get(1).getUpStation();
-        SectionParam sectionParam = new SectionParam(line.getId(), duplicateUpStation,
-            duplicateDownStation, 3);
-
-        // when & then
-        assertThatThrownBy(() -> sections.updateOverlappedSection(sectionParam))
-            .isInstanceOf(IllegalSectionException.class)
-            .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
-    }
-
-    @DisplayName("두 역이 모두 노선에 존재하지 않는 경우 검증에 실패한다.")
-    @Test
-    void validateSectionFailNeitherContainTest() {
-        // given
-        Sections sections = createInitialSections();
-        Line line = sections.getLine();
-
-        Station notExistUpStation = new Station(8L, "munjeong");
-        Station notExistDownStation = new Station("jangji");
-        SectionParam sectionParam = new SectionParam(line.getId(), notExistUpStation,
-            notExistDownStation, 3);
-
-        // when & then
-        assertThatThrownBy(() -> sections.updateOverlappedSection(sectionParam))
-            .isInstanceOf(IllegalSectionException.class)
-            .hasMessage("상행역과 하행역 중 하나만 노선에 등록되어 있어야 합니다.");
-    }
-
-    @DisplayName("역 사이에 새로운 역을 등록할 경우 기존 역 사이 길이보다 크거나 같으면 등록할 수 없다.")
-    @Test
-    void validateSectionDistanceFailTest() {
-        // given
-        List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
-
-        int invalidDistance = 10;
-        Station upStation = new Station(6, "munjeong");
-        Station downStation = sectionList.get(2).getUpStation();
-        SectionParam sectionParam = new SectionParam(line.getId(), upStation,
-            downStation, invalidDistance);
-
-        // when & then
-        assertThatThrownBy(() -> sections.updateOverlappedSection(sectionParam))
-            .isInstanceOf(IllegalSectionException.class)
-            .hasMessage("길이는 기존 역 사이 길이보다 크거나 같을 수 없습니다.");
-    }
-
-    @DisplayName("역 사이에 새로운 역을 등록할 경우 기존 역 사이 길이보다 작아야 검증에 성공한다.")
-    @Test
-    void validateSectionDistanceTest() {
-        // given
-        List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Line line = sections.getLine();
-
-        int validDistance = 3;
-        Station upStation = sectionList.get(1).getDownStation();
-        Station downStation = new Station(6, "munjeong");
-        SectionParam sectionParam = new SectionParam(line.getId(), upStation, downStation,
-            validDistance);
-
-        // when & then
-        assertThatNoException()
-            .isThrownBy(() -> sections.updateOverlappedSection(sectionParam));
-    }
-
-    @DisplayName("역 식별자로 해당 역이 종점역인지 반환한다.")
-    @Test
-    void isLastSectionTest() {
-        // given
-        List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Station startStation = sectionList.get(0).getUpStation();
-        Station innerStation = sectionList.get(1).getDownStation();
-
-        // when & then
-        assertThat(sections.isLastStation(startStation.getId())).isTrue();
-        assertThat(sections.isLastStation(innerStation.getId())).isFalse();
-    }
-
-    @DisplayName("역 식별자와 일치하는 종점역을 반환한다.")
-    @Test
-    void getLastSectionTest() {
-        // given
-        List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Station startStation = sectionList.get(0).getUpStation();
+        long stationId = sectionList.get(0)
+            .getUpStation()
+            .getId();
 
         // when
-        Section startSection = sections.getLastSection(startStation.getId());
+        List<Section> result = sections.getConnectedSection(stationId);
 
         // then
-        assertThat(startSection.getUpStation()).isEqualTo(startStation);
-    }
-
-    @DisplayName("식별자와 일치하는 종점역이 없으면 예외를 던진다.")
-    @Test
-    void getLastSectionNotExistExceptionTest() {
-        // given
-        List<Section> sectionList = createInitialSectionList();
-        Sections sections = new Sections(sectionList);
-        Station innerStation = sectionList.get(2).getUpStation();
-
-        // when & then
-        assertThatThrownBy(() -> sections.getLastSection(innerStation.getId()))
-            .hasMessage("종점 구간이 포함된 역이 아닙니다.")
-            .isInstanceOf(IllegalStationsException.class);
+        List<Section> expected = sectionList.stream()
+            .filter(section -> section.hasStation(stationId))
+            .collect(Collectors.toList());
+        assertThat(result).hasSameElementsAs(expected);
     }
 
     @DisplayName("역과 상행 방향으로 연결된 구간을 반환한다.")
     @Test
-    void findUpDirectionSectionTest() {
+    void getUpDirectionSection_returnSection() {
         // given
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
 
         Section upDirection = sectionList.get(2);
-        long stationId = upDirection.getDownStation().getId();
+        long stationId = upDirection.getDownStationId();
 
         // when
-        Section result = sections.findUpDirectionSection(stationId);
+        Section result = sections.getUpDirectionSection(stationId);
 
         // then
         assertThat(result).isEqualTo(upDirection);
@@ -198,19 +63,156 @@ class SectionsTest {
 
     @DisplayName("역과 하행 방향으로 연결된 구간을 반환한다.")
     @Test
-    void findDownDirectionSectionTest() {
+    void getDownDirectionSection_returnSection() {
         // given
         List<Section> sectionList = createInitialSectionList();
         Sections sections = new Sections(sectionList);
 
         Section downDirection = sectionList.get(2);
-        long stationId = downDirection.getUpStation().getId();
+        long stationId = downDirection.getUpStationId();
 
         // when
-        Section result = sections.findDownDirectionSection(stationId);
+        Section result = sections.getDownDirectionSection(stationId);
 
         // then
         assertThat(result).isEqualTo(downDirection);
+    }
+
+    @DisplayName("모든 구간을 반환한다.")
+    @Test
+    void getAll_returnAllSections() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+
+        // when
+        List<Section> allSections = sections.getAll();
+
+        // then
+        assertThat(sectionList).containsExactlyInAnyOrderElementsOf(allSections);
+    }
+
+    @DisplayName("식별자로 역 정보를 조회한다.")
+    @Test
+    void getStationById_returnSections() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+        Station station = sectionList.get(2).getDownStation();
+
+        // when
+        Station result = sections.getStationById(station.getId());
+
+        // then
+        assertThat(result).isEqualTo(station);
+    }
+
+    @DisplayName("식별자로 역 정보를 조회시, 역이 존재하지 않으면 예외를 던진다.")
+    @Test
+    void getStationById_notExist_throwException() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+        long notExistId = 99;
+
+        // when & then
+        assertThatThrownBy(() -> sections.getStationById(notExistId))
+            .hasMessage("존재하지 않는 역 정보입니다.")
+            .isInstanceOf(IllegalStationsException.class);
+    }
+
+    @DisplayName("모든 역 정보를 반환한다.")
+    @Test
+    void getAllStations_returnStations() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+
+        // when
+        List<Station> result = sections.getAllStations();
+
+        // then
+        List<Station> expected = sectionList.stream()
+            .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
+            .distinct()
+            .collect(Collectors.toList());
+        assertThat(result).hasSameElementsAs(expected);
+    }
+
+    @DisplayName("하행 방향으로 연결된 구간이 존재하는지 여부를 반환한다.")
+    @Test
+    void isDownDirectionSectionExist_returnBoolean() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+        long stationId = sectionList.get(1).getUpStationId();
+
+        // when & then
+        assertThat(sections.isDownDirectionSectionExist(stationId)).isTrue();
+    }
+
+    @DisplayName("상행 방향으로 연결된 구간이 존재하는지 여부를 반환한다.")
+    @Test
+    void isUpDirectionSectionExist_returnBoolean() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+        long stationId = sectionList.get(1).getUpStationId();
+
+        // when & then
+        assertThat(sections.isUpDirectionSectionExist(stationId)).isTrue();
+    }
+
+    @DisplayName("종점인지 여부를 반환한다.")
+    @Test
+    void isLastStation_returnBoolean() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+        long stationId = sectionList.get(0).getUpStationId();
+
+        // when & then
+        assertThat(sections.isLastStation(stationId)).isTrue();
+    }
+
+    @DisplayName("상행 종점 여부를 반환한다.")
+    @Test
+    void isStartStation_returnBoolean() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+        long stationId = sectionList.get(0).getUpStationId();
+
+        // when & then
+        assertThat(sections.isLastStation(stationId)).isTrue();
+    }
+
+    @DisplayName("하행 종점인지 여부를 반환한다.")
+    @Test
+    void isEndStation_returnBoolean() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+        long stationId = sectionList.get(sectionList.size()-1)
+            .getDownStationId();
+
+        // when & then
+        assertThat(sections.isEndStation(stationId)).isTrue();
+    }
+
+    @DisplayName("역이 존재하는지 여부를 반환한다.")
+    @Test
+    void isStationExist_returnBoolean() {
+        // given
+        List<Section> sectionList = createInitialSectionList();
+        Sections sections = new Sections(sectionList);
+        long existStationId = sectionList.get(sectionList.size()-1)
+            .getDownStationId();
+        long notExistStationId = 99;
+
+        // when & then
+        assertThat(sections.isStationExist(existStationId)).isTrue();
+        assertThat(sections.isStationExist(notExistStationId)).isFalse();
     }
 
     private List<Station> createInitialStationList() {
@@ -233,11 +235,6 @@ class SectionsTest {
         sections.add(new Section(3L, line, stations.get(2), stations.get(1), 10));
         sections.add(new Section(1L, line, stations.get(1), stations.get(3), 10));
         return sections;
-    }
-
-    private Sections createInitialSections() {
-        List<Section> sectionList = createInitialSectionList();
-        return new Sections(sectionList);
     }
 
     private Line createInitialLine() {

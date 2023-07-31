@@ -10,7 +10,7 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.vo.StationPair;
+import subway.domain.vo.StationPair;
 import subway.domain.Stations;
 import subway.ui.dto.LineRequest;
 import subway.ui.dto.LineResponse;
@@ -67,7 +67,7 @@ public class LineService {
     }
 
     private List<StationPair> getStationPairs(Long id) {
-        return sectionDao.findAll(id).stream()
+        return sectionDao.findAllByLineId(id).stream()
             .map(StationPair::of)
             .collect(Collectors.toList());
     }
