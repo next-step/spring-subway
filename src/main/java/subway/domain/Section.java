@@ -1,5 +1,6 @@
 package subway.domain;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Section {
@@ -26,7 +27,7 @@ public class Section {
 
     private void validatePositive(int distance) {
         if (distance <= 0) {
-            throw new IllegalArgumentException("구간 길이는 양수여야합니다 distance: \"" + distance + "\"");
+            throw new IllegalArgumentException("구간 길이는 양수여야 합니다 distance: \"" + distance + "\"");
         }
     }
 
@@ -130,6 +131,10 @@ public class Section {
 
     public Station getDownStation() {
         return downStation;
+    }
+
+    public List<Station> getStations() {
+        return List.of(upStation, downStation);
     }
 
     @Override

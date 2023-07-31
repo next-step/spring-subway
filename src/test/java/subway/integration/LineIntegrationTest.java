@@ -52,6 +52,51 @@ class LineIntegrationTest extends IntegrationTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
+    @DisplayName("상행역과 하행역이 같으면 지하철 노선을 생성할 수 없다.")
+    @Test
+    void createLineWithSameUpAndDownStation() {
+        //given
+        final List<Long> stationIds = extractCreatedIds(createStationsWithNames("사당역"));
+        final Long 사당역_ID = stationIds.get(0);
+        final LineRequest lineRequest = new LineRequest("2호선", 사당역_ID, 사당역_ID, 3,
+            "#ff0000");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(lineRequest)
+            .when().post("/lines")
+            .then().log().all().
+            extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @DisplayName("지하철 노선을 생성할 때 구간의 길이가 양수여야 한다.")
+    @Test
+    void createLineWithNonPositiveDistance() {
+        //given
+        final List<Long> stationIds = extractCreatedIds(createStationsWithNames("사당역", "방배역"));
+        final Long upStationId = stationIds.get(0);
+        final Long downStationId = stationIds.get(1);
+        final LineRequest lineRequest = new LineRequest("2호선", upStationId, downStationId, -1,
+            "#ff0000");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(lineRequest)
+            .when().post("/lines")
+            .then().log().all().
+            extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
     @Test
     void createLineWithDuplicateName() {

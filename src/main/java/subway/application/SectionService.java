@@ -1,5 +1,6 @@
 package subway.application;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
@@ -7,10 +8,11 @@ import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
-import subway.domain.SectionAddManager;
-import subway.domain.SectionRemoveManager;
 import subway.domain.Sections;
+import subway.domain.ShortestPath;
 import subway.domain.Station;
+import subway.dto.PathRequest;
+import subway.dto.PathResponse;
 import subway.dto.SectionAdditionRequest;
 
 @Service
@@ -34,11 +36,11 @@ public class SectionService {
         Sections sections = sectionDao.findAllBy(line);
         int distance = request.getDistance();
 
-        SectionAddManager sectionAddManager = new SectionAddManager(sections);
-        sectionAddManager.validate(upStation, downStation, distance);
+        sections.validateAddition(upStation, downStation, distance);
         Section section = new Section(line, upStation, downStation, distance);
-        sectionAddManager.lookForChange(section)
-            .ifPresent(sectionDao::update);
+        if (sections.isAddedInMiddle(section)) {
+            sectionDao.update(sections.findSectionToChange(section));
+        }
         sectionDao.save(section);
     }
 
@@ -48,11 +50,21 @@ public class SectionService {
         Sections sections = sectionDao.findAllBy(line);
         Station station = getStationBy(stationId);
 
-        SectionRemoveManager sectionRemoveManager = new SectionRemoveManager(sections);
-        sectionRemoveManager.validate(station);
-        sectionRemoveManager.lookForChange(station)
-            .ifPresent(sectionDao::update);
+        sections.validateRemoval(station);
+        if (sections.isInMiddle(station)) {
+            sectionDao.update(sections.findSectionToChange(station));
+        }
         sectionDao.deleteByLineAndStation(line, station);
+    }
+
+    @Transactional(readOnly = true)
+    public PathResponse findShortestPath(final PathRequest pathRequest) {
+        final List<Section> sections = sectionDao.findAll();
+        final Station source = getStationBy(pathRequest.getSource());
+        final Station target = getStationBy(pathRequest.getTarget());
+
+        final ShortestPath shortestPath = ShortestPath.createDefault(sections, source, target);
+        return PathResponse.of(shortestPath);
     }
 
     private Line getLineBy(Long id) {
