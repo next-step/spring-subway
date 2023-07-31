@@ -1,4 +1,4 @@
-package subway.dto;
+package subway.dto.response;
 
 import subway.domain.Line;
 import subway.domain.Station;
@@ -6,29 +6,30 @@ import subway.domain.Station;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LineResponse {
+public class LineFindResponse {
 
-    private Long id;
-    private String name;
-    private String color;
-    private List<StationResponse> stations;
+    private final Long id;
+    private final String name;
+    private final String color;
+    private final List<StationFindResponse> stations;
 
-    private LineResponse() {
-        /* no-op */
-    }
-
-    public LineResponse(final Long id, final String name, final String color, final List<StationResponse> stations) {
+    public LineFindResponse(
+            final Long id,
+            final String name,
+            final String color,
+            final List<StationFindResponse> stations
+    ) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.stations = stations;
     }
 
-    public static LineResponse of(final Line line, final List<Station> stations) {
-        return new LineResponse(
+    public static LineFindResponse of(final Line line, final List<Station> stations) {
+        return new LineFindResponse(
                 line.getId(), line.getName(), line.getColor(),
                 stations.stream()
-                        .map(StationResponse::of)
+                        .map(StationFindResponse::of)
                         .collect(Collectors.toList())
         );
     }
@@ -45,7 +46,7 @@ public class LineResponse {
         return this.color;
     }
 
-    public List<StationResponse> getStations() {
+    public List<StationFindResponse> getStations() {
         return this.stations;
     }
 }

@@ -1,19 +1,18 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.LineDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.ConnectedSections;
-import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Station;
-import subway.dto.LineRequest;
-import subway.dto.LineResponse;
+import subway.domain.*;
+import subway.dto.request.LineCreateRequest;
+import subway.dto.request.LineUpdateRequest;
+import subway.dto.response.LineCreateResponse;
+import subway.dto.response.LineFindResponse;
+import subway.exception.SubwayDataAccessException;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,48 +27,48 @@ public class LineService {
         this.stationDao = stationDao;
     }
 
-    public Line saveLine(final LineRequest request) {
+    @Transactional
+    public LineCreateResponse saveLine(final LineCreateRequest request) {
         final Line persistLine = lineDao.insert(new Line(request.getName(), request.getColor()));
         sectionDao.insert(
                 new Section(
                         persistLine.getId(),
                         request.getUpStationId(),
                         request.getDownStationId(),
-                        request.getDistance()
+                        new Distance(request.getDistance())
                 )
         );
 
-        return persistLine;
+        return LineCreateResponse.of(persistLine);
     }
 
-    public List<LineResponse> findLineResponses() {
-        final List<Line> persistLines = findLines();
-        return persistLines.stream()
-                .map(line -> findLineResponse(line.getId()))
+    @Transactional
+    public List<LineFindResponse> findAllLines() {
+        final List<Line> lines = lineDao.findAll();
+
+        return lines.stream()
+                .map(line -> findLine(line.getId()))
                 .collect(Collectors.toList());
     }
 
-    public LineResponse findLineResponse(final Long lineId) {
-        final Map<Long, Station> stationById = stationDao.findAllByLineId(lineId).stream()
-                .collect(Collectors.toMap(Station::getId, Function.identity()));
-
+    @Transactional
+    public LineFindResponse findLine(final Long lineId) {
         final ConnectedSections connectedSections = new ConnectedSections(sectionDao.findAllByLineId(lineId));
-        final List<Station> stations = connectedSections.getSortedStationIds().stream()
-                .map(stationById::get)
-                .collect(Collectors.toList());
+        final List<Station> stations = stationDao.findAllByIds(connectedSections.getConnectedStationIds());
 
-        return LineResponse.of(lineDao.findById(lineId), stations);
+        final Line line = lineDao.findById(lineId)
+                .orElseThrow(() -> new SubwayDataAccessException("존재하지 않는 노선입니다. 입력한 식별자: " + lineId));
+
+        return LineFindResponse.of(line, stations);
     }
 
-    public void updateLine(Long id, LineRequest lineUpdateRequest) {
-        lineDao.update(new Line(id, lineUpdateRequest.getName(), lineUpdateRequest.getColor()));
+    @Transactional
+    public void updateLine(final Long id, final LineUpdateRequest request) {
+        lineDao.update(new Line(id, request.getName(), request.getColor()));
     }
 
-    public void deleteLineById(Long id) {
+    @Transactional
+    public void deleteLine(final Long id) {
         lineDao.deleteById(id);
-    }
-
-    private List<Line> findLines() {
-        return lineDao.findAll();
     }
 }

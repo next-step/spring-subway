@@ -12,20 +12,21 @@ import java.util.stream.Stream;
 
 public class ConnectedSections {
 
-    private final List<Section> connectedSections;
+    private final List<Section> values;
 
     public ConnectedSections(final List<Section> sections) {
-        validateHasSectionAndAllSameLine(sections);
+        validateHaveSection(sections);
+        validateAllSameLine(sections);
 
-        this.connectedSections = convertToConnectedSections(sections);
+        this.values = convertToConnectedSections(sections);
     }
 
     public List<Section> getConnectedSections() {
-        return Collections.unmodifiableList(this.connectedSections);
+        return Collections.unmodifiableList(this.values);
     }
 
-    public List<Long> getSortedStationIds() {
-        final List<Long> sortedStationIds = connectedSections.stream()
+    public List<Long> getConnectedStationIds() {
+        final List<Long> sortedStationIds = values.stream()
                 .map(Section::getUpStationId)
                 .collect(Collectors.toList());
         sortedStationIds.add(getLastSection().getDownStationId());
@@ -34,31 +35,35 @@ public class ConnectedSections {
     }
 
     public SectionEditResult add(final Section target) {
-        validateAddSectionCondition(target);
+        validateContainsJustOneStation(target);
 
-        if (isFirstSection(target)) {
-            return addOnFirstSection(target);
+        if (target.isConnectedForward(getFirstSection())) {
+            values.add(0, target);
+            return new SectionEditResult(List.of(target), Collections.emptyList());
         }
-        if (isLastSection(target)) {
-            return addOnLastSection(target);
+        if (target.isConnectedBack(getLastSection())) {
+            values.add(target);
+            return new SectionEditResult(List.of(target), Collections.emptyList());
         }
 
         return addOnBetween(target);
     }
 
     public SectionEditResult remove(final Long targetStationId) {
-        validateRemoveSectionCondition(targetStationId);
+        validateValueIsNotEmptyAndTargetStationExists(targetStationId);
 
-        if (isRemovableFirstSection(targetStationId)) {
+        if (getFirstSection().isSameUpStationId(targetStationId)) {
+            final Section removed = removeFirstSection();
             return new SectionEditResult(
                     Collections.emptyList(),
-                    List.of(removeFirstSection())
+                    List.of(removed)
             );
         }
-        if (isRemovableLastSection(targetStationId)) {
+        if (getLastSection().isSameDownStationId(targetStationId)) {
+            final Section removed = removeLastSection();
             return new SectionEditResult(
                     Collections.emptyList(),
-                    List.of(removeLastSection())
+                    List.of(removed)
             );
         }
 
@@ -69,7 +74,7 @@ public class ConnectedSections {
         final Set<Long> upStationIds = SetUtils.toSet(sections, Section::getUpStationId);
         final Set<Long> downStationIds = SetUtils.toSet(sections, Section::getDownStationId);
 
-        validateConnectedSections(sections, SetUtils.union(upStationIds, downStationIds));
+        validateAllSectionIsConnected(sections, SetUtils.union(upStationIds, downStationIds));
 
         final Long firstStationId = extractFirstStationId(SetUtils.subtract(upStationIds, downStationIds));
         return generateConnectedSections(sections, firstStationId);
@@ -91,23 +96,15 @@ public class ConnectedSections {
                 .orElseThrow(() -> new SubwayIllegalArgumentException("상행 종점역을 찾을 수 없습니다."));
     }
 
-    private SectionEditResult addOnLastSection(final Section target) {
-        connectedSections.add(target);
-        return new SectionEditResult(List.of(target), Collections.emptyList());
-    }
-
-    private SectionEditResult addOnFirstSection(final Section target) {
-        connectedSections.add(0, target);
-        return new SectionEditResult(List.of(target), Collections.emptyList());
-    }
-
     private SectionEditResult addOnBetween(final Section target) {
-        final OptionalInt upStationAddIndex = findUpStationAddIndex(target);
+        final Long upStationId = target.getUpStationId();
+        final OptionalInt upStationAddIndex = findUpStationAddIndex(upStationId);
         if (upStationAddIndex.isPresent()) {
             return addOnUpStation(upStationAddIndex.getAsInt(), target);
         }
 
-        final OptionalInt downStationAddIndex = findDownStationAddIndex(target);
+        final Long downStationId = target.getDownStationId();
+        final OptionalInt downStationAddIndex = findDownStationAddIndex(downStationId);
         if (downStationAddIndex.isPresent()) {
             return addOnDownStation(downStationAddIndex.getAsInt(), target);
         }
@@ -117,15 +114,15 @@ public class ConnectedSections {
         );
     }
 
-    private OptionalInt findUpStationAddIndex(final Section target) {
-        return IntStream.range(0, connectedSections.size())
-                .filter(i -> getSection(i).isSameUpStation(target))
+    private OptionalInt findUpStationAddIndex(final Long upStationId) {
+        return IntStream.range(0, values.size())
+                .filter(index -> getSection(index).isSameUpStationId(upStationId))
                 .findAny();
     }
 
-    private OptionalInt findDownStationAddIndex(final Section target) {
-        return IntStream.range(0, connectedSections.size())
-                .filter(i -> getSection(i).isSameDownStation(target))
+    private OptionalInt findDownStationAddIndex(final Long downStationId) {
+        return IntStream.range(0, values.size())
+                .filter(index -> getSection(index).isSameDownStationId(downStationId))
                 .findAny();
     }
 
@@ -142,9 +139,9 @@ public class ConnectedSections {
     }
 
     private Section removeWithMapper(final IntPredicate mapper) {
-        return IntStream.range(0, connectedSections.size())
+        return IntStream.range(0, values.size())
                 .filter(mapper)
-                .mapToObj(connectedSections::remove)
+                .mapToObj(values::remove)
                 .findAny()
                 .orElseThrow(() ->
                         new SubwayIllegalArgumentException("삭제할 역의 구간을 찾지 못하였습니다.")
@@ -152,32 +149,21 @@ public class ConnectedSections {
     }
 
     private Section removeFirstSection() {
-        return connectedSections.remove(0);
+        return values.remove(0);
     }
 
     private Section removeLastSection() {
-        return connectedSections.remove(connectedSections.size() - 1);
-    }
-
-    private boolean isRemovableFirstSection(final Long targetStationId) {
-        return getFirstSection().getUpStationId().equals(targetStationId);
-    }
-
-    private boolean isRemovableLastSection(final Long targetStationId) {
-        return getLastSection().getDownStationId().equals(targetStationId);
+        return values.remove(values.size() - 1);
     }
 
     /**
      * {@link #addOnDownStation(int, Section)}와 대부분의 코드가 동일하지만 구간을 추가하는 순서만 다르다.
      */
     private SectionEditResult addOnUpStation(final int index, final Section target) {
-        final Section current = getSection(index);
-        validateDistance(current, target);
-
-        final Section subtracted = current.subtract(target);
-        final Section removed = connectedSections.remove(index);
-        connectedSections.add(index, subtracted);
-        connectedSections.add(index, target);
+        final Section subtracted = getSection(index).subtract(target);
+        final Section removed = values.remove(index);
+        values.add(index, subtracted);
+        values.add(index, target);
 
         return new SectionEditResult(
                 List.of(target, subtracted),
@@ -189,23 +175,15 @@ public class ConnectedSections {
      * {@link #addOnUpStation(int, Section)}와 대부분의 코드가 동일하지만 구간을 추가하는 순서만 다르다.
      */
     private SectionEditResult addOnDownStation(final int index, final Section target) {
-        final Section current = getSection(index);
-        validateDistance(current, target);
-
-        final Section subtracted = current.subtract(target);
-        final Section removed = connectedSections.remove(index);
-        connectedSections.add(index, target);
-        connectedSections.add(index, subtracted);
+        final Section subtracted = getSection(index).subtract(target);
+        final Section removed = values.remove(index);
+        values.add(index, target);
+        values.add(index, subtracted);
 
         return new SectionEditResult(
                 List.of(subtracted, target),
                 List.of(removed)
         );
-    }
-
-    private void validateHasSectionAndAllSameLine(final List<Section> sections) {
-        validateHaveSection(sections);
-        validateAllSameLine(sections);
     }
 
     private void validateHaveSection(final List<Section> sections) {
@@ -225,29 +203,27 @@ public class ConnectedSections {
         }
     }
 
-    private void validateConnectedSections(final List<Section> sections, final Set<Long> stationIds) {
+    private void validateAllSectionIsConnected(final List<Section> sections, final Set<Long> stationIds) {
         if (stationIds.size() - 1 != sections.size()) {
             throw new SubwayIllegalArgumentException("구간이 모두 연결되어있지 않습니다.");
         }
     }
 
-    private void validateDistance(final Section current, final Section target) {
-        if (current.subtractDistance(target) <= 0) {
-            throw new SubwayIllegalArgumentException("새로운 구간의 길이는 기존 구간의 길이보다 짧아야 합니다.");
-        }
-    }
+    private void validateContainsJustOneStation(final Section target) {
+        final Long upStationId = target.getUpStationId();
+        final Long downStationId = target.getDownStationId();
 
-    private void validateAddSectionCondition(final Section target) {
-        if (containsAll(target)) {
+        final Set<Long> stationIds = getStationIds();
+        if (stationIds.contains(upStationId) && stationIds.contains(downStationId)) {
             throw new SubwayIllegalArgumentException("상행 역과 하행 역이 이미 노선에 모두 등록되어 있습니다.");
         }
-        if (containsAny(target)) {
+        if (!stationIds.contains(upStationId) && !stationIds.contains(downStationId)) {
             throw new SubwayIllegalArgumentException("상행 역과 하행 역이 모두 노선에 없습니다.");
         }
     }
 
-    private void validateRemoveSectionCondition(final Long targetStationId) {
-        if (connectedSections.size() == 1) {
+    private void validateValueIsNotEmptyAndTargetStationExists(final Long targetStationId) {
+        if (values.size() == 1) {
             throw new SubwayIllegalArgumentException("해당 노선에 구간이 하나여서 제거할 수 없습니다.");
         }
         if (!getStationIds().contains(targetStationId)) {
@@ -255,28 +231,8 @@ public class ConnectedSections {
         }
     }
 
-    private boolean isFirstSection(final Section target) {
-        return target.isHead(getFirstSection());
-    }
-
-    private boolean isLastSection(final Section target) {
-        return getLastSection().isHead(target);
-    }
-
-    private boolean containsAll(final Section target) {
-        final Set<Long> stationIds = getStationIds();
-
-        return stationIds.contains(target.getUpStationId()) && stationIds.contains(target.getDownStationId());
-    }
-
-    private boolean containsAny(final Section target) {
-        final Set<Long> stationIds = getStationIds();
-
-        return !stationIds.contains(target.getUpStationId()) && !stationIds.contains(target.getDownStationId());
-    }
-
     private Section getSection(final int index) {
-        return connectedSections.get(index);
+        return values.get(index);
     }
 
     private Section getFirstSection() {
@@ -284,13 +240,13 @@ public class ConnectedSections {
     }
 
     private Section getLastSection() {
-        return getSection(connectedSections.size() - 1);
+        return getSection(values.size() - 1);
     }
 
     private Set<Long> getStationIds() {
         return SetUtils.union(
-                SetUtils.toSet(connectedSections, Section::getUpStationId),
-                SetUtils.toSet(connectedSections, Section::getDownStationId)
+                SetUtils.toSet(values, Section::getUpStationId),
+                SetUtils.toSet(values, Section::getDownStationId)
         );
     }
 }

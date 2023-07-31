@@ -1,10 +1,14 @@
 package subway.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.StationDao;
 import subway.domain.Station;
-import subway.dto.StationRequest;
-import subway.dto.StationResponse;
+import subway.dto.request.StationCreateRequest;
+import subway.dto.request.StationUpdateRequest;
+import subway.dto.response.StationCreateResponse;
+import subway.dto.response.StationFindResponse;
+import subway.exception.SubwayDataAccessException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,28 +21,36 @@ public class StationService {
         this.stationDao = stationDao;
     }
 
-    public StationResponse saveStation(StationRequest stationRequest) {
-        Station station = stationDao.insert(new Station(stationRequest.getName()));
-        return StationResponse.of(station);
+    @Transactional
+    public StationCreateResponse saveStation(StationCreateRequest request) {
+        final Station station = stationDao.insert(new Station(request.getName()));
+        return StationCreateResponse.of(station);
     }
 
-    public StationResponse findStationResponseById(Long id) {
-        return StationResponse.of(stationDao.findById(id));
+    @Transactional
+    public StationFindResponse findStation(final Long id) {
+        final Station station = stationDao.findById(id)
+                .orElseThrow(() -> new SubwayDataAccessException("존재하지 않는 역입니다. 입력한 식별자: " + id));
+
+        return StationFindResponse.of(station);
     }
 
-    public List<StationResponse> findAllStationResponses() {
-        List<Station> stations = stationDao.findAll();
+    @Transactional
+    public List<StationFindResponse> findAllStation() {
+        final List<Station> stations = stationDao.findAll();
 
         return stations.stream()
-                .map(StationResponse::of)
+                .map(StationFindResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public void updateStation(Long id, StationRequest stationRequest) {
-        stationDao.update(new Station(id, stationRequest.getName()));
+    @Transactional
+    public void updateStation(final Long id, final StationUpdateRequest request) {
+        stationDao.update(new Station(id, request.getName()));
     }
 
-    public void deleteStationById(Long id) {
+    @Transactional
+    public void deleteStation(Long id) {
         stationDao.deleteById(id);
     }
 }

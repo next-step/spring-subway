@@ -1,6 +1,6 @@
 package subway.domain;
 
-import subway.exception.SubwayException;
+import subway.exception.SubwayIllegalArgumentException;
 
 import java.util.Objects;
 
@@ -10,9 +10,9 @@ public class Section {
     private final Long lineId;
     private final Long upStationId;
     private final Long downStationId;
-    private final Long distance;
+    private final Distance distance;
 
-    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Long distance) {
+    public Section(final Long lineId, final Long upStationId, final Long downStationId, final Distance distance) {
         this(null, lineId, upStationId, downStationId, distance);
     }
 
@@ -25,9 +25,9 @@ public class Section {
             final Long lineId,
             final Long upStationId,
             final Long downStationId,
-            final Long distance
+            final Distance distance
     ) {
-        validateSectionValues(upStationId, downStationId, distance);
+        validateStationValues(upStationId, downStationId);
 
         this.id = id;
         this.lineId = lineId;
@@ -37,35 +37,30 @@ public class Section {
     }
 
     public Section subtract(final Section from) {
+        validateIsSubtractable(from);
+
         if (Objects.equals(this.upStationId, from.upStationId)) {
-            return new Section(this.lineId, from.downStationId, this.downStationId, this.distance - from.distance);
+            return new Section(this.lineId, from.downStationId, this.downStationId, this.distance.subtract(from.distance));
         }
-        return new Section(this.lineId, this.upStationId, from.upStationId, this.distance - from.distance);
+        return new Section(this.lineId, this.upStationId, from.upStationId, this.distance.subtract(from.distance));
     }
 
     public Section merge(final Section target) {
-        if (!isHead(target)) {
-            throw new SubwayException("구간이 연결되어있지 않습니다.");
+        if (isConnectedForward(target)) {
+            return new Section(this.lineId, this.upStationId, target.downStationId, this.distance.add(target.distance));
+        }
+        if (isConnectedBack(target)) {
+            return new Section(this.lineId, target.downStationId, this.upStationId, target.distance.add(this.distance));
         }
 
-        return new Section(
-                this.lineId,
-                this.upStationId,
-                target.downStationId,
-                this.distance + target.distance
+        throw new SubwayIllegalArgumentException(
+                "구간이 연결되어있지 않습니다. 입력 구간: (" + this.upStationId + ", " + this.downStationId + "), " +
+                        "(" + target.upStationId + ", " + target.downStationId + ")"
         );
     }
 
-    public Long subtractDistance(final Section target) {
-        return this.distance - target.distance;
-    }
-
-    public boolean isSameUpStation(final Section target) {
-        return Objects.equals(this.upStationId, target.upStationId);
-    }
-
-    public boolean isSameDownStation(final Section target) {
-        return Objects.equals(this.downStationId, target.downStationId);
+    public boolean isNotSubtractable(final Section target) {
+        return this.distance.isShorterOrEqual(target.distance);
     }
 
     public boolean isSameUpStationId(final Long targetId) {
@@ -76,8 +71,12 @@ public class Section {
         return Objects.equals(this.downStationId, targetId);
     }
 
-    public boolean isHead(final Section target) {
+    public boolean isConnectedForward(final Section target) {
         return Objects.equals(this.downStationId, target.upStationId);
+    }
+
+    public boolean isConnectedBack(final Section target) {
+        return Objects.equals(this.upStationId, target.downStationId);
     }
 
     public Long getId() {
@@ -96,27 +95,19 @@ public class Section {
         return this.downStationId;
     }
 
-    public Long getDistance() {
+    public Distance getDistance() {
         return this.distance;
     }
 
-    private void validateSectionValues(final Long upStationId, final Long downStationId, final Long distance) {
-        validateStationValues(upStationId, downStationId);
-        validateDistanceValue(distance);
-    }
-
-    private void validateDistanceValue(final Long distance) {
-        if (distance == null) {
-            throw new SubwayException("구간 길이 정보는 입력해야 합니다.");
-        }
-        if (distance <= 0L) {
-            throw new SubwayException("구간 길이는 0보다 커야합니다.");
+    private void validateIsSubtractable(final Section from) {
+        if (isNotSubtractable(from)) {
+            throw new SubwayIllegalArgumentException("새로운 구간의 길이는 기존 구간의 길이보다 짧아야 합니다.");
         }
     }
 
     private void validateStationValues(final Long upStationId, final Long downStationId) {
         if (upStationId == null || downStationId == null) {
-            throw new SubwayException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
+            throw new SubwayIllegalArgumentException("상행 역 정보와 하행 역 정보는 모두 입력해야 합니다.");
         }
     }
 
