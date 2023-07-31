@@ -15,11 +15,18 @@ import static subway.exception.ErrorCode.*;
 public class PathGraph {
 
     private final WeightedMultigraph<Station, DefaultWeightedEdge> graph;
+    private GraphPath<Station, DefaultWeightedEdge> path;
 
-    private PathGraph(final Set<Station> vertex, List<Section> edges) {
+    private PathGraph(final WeightedMultigraph<Station, DefaultWeightedEdge> graph,
+        final GraphPath<Station, DefaultWeightedEdge> path) {
+        this.graph = graph;
+        this.path = path;
+    }
+
+    public PathGraph(final Sections sections) {
         graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
-        initializeVertex(vertex);
-        initializeEdges(edges);
+        initializeVertex(sections.getStationsCache());
+        initializeEdges(sections.getSections());
     }
 
     private void initializeEdges(final List<Section> edges) {
@@ -34,11 +41,8 @@ public class PathGraph {
         vertex.forEach(graph::addVertex);
     }
 
-    public PathGraph(final Sections sections) {
-        this(sections.getStationsCache(), sections.getSections());
-    }
 
-    public GraphPath<Station, DefaultWeightedEdge> createPath(final Station start, final Station end) {
+    public PathGraph createPath(final Station start, final Station end) {
         validatePathConnect(start, end);
 
         GraphPath<Station, DefaultWeightedEdge> path = new DijkstraShortestPath<>(graph)
@@ -46,7 +50,7 @@ public class PathGraph {
         if (path == null) {
             throw new SubwayException(NOT_CONNECTED_BETWEEN_START_AND_END_PATH);
         }
-        return path;
+        return new PathGraph(graph, path);
     }
 
     private void validatePathConnect(final Station start, final Station end) {
@@ -63,5 +67,13 @@ public class PathGraph {
 
     public boolean notContainsVertex(final Station station) {
         return !graph.containsVertex(station);
+    }
+
+    public long getDistance() {
+        return (long) path.getWeight();
+    }
+
+    public List<Station> getStations() {
+        return path.getVertexList();
     }
 }

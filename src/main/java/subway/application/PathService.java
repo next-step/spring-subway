@@ -34,7 +34,9 @@ public class PathService {
 
         List<Section> sections = sectionDao.findAll()
             .orElseThrow(() -> new SubwayException(NOT_FOUND_SECTION));
-        Path path = new Path(new PathGraph(new Sections(sections)), startStation, endStation);
+        PathGraph pathGraph = new PathGraph(new Sections(sections))
+            .createPath(startStation, endStation);
+        Path path = new Path(pathGraph);
         return PathResponse.from(path);
     }
 }
