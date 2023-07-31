@@ -8,7 +8,6 @@ import subway.exception.ErrorCode;
 import subway.exception.SubwayException;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class PathGraph {
     private final WeightedMultigraph<Station, DefaultWeightedEdge> graph;
@@ -21,11 +20,6 @@ public class PathGraph {
         validateSize(sections);
 
         WeightedMultigraph<Station, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
-        graph.addVertex(sections.get(0).getUpStation());
-        sections.stream()
-                .flatMap(section -> Stream.of(section.getUpStation(), section.getDownStation()))
-                .distinct()
-                .forEach(graph::addVertex);
 
         Stations.of(sections)
                 .getStations()
