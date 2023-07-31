@@ -39,8 +39,8 @@ public class SectionService {
         Line newLine = line.addSection(section);
         SectionsChange changes = SectionsChange.of(line, newLine);
 
-        changes.getDeletes().forEach(sectionDao::delete);
-        changes.getInserts().forEach(s -> sectionDao.insert(s, lineId));
+        sectionDao.delete(changes.getDeletes());
+        sectionDao.insert(changes.getInserts(), lineId);
     }
 
     @Transactional
@@ -52,6 +52,6 @@ public class SectionService {
         Line newLine = line.removeStation(station);
         SectionsChange changes = SectionsChange.of(line, newLine);
 
-        changes.getDeletes().forEach(sectionDao::delete);
+        sectionDao.delete(changes.getDeletes());
     }
 }

@@ -10,9 +10,12 @@ import subway.domain.Section;
 import subway.domain.Station;
 
 import javax.sql.DataSource;
+import java.sql.Types;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class SectionDao {
@@ -34,7 +37,7 @@ public class SectionDao {
                 .usingGeneratedKeyColumns("id");
     }
 
-    public Optional<Section> findById(Long id) {
+    public Optional<Section> findById(final Long id) {
         String sql = "select section.id as section_id, " +
                 "up_station.id as up_station_id, " +
                 "up_station.name as up_station_name, " +
@@ -53,6 +56,20 @@ public class SectionDao {
         }
     }
 
+    public List<Section> findAll() {
+        String sql = "select section.id as section_id, " +
+                "up_station.id as up_station_id, " +
+                "up_station.name as up_station_name, " +
+                "down_station.id as down_station_id, " +
+                "down_station.name as down_station_name, " +
+                "section.distance as section_distance " +
+                "from SECTION section " +
+                "left join STATION up_station on section.up_station_id = up_station.id " +
+                "left join STATION down_station on section.down_station_id = down_station.id";
+
+        return jdbcTemplate.query(sql, rowMapper);
+    }
+
     public Section insert(final Section section, final Long lineId) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", section.getId());
@@ -68,5 +85,33 @@ public class SectionDao {
     public void delete(final Section section) {
         String sql = "delete from SECTION where id= ?";
         jdbcTemplate.update(sql, section.getId());
+    }
+
+    public void delete(final List<Section> sections) {
+        String sql = "delete from SECTION where id=?";
+
+        List<Object[]> batchIds = sections.stream()
+                .map(section -> new Object[]{section.getId()})
+                .collect(Collectors.toList());
+
+        jdbcTemplate.batchUpdate(sql, batchIds);
+    }
+
+    public void insert(final List<Section> sections, final Long lineId) {
+        String sql = "insert into SECTION (up_station_id, down_station_id, line_id, distance) " +
+                "values (?, ?, ?, ?)";
+
+        int[] argumentTypes = {Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.INTEGER};
+
+        List<Object[]> batchIds = sections.stream()
+                .map(section -> new Object[]{
+                        section.getUpStation().getId(),
+                        section.getDownStation().getId(),
+                        lineId,
+                        section.getDistance()
+                })
+                .collect(Collectors.toList());
+
+        jdbcTemplate.batchUpdate(sql, batchIds, argumentTypes);
     }
 }

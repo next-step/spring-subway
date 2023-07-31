@@ -8,11 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.ExceptionResponse;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static subway.util.TestRequestUtil.createLine;
+import static subway.util.TestRequestUtil.createStation;
+import static subway.util.TestRequestUtil.extractId;
 
 @DisplayName("유효성 검사 통합 테스트")
 public class ValidationIntegrationTest extends IntegrationTest {
@@ -167,11 +170,11 @@ public class ValidationIntegrationTest extends IntegrationTest {
     @DisplayName("노선 이름이 null이면 노선을 생성할 수 없다.")
     void createNullNameLineTest() {
         // given
-        LineRequest lineRequest = new LineRequest(null, "red", 1L, 2L, 1);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest(null, "red", 1L, 2L, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -188,11 +191,11 @@ public class ValidationIntegrationTest extends IntegrationTest {
     @DisplayName("노선 이름이 공백이면 노선을 생성할 수 없다.")
     void createBlankNameLineTest() {
         // given
-        LineRequest lineRequest = new LineRequest("", "red", 1L, 2L, 1);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("", "red", 1L, 2L, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -209,11 +212,11 @@ public class ValidationIntegrationTest extends IntegrationTest {
     @DisplayName("노선 색상이 null이면 노선을 생성할 수 없다.")
     void createNullColorLineTest() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", null, 1L, 2L, 1);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", null, 1L, 2L, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -230,11 +233,11 @@ public class ValidationIntegrationTest extends IntegrationTest {
     @DisplayName("노선 색상이 공백이면 노선을 생성할 수 없다.")
     void createBlankColorLineTest() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "", 1L, 2L, 1);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "", 1L, 2L, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -251,11 +254,11 @@ public class ValidationIntegrationTest extends IntegrationTest {
     @DisplayName("노선 상행종점역이 null이면 노선을 생성할 수 없다.")
     void createNullUpStationLineTest() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "red", null, 2L, 1);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "red", null, 2L, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -272,11 +275,11 @@ public class ValidationIntegrationTest extends IntegrationTest {
     @DisplayName("노선 하행종점역이 null이면 노선을 생성할 수 없다.")
     void createNullDownStationLineTest() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "red", 1L, null, 1);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "red", 1L, null, 1);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -293,11 +296,11 @@ public class ValidationIntegrationTest extends IntegrationTest {
     @DisplayName("노선 구간 거리가 null이면 노선을 생성할 수 없다.")
     void createNullDistanceLineTest() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "red", 1L, 2L, null);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "red", 1L, 2L, null);
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .body(lineRequest)
+                .body(lineCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post("/lines")
@@ -308,5 +311,49 @@ public class ValidationIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.body().as(ExceptionResponse.class).getMessage())
                 .isEqualTo("거리는 필수 항목입니다");
+    }
+
+    @Test
+    @DisplayName("출발역이 null인 경우 오류가 발생한다.")
+    void nullSourceStation() {
+        // given
+        long station1Id = extractId(createStation(new StationRequest("강남역")));
+        long station2Id = extractId(createStation(new StationRequest("역삼역")));
+
+        createLine(new LineCreateRequest("1호선", "green", station1Id, station2Id, 10));
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/paths?target={station1Id}", station1Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo("다음 파라미터는 필수입니다 : source");
+    }
+
+    @Test
+    @DisplayName("도착역이 null인 경우 오류가 발생한다.")
+    void nullTargetStation() {
+        // given
+        long station1Id = extractId(createStation(new StationRequest("강남역")));
+        long station2Id = extractId(createStation(new StationRequest("역삼역")));
+
+        createLine(new LineCreateRequest("1호선", "green", station1Id, station2Id, 10));
+
+        // when
+        ExtractableResponse<Response> response = RestAssured
+                .given().log().all()
+                .when().get("/paths?source={station1Id}", station1Id)
+                .then().log().all()
+                .extract();
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.body().as(ExceptionResponse.class).getMessage())
+                .isEqualTo("다음 파라미터는 필수입니다 : target");
     }
 }

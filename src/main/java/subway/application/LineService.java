@@ -8,8 +8,8 @@ import subway.dao.StationDao;
 import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
+import subway.dto.LineCreateRequest;
 import subway.dto.LineDataResponse;
-import subway.dto.LineRequest;
 import subway.dto.LineResponse;
 import subway.dto.LineUpdateRequest;
 import subway.exception.ErrorCode;
@@ -31,7 +31,7 @@ public class LineService {
     }
 
     @Transactional
-    public LineResponse saveLine(final LineRequest request) {
+    public LineDataResponse saveLine(final LineCreateRequest request) {
         Line line = lineDao.insert(new Line(request.getName(), request.getColor()));
         Station upStation = stationDao.findById(request.getUpStationId())
                 .orElseThrow(() -> new SubwayException(ErrorCode.UP_STATION_ID_NO_EXIST, request.getUpStationId()));
@@ -40,7 +40,7 @@ public class LineService {
 
         sectionDao.insert(new Section(upStation, downStation, request.getDistance()), line.getId());
 
-        return LineResponse.of(line);
+        return LineDataResponse.of(line);
     }
 
     public List<LineDataResponse> findLineResponses() {

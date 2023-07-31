@@ -9,29 +9,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Sections {
+public class LineSections {
     private final List<Section> sections;
-    private final Set<Station> downStationsCache;
-    private final Set<Station> upStationsCache;
+    private final Stations stationsCache;
 
-    public Sections(final List<Section> sections) {
+    public LineSections(final List<Section> sections) {
         this.sections = Collections.unmodifiableList(sections);
-        this.downStationsCache = sections.stream()
-                .map(Section::getDownStation)
-                .collect(Collectors.toSet());
-        this.upStationsCache = sections.stream()
-                .map(Section::getUpStation)
-                .collect(Collectors.toSet());
+        this.stationsCache = Stations.of(sections);
     }
 
-    public Sections() {
+    public LineSections() {
         this(new ArrayList<>());
     }
 
-    public Sections addSection(final Section section) {
+    public LineSections addSection(final Section section) {
         validateBothMatches(section);
         validateNoMatches(section);
 
@@ -43,7 +36,7 @@ public class Sections {
         });
 
         newSections.add(section);
-        return new Sections(newSections);
+        return new LineSections(newSections);
     }
 
     private void validateBothMatches(final Section section) {
@@ -59,7 +52,7 @@ public class Sections {
     }
 
     private boolean contains(final Station station) {
-        return downStationsCache.contains(station) || upStationsCache.contains(station);
+        return stationsCache.contains(station);
     }
 
     private boolean notContains(final Station station) {
@@ -72,7 +65,7 @@ public class Sections {
                 .findAny();
     }
 
-    public Sections removeStation(final Station station) {
+    public LineSections removeStation(final Station station) {
         validateSize();
         validateContainStation(station);
         List<Section> newSections = new ArrayList<>(this.sections);
@@ -93,10 +86,10 @@ public class Sections {
             newSections.add(downSection.union(upSection));
         }
 
-        return new Sections(newSections);
+        return new LineSections(newSections);
     }
 
-    private void validateContainStation(Station station) {
+    private void validateContainStation(final Station station) {
         if (notContains(station)) {
             throw new SubwayException(ErrorCode.REMOVE_SECTION_NOT_CONTAIN);
         }
@@ -110,28 +103,28 @@ public class Sections {
 
     public List<Station> getSortedStations() {
         Map<Station, Station> stationMap = new HashMap<>();
+        List<Station> sortedStations = new ArrayList<>();
+        Station start = findTerminalUpStation()
+                .orElseThrow(() -> new SubwayException(ErrorCode.SECTION_NO_START_STATION));
 
         sections.forEach(section -> stationMap.put(section.getUpStation(), section.getDownStation()));
 
-        Station start = findTerminalUpStation();
-
-        List<Station> sortedStations = new ArrayList<>();
-
-        while (start != null) {
-            sortedStations.add(start);
+        sortedStations.add(start);
+        while (stationMap.containsKey(start)) {
             start = stationMap.get(start);
+            sortedStations.add(start);
         }
 
         return sortedStations;
     }
 
-    private Station findTerminalUpStation() {
-        Station start = sections.stream()
-                .map(Section::getUpStation)
-                .filter(downStation -> !downStationsCache.contains(downStation))
-                .findAny()
-                .orElse(null);
-        return start;
+    private Optional<Station> findTerminalUpStation() {
+        Stations downStations = new Stations(sections.stream()
+                .map(Section::getDownStation)
+                .collect(Collectors.toSet()));
+
+        return stationsCache.subtract(downStations)
+                .findAny();
     }
 
     public List<Section> getSections() {

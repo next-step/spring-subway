@@ -14,7 +14,7 @@ public class SectionsChange {
         this.inserts = Collections.unmodifiableList(inserts);
     }
 
-    public static SectionsChange of(final Sections previous, final Sections next) {
+    public static SectionsChange of(final LineSections previous, final LineSections next) {
         Set<Section> previousSet = new HashSet<>(previous.getSections());
         Set<Section> nextSet = new HashSet<>(next.getSections());
 

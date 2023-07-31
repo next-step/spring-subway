@@ -6,33 +6,33 @@ public class Line {
     private final Long id;
     private final String name;
     private final String color;
-    private final Sections sections;
+    private final LineSections lineSections;
 
     public Line(final String name, final String color) {
         this(null, name, color);
     }
 
     public Line(final Long id, final String name, final String color) {
-        this(id, name, color, new Sections());
+        this(id, name, color, new LineSections());
     }
 
-    public Line(final String name, final String color, final Sections sections) {
-        this(null, name, color, sections);
+    public Line(final String name, final String color, final LineSections lineSections) {
+        this(null, name, color, lineSections);
     }
 
-    public Line(final Long id, final String name, final String color, final Sections sections) {
+    public Line(final Long id, final String name, final String color, final LineSections lineSections) {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.sections = sections;
+        this.lineSections = lineSections;
     }
 
     public Line addSection(final Section section) {
-        return new Line(name, color, sections.addSection(section));
+        return new Line(name, color, lineSections.addSection(section));
     }
 
     public Line removeStation(final Station station) {
-        return new Line(id, name, color, sections.removeStation(station));
+        return new Line(id, name, color, lineSections.removeStation(station));
     }
 
     public Long getId() {
@@ -47,8 +47,8 @@ public class Line {
         return color;
     }
 
-    public Sections getSections() {
-        return sections;
+    public LineSections getSections() {
+        return lineSections;
     }
 
     @Override

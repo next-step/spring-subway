@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("SectionChange 단위 테스트")
-class SectionsChangeTest {
+class LineSectionsChangeTest {
     @Test
     @DisplayName("변경사항 DTO 생성 테스트")
     void createSectionsChange() {
@@ -30,11 +30,11 @@ class SectionsChangeTest {
                 10
         );
 
-        Sections sections1 = new Sections(List.of(section1, section2));
-        Sections sections2 = new Sections(List.of(section2, section3));
+        LineSections lineSections1 = new LineSections(List.of(section1, section2));
+        LineSections lineSections2 = new LineSections(List.of(section2, section3));
 
         // when
-        SectionsChange sectionsChange = SectionsChange.of(sections1, sections2);
+        SectionsChange sectionsChange = SectionsChange.of(lineSections1, lineSections2);
 
         // then
         assertAll(

@@ -9,14 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import subway.dto.ExceptionResponse;
-import subway.dto.LineRequest;
+import subway.dto.LineCreateRequest;
 import subway.dto.SectionRequest;
 import subway.dto.StationRequest;
 import subway.exception.ErrorCode;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static subway.integration.TestRequestUtil.createLine;
-import static subway.integration.TestRequestUtil.createStation;
+import static subway.util.TestRequestUtil.createLine;
+import static subway.util.TestRequestUtil.createStation;
+import static subway.util.TestRequestUtil.extractId;
 
 @DisplayName("구간 관련 기능 통합 테스트")
 public class SectionIntegrationTest extends IntegrationTest {
@@ -35,17 +36,17 @@ public class SectionIntegrationTest extends IntegrationTest {
         StationRequest stationRequest3 = new StationRequest("잠실역");
 
         ExtractableResponse<Response> createStation1Response = createStation(stationRequest1);
-        station1Id = Long.parseLong(createStation1Response.header("Location").split("/")[2]);
+        station1Id = extractId(createStation1Response);
 
         ExtractableResponse<Response> createStation2Response = createStation(stationRequest2);
-        station2Id = Long.parseLong(createStation2Response.header("Location").split("/")[2]);
+        station2Id = extractId(createStation2Response);
 
         ExtractableResponse<Response> createStation3Response = createStation(stationRequest3);
-        station3Id = Long.parseLong(createStation3Response.header("Location").split("/")[2]);
+        station3Id = extractId(createStation3Response);
 
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 15);
-        ExtractableResponse<Response> lineResponse = createLine(lineRequest);
-        lineId = Long.parseLong(lineResponse.header("Location").split("/")[2]);
+        LineCreateRequest lineCreateRequest = new LineCreateRequest("2호선", "green", station1Id, station2Id, 15);
+        ExtractableResponse<Response> lineResponse = createLine(lineCreateRequest);
+        lineId = extractId(lineResponse);
     }
 
     @Test
@@ -146,7 +147,7 @@ public class SectionIntegrationTest extends IntegrationTest {
         // when
         StationRequest stationRequest = new StationRequest("공릉역");
         ExtractableResponse<Response> createStationResponse = createStation(stationRequest);
-        Long station4Id = Long.parseLong(createStationResponse.header("Location").split("/")[2]);
+        Long station4Id = extractId(createStationResponse);
 
         SectionRequest sectionRequest = new SectionRequest(station3Id, station4Id, 14);
         ExtractableResponse<Response> response = RestAssured
@@ -333,7 +334,7 @@ public class SectionIntegrationTest extends IntegrationTest {
     void noStationRemoveBadRequest() {
         // given
         ExtractableResponse<Response> station4Response = createStation(new StationRequest("몽촌토성역"));
-        Long station4Id = Long.parseLong(station4Response.header("Location").split("/")[2]);
+        Long station4Id = extractId(station4Response);
 
         SectionRequest sectionRequest = new SectionRequest(station2Id, station3Id, 15);
         RestAssured
