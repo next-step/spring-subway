@@ -8,6 +8,7 @@ import subway.domain.Station;
 import subway.dto.response.FindPathResponse;
 import subway.exception.PathException;
 import subway.exception.StationException;
+import subway.vo.Path;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -16,9 +17,9 @@ import java.util.List;
 public class PathService {
     private final SectionDao sectionDao;
     private final StationDao stationDao;
-    private final PathFinderService pathFinder;
+    private final PathFinder pathFinder;
 
-    public PathService(SectionDao sectionDao, StationDao stationDao, PathFinderService pathFinder) {
+    public PathService(SectionDao sectionDao, StationDao stationDao, PathFinder pathFinder) {
         this.sectionDao = sectionDao;
         this.stationDao = stationDao;
         this.pathFinder = pathFinder;
@@ -30,7 +31,9 @@ public class PathService {
         validateSameStations(startStation, endStation);
         List<Section> sections = sectionDao.findAll();
 
-        return pathFinder.findPath(sections, startStation, endStation);
+        Path path = pathFinder.findPath(sections, startStation, endStation);
+
+        return FindPathResponse.from(path.getStations(), path.getDistance());
     }
 
     private Station getStation(final Long stationId) {

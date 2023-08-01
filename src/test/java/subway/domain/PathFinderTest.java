@@ -9,10 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import subway.DomainFixture;
-import subway.application.PathFinderService;
-import subway.dto.response.FindPathResponse;
-import subway.dto.response.FindStationResponse;
+import subway.application.PathFinder;
 import subway.exception.PathException;
+import subway.vo.Path;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,12 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = PathFinderService.class)
+@ContextConfiguration(classes = PathFinder.class)
 @DisplayName("PathFinder 클래스")
 public class PathFinderTest {
 
     @Autowired
-    private PathFinderService pathFinder;
+    private PathFinder pathFinder;
 
     private Station station1;
     private Station station2;
@@ -75,17 +74,13 @@ public class PathFinderTest {
             Section section3 = DomainFixture.Section.buildWithStations(station3, station4, 10);
 
             // when
-            FindPathResponse path = pathFinder.findPath(List.of(section1, section2, section3), startStation, endStation);
-
-            List<FindStationResponse> stations = path.getStations();
-            Integer distance = path.getDistance();
+            Path path = pathFinder.findPath(List.of(section1, section2, section3), startStation, endStation);
 
             // then
             List<Station> expectedStations = Arrays.asList(startStation, station2, station3, endStation);
 
-            assertThat(stations.size()).isEqualTo(expectedStations.size());
-            assertStations(expectedStations, stations);
-            assertThat(distance).isEqualTo(30);
+            assertThat(path.getStations()).containsAll(expectedStations);
+            assertThat(path.getDistance()).isEqualTo(30);
         }
 
         /**
@@ -108,24 +103,13 @@ public class PathFinderTest {
             Section section4 = DomainFixture.Section.buildWithStations(station1, station3, 12);
 
             // when
-            FindPathResponse path = pathFinder.findPath(List.of(section1, section2, section3, section4), startStation, endStation);
-
-            List<FindStationResponse> stations = path.getStations();
-            Integer distance = path.getDistance();
+            Path path = pathFinder.findPath(List.of(section1, section2, section3, section4), startStation, endStation);
 
             // then
 
             List<Station> expectedStations = Arrays.asList(startStation, station3, endStation);
-
-            assertThat(stations.size()).isEqualTo(expectedStations.size());
-            assertStations(expectedStations, stations);
-            assertThat(distance).isEqualTo(24);
-        }
-
-        private void assertStations(List<Station> expectedStations, List<FindStationResponse> stations) {
-            for (int i = 0; i < stations.size(); i++) {
-                assertThat(stations.get(i).getId()).isEqualTo(expectedStations.get(i).getId());
-            }
+            assertThat(path.getStations()).isEqualTo(expectedStations);
+            assertThat(path.getDistance()).isEqualTo(24);
         }
 
     }

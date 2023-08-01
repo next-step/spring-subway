@@ -4,18 +4,18 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import subway.domain.Section;
 import subway.domain.Station;
-import subway.dto.response.FindPathResponse;
 import subway.exception.PathException;
+import subway.vo.Path;
 
 import java.util.List;
 
-@Service
-public class PathFinderService {
+@Component
+public class PathFinder {
 
-    public FindPathResponse findPath(List<Section> sections, Station startStation, Station endStation) {
+    public Path findPath(List<Section> sections, Station startStation, Station endStation) {
         DijkstraShortestPath<Station, DefaultWeightedEdge> shortestPath = getShortestPath(sections, startStation, endStation);
         GraphPath graphPath = shortestPath.getPath(startStation, endStation);
         validateUnlinked(graphPath);
@@ -23,7 +23,7 @@ public class PathFinderService {
         List<Station> stations = graphPath.getVertexList();
         int distance = (int) shortestPath.getPathWeight(startStation, endStation);
 
-        return FindPathResponse.from(stations, distance);
+        return new Path(distance, stations);
     }
 
     private DijkstraShortestPath<Station, DefaultWeightedEdge> getShortestPath(List<Section> sections, Station startStation, Station endStation) {
