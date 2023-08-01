@@ -46,12 +46,12 @@ public final class DijkstraPathManager implements PathManager {
     }
 
     private void validateStations(final Station source, final Station target) {
-        validateStation(source);
-        validateStation(target);
+        validateStationExist(source);
+        validateStationExist(target);
         validateStationsDuplicate(source, target);
     }
 
-    private void validateStation(final Station station) {
+    private void validateStationExist(final Station station) {
         if (!subwayMap.containsVertex(station)) {
             throw new SubwayException(String.format("%s은(는) 존재하지 않는 역입니다.", station.getName()));
         }
@@ -70,6 +70,7 @@ public final class DijkstraPathManager implements PathManager {
     }
 
     private void validateDistance(final double distance) {
+        // DijkstraShortestPath에서 경로를 찾을 수 없는 경우에는 POSITIVE_INFINITY를 반환한다.
         if (Double.isInfinite(distance)) {
             throw new SubwayException("출발역과 도착역을 연결하는 경로가 존재하지 않습니다.");
         }
