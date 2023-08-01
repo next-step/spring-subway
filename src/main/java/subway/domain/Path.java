@@ -9,10 +9,18 @@ public class Path {
 
     private final Long distance;
 
-    public Path(final List<Section> allSections, final Station source, final Station target) {
+    private Path(List<Station> stations, Long distance) {
+        this.stations = stations;
+        this.distance = distance;
+    }
+
+    public static Path of(
+            final List<Section> allSections,
+            final Station source,
+            final Station target) {
+
         PathGraph pathGraph = new DijkstraPathGraph(allSections, source, target);
-        this.stations = pathGraph.findRoute();
-        this.distance = pathGraph.findDistance();
+        return new Path(pathGraph.findRoute(), pathGraph.findDistance());
     }
 
     public List<Station> getStations() {

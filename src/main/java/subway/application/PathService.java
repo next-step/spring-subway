@@ -29,7 +29,7 @@ public class PathService {
         Station targetStation = stationDao.findById(target)
                 .orElseThrow(() -> new StationNotFoundException(target));
 
-        Path path = new Path(allSections, sourceStation, targetStation);
+        Path path = Path.of(allSections, sourceStation, targetStation);
         return PathResponse.of(path);
     }
 }
