@@ -2,43 +2,35 @@ package subway.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 import static subway.exception.ErrorCode.NOT_FOUND_SECTION;
 
 import java.util.List;
 import java.util.Optional;
-import javax.sql.DataSource;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Distance;
+import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.exception.SubwayException;
 
+@JdbcTest
+@Sql({"classpath:schema.sql", "classpath:test-data.sql"})
+@Import({LineDao.class, StationDao.class, SectionDao.class})
 public class SectionDaoTest {
 
-    private DataSource dataSource;
-
+    @Autowired
     private SectionDao sectionDao;
 
+    @Autowired
     private StationDao stationDao;
 
-    @BeforeEach
-    public void setUp() {
-        dataSource = new EmbeddedDatabaseBuilder()
-            .generateUniqueName(true)
-            .setType(H2)
-            .setScriptEncoding("UTF-8")
-            .ignoreFailedDrops(true)
-            .addScript("schema.sql")
-            .addScripts("test.sql")
-            .build();
-        sectionDao = new SectionDao(new JdbcTemplate(dataSource), dataSource);
-        stationDao = new StationDao(new JdbcTemplate(dataSource), dataSource);
-    }
+    @Autowired
+    private LineDao lineDao;
 
     @Test
     @DisplayName("section를 조회한다")
@@ -116,5 +108,33 @@ public class SectionDaoTest {
         // then
         Optional<Section> section = sectionDao.selectSection(insertSection.getId());
         assertThat(section).isEmpty();
+    }
+
+    @Test
+    @DisplayName("모든 section을 조회한다")
+    void findAllSection() {
+        // given
+        int beforeSize = sectionDao.findAll().orElseThrow().size();
+
+        Station station1 = new Station("수원역");
+        Station station2 = new Station("신촌역");
+        Station station3 = new Station("망원역");
+
+        Station insertStation = stationDao.insert(station1);
+        Station insertStation2 = stationDao.insert(station2);
+        Station insertStation3 = stationDao.insert(station3);
+
+        Section section = new Section(insertStation, insertStation2, new Distance(10));
+        Section section2 = new Section(insertStation2, insertStation3, new Distance(20));
+
+        List<Section> sections = List.of(section, section2);
+        Line line = new Line("3호선", "yellow");
+        Line insertLine = lineDao.insert(line);
+
+        // when
+        sectionDao.insertSections(List.of(section, section2), insertLine.getId());
+        List<Section> allSections = sectionDao.findAll().orElseThrow();
+        // then
+        assertThat(allSections.size()).isEqualTo(beforeSize + sections.size());
     }
 }

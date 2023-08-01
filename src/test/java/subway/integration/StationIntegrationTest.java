@@ -3,7 +3,7 @@ package subway.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static subway.exception.ErrorCode.DUPLICATED_STATION_NAME;
-import static subway.fixture.TestFixture.createStation;
+import static subway.helper.TestHelper.createStation;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;

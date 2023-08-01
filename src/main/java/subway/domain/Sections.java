@@ -1,23 +1,12 @@
 package subway.domain;
 
-import static subway.exception.ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE;
-import static subway.exception.ErrorCode.INVALID_SECTION_ALREADY_EXISTS;
-import static subway.exception.ErrorCode.INVALID_SECTION_NO_EXISTS;
-import static subway.exception.ErrorCode.NOT_FOUND_REMOVE_STATION;
-import static subway.exception.ErrorCode.NOT_FOUND_START;
-import static subway.exception.ErrorCode.NOT_FOUND_STATION;
+import subway.exception.SubwayException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import subway.exception.SubwayException;
+
+import static subway.exception.ErrorCode.*;
 
 public class Sections {
 
@@ -75,22 +64,12 @@ public class Sections {
         validateSize();
         validateContainStation(station);
 
-        List<Section> newSections = new ArrayList<>(this.sections);
-        Optional<Section> sectionByUpStation = sections.stream()
-            .filter(section -> section.getUpStation().match(station))
-            .peek(newSections::remove)
-            .findAny();
+        List<Section> originalSections = new ArrayList<>(sections);
 
-        Optional<Section> sectionByDownStation = sections.stream()
-            .filter(section -> section.getDownStation().match(station))
-            .peek(newSections::remove)
-            .findAny();
+        removeSectionsByStation(station, originalSections);
+        mergeSection(station, originalSections);
 
-        if (sectionByUpStation.isPresent() && sectionByDownStation.isPresent()) {
-            Section mergeSection = sectionByDownStation.get().merge(sectionByUpStation.get());
-            newSections.add(mergeSection);
-        }
-        return new Sections(newSections);
+        return new Sections(originalSections);
     }
 
     private void validateSize() {
@@ -99,12 +78,31 @@ public class Sections {
         }
     }
 
-    private void validateContainStation(Station station) {
+    private void validateContainStation(final Station station) {
         if (notContains(station)) {
             throw new SubwayException(NOT_FOUND_REMOVE_STATION);
         }
     }
 
+    private void removeSectionsByStation(final Station station, final List<Section> originalSections) {
+        List<Section> matchingSection = sections.stream()
+            .filter(section -> section.matchOneStation(station))
+            .collect(Collectors.toList());
+        originalSections.removeAll(matchingSection);
+    }
+
+    private void mergeSection(final Station station, final List<Section> originalSections) {
+        Optional<Section> sectionByUpStation = sections.stream()
+            .filter(section -> section.getUpStation().match(station))
+            .findAny();
+        Optional<Section> sectionByDownStation = sections.stream()
+            .filter(section -> section.getDownStation().match(station))
+            .findAny();
+        if (sectionByUpStation.isPresent() && sectionByDownStation.isPresent()) {
+            Section mergeSection = sectionByDownStation.get().merge(sectionByUpStation.get());
+            originalSections.add(mergeSection);
+        }
+    }
 
     public List<Station> getSortedStations() {
         Map<Station, Station> stationMap = new HashMap<>();
@@ -136,5 +134,9 @@ public class Sections {
 
     public List<Section> getSections() {
         return sections;
+    }
+
+    public Set<Station> getStationsCache() {
+        return stationsCache;
     }
 }

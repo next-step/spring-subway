@@ -10,8 +10,8 @@ import static subway.exception.ErrorCode.CAN_NOT_DELETE_WHEN_SECTION_IS_ONE;
 import static subway.exception.ErrorCode.DUPLICATED_LINE_NAME;
 import static subway.exception.ErrorCode.SAME_UP_AND_DOWN_STATION;
 
-import static subway.fixture.TestFixture.createLine;
-import static subway.fixture.TestFixture.createStation;
+import static subway.helper.TestHelper.createLine;
+import static subway.helper.TestHelper.createStation;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -71,7 +71,13 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("기존에 존재하는 지하철 노선 이름으로 지하철 노선을 생성한다.")
     void createLineWithDuplicateName() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        LineRequest lineRequest = new LineRequest(
+            "2호선",
+            "green",
+            station1Id,
+            station2Id,
+            14
+        );
         createLine(lineRequest);
 
         // when
@@ -85,8 +91,7 @@ public class LineIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(BAD_REQUEST.value());
-        assertThat(response.body().as(ErrorResponse.class)
-            .getMessage())
+        assertThat(response.body().as(ErrorResponse.class).getMessage())
             .isEqualTo(DUPLICATED_LINE_NAME.getMessage());
     }
 
@@ -208,7 +213,13 @@ public class LineIntegrationTest extends IntegrationTest {
     @DisplayName("구간이 하나면, 지하철 역을 제거할 수 없다")
     void 지하철_역_제거() {
         // given
-        LineRequest lineRequest = new LineRequest("2호선", "green", station1Id, station2Id, 14);
+        LineRequest lineRequest = new LineRequest(
+            "2호선",
+            "green",
+            station1Id,
+            station2Id,
+            14
+        );
         ExtractableResponse<Response> createResponse = createLine(lineRequest);
 
         // when

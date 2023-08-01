@@ -1,17 +1,16 @@
 package subway.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 import static subway.exception.ErrorCode.NOT_FOUND_LINE;
 
 import java.util.List;
 import java.util.Optional;
-import javax.sql.DataSource;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.jdbc.Sql;
 import subway.domain.Distance;
 import subway.domain.Line;
 import subway.domain.Section;
@@ -19,24 +18,13 @@ import subway.domain.Sections;
 import subway.domain.Station;
 import subway.exception.SubwayException;
 
+@JdbcTest
+@Import(LineDao.class)
+@Sql({"classpath:schema.sql", "classpath:test-data.sql"})
 public class LineDaoTest {
 
-    private DataSource dataSource;
-
+    @Autowired
     private LineDao lineDao;
-
-    @BeforeEach
-    public void setUp() {
-        dataSource = new EmbeddedDatabaseBuilder()
-            .generateUniqueName(true)
-            .setType(H2)
-            .setScriptEncoding("UTF-8")
-            .ignoreFailedDrops(true)
-            .addScript("schema.sql")
-            .addScripts("test.sql")
-            .build();
-        lineDao = new LineDao(new JdbcTemplate(dataSource), dataSource);
-    }
 
     @Test
     @DisplayName("라인 하나를 조회한다")
