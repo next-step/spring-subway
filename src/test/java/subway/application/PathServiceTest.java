@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.catchException;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = PathService.class)
+@ContextConfiguration(classes = {PathService.class, PathFinderService.class})
 @DisplayName("PathService 클래스")
 public class PathServiceTest {
 

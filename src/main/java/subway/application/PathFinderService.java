@@ -1,30 +1,29 @@
-package subway.domain;
+package subway.application;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import org.springframework.stereotype.Service;
+import subway.domain.Section;
+import subway.domain.Station;
+import subway.dto.response.FindPathResponse;
 import subway.exception.PathException;
-import subway.exception.StationException;
 
 import java.util.List;
 
-public class PathFinder {
+@Service
+public class PathFinderService {
 
-    private final Integer distance;
-    private final List<Station> path;
-
-    public PathFinder(List<Section> sections, Station startStation, Station endStation) {
-        validateStartStation(startStation);
-        validateEndStation(endStation);
-        validateSameStations(startStation, endStation);
-
+    public FindPathResponse findPath(List<Section> sections, Station startStation, Station endStation) {
         DijkstraShortestPath<Station, DefaultWeightedEdge> shortestPath = getShortestPath(sections, startStation, endStation);
         GraphPath graphPath = shortestPath.getPath(startStation, endStation);
         validateUnlinked(graphPath);
 
-        this.path = graphPath.getVertexList();
-        this.distance = (int) shortestPath.getPathWeight(startStation, endStation);
+        List<Station> stations = graphPath.getVertexList();
+        int distance = (int) shortestPath.getPathWeight(startStation, endStation);
+
+        return FindPathResponse.from(stations, distance);
     }
 
     private DijkstraShortestPath<Station, DefaultWeightedEdge> getShortestPath(List<Section> sections, Station startStation, Station endStation) {
@@ -47,31 +46,5 @@ public class PathFinder {
         if (graphPath == null) {
             throw new PathException("startStation와 endStation이 연결되어있지 않습니다");
         }
-    }
-
-    private void validateSameStations(Station startStation, Station endStation) {
-        if (startStation.equals(endStation)) {
-            throw new PathException("startStation과 endStation이 동일합니다");
-        }
-    }
-
-    private void validateEndStation(Station endStation) {
-        if (endStation == null) {
-            throw new StationException("endStation이 존재하지 않습니다");
-        }
-    }
-
-    private void validateStartStation(Station startStation) {
-        if (startStation == null) {
-            throw new StationException("startStation이 존재하지 않습니다");
-        }
-    }
-
-    public Integer getDistance() {
-        return distance;
-    }
-
-    public List<Station> getPath() {
-        return path;
     }
 }
