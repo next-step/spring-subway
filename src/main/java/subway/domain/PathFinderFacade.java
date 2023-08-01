@@ -1,22 +1,23 @@
-package subway.application;
+package subway.domain;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
-import org.springframework.stereotype.Component;
-import subway.domain.Section;
-import subway.domain.Station;
 import subway.exception.PathException;
 import subway.vo.Path;
 
 import java.util.List;
 
-@Component
-public class PathFinder {
+public class PathFinderFacade {
 
-    public Path findPath(List<Section> sections, Station startStation, Station endStation) {
-        DijkstraShortestPath<Station, DefaultWeightedEdge> shortestPath = getShortestPath(sections, startStation, endStation);
+    private final DijkstraShortestPath<Station, DefaultWeightedEdge> shortestPath;
+
+    public PathFinderFacade(List<Section> sections, Station startStation, Station endStation) {
+        this.shortestPath = getShortestPath(sections, startStation, endStation);
+    }
+
+    public Path findPath(Station startStation, Station endStation) {
         GraphPath graphPath = shortestPath.getPath(startStation, endStation);
         validateUnlinked(graphPath);
 

@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import subway.DomainFixture;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
+import subway.domain.PathFinder;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.response.FindPathResponse;

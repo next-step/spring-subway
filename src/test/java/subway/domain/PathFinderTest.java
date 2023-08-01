@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import subway.DomainFixture;
-import subway.application.PathFinder;
 import subway.exception.PathException;
 import subway.vo.Path;
 
