@@ -24,7 +24,7 @@ public class PathFinder {
 
     private void validateStation(Station departureStation, Station destinationStation) {
         if (departureStation.equals(destinationStation)) {
-            throw new IllegalArgumentException("중복된 역 입니다.");
+            throw new IllegalArgumentException("출발역과 도착역이 일치합니다.");
         }
     }
 
