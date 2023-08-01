@@ -3,6 +3,7 @@ package subway.application;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.PathFinder;
@@ -12,6 +13,7 @@ import subway.dto.response.PathResponse;
 import subway.dto.response.StationResponse;
 
 @Service
+@Transactional(readOnly = true)
 public class PathService {
 
     private final SectionDao sectionDao;
