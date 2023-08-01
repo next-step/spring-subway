@@ -22,7 +22,7 @@ class PathManagerTest {
         final List<Section> sections = List.of();
 
         // when & then
-        assertThatNoException().isThrownBy(() -> PathManager.create(stations, sections));
+        assertThatNoException().isThrownBy(() -> new DijkstraPathManager(stations, sections));
     }
 
     @DisplayName("출발역과 도착역으로 최단 경로를 찾는 데 성공한다.")
@@ -128,6 +128,6 @@ class PathManagerTest {
                 여의도역_노량진역_구간(DEFAULT_DISTANCE)
         );
 
-        return PathManager.create(stations, sections);
+        return new DijkstraPathManager(stations, sections);
     }
 }

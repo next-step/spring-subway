@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
+import subway.domain.DijkstraPathManager;
 import subway.domain.PathManager;
 import subway.domain.Station;
 import subway.dto.PathResponse;
@@ -24,7 +25,7 @@ public class PathService {
 
     @Transactional(readOnly = true)
     public PathResponse findPath(final Long sourceId, final Long targetId) {
-        final PathManager pathManager = PathManager.create(
+        final PathManager pathManager = new DijkstraPathManager(
                 stationDao.findAll(), sectionDao.findAll()
         );
 
