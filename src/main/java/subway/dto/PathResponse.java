@@ -1,8 +1,8 @@
 package subway.dto;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
+import subway.domain.Path;
 import subway.domain.Station;
 
 public class PathResponse {
@@ -24,37 +24,19 @@ public class PathResponse {
                 distance);
     }
 
+    public static PathResponse of(Path path) {
+        return new PathResponse(
+                path.getStations().stream()
+                        .map(StationResponse::of)
+                        .collect(Collectors.toUnmodifiableList()),
+                path.getDistance());
+    }
+
     public List<StationResponse> getStations() {
         return stations;
     }
 
     public Long getDistance() {
         return distance;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        PathResponse that = (PathResponse) o;
-        return Objects.equals(stations, that.stations) && Objects.equals(distance,
-                that.distance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(stations, distance);
-    }
-
-    @Override
-    public String toString() {
-        return "PathResponse{" +
-                "stations=" + stations +
-                ", distance=" + distance +
-                '}';
     }
 }

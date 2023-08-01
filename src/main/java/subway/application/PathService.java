@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
-import subway.domain.PathGraph;
+import subway.domain.Path;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.PathResponse;
@@ -28,9 +28,8 @@ public class PathService {
                 .orElseThrow(() -> new StationNotFoundException(source));
         Station targetStation = stationDao.findById(target)
                 .orElseThrow(() -> new StationNotFoundException(target));
-        PathGraph graph = new PathGraph(allSections, sourceStation, targetStation);
-        List<Station> stations = graph.findRoute();
-        Long distance = graph.findDistance();
-        return PathResponse.of(stations, distance);
+
+        Path path = new Path(allSections, sourceStation, targetStation);
+        return PathResponse.of(path);
     }
 }
