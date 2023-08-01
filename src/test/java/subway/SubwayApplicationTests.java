@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+@Sql({"classpath:schema.sql", "classpath:data.sql"})
 @SpringBootTest
-@Sql("classpath:data.sql")
 class SubwayApplicationTests {
 
 	@Test
@@ -13,3 +13,4 @@ class SubwayApplicationTests {
 	}
 
 }
+
