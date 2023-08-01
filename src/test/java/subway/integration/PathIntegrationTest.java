@@ -37,7 +37,7 @@ class PathIntegrationTest extends IntegrationTest {
         setUpStationsAndLine();
     }
 
-    @DisplayName("하나의 노선에서 찾기")
+    @DisplayName("하나의 노선에서 경로 반환")
     @Test
     void findOneLinePath() {
         // when
@@ -61,7 +61,7 @@ class PathIntegrationTest extends IntegrationTest {
         );
     }
 
-    @DisplayName("환승 한번")
+    @DisplayName("환승 한번하는 경로 반환")
     @Test
     void findOneTransferPath() {
         // given
@@ -94,7 +94,7 @@ class PathIntegrationTest extends IntegrationTest {
         );
     }
 
-    @DisplayName("환승 여러번")
+    @DisplayName("환승 여러번하는 경로 반환")
     @Test
     void findMultiTransferPath() {
         // given
@@ -149,7 +149,7 @@ class PathIntegrationTest extends IntegrationTest {
         );
     }
 
-    @DisplayName("데이터 베이스에 출발역 없음")
+    @DisplayName("데이터 베이스에 출발역 없으면 예외발생")
     @Test
     void noSourceIdInDB() {
         // when
@@ -165,7 +165,7 @@ class PathIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
-    @DisplayName("데이터베이스에 도착역 없음")
+    @DisplayName("데이터베이스에 도착역 없으면 예외발생")
     @Test
     void noTargetIdInDB() {
         // when
@@ -181,7 +181,7 @@ class PathIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
-    @DisplayName("출발역이 소속된 노선 없음")
+    @DisplayName("출발역이 소속된 노선 없으면 예외발생")
     @Test
     void noSourceInLine() {
         // when
@@ -197,7 +197,7 @@ class PathIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("도착역이 소속된 노선 없음")
+    @DisplayName("도착역이 소속된 노선 없으면 예외발생")
     @Test
     void noTargetInLine() {
         // when
@@ -213,7 +213,7 @@ class PathIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("출발역과 도착역이 같음")
+    @DisplayName("출발역과 도착역이 같으면 예외발생")
     @Test
     void sameSourceAndTarget() {
         // when
@@ -229,7 +229,7 @@ class PathIntegrationTest extends IntegrationTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("출발역과 도착역 사이 연결된 구간 없음")
+    @DisplayName("출발역과 도착역 사이 연결된 구간 없으면 예외발생")
     @Test
     void noPathExist() {
         // when

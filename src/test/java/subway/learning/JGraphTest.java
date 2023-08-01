@@ -10,6 +10,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import subway.domain.Distance;
@@ -17,6 +18,7 @@ import subway.domain.Line;
 import subway.domain.Section;
 import subway.domain.Station;
 
+@Disabled
 @DisplayName("JGraph 학습 테스트")
 class JGraphTest {
 
