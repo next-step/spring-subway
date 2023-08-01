@@ -11,6 +11,7 @@ import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.response.PathResponse;
 import subway.dto.response.StationResponse;
+import subway.utils.Jgrapht;
 
 @Service
 @Transactional(readOnly = true)
@@ -31,7 +32,7 @@ public class PathService {
             .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다."));
         List<Section> sections = sectionDao.findAll();
 
-        PathFinder pathFinder = new PathFinder(sections, departureStation, destinationStation);
+        PathFinder pathFinder = new Jgrapht(sections, departureStation, destinationStation);
         List<StationResponse> stations = pathFinder.findShortestStations().stream()
             .map(StationResponse::of)
             .collect(Collectors.toUnmodifiableList());

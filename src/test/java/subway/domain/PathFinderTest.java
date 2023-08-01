@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import subway.utils.Jgrapht;
 
 @DisplayName("PathFinder 테스트")
 public class PathFinderTest {
@@ -49,14 +50,14 @@ public class PathFinderTest {
     @DisplayName("성공 : 객체 생성")
     void create() {
         assertThatNoException()
-            .isThrownBy(() -> new PathFinder(교대_강남_남부터미널_양재, 교대역, 양재역));
+            .isThrownBy(() -> new Jgrapht(교대_강남_남부터미널_양재, 교대역, 양재역));
     }
 
     @Test
     @DisplayName("성공1 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
     void successFindStations() {
         // when
-        PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 양재역);
+        PathFinder pathFinder = new Jgrapht(교대_강남_남부터미널_양재, 교대역, 양재역);
 
         // then
         assertThat(pathFinder.findShortestStations()).containsExactly(교대역, 남부터미널역, 양재역);
@@ -66,7 +67,7 @@ public class PathFinderTest {
     @DisplayName("성공2 : 출발역과 도착역의 최단 거리 역 정보를 리턴")
     void successFindStations2() {
         // when
-        PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 남부터미널역);
+        PathFinder pathFinder = new Jgrapht(교대_강남_남부터미널_양재, 교대역, 남부터미널역);
 
         // then
         assertThat(pathFinder.findShortestStations()).containsExactly(교대역, 남부터미널역);
@@ -76,7 +77,7 @@ public class PathFinderTest {
     @DisplayName("성공1 : 출발역과 도착역의 최단 거리 리턴")
     void successFindShortestDistance1() {
         // when
-        PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 양재역);
+        PathFinder pathFinder = new Jgrapht(교대_강남_남부터미널_양재, 교대역, 양재역);
 
         // then
         assertThat(pathFinder.findShortestDistance()).isEqualTo(5D);
@@ -86,7 +87,7 @@ public class PathFinderTest {
     @DisplayName("성공2 : 출발역과 도착역의 최단 거리 리턴")
     void successFindShortestDistance2() {
         // when
-        PathFinder pathFinder = new PathFinder(교대_강남_남부터미널_양재, 교대역, 남부터미널역);
+        PathFinder pathFinder = new Jgrapht(교대_강남_남부터미널_양재, 교대역, 남부터미널역);
 
         // then
         assertThat(pathFinder.findShortestDistance()).isEqualTo(2D);
@@ -96,7 +97,7 @@ public class PathFinderTest {
     @DisplayName("예외 : 출발역과 도착역이 같은 경우 예외 발생")
     void exceptionDepartureDestinationSameStationName() {
         // then
-        assertThatThrownBy(() -> new PathFinder(교대_강남_남부터미널_양재, 교대역, 교대역))
+        assertThatThrownBy(() -> new Jgrapht(교대_강남_남부터미널_양재, 교대역, 교대역))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -104,7 +105,7 @@ public class PathFinderTest {
     @DisplayName("예외 : 출발역과 도착역이 연결이 되어 있지 않은 경우 예외 발생")
     void exceptionNotConnected() {
         // then
-        assertThatThrownBy(() -> new PathFinder(교대_강남_남부터미널_양재, 교대역, 부산역))
+        assertThatThrownBy(() -> new Jgrapht(교대_강남_남부터미널_양재, 교대역, 부산역))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
