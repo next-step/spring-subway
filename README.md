@@ -27,26 +27,30 @@
 
 - 노선에 등록되어있지 않은 역을 제거하려 한다.
 
-## 클래스 설명
+## 도메인 설명
 
 - Line : 지하철 노선
-    - [field] : 아이디, 이름, 색
+  - [field] : 아이디, 이름, 색
 - Station : 지하철 역
-    - [field] : 아이디, 이름
+  - [field] : 아이디, 이름
 - Section : 역과 역 사이를 잇는 구간
-    - [field] : 아이디, 구간의 상행역(upStation), 구간의 하행역(downStation), 노선, 역과 역사이의 거리
-    - [method] divideDownSection : 기존 구간과 새로 추가되는 구간 차이의 아래 구간을 반환
-    - [method] divideUpSection : 기존 구간과 새로 추가되는 구간 차이의 위 구간을 반환
-    - [method] findDuplicatedSection : 기존 구간과 새로 추가하는 구간이 겹치면 기존 구간 반환
-    - [method] linkToDown : 상행 구간(upSection)의 상행역과 하행 구간(downSection)의 하행역을 연결한 구간 반환
+  - [field] : 아이디, 구간의 상행역(upStation), 구간의 하행역(downStation), 노선, 역과 역사이의 거리
+  - [method] divideDownSection : 기존 구간과 새로 추가되는 구간 차이의 아래 구간을 반환
+  - [method] divideUpSection : 기존 구간과 새로 추가되는 구간 차이의 위 구간을 반환
+  - [method] findDuplicatedSection : 기존 구간과 새로 추가하는 구간이 겹치면 기존 구간 반환
+  - [method] linkToDown : 상행 구간(upSection)의 상행역과 하행 구간(downSection)의 하행역을 연결한 구간 반환
 - Sections
-    - [field] : 구간의 리스트를 관리
-    - [method] findUpSectionFrom : 입력 받은 역(Station)을 기준으로 상행 구간(upSection)을 반환 (상행 구간의 하행역 = 입력받은 역)
-    - [method] findDownSectionFrom : 입력 받은 역(Station)을 기준으로 하행 구간(downSection)을 반환 (하행 구간의 상행역 = 입력받은 역)
-    - [method] sortStations : 구간에 포함된 모든역을 상행 종점역(upTerminusStation) -> 하행 종점역(downTerminusStation) 순으로 리턴
-    - [method] findModifiedSection : 기존 구간과 새로 추가되는 구간의 겹치는 부분을 제외한 구간을 리턴
+  - [field] : 구간의 리스트를 관리
+  - [method] findUpSectionFrom : 입력 받은 역(Station)을 기준으로 상행 구간(upSection)을 반환 (상행 구간의 하행역 = 입력받은 역)
+  - [method] findDownSectionFrom : 입력 받은 역(Station)을 기준으로 하행 구간(downSection)을 반환 (하행 구간의 상행역 = 입력받은 역)
+  - [method] sortStations : 구간에 포함된 모든역을 상행 종점역(upTerminusStation) -> 하행 종점역(downTerminusStation) 순으로 리턴
+  - [method] findModifiedSection : 기존 구간과 새로 추가되는 구간의 겹치는 부분을 제외한 구간을 리턴
 - Distance (Value Object) : 역 사이의 거리
   - [field] : 거리
+- PathFinder : 역과 역사이의 최단 거리 구하는 도메인
+  - [field] : 역과 역사이 구간과 거리를 저장한 그래프
+  - [method] : 역과 역사이의 최단 거리의 역 정보를 List로 반환
+  - [method] : 역과 역사이의 최단 거리를 리턴
 
 ----
 ## 1단계 - 기능
@@ -87,3 +91,27 @@
 - [x] 중간역이 제거될 경우 재배치를 함
     1. 노선에 A - B - C 역이 연결되어 있을 때 B역을 제거할 경우 A - C로 재배치 됨
     2. 거리는 두 구간의 거리의 합으로 정함
+
+## 4단계 - 기능
+
+- 데이터베이스 설정을 프로덕션과 테스트를 다르게 설정
+  - [x] 프로덕션의 데이터베이스는 로컬에 저장될 수 있도록 설정
+  - [x] 테스트용 데이터베이스는 인메모리로 동작할 수 있도록 설정
+- 최단거리 경로 조회
+  - [x] 기능 : 출발역으로 부터 도착역까지 경로에 있는 역 목록 반환
+  - [x] 예외 : 출발역과 도착역이 같은 경우
+  - [x] 예외 : 출발역과 도착역이 연결이 되어 있지 않은 경우
+  - [x] 예외 : 존재하지 않은 출발역이나 도착역을 조회 할 경우
+- TDD 구현
+  - Outside In
+    - [x] 컨트롤러 구현 이후 서비스 구현 시 바로 기능 구현에 앞서 단위 테스트 먼저 작성
+    - [x] 서비스 레이어의 단위 테스트 목적은 비즈니스 플로우를 검증하는 것이며 이 때 협력 객체는 stubbing을 활용하여 대체함
+    - [x] 단위 테스트 작성 후 해당 단위 테스트를 만족하는 기능을 구현한 다음 리팩터링 진행
+    - [x] 그 다음 기능 구현은 방금 전 사이클에서 stubbing 한 객체를 대상으로 진행하면 수월하게 TDD 사이클을 진행할 수 있음
+    - [x] 외부 라이브러리를 활용한 로직을 검증할 때는 가급적 실제 객체를 활용
+    - [x] Happy 케이스에 대한 부분만 구현( Side 케이스에 대한 구현은 다음 단계에서 진행)
+  - Inside Out
+    - [ ] 인수 테스트를 작성하며 도메인에 대한 이해도를 높이고 기능 구현 전 도메인 설계를 진행
+    - [ ] 도메인 설계 후 도메인 객체에 대한 단위 테스트 작성을 시작으로 TDD 사이클 시작
+    - [ ] 해당 도메인의 단위 테스트를 통해 도메인의 역할과 경계를 설계
+    - [ ] 도메인의 구현이 끝나면 해당 도메인과 관계를 맺는 객체에 대해 기능 구현 시작

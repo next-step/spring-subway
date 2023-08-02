@@ -37,9 +37,12 @@ public class SectionService {
     }
 
     private Section convertRegistSection(SectionRegistRequest sectionRegistRequest, Long lineId) {
-        Station upStation = stationDao.findById(sectionRegistRequest.getUpStationId());
-        Station downStation = stationDao.findById(sectionRegistRequest.getDownStationId());
-        Line line = lineDao.findById(lineId);
+        Station upStation = stationDao.findById(sectionRegistRequest.getUpStationId())
+            .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다."));
+        Station downStation = stationDao.findById(sectionRegistRequest.getDownStationId())
+            .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다."));
+        Line line = lineDao.findById(lineId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 노선이 존재하지 않습니다."));
         return new Section(
             upStation,
             downStation,
@@ -51,7 +54,8 @@ public class SectionService {
     @Transactional
     public void deleteSection(Long stationId, Long lineId) {
         Sections sections = sectionDao.findAllByLineId(lineId);
-        Station deleteStation = stationDao.findById(stationId);
+        Station deleteStation = stationDao.findById(stationId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 역이 존재하지 않습니다."));
         sections.canDeleteStation(deleteStation);
 
         Optional<Section> upSection = sections.findUpSectionFrom(deleteStation);
