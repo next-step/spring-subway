@@ -51,7 +51,7 @@ class SectionServiceTest {
         final Section oldSection = new Section(1L, line, station1, station2, 10);
 
         given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
-        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
+        given(sectionDao.findAllByLineId(1L)).willReturn(List.of(oldSection));
         given(stationDao.findById(station2.getId())).willReturn(Optional.of(station2));
         given(stationDao.findById(station3.getId())).willReturn(Optional.of(station3));
         given(sectionDao.insert(any(Section.class))).willReturn(newSection);
@@ -92,7 +92,7 @@ class SectionServiceTest {
         given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
         given(stationDao.findById(station1.getId())).willReturn(Optional.of(station1));
         given(stationDao.findById(station2.getId())).willReturn(Optional.of(station2));
-        given(sectionDao.findAll(1L)).willReturn(List.of(oldSection));
+        given(sectionDao.findAllByLineId(1L)).willReturn(List.of(oldSection));
 
         // when & then
         final SectionRequest sectionRequest = new SectionRequest("1", "2", 10);
@@ -111,7 +111,7 @@ class SectionServiceTest {
         final Section oldSection = new Section(1L, line, station1, station2, 10);
         final SectionRequest sectionRequest = new SectionRequest("3", "4", 10);
 
-        given(sectionDao.findAll(line.getId())).willReturn(List.of(oldSection));
+        given(sectionDao.findAllByLineId(line.getId())).willReturn(List.of(oldSection));
         given(lineDao.findById(line.getId())).willReturn(Optional.of(line));
         given(stationDao.findById(sectionRequest.getUpStationId())).willReturn(Optional.of(new Station(3L, "한대앞")));
         given(stationDao.findById(sectionRequest.getDownStationId())).willReturn(Optional.of(new Station(4L, "중앙")));
@@ -135,7 +135,7 @@ class SectionServiceTest {
         final Section section1 = new Section(line, station1, station2, 10);
         final Section section2 = new Section(line, station2, station3, 10);
 
-        given(sectionDao.findAll(line.getId())).willReturn(List.of(section1, section2));
+        given(sectionDao.findAllByLineId(line.getId())).willReturn(List.of(section1, section2));
 
         // when & then
         assertThatNoException().isThrownBy(() -> sectionService.deleteSection(line.getId(), stationId));
@@ -154,7 +154,7 @@ class SectionServiceTest {
         final Section section1 = new Section(line, station1, station2, 10);
         final Section section2 = new Section(line, station2, station3, 10);
 
-        given(sectionDao.findAll(line.getId())).willReturn(List.of(section1, section2));
+        given(sectionDao.findAllByLineId(line.getId())).willReturn(List.of(section1, section2));
 
         // when & then
         assertThatNoException().isThrownBy(() -> sectionService.deleteSection(line.getId(), stationId));
@@ -171,7 +171,7 @@ class SectionServiceTest {
         final Station station2 = new Station(2L, "안산");
         final Section section1 = new Section(line, station1, station2, 10);
 
-        given(sectionDao.findAll(line.getId())).willReturn(List.of(section1));
+        given(sectionDao.findAllByLineId(line.getId())).willReturn(List.of(section1));
 
         // when & then
         assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), stationId))
@@ -192,7 +192,7 @@ class SectionServiceTest {
         final Section section1 = new Section(line, station1, station2, 10);
         final Section section2 = new Section(line, station2, station3, 10);
 
-        given(sectionDao.findAll(line.getId())).willReturn(List.of(section1, section2));
+        given(sectionDao.findAllByLineId(line.getId())).willReturn(List.of(section1, section2));
 
         // when & then
         assertThatThrownBy(() -> sectionService.deleteSection(line.getId(), stationId))

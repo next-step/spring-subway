@@ -2,7 +2,6 @@ package subway.integration;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -37,7 +36,7 @@ class SectionIntegrationTest {
         // when
         ExtractableResponse<Response> response = SectionIntegrationSupporter.createSectionInLine(
                 신분당선_ID,
-                SectionRequestFixture.create(2, 3)
+                SectionRequestFixture.createSection(2, 3)
         );
 
         // then
@@ -58,7 +57,7 @@ class SectionIntegrationTest {
         // when
         ExtractableResponse<Response> response = SectionIntegrationSupporter.createSectionInLine(
                 2L,
-                SectionRequestFixture.create(2, 3));
+                SectionRequestFixture.createSection(2, 3));
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -70,7 +69,7 @@ class SectionIntegrationTest {
         // given
         final long 신분당선_ID = 1L;
         create_신분당선_with_첫번째역_두번째역();
-        final SectionRequest badRequest = SectionRequestFixture.create(1, 2);
+        final SectionRequest badRequest = SectionRequestFixture.createSection(1, 2);
 
         // when
         ExtractableResponse<Response> response = SectionIntegrationSupporter.createSectionInLine(신분당선_ID, badRequest);
@@ -85,7 +84,7 @@ class SectionIntegrationTest {
         // given
         final long 신분당선_ID = 1L;
         create_신분당선_with_첫번째역_두번째역();
-        final SectionRequest badRequest = SectionRequestFixture.create(5, 6);
+        final SectionRequest badRequest = SectionRequestFixture.createSection(5, 6);
 
         // when
         ExtractableResponse<Response> response = SectionIntegrationSupporter.createSectionInLine(신분당선_ID, badRequest);
@@ -103,7 +102,7 @@ class SectionIntegrationTest {
 
         final long 마지막_역_ID = 3L;
         StationIntegrationSupporter.createStation(StationRequestFixture.세번째역_요청());
-        SectionIntegrationSupporter.createSectionInLine(신분당선_ID, SectionRequestFixture.create(2, 마지막_역_ID));
+        SectionIntegrationSupporter.createSectionInLine(신분당선_ID, SectionRequestFixture.createSection(2, 마지막_역_ID));
 
         // when
         ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(
@@ -122,7 +121,7 @@ class SectionIntegrationTest {
         create_신분당선_with_첫번째역_두번째역();
 
         StationIntegrationSupporter.createStation(StationRequestFixture.세번째역_요청());
-        SectionIntegrationSupporter.createSectionInLine(신분당선_ID, SectionRequestFixture.create(2, 3));
+        SectionIntegrationSupporter.createSectionInLine(신분당선_ID, SectionRequestFixture.createSection(2, 3));
 
         // when
         ExtractableResponse<Response> response = SectionIntegrationSupporter.deleteSectionInLineByStationId(

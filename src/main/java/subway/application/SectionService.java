@@ -25,7 +25,7 @@ public class SectionService {
 
     @Transactional
     public SectionResponse saveSection(final long lineId, final SectionRequest sectionRequest) {
-        final Sections sections = new Sections(sectionDao.findAll(lineId));
+        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
 
         final Line line = findLine(lineId);
         final Station upStation = findStationById(sectionRequest.getUpStationId());
@@ -49,15 +49,16 @@ public class SectionService {
 
     @Transactional
     public void deleteSection(final long lineId, final long stationId) {
-        final Sections sections = new Sections(sectionDao.findAll(lineId));
+        final Sections sections = new Sections(sectionDao.findAllByLineId(lineId));
         disconnectSection(stationId, sections);
     }
 
     private void disconnectSection(final long stationId, final Sections sections) {
         final DisconnectedSections disconnectedSections = DisconnectedSections.of(sections.disconnect(stationId));
-        if(disconnectedSections.getUpdateSection().isNotNull()) {
-            sectionDao.update(disconnectedSections.getUpdateSection());
-        }
+
+        disconnectedSections.getUpdateSection()
+                .ifPresent(sectionDao::update);
+
         sectionDao.delete(disconnectedSections.getDeleteSection());
     }
 

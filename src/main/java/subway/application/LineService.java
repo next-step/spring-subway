@@ -50,13 +50,13 @@ public class LineService {
                 .collect(Collectors.toList());
     }
 
-    public List<Line> findLines() {
+    private List<Line> findLines() {
         return lineDao.findAll();
     }
 
     public LineWithStationsResponse findLineResponseById(Long id) {
         final Line line = findLineById(id);
-        final List<Station> stations = new Sections(sectionDao.findAll(id)).getStations();
+        final List<Station> stations = new Sections(sectionDao.findAllByLineId(id)).getStations();
         return LineWithStationsResponse.of(line, stations);
     }
 

@@ -50,13 +50,11 @@ public class SectionDao {
         return new Section(id, section.getLine(), section.getUpStation(), section.getDownStation(), section.getDistance());
     }
 
-    public long count(final long lineId) {
-        String sql = SELECT_ALL_FROM_SECTION_QUERY + "WHERE line_id = ?";
-        return jdbcTemplate.query(sql, rowMapper, lineId)
-                .size();
+    public List<Section> findAll() {
+        return jdbcTemplate.query(SELECT_ALL_FROM_SECTION_QUERY, rowMapper);
     }
 
-    public List<Section> findAll(final long lineId) {
+    public List<Section> findAllByLineId(final long lineId) {
         String sql = SELECT_ALL_FROM_SECTION_QUERY + "WHERE line_id = ?";
         return jdbcTemplate.query(sql, rowMapper, lineId);
     }

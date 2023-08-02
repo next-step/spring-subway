@@ -47,7 +47,7 @@ class LineServiceTest {
         final Station station4 = new Station(4L, "한대앞");
 
         given(lineDao.findById(lineId)).willReturn(Optional.of(line));
-        given(sectionDao.findAll(lineId)).willReturn(List.of(
+        given(sectionDao.findAllByLineId(lineId)).willReturn(List.of(
                 new Section(line, station4, station1, 10),
                 new Section(line, station1, station3, 10),
                 new Section(line, station3, station2, 10)
