@@ -1,5 +1,6 @@
 package subway.dto;
 
+import java.util.Objects;
 import subway.domain.Station;
 
 public class StationResponse {
@@ -22,5 +23,30 @@ public class StationResponse {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        StationResponse that = (StationResponse) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
+    @Override
+    public String toString() {
+        return "StationResponse{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
