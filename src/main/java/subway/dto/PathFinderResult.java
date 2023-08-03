@@ -1,8 +1,9 @@
-package subway.domain;
+package subway.dto;
 
 import java.util.List;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import subway.domain.Distance;
 import subway.exception.ErrorCode;
 import subway.exception.FindPathException;
 

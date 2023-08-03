@@ -6,13 +6,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import subway.common.util.PathFinder;
 import subway.dao.PathDao;
 import subway.dao.SectionDao;
 import subway.dao.StationDao;
 import subway.domain.Path;
-import subway.domain.PathFinder;
-import subway.domain.PathFinderResult;
 import subway.domain.Station;
+import subway.dto.PathFinderResult;
 import subway.dto.PathResponse;
 import subway.dto.StationResponse;
 import subway.exception.ErrorCode;
@@ -24,11 +24,14 @@ public class PathService {
     private final StationDao stationDao;
     private final SectionDao sectionDao;
     private final PathDao pathDao;
+    private final PathFinder pathFinder;
 
-    public PathService(final StationDao stationDao, final SectionDao sectionDao, final PathDao pathDao) {
+    public PathService(final StationDao stationDao, final SectionDao sectionDao, final PathDao pathDao,
+            final PathFinder pathFinder) {
         this.stationDao = stationDao;
         this.sectionDao = sectionDao;
         this.pathDao = pathDao;
+        this.pathFinder = pathFinder;
     }
 
     @Transactional
@@ -43,8 +46,7 @@ public class PathService {
             return loadCache(source, target, optionalCachedPath.get());
         }
 
-        PathFinder pathFinder = new PathFinder(sectionDao.findAll());
-        PathFinderResult result = pathFinder.findShortestPath(source, target);
+        PathFinderResult result = pathFinder.findShortestPath(sectionDao.findAll(), source, target);
 
         List<StationResponse> stationResponses = sortedStationResponse(result, stationDao.findAllIn(result.getPaths()));
 

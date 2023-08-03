@@ -1,4 +1,4 @@
-package subway.domain;
+package subway.common.util;
 
 import java.util.HashSet;
 import java.util.List;
@@ -7,17 +7,27 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import org.springframework.stereotype.Component;
+import subway.domain.Section;
+import subway.domain.Station;
+import subway.dto.PathFinderResult;
 import subway.exception.ErrorCode;
 import subway.exception.SectionException;
 
+@Component
 public class PathFinder {
 
-    private final DijkstraShortestPath<Long, DefaultWeightedEdge> shortestPath;
+    PathFinder() {
+    }
 
-    public PathFinder(final List<Section> sections) {
+    public PathFinderResult findShortestPath(final List<Section> sections, final Station source, final Station target) {
         validateNotEmpty(sections);
 
-        this.shortestPath = initGraph(sections);
+        DijkstraShortestPath<Long, DefaultWeightedEdge> shortestPath = initGraph(sections);
+
+        GraphPath<Long, DefaultWeightedEdge> path = shortestPath.getPath(source.getId(), target.getId());
+
+        return new PathFinderResult(path);
     }
 
     private void validateNotEmpty(final List<Section> sections) {
@@ -55,11 +65,5 @@ public class PathFinder {
 
             graph.setEdgeWeight(graph.addEdge(upStationId, downStationId), distance);
         });
-    }
-
-    public PathFinderResult findShortestPath(final Station source, final Station target) {
-        GraphPath<Long, DefaultWeightedEdge> path = shortestPath.getPath(source.getId(), target.getId());
-
-        return new PathFinderResult(path);
     }
 }
