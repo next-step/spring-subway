@@ -1,4 +1,4 @@
-package subway.util;
+package subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,17 +14,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import subway.common.util.PathFinder;
-import subway.domain.Section;
-import subway.domain.Station;
 import subway.dto.PathFinderResult;
 import subway.exception.FindPathException;
 import subway.exception.SectionException;
+import subway.infra.jgrapht.JGraphTPathFinder;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {PathFinder.class})
-@DisplayName("경로 조회 유틸 테스트")
-class PathFinderUtilTest {
+@ContextConfiguration(classes = {JGraphTPathFinder.class})
+@DisplayName("경로 조회 테스트")
+class PathFinderTest {
 
     @Autowired
     private PathFinder pathFinder;

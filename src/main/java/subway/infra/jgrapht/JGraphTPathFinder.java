@@ -1,4 +1,4 @@
-package subway.common.util;
+package subway.infra.jgrapht;
 
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +8,7 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
 import org.springframework.stereotype.Component;
+import subway.domain.PathFinder;
 import subway.domain.Section;
 import subway.domain.Station;
 import subway.dto.PathFinderResult;
@@ -15,11 +16,9 @@ import subway.exception.ErrorCode;
 import subway.exception.SectionException;
 
 @Component
-public class PathFinder {
+public class JGraphTPathFinder implements PathFinder {
 
-    PathFinder() {
-    }
-
+    @Override
     public PathFinderResult findShortestPath(final List<Section> sections, final Station source, final Station target) {
         validateNotEmpty(sections);
 
