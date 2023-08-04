@@ -7,9 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,40 +23,47 @@ import subway.infra.jgrapht.JGraphTPathFinder;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {JGraphTPathFinder.class})
+@TestInstance(Lifecycle.PER_CLASS)
 @DisplayName("경로 조회 테스트")
 class PathFinderTest {
 
     @Autowired
     private PathFinder pathFinder;
 
-    Station 교대역;
-    Station 강남역;
-    Station 양재역;
-    Station 남부터미널역;
-    Section 교대_강남;
-    Section 강남_양재;
-    Section 교대_남부터미널;
-    Section 남부터미널_양재;
-    List<Section> sections;
+    private Station 교대역;
+    private Station 강남역;
+    private Station 양재역;
+    private Station 남부터미널역;
+    private Station 면목역;
+    private Station 상봉역;
+    private Section 교대_강남;
+    private Section 강남_양재;
+    private Section 교대_남부터미널;
+    private Section 남부터미널_양재;
+    private Section 면목_상봉;
+    private List<Section> sections;
 
-    @BeforeEach
+    @BeforeAll
     void setUp() {
         /**
          * 교대역    --- 1km ---    강남역
          * |                        |
          * 100km                    1km
          * |                        |
-         * 남부터미널역 --- 100km ---  양재역
+         * 남부터미널역 --- 100km ---  양재역            면목역 --- 1km --- 상봉역
          */
         교대역 = new Station(1L, "교대역");
         강남역 = new Station(2L, "강남역");
         양재역 = new Station(3L, "양재역");
         남부터미널역 = new Station(4L, "남부터미널역");
+        면목역 = new Station(5L, "면목역");
+        상봉역 = new Station(6L, "상봉역");
 
         교대_강남 = new Section(교대역, 강남역, 1);
         강남_양재 = new Section(강남역, 양재역, 1);
         교대_남부터미널 = new Section(교대역, 남부터미널역, 100);
         남부터미널_양재 = new Section(남부터미널역, 양재역, 100);
+        면목_상봉 = new Section(면목역, 상봉역, 1);
 
         sections = new ArrayList<>(List.of(교대_강남, 강남_양재, 교대_남부터미널, 남부터미널_양재));
     }
@@ -95,18 +104,6 @@ class PathFinderTest {
     @Test
     void notExistsShortestPath() {
         // given
-        /**
-         * 교대역    --- 1km ---    강남역
-         * |                        |
-         * 100km                    1km
-         * |                        |
-         * 남부터미널역 --- 100km ---  양재역            면목역 --- 1km --- 상봉역
-         */
-        final Station 면목역 = new Station(5L, "면목역");
-        final Station 상봉역 = new Station(6L, "상봉역");
-
-        final Section 면목_상봉 = new Section(면목역, 상봉역, 1);
-
         final List<Section> sections = new ArrayList<>(List.of(교대_강남, 강남_양재, 교대_남부터미널, 남부터미널_양재, 면목_상봉));
 
         // when & then
