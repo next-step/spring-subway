@@ -1,12 +1,8 @@
 package subway.domain;
 
-import subway.exception.ErrorCode;
-import subway.exception.InvalidRequestException;
-
 public class StationName {
 
     private static final int MAX_LENGTH = 255;
-    private static final String OUT_OF_RANGE_LENGTH_EXCEPTION_MESSAGE = "지하철 역명의 길이 제한을 초과했습니다.";
 
     private final String value;
 
@@ -18,8 +14,7 @@ public class StationName {
 
     private void validate(final String value) {
         if (value == null || isInvalidLength(value)) {
-            throw new InvalidRequestException(
-                    ErrorCode.INVALID_STATION_NAME_LENGTH, OUT_OF_RANGE_LENGTH_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException("지하철 역명의 길이 제한을 초과했습니다.");
         }
     }
 

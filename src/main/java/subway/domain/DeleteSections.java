@@ -6,8 +6,6 @@ import subway.exception.StationException;
 
 public class DeleteSections {
 
-    private static final String NOT_EXISTS_STATION_EXCEPTION_MESSAGE = "삭제할 역이 존재하지 않습니다.";
-
     private final Sections deleteSections;
 
     public DeleteSections(final List<Section> deleteSections) {
@@ -18,7 +16,7 @@ public class DeleteSections {
 
     private void validate(final List<Section> deleteSections) {
         if (deleteSections.isEmpty()) {
-            throw new StationException(ErrorCode.EMPTY_SECTION, NOT_EXISTS_STATION_EXCEPTION_MESSAGE);
+            throw new StationException(ErrorCode.EMPTY_SECTION, "삭제할 역이 존재하지 않습니다.");
         }
     }
 

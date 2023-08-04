@@ -24,6 +24,10 @@ public class Station {
         this.id = id;
     }
 
+    public boolean hasSmallerIdThan(Station other) {
+        return id < other.getId();
+    }
+
     public Long getId() {
         return id;
     }

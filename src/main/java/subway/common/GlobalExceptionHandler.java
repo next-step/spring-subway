@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import subway.dto.ErrorResponse;
 import subway.exception.CustomException;
 import subway.exception.ErrorCode;
-import subway.exception.InvalidRequestException;
+import subway.exception.FindPathException;
 import subway.exception.LineException;
 import subway.exception.SectionException;
 import subway.exception.StationException;
@@ -22,8 +22,7 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({LineException.class, SectionException.class, StationException.class,
-            InvalidRequestException.class})
+    @ExceptionHandler({LineException.class, SectionException.class, StationException.class, FindPathException.class})
     protected ResponseEntity<ErrorResponse> handleSectionException(final CustomException e) {
         log.error(e.getMessage());
 
@@ -33,10 +32,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getStatus()).body(errorResponse);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ErrorResponse handleIllegalArgumentException(final IllegalArgumentException e) {
+        log.info(e.getMessage());
+
+        return ErrorResponse.from(ErrorCode.INVALID_REQUEST.getCode(), e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    protected ErrorResponse handleDataIntegrityViolationException(
-            final DataIntegrityViolationException e) {
+    protected ErrorResponse handleDataIntegrityViolationException(final DataIntegrityViolationException e) {
         log.error(e.getMessage());
 
         return ErrorResponse.of(ErrorCode.DATABASE_EXISTS);

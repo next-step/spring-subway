@@ -6,8 +6,6 @@ import subway.exception.SectionException;
 
 public class Distance {
 
-    private static final String DISTANCE_POSITIVE_EXCEPTION_MESSAGE = "거리는 양수여야 합니다.";
-
     private final int value;
 
     public Distance(final int value) {
@@ -18,7 +16,7 @@ public class Distance {
 
     private void validatePositive(final int distance) {
         if (distance <= 0) {
-            throw new SectionException(ErrorCode.NOT_POSITIVE_DISTANCE, DISTANCE_POSITIVE_EXCEPTION_MESSAGE);
+            throw new SectionException(ErrorCode.NOT_POSITIVE_DISTANCE, "거리는 양수여야 합니다.");
         }
     }
 

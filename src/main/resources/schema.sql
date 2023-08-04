@@ -25,3 +25,25 @@ create table if not exists SECTION
     foreign key(down_station_id) references STATION(id),
     foreign key(line_id) references LINE(id) on delete cascade
 );
+
+create table if not exists PATH
+(
+    id bigint auto_increment not null,
+    source_id bigint not null,
+    target_id bigint not null,
+    distance int not null,
+    primary key(id),
+    foreign key(source_id) references STATION(id),
+    foreign key(target_id) references STATION(id)
+);
+
+create table if not exists DETAIL_PATH
+(
+    id bigint auto_increment not null,
+    path_id bigint not null,
+    waypoint_id bigint not null,
+    sequence int not null,
+    primary key(id),
+    foreign key(path_id) references PATH(id) on delete cascade,
+    foreign key(waypoint_id) references STATION(id)
+);

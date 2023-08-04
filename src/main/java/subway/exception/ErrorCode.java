@@ -25,6 +25,9 @@ public enum ErrorCode {
     NOT_FOUND_UP_STATION_TERMINAL("STA004"),
     EXISTS_STATION(400, "STA005", "이미 존재하는 지하철역입니다."),
 
+    NOT_FOUND_PATH(404, "PAT001", "경로가 존재하지 않습니다."),
+    SAME_SOURCE_AS_TARGET(400, "PAT001", "출발역과 도착역이 같습니다."),
+
     TOO_LONG_DISTANCE(400, "DST001", "새로운 구간의 거리는 기존 구간의 거리보다 짧아야 합니다."),
     NOT_POSITIVE_DISTANCE(400, "DST002", "거리는 양의 정수여야 합니다."),
 

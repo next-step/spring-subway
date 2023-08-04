@@ -3,6 +3,7 @@ package subway.helper;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.Map;
 import org.springframework.http.MediaType;
 
 public class RestAssuredHelper {
@@ -11,6 +12,16 @@ public class RestAssuredHelper {
         return RestAssured
                 .given().log().all()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(path)
+                .then().log().all()
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> get(final String path, final Map<String, Object> params) {
+        return RestAssured
+                .given().log().all()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .params(params)
                 .when().get(path)
                 .then().log().all()
                 .extract();

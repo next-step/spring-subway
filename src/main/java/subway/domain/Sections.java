@@ -12,13 +12,6 @@ import subway.exception.StationException;
 
 public class Sections {
 
-    private static final String INVALID_STATIONS_EXCEPTION_MESSAGE = "삽입 시 기준역은 한 개의 역이어야 합니다.";
-    private static final String EMPTY_EXCEPTION_MESSAGE = "최소 1개 이상의 구간이 있어야 합니다.";
-    private static final String AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE = "구간은 0개가 될 수 없습니다.";
-    private static final String CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE = "출발역에 해당되는 구간을 찾을 수 없습니다.";
-    private static final String TWO_MORE_START_STATION_EXCEPTION_MESSAGE = "상행 종점역이 두 개 이상입니다.";
-    private static final String CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE = "상행 종점역을 찾을 수 없습니다.";
-    private static final String CANNOT_FIND_OLD_SECTION = "기존 구간을 찾을 수 없습니다.";
     private static final int MIN_SECTIONS_COUNT = 2;
 
     private final List<Section> sections;
@@ -65,7 +58,7 @@ public class Sections {
                 .filter(section -> section.isSameUpStation(upStation))
                 .findFirst()
                 .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_DEPARTURE,
-                        CANNOT_FIND_START_SECTION_EXCEPTION_MESSAGE));
+                        "출발역에 해당되는 구간을 찾을 수 없습니다."));
     }
 
     private Station firstStation(final List<Section> sections) {
@@ -73,13 +66,13 @@ public class Sections {
         endUpStations.removeAll(createDownStations(sections));
 
         if (endUpStations.size() > 1) {
-            throw new StationException(ErrorCode.TOO_MANY_STATION, TWO_MORE_START_STATION_EXCEPTION_MESSAGE);
+            throw new StationException(ErrorCode.TOO_MANY_STATION, "상행 종점역이 두 개 이상입니다.");
         }
 
         return endUpStations.stream()
                 .findFirst()
                 .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_UP_STATION_TERMINAL,
-                        CANNOT_FIND_START_STATION_EXCEPTION_MESSAGE));
+                        "상행 종점역을 찾을 수 없습니다."));
     }
 
     private Section lastSection() {
@@ -99,7 +92,7 @@ public class Sections {
         return this.sections.stream()
                 .filter(section -> section.isSameUpStation(newSection) || section.isSameDownStation(newSection))
                 .findFirst()
-                .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_OLD_SECTION, CANNOT_FIND_OLD_SECTION));
+                .orElseThrow(() -> new SectionException(ErrorCode.NOT_FOUND_OLD_SECTION, "기존 구간을 찾을 수 없습니다."));
     }
 
     private Set<Station> createUpStations(final List<Section> sections) {
@@ -151,19 +144,19 @@ public class Sections {
 
     public void validateDelete() {
         if (sections.size() < MIN_SECTIONS_COUNT) {
-            throw new SectionException(ErrorCode.AT_LEAST_ONE_SECTION, AT_LEAST_ONE_SECTION_EXCEPTION_MESSAGE);
+            throw new SectionException(ErrorCode.AT_LEAST_ONE_SECTION, "구간은 0개가 될 수 없습니다.");
         }
     }
 
     private void validateEmpty() {
         if (this.sections.isEmpty()) {
-            throw new SectionException(ErrorCode.EMPTY_SECTION, EMPTY_EXCEPTION_MESSAGE);
+            throw new SectionException(ErrorCode.EMPTY_SECTION, "최소 1개 이상의 구간이 있어야 합니다.");
         }
     }
 
     private void validateExistOnlyOne(final boolean hasUpStation, final boolean hasDownStation) {
         if (hasUpStation == hasDownStation) {
-            throw new SectionException(ErrorCode.INVALID_SECTION, INVALID_STATIONS_EXCEPTION_MESSAGE);
+            throw new SectionException(ErrorCode.INVALID_SECTION, "삽입 시 기준역은 한 개의 역이어야 합니다.");
         }
     }
 

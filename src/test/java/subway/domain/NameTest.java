@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import subway.exception.InvalidRequestException;
 
 class NameTest {
 
@@ -25,7 +24,7 @@ class NameTest {
         final String name = "가".repeat(length);
 
         // when & then
-        assertThrows(InvalidRequestException.class, () -> new StationName(name));
+        assertThrows(IllegalArgumentException.class, () -> new StationName(name));
     }
 
     @DisplayName("노선명으로 사용할 이름 생성")
@@ -43,6 +42,6 @@ class NameTest {
         final String name = "가".repeat(length);
 
         // when & then
-        assertThrows(InvalidRequestException.class, () -> new LineName(name));
+        assertThrows(IllegalArgumentException.class, () -> new LineName(name));
     }
 }
