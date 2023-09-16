@@ -31,7 +31,6 @@ class LineServiceTest {
     @Autowired
     private SectionService sectionService;
 
-
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("delete from section");
