@@ -28,7 +28,7 @@ public class LineService {
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(line -> LineResponse.of(line, new Sections(line.getSections()).findAllStation()))
+                .map(line -> LineResponse.of(line, line.getSections().findAllStation()))
                 .collect(Collectors.toList());
     }
 
@@ -38,7 +38,7 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         Line persistLine = findLineById(id);
-        Sections sections = new Sections(persistLine.getSections());
+        Sections sections = persistLine.getSections();
         List<Station> allStation = sections.findAllStation();
         return LineResponse.of(persistLine, allStation);
     }

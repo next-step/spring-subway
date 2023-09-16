@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import subway.domain.Line;
+import subway.domain.Sections;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class LineDao {
                     rs.getLong("id"),
                     rs.getString("name"),
                     rs.getString("color"),
-                    sectionDao.findAllByLineId(rs.getLong("id"))
+                    new Sections(sectionDao.findAllByLineId(rs.getLong("id")))
             );
 
     public LineDao(JdbcTemplate jdbcTemplate, DataSource dataSource, SectionDao sectionDao) {

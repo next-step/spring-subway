@@ -34,4 +34,7 @@ public class Sections {
         return sections.size();
     }
 
+    public List<Section> getSectionList() {
+        return sections;
+    }
 }

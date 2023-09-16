@@ -1,13 +1,12 @@
 package subway.domain;
 
-import java.util.List;
 import java.util.Objects;
 
 public class Line {
     private Long id;
     private String name;
     private String color;
-    private List<Section> sections;
+    private Sections sections;
 
     public Line() {
     }
@@ -23,7 +22,7 @@ public class Line {
         this.color = color;
     }
 
-    public Line(Long id, String name, String color, List<Section> sections) {
+    public Line(Long id, String name, String color, Sections sections) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -42,7 +41,7 @@ public class Line {
         return color;
     }
 
-    public List<Section> getSections() {
+    public Sections getSections() {
         return sections;
     }
 
