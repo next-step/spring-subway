@@ -68,4 +68,50 @@ class PathFindServiceTest {
                 () -> assertThat(response.getStations().get(3).getId()).isEqualTo(부발역)
         );
     }
+
+
+    @DisplayName("이용거리가 10km 이내일 경우 운행 요금 테스트")
+    @Test
+    void basicChargeTest() {
+
+        var 강남역 = stationService.saveStation(new StationRequest("강남역")).getId();
+        var 양재역 = stationService.saveStation(new StationRequest("양재역")).getId();
+        var 신분당선 = lineService.saveLine(new LineRequest("신분당선", "red"));
+        sectionService.save(신분당선.getId(), new SectionRequest(강남역, 양재역, 3));
+
+        var response = findService.findShortPath(강남역, 양재역);
+
+        assertThat(response.getCharge()).isEqualTo(1250);
+    }
+
+    @DisplayName("이용거리가 10km~50km 사이일 경우 운행 요금 테스트")
+    @Test
+    void over10ChargeTest() {
+
+        var 강남역 = stationService.saveStation(new StationRequest("강남역")).getId();
+        var 부발역 = stationService.saveStation(new StationRequest("부발역")).getId();
+        var 경기광주역 = stationService.saveStation(new StationRequest("경기광주역")).getId();
+        var 경강선 = lineService.saveLine(new LineRequest("경강선", "blue"));
+        sectionService.save(경강선.getId(), new SectionRequest(강남역, 경기광주역, 15));
+        sectionService.save(경강선.getId(), new SectionRequest(경기광주역, 부발역, 8));
+
+        var response = findService.findShortPath(강남역, 부발역);
+
+        assertThat(response.getCharge()).isEqualTo(1550);
+    }
+
+    @DisplayName("이용거리가 50km 초과일 경우 운행 요금 테스트")
+    @Test
+    void over50ChargeTest() {
+
+        var 강남역 = stationService.saveStation(new StationRequest("강남역")).getId();
+        var 부발역 = stationService.saveStation(new StationRequest("부발역")).getId();
+        var 경기광주역 = stationService.saveStation(new StationRequest("경기광주역")).getId();
+        var 경강선 = lineService.saveLine(new LineRequest("경강선", "blue"));
+        sectionService.save(경강선.getId(), new SectionRequest(강남역, 경기광주역, 15));
+        sectionService.save(경강선.getId(), new SectionRequest(경기광주역, 부발역, 50));
+        var response = findService.findShortPath(강남역, 부발역);
+
+        assertThat(response.getCharge()).isEqualTo(2250);
+    }
 }
