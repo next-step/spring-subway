@@ -31,9 +31,6 @@ class LineServiceTest {
     @Autowired
     private SectionService sectionService;
 
-    @Autowired
-    private
-
 
     @BeforeEach
     void setUp() {
@@ -90,9 +87,9 @@ class LineServiceTest {
         assertAll(
                 () -> assertThat(response.getId()).isEqualTo(신분당선.getId()),
                 () -> assertThat(response.getColor()).isEqualTo(신분당선.getColor()),
-                () -> assertThat(response.getSections().get(0).getUpStation().getName()).isEqualTo(강남역.getName()),
-                () -> assertThat(response.getSections().get(0).getDownStation().getName()).isEqualTo(양재역.getName()),
-                () -> assertThat(response.getSections().get(0).getDistance()).isEqualTo(구간_추가.getDistance())
+                () -> assertThat(response.getSections().getSectionList().get(0).getUpStation().getName()).isEqualTo(강남역.getName()),
+                () -> assertThat(response.getSections().getSectionList().get(0).getDownStation().getName()).isEqualTo(양재역.getName()),
+                () -> assertThat(response.getSections().getSectionList().get(0).getDistance()).isEqualTo(구간_추가.getDistance())
         );
     }
 
