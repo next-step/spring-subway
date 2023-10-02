@@ -4,11 +4,11 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
-import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class DijkstraPathFinder implements PathFinder{
+public class DijkstraPathFinder implements PathFinder {
 
     private final WeightedMultigraph<Station, DefaultWeightedEdge> graph;
     private final DijkstraShortestPath<Station, DefaultWeightedEdge> dijkstraShortestPath;
@@ -22,7 +22,7 @@ public class DijkstraPathFinder implements PathFinder{
     private void drawGraph(List<Line> lines) {
         for (Line line : lines) {
             line.getSections().findAllStation().forEach(graph::addVertex);
-            line.getSections().getSectionList().forEach(
+            line.getSections().getSections().forEach(
                     section -> graph.setEdgeWeight(
                             graph.addEdge(section.getUpStation(), section.getDownStation()), section.getDistance()
                     )
@@ -41,23 +41,14 @@ public class DijkstraPathFinder implements PathFinder{
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("출발역과 도착역이 연결되어 있지 않습니다.");
         }
-        int charge = calculateCharge((int) path.getWeight());
-        return new Path(path.getVertexList(), (int) path.getWeight(), charge);
+        List<Station> vertexList = path.getVertexList();
+        List<Section> sections = new ArrayList<>();
+        for (int i = 0; i < vertexList.size(); i++) {
+            for (int j = i+1; j < vertexList.size(); j++) {
+                sections.add(new Section(vertexList.get(i), vertexList.get(j), (int) path.getWeight()));
+            }
+        }
+        return new Path(new Sections(sections));
     }
 
-    @Override
-    public int calculateCharge(int distance) {
-        int fare = 1250;
-        if (distance > 50) {
-            int over50 = distance - 50;
-            fare += ((over50 + 8 - 1) / 8) * 100;
-            distance = 50;
-        }
-
-        if (distance > 10) {
-            int over10 = distance -10;
-            fare += ((over10 + 5 - 1) / 5) * 100;
-        }
-        return fare;
-    }
 }

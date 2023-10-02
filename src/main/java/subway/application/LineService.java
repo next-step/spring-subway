@@ -3,12 +3,8 @@ package subway.application;
 import org.springframework.stereotype.Service;
 import subway.dao.LineDao;
 import subway.domain.Line;
-import subway.domain.Section;
-import subway.domain.Sections;
-import subway.domain.Station;
 import subway.dto.LineRequest;
 import subway.dto.LineResponse;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +24,7 @@ public class LineService {
     public List<LineResponse> findLineResponses() {
         List<Line> persistLines = findLines();
         return persistLines.stream()
-                .map(line -> LineResponse.of(line, line.getSections().findAllStation()))
+                .map(LineResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -38,9 +34,7 @@ public class LineService {
 
     public LineResponse findLineResponseById(Long id) {
         Line persistLine = findLineById(id);
-        Sections sections = persistLine.getSections();
-        List<Station> allStation = sections.findAllStation();
-        return LineResponse.of(persistLine, allStation);
+        return LineResponse.of(persistLine);
     }
 
 

@@ -46,6 +46,10 @@ public class Line {
         return sections;
     }
 
+    public List<Station> findAllStation() {
+        return sections.findAllStation();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
