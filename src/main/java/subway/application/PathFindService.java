@@ -31,7 +31,8 @@ public class PathFindService {
     }
 
     private PathResponse createPathResponse(Path path) {
-        return new PathResponse(createStationResponse(path.getStations()), path.getSections().getSections().get(0).getDistance(), path.getSections().getSections().get(0).getCharge());
+        int totalDistance = path.getTotalDistance();
+        return new PathResponse(createStationResponse(path.getStations()), totalDistance, path.getCharge(totalDistance));
     }
 
     public List<StationResponse> createStationResponse(List<Station> stations) {

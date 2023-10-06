@@ -37,4 +37,27 @@ public class Sections {
     public List<Section> getSections() {
         return sections;
     }
+
+    public int getTotalDistance() {
+        int distance = 0;
+        for (Section section : sections) {
+            distance += section.getDistance();
+        }
+        return distance;
+    }
+
+    public int calculateCharge(int distance) {
+        int fare = 1250;
+        if (distance > 50) {
+            int over50 = distance - 50;
+            fare += ((over50 + 8 - 1) / 8) * 100;
+            distance = 50;
+        }
+
+        if (distance > 10) {
+            int over10 = distance -10;
+            fare += ((over10 + 5 - 1) / 5) * 100;
+        }
+        return fare;
+    }
 }

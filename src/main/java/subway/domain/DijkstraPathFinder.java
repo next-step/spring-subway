@@ -43,10 +43,8 @@ public class DijkstraPathFinder implements PathFinder {
         }
         List<Station> vertexList = path.getVertexList();
         List<Section> sections = new ArrayList<>();
-        for (int i = 0; i < vertexList.size(); i++) {
-            for (int j = i+1; j < vertexList.size(); j++) {
-                sections.add(new Section(vertexList.get(i), vertexList.get(j), (int) path.getWeight()));
-            }
+        for (int i = 1; i < vertexList.size(); i++) {
+            sections.add(new Section(vertexList.get(i-1), vertexList.get(i), (int) dijkstraShortestPath.getPathWeight(vertexList.get(i-1), vertexList.get(i))));
         }
         return new Path(new Sections(sections));
     }
